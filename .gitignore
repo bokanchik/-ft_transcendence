@@ -1,1 +1,9 @@
-.env 
+# Environment variables
+.env
+
+# Node modules (can be installed with npm install)
+node_modules/
+
+.DS_Store
+.vscode/
+
