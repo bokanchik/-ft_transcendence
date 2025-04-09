@@ -1,0 +1,70 @@
+openapi: 3.0.3
+info: # API's general information
+  title: Ping-Pong API
+  version: 1.0.0
+  description: REST API for a ping-pong contest 
+
+paths:
+  /users: # Resource
+    post: # Action's HTTP method
+      summary: Subscribe to the website
+      description: |
+        Subscribe to the website with provided information:
+        username, email, password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: # Mandatory properties list
+                - username
+                - email
+                - password
+              properties:
+                username:
+                  type: string
+                  example: john
+                email:
+                  type: string
+                  example: john@example.com
+                password:
+                  type: string
+                  example: "1234abcd"
+      responses: # Action's response list
+        '201':
+          description: User has subscribed to the website
+          content: # Response body's definition
+            application/json: # Response body's media type
+              schema: # Response body's JSON shema
+                $ref: '#/components/schemas/user' # Reference to predefined schema
+              example:
+                id: "123e3-e87-12d3"
+                username: john
+                email: john@example.com
+
+# Reusable components
+components:
+  schemas:
+    user:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          writeOnly: true # Sensitive information, not returned in API responses
+  parameters:
+    userId:
+      name: userId
+      in: path
+      required: true
+      description: User's Reference
+      schema: 
+        type: string

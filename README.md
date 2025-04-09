@@ -1,7 +1,7 @@
 ## Project Structure
 
 ### Overview
-This is the directory structure of the Ping Pong game full-stack application. The project is organized into separate folders for the backend, frontend, configuration, tests, and Docker-related files.
+This is the directory structure of the Ping Pong game full-stack application. The project is organized into separate folders for the backend, frontend, tests, and Docker-related files.
 
 ```plaintext
 .
@@ -9,7 +9,7 @@ This is the directory structure of the Ping Pong game full-stack application. Th
 │   └── src/             
 │       ├── config/      # Configuration files (e.g., environment settings)
 │       ├── controllers/ # Controllers handling the backend logic
-│       ├── models/      # Database models (if applicable)
+│       ├── models/      # Database models
 │       ├── routes/      # API routes and endpoints
 │       ├── services/    # Business logic, including game and user services
 │       │   ├── game/    # Game-specific services
