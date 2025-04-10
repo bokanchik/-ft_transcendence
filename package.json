@@ -2,12 +2,12 @@
   "name": "ft_transcendence",
   "version": "1.0.0",
   "description": "This project is a website for the mighty Pong contest!",
-  "main": "app.js",
+  "main": "srcs/app.js",
   "type": "module",
   "scripts": {
     "test": "node --test test/**/*.test.js",
-    "start": "fastify start -l info app.js",
-    "dev": "fastify start -w -l info -P app.js"
+    "start": "fastify start -l info srcs/app.js",
+    "dev": "fastify start -w -l info -P srcs/app.js"
   },
   "repository": {
     "type": "git",
@@ -28,9 +28,10 @@
     "@fastify/sensible": "^6.0.0",
     "@fastify/swagger": "^9.4.2",
     "@fastify/swagger-ui": "^5.2.2",
+    "better-sqlite3": "^11.9.1",
     "fastify": "^5.2.2",
     "fastify-cli": "^7.4.0",
-    "fastify-plugin": "^5.0.0",
+    "fastify-plugin": "^5.0.1",
     "yamljs": "^0.3.0"
   }
 }

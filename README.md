@@ -5,7 +5,7 @@ This is the directory structure of the Ping Pong game full-stack application. Th
 
 ```plaintext
 .
-├── backend/             # Backend source code for the application
+├── server/             # Backend source code for the application
 │   └── src/             
 │       ├── config/      # Configuration files (e.g., environment settings)
 │       ├── controllers/ # Controllers handling the backend logic
@@ -15,7 +15,7 @@ This is the directory structure of the Ping Pong game full-stack application. Th
 │       │   ├── game/    # Game-specific services
 │       │   └── user/    # User-related services
 │       └── utils/       # Utility functions used throughout the backend
-├── frontend/            # Frontend source code for the application
+├── client/            # Frontend source code for the application
 │   └── src/             
 │       ├── assets/      # Static assets like images, fonts, and icons
 │       │   ├── images/  # Image files used in the UI
