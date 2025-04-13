@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test test/**/*.test.js",
-    "start": "fastify start -l info srcs/app.js",
+    "start": "node srcs/app.js",
     "dev": "fastify start -w -l info -P srcs/app.js"
   },
   "repository": {
@@ -29,7 +29,7 @@
     "@fastify/swagger": "^9.4.2",
     "@fastify/swagger-ui": "^5.2.2",
     "better-sqlite3": "^11.9.1",
-    "fastify": "^5.2.2",
+    "fastify": "^5.3.0",
     "fastify-cli": "^7.4.0",
     "fastify-plugin": "^5.0.1",
     "install": "^0.13.0",

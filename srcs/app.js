@@ -34,18 +34,23 @@ await server.register(swaggerUi, {
 });
 
 // Declare a route
-export default async function (server, opts) {
-    server.get('/ping', async (req, reply) => {
-      return { pong: true };
-    });
-  }
+server.get('/ping', async (req, res) => {
+    return { pong: true };
+})
 
 // Run the server
-server.listen({ port: 3001, host: '0.0.0.0' }, function (err, address) {
-    if (err) {
+const start = async () => {
+    try {
+        await server.listen({
+            port: 3002,
+          //  host: '0.0.0.0', => when deploying to a Docker !
+            listenTextResolver: (address) => { return `Server is listening on ${address}`}
+        })
+            .then((address) => { server.log.info(`Docs available at ${address}/openapi`)});
+    } catch (err) {
         server.log.error(err)
         process.exit(1)
     }
-    server.log.info(`Server is listening on ${address}`);
-    server.log.info(`Docs available at ${address}/openapi`);
-})
+}
+
+start();

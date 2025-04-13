@@ -14,6 +14,7 @@ This is the directory structure of the Ping Pong game full-stack application. Th
 │       ├── services/    # Business logic, including game and user services
 │       │   ├── game/    # Game-specific services
 │       │   └── user/    # User-related services
+        │   └── tournement/    # Tournements-related services
 │       └── utils/       # Utility functions used throughout the backend
 ├── client/            # Frontend source code for the application
 │   └── src/             
