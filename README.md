@@ -8,14 +8,14 @@ The backend follows a **microservices architecture** using Docker containers, wi
 
 ```bash
 app/
-├── docker-compose.yml         # Docker Compose configuration
+├── docker-compose.yml         
 ├── getaway/                   # API Gateway using Nginx
-│   ├── Dockerfile             # Gateway Dockerfile
-│   ├── index.html             # Static landing page
+│   ├── Dockerfile             
+│   ├── index.html             
 │   └── nginx/                 
-│       ├── default.conf       # Nginx site configuration
-│       └── nginx.conf         # Main Nginx configuration
-└── services/                  # Microservices
+│       ├── default.conf       
+│       └── nginx.conf         
+└── services/                  
     ├── game/                  # Game service
     │   ├── Dockerfile
     │   ├── game_service.js
