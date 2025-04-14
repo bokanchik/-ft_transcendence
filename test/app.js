@@ -43,7 +43,7 @@ const start = async () => {
     try {
         await server.listen({
             port: 3002,
-          //  host: '0.0.0.0', => when deploying to a Docker !
+            host: '0.0.0.0',// => when deploying to a Docker !
             listenTextResolver: (address) => { return `Server is listening on ${address}`}
         })
             .then((address) => { server.log.info(`Docs available at ${address}/openapi`)});

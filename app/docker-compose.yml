@@ -1,34 +1,23 @@
 services:
-  nginx:
-    container_name: nginx
-    build: ./services/nginx
+  getaway:
+    container_name: getaway
+    build: ./getaway
     ports:
       - "8080:80"
     restart: always
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
       - user_service
       - game_service
-    networks:
-      - web
 
   user_service:
-    build: ./services/ugiser
-    expose:
-      - "3002"
+    build: ./services/user
+    ports:
+      - "3002:3002"
     restart: always
-    networks:
-      - web
+
   
   game_service:
     build: ./services/game
-    expose:
-      - "3001"
+    ports:
+      - "3001:3001"
     restart: always
-    networks:
-      - web
-
-networks:
-  web:
-    driver: bridge
