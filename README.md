@@ -26,23 +26,3 @@ app/
         ├── user_service.js
         ├── package.json
         └── package-lock.json
-        
-</details> <details> <summary><code>./openapi/</code> - API Documentation</summary>
-Houses the OpenAPI specifications for documenting and testing your REST APIs.
-
-</details> <details> <summary><code>./test/</code> - Tests</summary>
-Contains test cases for the microservices and possibly integration tests.
-
-</details> <details> <summary><code>./node_modules/</code></summary>
-Installed Node.js dependencies (automatically generated).
-
-</details> <details> <summary><code>Makefile</code></summary>
-Common commands to build, start, or manage the containers and services.
-
-</details> <details> <summary><code>README.md</code></summary>
-You're reading it!
-
-</details> <details> <summary><code>TODO.md</code></summary>
-List of tasks, bugs, or enhancements to be addressed.
-
-</details> ```
