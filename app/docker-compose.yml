@@ -1,9 +1,9 @@
 services:
-  getaway:
+  getaway: # entrypoint for services
     container_name: getaway
     build: ./getaway
     ports:
-      - "8080:80"
+      - "443:443"
     restart: always
     depends_on:
       - user_service
@@ -15,9 +15,14 @@ services:
       - "3002:3002"
     restart: always
 
-  
   game_service:
     build: ./services/game
     ports:
       - "3001:3001"
     restart: always
+
+  openapi_service:
+    build: ./services/openapi
+    ports:
+      - "8080:8080" # for internal use
+    

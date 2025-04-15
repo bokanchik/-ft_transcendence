@@ -1,0 +1,17 @@
+{
+    "name": "openapi-service",
+    "version": "1.0.0",
+    "description": "Microservice for openapi documentation",
+    "main": "openapi_service.js",
+    "type": "module",
+    "scripts": {
+        "start": "node openapi_service.js"
+    },
+    "dependencies": {
+        "express": "^4.18.4",
+        "fastify": "^4.0.0",
+        "@fastify/swagger": "^8.9.1",
+        "@fastify/swagger-ui": "^1.8.0",
+        "yamljs": "^0.3.0"
+    }
+}
