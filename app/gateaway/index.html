@@ -1,36 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>king-pong</title>
   <style>
-    body, html {
-      height: 100%;
-      margin: 0;
+    body {
       font-family: Arial, sans-serif;
-    }
-
-    .bgimg {
-      height: 100%;
+      margin: 0;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      background-color: #f5f5f5;
     }
 
-    .middle {
+    .container {
       text-align: center;
     }
 
-    h1 {
-      font-size: 48px;
-      color: #333;
+    button {
+      padding: 15px 30px;
+      margin: 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background-color: #007BFF;
+      color: white;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
     }
   </style>
 </head>
 <body>
-  <div class="bgimg">
-    <div class="middle">
-      <h1>Nginx API Gateway</h1>
-    </div>
+  <div class="container">
+    <h1>Welcome to the King-Pong game! 🏓</h1>
+    <button onclick="location.href='/api/users'">Create Profile</button>
+    <button onclick="location.href='/api/games'">Play</button>
   </div>
 </body>
 </html>

@@ -8,6 +8,6 @@ RUN npm install
 
 COPY . /app
 
-EXPOSE 3001
+EXPOSE 3003
 
 CMD ["node", "./user_service.js"]

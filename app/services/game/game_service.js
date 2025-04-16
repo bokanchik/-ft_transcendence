@@ -6,9 +6,19 @@ const server = Fastify({
 
 // !!dans le dossier "/routes" folder server.register(routes) par exemple
 server.get('/', async (req, res) => {
-    return "It's a game service!";
+    res.type('text/html').send(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Game</title>
+        </head>
+        <body>
+          <h1>Welcome to the Game Service</h1>
+          <p>This is the game page!</p>
+        </body>
+      </html>
+    `);
 })
-
 const start = async () => {
     try {
         await server.listen({

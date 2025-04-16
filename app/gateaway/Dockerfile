@@ -16,6 +16,6 @@ RUN mkdir -p /etc/nginx/ssl && \
     -keyout /etc/nginx/ssl/api_nginx.key \
     -subj "/C=FR/ST=IDF/L=Paris/O=KingPong/OU=Dev/CN=king-pong.com"
 
-EXPOSE 443
+EXPOSE 8443
 
 CMD ["nginx", "-g", "daemon off;"]
