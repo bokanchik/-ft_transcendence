@@ -1,21 +1,15 @@
-FROM nginx:alpine
+FROM alpine:3.20
 
-RUN apk update && apk add openssl
+RUN apk update && apk add --no-cache \
+        nginx \
+        openssl \
+        procps
 
-COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY conf/nginx.conf /etc/nginx/nginx.conf
+COPY conf/default.conf /etc/nginx/conf.d/default.conf
 
-COPY nginx/nginx.conf /etc/nginx/nginx.conf
+COPY --chmod=0755 tools/script.sh /usr/local/bin/
 
-COPY nginx/api_json_errors.conf /etc/nginx/
+EXPOSE 443
 
-COPY index.html /usr/share/nginx/html/index.html
-
-RUN mkdir -p /etc/nginx/ssl && \
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-    -out /etc/nginx/ssl/api_nginx.crt \
-    -keyout /etc/nginx/ssl/api_nginx.key \
-    -subj "/C=FR/ST=IDF/L=Paris/O=KingPong/OU=Dev/CN=king-pong.com"
-
-EXPOSE 8443
-
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/usr/local/bin/script.sh"]

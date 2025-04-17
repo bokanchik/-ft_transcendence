@@ -1,13 +1,12 @@
-FROM node:latest
+FROM node:22
 
 WORKDIR /app
 
-COPY package.json ./
-
+COPY package*.json ./
 RUN npm install
 
-COPY . /app
+COPY . .
 
-EXPOSE 3003
+EXPOSE 3000
 
-CMD ["node", "./user_service.js"]
+CMD ["npm", "start"]
