@@ -1,0 +1,39 @@
+services:
+  gateaway: # entrypoint for services
+    container_name: gateaway
+    build: ./gateaway
+    ports:
+      - "8443:8443"
+    restart: always
+    depends_on:
+      - user_service
+      - game_service
+    networks:
+      - app-network
+
+  user_service:
+    build: ./services/user
+    ports:
+      - "3003:3003"
+    restart: always
+    networks:
+      - app-network
+
+  game_service:
+    build: ./services/game
+    ports:
+      - "3001:3001"
+    restart: always
+    networks:
+      - app-network
+
+  openapi_service:
+    build: ./services/openapi
+    ports:
+      - "8080:8080" # for internal use
+    networks:
+      - app-network
+    
+networks:
+  app-network:
+    driver: bridge
