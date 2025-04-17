@@ -9,7 +9,7 @@ The backend follows a **microservices architecture** using Docker containers, wi
 ```bash
 app/
 ├── docker-compose.yml         
-├── getaway/                   # API Gateway using Nginx
+├── gateaway/                   # API Gateway using Nginx
 │   ├── Dockerfile             
 │   ├── index.html             
 │   └── nginx/                 
