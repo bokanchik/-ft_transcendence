@@ -6,7 +6,7 @@ build:
 	docker compose -f app/docker-compose.yml build
 
 up:
-	docker compose -f app/docker-compose.yml up -d
+	docker compose -f app/docker-compose.yml up
 
 down:
 	docker compose -f app/docker-compose.yml down
