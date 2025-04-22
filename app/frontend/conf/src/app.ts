@@ -158,18 +158,17 @@ async function router() {
   }
 
   const path = window.location.pathname;
-  console.log("Current path:", path); // Debug: Vérifiez la route actuelle
+  console.log("Current path:", path);
   const handler = routes[path];
 
   if (!handler) {
     console.warn("No route found for:", path);
   }
 
-  app.innerHTML = '<p class="text-center p-8">Loading...</p>'; // Indicateur de chargement
-
+  app.innerHTML = '<p class="text-center p-8">Loading...</p>';
   if (handler) {
     try {
-        const content = await handler(); // Gère les fonctions sync et async
+        const content = await handler(); // Gère les fonctions sync et async (await)
         app.innerHTML = ''; // Vide avant d'ajouter
         app.appendChild(content);
     } catch (error) {
@@ -178,7 +177,6 @@ async function router() {
     }
   } else {
     console.warn("No route found for:", path);
-    // Tu pourrais afficher une page 404 ici
     app.innerHTML = `
         <div class="text-center p-8">
             <h1 class="text-2xl font-bold mb-4">404 - Not Found</h1>
@@ -207,6 +205,7 @@ window.addEventListener('popstate', router);
 
 // Gérer le chargement initial de la page
 document.addEventListener('DOMContentLoaded', () => {
+
     //Attacher les gestionnaires de clics aux liens présents initialement (si besoin)
     // document.body.addEventListener('click', (event) => {
     //     const target = event.target as HTMLElement;
