@@ -4,26 +4,14 @@ const server = Fastify({
     logger:true
 })
 
-// !!dans le dossier "/routes" folder server.register(routes) par exemple
-server.get('/', async (req, res) => {
-    res.type('text/html').send(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>User Profile</title>
-        </head>
-        <body>
-          <h1>Welcome to the User Service</h1>
-          <p>This is the profile creation page!</p>
-        </body>
-      </html>
-    `);
-})
-
-
-// server.get('/profile', async (req, res) => {
-//     return { user: "Sasha" };
-// });
+// Register the route for user login
+server.post('/auth/login', async (request, reply) => {
+    const { username, password } = request.body;
+  
+    if (!username || !password) {
+      return reply.status(400).send({ message: 'Username and password are required' });
+    }
+});
 
 const start = async () => {
     try {

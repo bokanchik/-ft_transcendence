@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>King-Pong</title>
+    <title>Login Button</title>
 
     <!-- Import Google Font -->
     <link
@@ -11,7 +11,9 @@
       rel="stylesheet"
     />
 
-    <link rel="stylesheet" href="/src/style.css" />
+    <link rel="stylesheet" href="/src/main.css" />
+    <script type="module" crossorigin src="/assets/index-CYjduu09.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-hmfKpoLX.css">
   </head>
   <body class="h-screen bg-gray-900 relative">
     <!-- ENG button (top left) -->
@@ -32,7 +34,6 @@
     <div class="flex flex-col justify-center items-center h-full space-y-12">
       <!-- LOG IN button -->
       <button
-        id="login-btn"
         data-layer="Button start"
         data-state="inactive"
         class="w-80 h-32 p-8 rounded-[100px] shadow-lg outline outline-2 outline-offset-[-2px] outline-red-900 inline-flex justify-center items-center gap-5 overflow-hidden bg-transparent transition-all duration-200 hover:bg-[rgb(255,0,0)] active:bg-[rgb(0,255,0)] active:scale-95"
@@ -45,9 +46,8 @@
         </span>
       </button>
 
-      <!-- Register button -->
+      <!-- REGISTER button -->
       <button
-        id="register-btn"
         data-layer="Button start"
         data-state="inactive"
         class="w-80 h-32 p-8 rounded-[100px] shadow-lg outline outline-2 outline-offset-[-2px] outline-red-900 inline-flex justify-center items-center gap-5 overflow-hidden bg-transparent transition-all duration-200 hover:bg-[rgb(0,0,255)] active:bg-[rgb(255,255,0)] active:scale-95"
@@ -59,10 +59,7 @@
           REGISTER
         </span>
       </button>
-
-      <!-- Placeholder for dynamic error/success message -->
-      <div id="login-status" class="text-center text-red-500 mt-4"></div>
     </div>
-    <script type="module" src="./src/main.ts"></script>
+
   </body>
 </html>

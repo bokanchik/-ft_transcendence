@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Log In - King-Pong</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body class="h-screen bg-gray-900 flex justify-center items-center">
+    <div class="w-full max-w-sm bg-white p-8 rounded-lg shadow-md">
+      <h2 class="text-center text-3xl font-bold text-gray-900">Log In</h2>
+      <form id="login-form" class="space-y-4 mt-6">
+        <div>
+          <label for="username" class="block text-gray-700">Username</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            class="w-full p-3 border border-gray-300 rounded-md"
+            placeholder="Enter your username"
+            required
+          />
+        </div>
+        <div>
+          <label for="password" class="block text-gray-700">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="w-full p-3 border border-gray-300 rounded-md"
+            placeholder="Enter your password"
+            required
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full p-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all"
+        >
+          Log In
+        </button>
+      </form>
+    </div>
+
+    <script type="module" src="/src/login.js"></script>
+  </body>
+</html>
