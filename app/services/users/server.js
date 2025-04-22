@@ -25,7 +25,7 @@ fastify.register(userRoutes);
 const start = async () => {
   await initializeDb(); // Initialiser la base de données
   try {
-    await fastify.listen({ port: 3000, host: '0.0.0.0' });
+    await fastify.listen({ port: 4000, host: '0.0.0.0' });
     console.log('Serveur démarré sur https://KingPong.fr');
   } catch (err) {
     fastify.log.error(err);

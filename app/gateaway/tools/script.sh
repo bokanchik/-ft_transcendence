@@ -12,7 +12,7 @@ if [ ! -f "$SSL_KEY" ] || [ ! -f "$SSL_CERT" ]; then
 		-newkey rsa:2048 \
 		-keyout ${SSL_KEY} \
 		-out ${SSL_CERT} \
-		-subj "/C=FR/ST=IDF/L=Paris/O=42/OU=42/CN=${DOMAIN_NAME}"
+		-subj "/C=FR/ST=IDF/L=Paris/O=KingPong/OU=Dev/CN=${DOMAIN_NAME}"
 fi
 
 exec nginx -g "daemon off;"

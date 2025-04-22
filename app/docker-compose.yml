@@ -4,20 +4,25 @@ services:
     build: ./gateaway
     ports:
       - "8443:8443"
+      - "443:443"
+      - "80:80"
     restart: always
+    env_file: .env
     depends_on:
       - user_service
       - game_service
     networks:
-      - app-network
+      - tranet
 
   user_service:
-    build: ./services/user
+    build: ./services/users
+    container_name: users
     ports:
-      - "3003:3003"
+      - "4000:4000"
+    env_file: .env
     restart: always
     networks:
-      - app-network
+      - tranet
 
   game_service:
     build: ./services/game
@@ -25,15 +30,25 @@ services:
       - "3001:3001"
     restart: always
     networks:
-      - app-network
+      - tranet
 
   openapi_service:
     build: ./services/openapi
     ports:
       - "8080:8080" # for internal use
     networks:
-      - app-network
+      - tranet
     
 networks:
-  app-network:
+  tranet:
+    name: tranet
     driver: bridge
+
+volumes:
+  userdb:
+    name: userdb
+    driver: local
+    driver_opts:
+      device: /home/${LOGNAME}/data/userdb
+      o: bind
+      type: none
