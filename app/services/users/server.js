@@ -1,10 +1,12 @@
 import Fastify from 'fastify';
 import { initializeDb } from './config/dbConfig.js';
 import userRoutes from './routes/users.js';
+import authRoutes from './routes/auth.js'
 
 const fastify = Fastify({ logger: true });
 
 fastify.register(userRoutes);
+fastify.register(authRoutes);
 
 const start = async () => {
   await initializeDb(); // Initialiser la base de données

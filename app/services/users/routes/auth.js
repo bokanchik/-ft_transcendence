@@ -1,5 +1,5 @@
 import { registerHandler, loginHandler } from '../handlers/authHandlers.js';
-import { registerSchema, loginSchema } from '../schemas/authSchemas.js';
+import { registerSchema, loginSchema } from '../schemas/userSchemas.js';
 
 async function authRoute (fastify, options) {
   fastify.post('/api/auth/register', { schema: registerSchema }, registerHandler);

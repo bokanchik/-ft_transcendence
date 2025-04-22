@@ -17,7 +17,7 @@
     </div>
   </div>
 
-  <!-- 'defer' est important pour que le script s'exécute après le parsing du HTML -->
+  <div id="app"></div>
   <script src="js/app.js" defer></script>
 </body>
 </html>
