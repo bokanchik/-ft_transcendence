@@ -1,7 +1,9 @@
 services:
   gateaway: # entrypoint for services
     container_name: gateaway
-    build: ./gateaway
+    build:
+      context: .
+      dockerfile: gateaway/Dockerfile
     ports:
       - "8443:8443"
     restart: always
@@ -34,14 +36,6 @@ services:
     networks:
       - app-network
 
-  frontend:
-    build:
-      context: ./frontend
-    ports:
-      - "8081:8081"
-    networks:
-      - app-network
-    
 networks:
   app-network:
     driver: bridge
