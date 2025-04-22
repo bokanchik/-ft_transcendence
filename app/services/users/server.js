@@ -2,24 +2,8 @@ import Fastify from 'fastify';
 import { initializeDb } from './config/dbConfig.js';
 import userRoutes from './routes/users.js';
 
-// Static test
-import fastifyStatic from '@fastify/static';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-// __dirname équivalent en ESModules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const fastify = Fastify({ logger: true });
 
-// Servir les fichiers statiques (ex: SPA)
-fastify.register(fastifyStatic, {
-  root: path.join(__dirname, 'public'),
-  wildcard: false,
-});
-
-// Fin du Static - reg routes
 fastify.register(userRoutes);
 
 const start = async () => {

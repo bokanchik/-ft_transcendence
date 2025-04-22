@@ -1,0 +1,9 @@
+/* frontend/src/input.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tu peux ajouter des styles personnalisés ici si nécessaire */
+body {
+  @apply bg-gray-100; /* Exemple: Fond gris clair pour le body */
+}
