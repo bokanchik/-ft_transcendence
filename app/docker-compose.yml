@@ -8,9 +8,21 @@ services:
       - "80:80"
     restart: always
     env_file: .env
+    volumes:
+      - frontdata:/usr/share/nginx/html:ro
     depends_on:
       - user_service
       - game_service
+      - frontend
+    networks:
+      - tranet
+
+  frontend:
+    container_name: frontend
+    build: ./frontend
+    restart: always
+    volumes:
+      - frontdata:/app/dist
     networks:
       - tranet
 
@@ -45,6 +57,9 @@ networks:
     driver: bridge
 
 volumes:
+  frontdata:
+    name: frontdata
+
   userdb:
     name: userdb
     driver: local

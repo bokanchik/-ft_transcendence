@@ -10,7 +10,6 @@ COPY conf/default.conf /etc/nginx/conf.d/default.conf
 COPY conf/api_json_errors.conf /etc/nginx/api_json_errors.conf
 
 #COPY index.html /usr/share/nginx/html/index.html
-COPY frontend/dist/ /usr/share/nginx/html/
 
 COPY --chmod=0755 tools/script.sh /usr/local/bin/
 

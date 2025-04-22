@@ -88,13 +88,8 @@ function displayUsers(users: User[]): void {
 document.addEventListener('DOMContentLoaded', async () => {
   const userListElement = document.getElementById('user-list');
   if (userListElement) {
-    // Afficher un message de chargement initial
     userListElement.innerHTML = '<p class="text-center text-gray-500">Loading users...</p>';
   }
-
-  // Récupérer les utilisateurs
   const users = await fetchUsers();
-
-  // Afficher les utilisateurs
   displayUsers(users);
 });

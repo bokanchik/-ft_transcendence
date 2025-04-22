@@ -1,4 +1,4 @@
-// frontend/tailwind.config.js
+const colors = require('tailwindcss/colors')
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -6,7 +6,11 @@ module.exports = {
     "./dist/**/*.html"    // Scanne TOUS les html dans dist
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        gray: colors.gray,
+      }
+    },
   },
   plugins: [],
 }
