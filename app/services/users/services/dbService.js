@@ -1,31 +1,80 @@
 // Logique métier (authentification, validation, etc.), sans reply
 import * as userModel from '../models/userModel.js';
-//import * as passwordUtils from '../utils/pswdUtils.js';
-//import * as jwtUtils from '../utils/jwtUtils.js';
+import * as passwordUtils from '../utils/pswdUtils.js';
+import * as jwtUtils from '../utils/jwtUtils.js';
 
-export async function registerUser(username, email, password, display_name, reply) {
-  const existingUser = await userModel.getUserByUsername(username);
-  if (existingUser) {
-    throw new Error('Username already exists');
-  }
-  const hashedPassword = await passwordUtils.hashPassword(password);
-  const user = await userModel.createUser({ username, email, password_hash: hashedPassword, display_name });
-  return user;
+export async function registerUser(username, email, password, display_name) {
+	console.log('Registering a new user');
+	const existingUser = await userModel.getUserByUsernameFromDb(username);
+	if (existingUser) {
+		throw new Error('Username already exists');
+	}
+	const existingEmail = await userModel.getUserByEmailFromDb(email);
+	if (existingEmail) {
+		throw new Error('Email already exists');
+	}
+	if (!passwordUtils.isValidPassword(password)) {
+		throw new Error('Password must be at least 8 characters long and contain at least one number and one special character');
+	}
+	const hashedPassword = await passwordUtils.hashPassword(password);
+	const newUser = await userModel.createUser({ username, email, password_hash: hashedPassword, display_name });
+	if (newUser) {
+		return newUser;
+	} else {
+		throw new Error('Failed to create user');
+	}
 }
 
 export async function loginUser({ username, password }) {
-  const user = await userModel.getUserByUsername(username);
-  if (!user || !(await passwordUtils.comparePassword(password, user.password_hash))) {
-    throw new Error('Invalid credentials');
-  }
-  const token = jwtUtils.generateJWT({ id: user.id, username: user.username });
-  return token;
-}
-
-export async function getAllUsers() {
-  return await userModel.getAllUsersFromDb();
+	console.log('Logging in user');
+	const user = await userModel.getUserByUsername(username);
+	if (!user || !(await passwordUtils.comparePassword(password, user.password_hash))) {
+		throw new Error('Invalid credentials');
+	}
+	const token = jwtUtils.generateJWT({ id: user.id, username: user.username });
+	return token;
 }
 
 export async function createUserAccount(userData) {
-  return await userModel.insertUserIntoDb(userData);
+	console.log('Creating a new user account');
+	const { username, email, password, display_name } = userData;
+	const existingUser = await userModel.getUserByUsername(username);
+	if (existingUser) {
+		throw new Error('Username already exists');
+	}
+	const hashedPassword = await passwordUtils.hashPassword(password);
+	const newUser = await userModel.createUser({ username, email, password_hash: hashedPassword, display_name });
+	return newUser;
+}
+
+export async function getAllUsers() {
+	console.log('Fetching all users from the database');
+	return await userModel.getAllUsersFromDb();
+}
+
+export async function getUserById(userId) {
+	console.log('Fetching user by ID from the database');
+	const user = await userModel.getUserByIdFromDb(userId);
+	if (!user) {
+		throw new Error('User not found');
+	}
+	return user;
+}
+
+export async function getUserByUsername(username) {
+	console.log('Fetching user by username from the database');
+	const user = await userModel.getUserByUsernameFromDb(username);
+	if (!user) {
+		throw new Error('User not found');
+	}
+	return user;
+}
+
+export async function getUserMatches(userId) {
+	console.log('Fetching user matches from the database');
+	const matches = await userModel.getUserMatchesFromDb(userId);
+	if (!matches) {
+		throw new Error('No matches found for this user');
+	}
+	return matches;
 }

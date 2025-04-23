@@ -5,7 +5,6 @@ export async function registerHandler(req, reply) {
   try {
     const { username, email, password, display_name } = req.body;
     const user = await registerUser({ username, email, password, display_name });
-
     return reply.send({ message: 'User registered successfully', userId: user.id });
   } catch (err) {
     if (err.message === 'Username already exists') {

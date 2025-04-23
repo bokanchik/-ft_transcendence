@@ -2,7 +2,7 @@ import { HomePage } from './components/homePage.js';
 import { UsersPage } from './pages/userPage.js';
 
 // 1. Conteneur où le contenu de la page sera injecté
-const appContainer = document.getElementById('app');
+const appContainer = document.getElementById('main');
 
 // 2. Fonctions simples pour générer le contenu de chaque "page"
 function renderNotFoundPage(): HTMLElement {

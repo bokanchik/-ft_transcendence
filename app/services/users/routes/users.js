@@ -1,11 +1,9 @@
-import { getUsersHandler, postUserHandler } from '../handlers/userHandlers.js';
+import { getUsersHandler, postUserHandler, getUserMeHandler, getUserMeMatchHandler } from '../handlers/userHandlers.js';
 import { postUserSchema } from '../schemas/userSchemas.js';
 
-async function userRoutes(fastify, options) {
-  fastify.get('/api/users/', getUsersHandler);
-
-  fastify.post('/api/users', { schema: postUserSchema }, postUserHandler);
+export default async function userRoutes(fastify, options) {
+	fastify.get('/users/', getUsersHandler);
+	fastify.get('/users/me', getUserMeHandler);
+	fastify.get('/users/me/matches', getUserMeMatchHandler);
+	fastify.post('/users', { schema: postUserSchema }, postUserHandler);
 }
-
-export default userRoutes;
-
