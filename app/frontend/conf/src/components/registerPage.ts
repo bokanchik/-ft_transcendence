@@ -13,8 +13,9 @@ export function RegisterPage(): HTMLElement {
         <form id="register-form">
             <div class="mb-4">
                 <label for="username" class="block text-gray-700 text-sm font-bold mb-2">Username</label>
-                <input type="text" id="username" name="username" required minlength="3"
+                <input type="text" id="username" name="username" required minlength="3" maxlength="20"
                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <p class="text-xs text-gray-600 mt-1">3 to 20 characters.</p>
             </div>
             <div class="mb-4">
                 <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
@@ -23,18 +24,19 @@ export function RegisterPage(): HTMLElement {
             </div>
              <div class="mb-4">
                 <label for="display_name" class="block text-gray-700 text-sm font-bold mb-2">Display Name</label>
-                <input type="text" id="display_name" name="display_name" required minlength="1"
+                <input type="text" id="display_name" name="display_name" required minlength="3" maxlength="20"
                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <p class="text-xs text-gray-600 mt-1">3 to 20 characters.</p>
             </div>
             <div class="mb-4">
                 <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-                <input type="password" id="password" name="password" required minlength="8"
+                <input type="password" id="password" name="password" required minlength="8" maxlength="100"
                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                 <p class="text-xs text-gray-600 mt-1">Minimum 8 characters.</p>
+                 <p class="text-xs text-gray-600 mt-1">8 to 100 characters.</p>
             </div>
              <div class="mb-6">
                 <label for="confirm_password" class="block text-gray-700 text-sm font-bold mb-2">Confirm Password</label>
-                <input type="password" id="confirm_password" name="confirm_password" required minlength="8"
+                <input type="password" id="confirm_password" name="confirm_password" required minlength="8" maxlength="100"
                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline">
             </div>
             <div class="mb-6">

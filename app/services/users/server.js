@@ -19,8 +19,6 @@ async function buildUser() {
 				reply.code(401).send({ error: 'Unauthorized' });
 			}
 		});
-		// fastify.register(userRoutes);
-		// fastify.register(authRoutes);
 		fastify.register(userRoutes, { prefix: '/api' });
 		fastify.register(authRoutes, { prefix: '/api' });
 		return fastify;

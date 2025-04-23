@@ -17,8 +17,11 @@ export async function registerHandler(req, reply) {
 
 export async function loginHandler(req, reply) {
 	try {
-		const token = await loginUser(req.body);
-		return reply.send({ token });
+		const user = await loginUser(req.body);
+        const tokenPayload = { id: user.id, username: user.username };
+        const token = req.server.jwt.sign(tokenPayload);
+        console.log(`Token generated for ${user.username}`);
+		return reply.send({ message: 'Connexion accepted', token: token, user: user });
 	} catch (err) {
 		console.error('Error while login:', err);
 		if (err.message.includes('Invalid credentials')) {
@@ -27,4 +30,3 @@ export async function loginHandler(req, reply) {
 		return reply.status(500).send({ error: 'Erreur serveur', detail: err.message });
 	}
 }
-
