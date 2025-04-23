@@ -8,15 +8,8 @@ export async function registerUser(username, email, password, display_name, repl
   if (existingUser) {
     throw new Error('Username already exists');
   }
-
   const hashedPassword = await passwordUtils.hashPassword(password);
-  const user = await userModel.createUser({
-    username,
-    email,
-    password_hash: hashedPassword,
-    display_name
-  });
-
+  const user = await userModel.createUser({ username, email, password_hash: hashedPassword, display_name });
   return user;
 }
 
@@ -25,12 +18,7 @@ export async function loginUser({ username, password }) {
   if (!user || !(await passwordUtils.comparePassword(password, user.password_hash))) {
     throw new Error('Invalid credentials');
   }
-
-  const token = jwtUtils.generateJWT({
-    id: user.id,
-    username: user.username
-  });
-
+  const token = jwtUtils.generateJWT({ id: user.id, username: user.username });
   return token;
 }
 

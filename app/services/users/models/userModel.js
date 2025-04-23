@@ -26,7 +26,6 @@ export async function insertUserIntoDb({ username, email, password_hash, display
     `INSERT INTO users (username, email, password_hash, display_name, avatar_url) VALUES (?, ?, ?, ?, ?)`,
     [username, email, password_hash, display_name, avatar_url]
   );
-
   return {
     id: result.lastID,
     username,
