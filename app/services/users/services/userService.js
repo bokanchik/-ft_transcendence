@@ -27,7 +27,7 @@ export async function registerUser(username, email, password, display_name) {
 
 export async function loginUser({ username, password }) {
 	console.log('Logging in user');
-	const user = await userModel.getUserByUsername(username);
+	const user = await userModel.getUserByUsernameFromDb(username);
 	if (!user || !(await passwordUtils.comparePassword(password, user.password_hash))) {
 		throw new Error('Invalid credentials');
 	}
@@ -38,7 +38,8 @@ export async function loginUser({ username, password }) {
 export async function createUserAccount(userData) {
 	console.log('Creating a new user account');
 	const { username, email, password, display_name } = userData;
-	const existingUser = await userModel.getUserByUsername(username);
+	const existingUser = await userModel.getUserByUsernameFromDb(username);
+	console.log(existingUser);
 	if (existingUser) {
 		throw new Error('Username already exists');
 	}
