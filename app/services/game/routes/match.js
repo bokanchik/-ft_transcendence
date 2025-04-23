@@ -1,10 +1,8 @@
-import { getMatchHandler, postMatchHandler } from '../handlers/matchHandlers.js'
-import postMatchSchema from '../schemas/matchSchemas.js'
+import { createMatchHandler } from '../handlers/matchHandlers.js'
+import { createMatchSchema } from '../schemas/matchSchemas.js'
 
 async function matchRoutes(fastify, options) {
-   // fastify.get('/api/game/1v1/match', getMatchHandler)
-
-   fastify.post('/api/game/1v1/match', { schema: postMatchSchema }, postMatchHandler)
+   fastify.post('/api/game/1v1/match', { schema: createMatchSchema }, createMatchHandler)
 }
 
 export default matchRoutes;

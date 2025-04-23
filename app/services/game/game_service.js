@@ -1,7 +1,7 @@
 import Fastify from 'fastify'
-import initializeDb from './config/dbConfig.js'
+import db from './database/connectDB.js'
 import matchRoutes from './routes/match.js'
-import settingsRoutes from './routes/settings.js'
+// import settingsRoutes from './routes/settings.js'
 
 const fastify = Fastify({
     logger:true
@@ -9,12 +9,12 @@ const fastify = Fastify({
 
 // declare routes for game service
 fastify.register(matchRoutes);
-fastify.register(settingsRoutes);
+
+// fastify.register(settingsRoutes); ?
 
 const start = async () => {
   try {
-    const dbConnected = await initializeDb();
-    if (!dbConnected){
+    if (!db) {
       throw new Error('Failed to connect to the database');
     }
     await fastify.listen({
