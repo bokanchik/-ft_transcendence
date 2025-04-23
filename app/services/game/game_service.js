@@ -1,32 +1,28 @@
 import Fastify from 'fastify'
+import initializeDb from './config/dbConfig.js'
+import matchRoutes from './routes/match.js'
+import settingsRoutes from './routes/settings.js'
 
-const server = Fastify({
+const fastify = Fastify({
     logger:true
 });
 
-// !!dans le dossier "/routes" folder server.register(routes) par exemple
-server.get('/', async (req, res) => {
-    res.type('text/html').send(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Game</title>
-        </head>
-        <body>
-          <h1>Welcome to the Game Service</h1>
-          <p>This is the game page!</p>
-        </body>
-      </html>
-    `);
-})
+// declare routes for game service
+fastify.register(matchRoutes);
+fastify.register(settingsRoutes);
+
 const start = async () => {
-    try {
-        await server.listen({
-            port: 3001,
-            host: '0.0.0.0',// => when deploying to a Docker !
-        })
+  try {
+    const dbConnected = await initializeDb();
+    if (!dbConnected){
+      throw new Error('Failed to connect to the database');
+    }
+    await fastify.listen({
+      port: 3001,
+      host: '0.0.0.0',
+    })
     } catch (err) {
-        server.log.error(err);
+        fastify.log.error(err);
         process.exit(1);
     }
 };
