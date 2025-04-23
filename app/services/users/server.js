@@ -1,5 +1,5 @@
 import Fastify from 'fastify';
-import { initializeDb } from './config/dbConfig.js';
+import { initializeDb } from './utils/dbConfig.js';
 import { registerJWTPlugin } from './utils/jwtUtils.js'
 import userRoutes from './routes/users.js';
 import authRoutes from './routes/auth.js'

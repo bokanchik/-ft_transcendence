@@ -1,5 +1,5 @@
 // Accès à la base de données (getUserByUsername, etc.)
-import { getDb } from '../config/dbConfig.js';
+import { getDb } from '../utils/dbConfig.js';
 
 export async function getAllUsersFromDb() {
 	const db = getDb();
