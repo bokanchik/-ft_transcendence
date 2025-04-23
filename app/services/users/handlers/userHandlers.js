@@ -31,12 +31,16 @@ export async function getUserMeMatchHandler(req, reply) {
 	}
 }
 
-export async function postUserHandler(req, reply) {
+export async function registerHandler(req, reply) {
 	try {
 		const newUser = await createUserAccount(req.body);
-		return newUser;
+		return reply.status(201).send(newUser);
 	} catch (err) {
-		console.error('Erreur lors de la création de l’utilisateur:', err);
-		return reply.status(500).send({ error: 'Erreur lors de l’insertion', });
+		console.error('Erreur lors de l’inscription:', err);
+		if (err.message.includes('already exists')) {
+			return reply.status(409).send({ error: err.message });
+		} else {
+			return reply.status(400).send({ error: err.message });
+		}
 	}
 }
