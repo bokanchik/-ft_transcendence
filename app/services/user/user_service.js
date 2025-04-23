@@ -5,13 +5,13 @@ const server = Fastify({
 })
 
 // Register the route for user login
-server.post('/auth/login', async (request, reply) => {
-    const { username, password } = request.body;
+// server.post('/auth/login', async (request, reply) => {
+//     const { username, password } = request.body;
   
-    if (!username || !password) {
-      return reply.status(400).send({ message: 'Username and password are required' });
-    }
-});
+//     if (!username || !password) {
+//       return reply.status(400).send({ message: 'Username and password are required' });
+//     }
+// });
 
 const start = async () => {
     try {

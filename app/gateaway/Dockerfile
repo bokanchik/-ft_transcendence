@@ -1,11 +1,3 @@
-FROM node:20 AS frontend-builder
-
-WORKDIR /app
-
-COPY ../frontend ./
-
-RUN npm install && npm install --save-dev postcss-cli && npm run build
-
 FROM nginx:alpine
 
 RUN apk update && apk add openssl
@@ -20,7 +12,8 @@ RUN mkdir -p /etc/nginx/ssl && \
     -keyout /etc/nginx/ssl/api_nginx.key \
     -subj "/C=FR/ST=IDF/L=Paris/O=KingPong/OU=Dev/CN=king-pong.com"
 
-COPY --from=frontend-builder /app/dist /usr/share/nginx/html
+# Copie brute du dossier src dans nginx
+COPY ../frontend/src /usr/share/nginx/html
 
 EXPOSE 8443
 

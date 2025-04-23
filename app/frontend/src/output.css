@@ -1,0 +1,156 @@
+/*! tailwindcss v4.1.4 | MIT License | https://tailwindcss.com */
+@layer properties;
+.absolute {
+  position: absolute;
+}
+.relative {
+  position: relative;
+}
+.z-10 {
+  z-index: 10;
+}
+.container {
+  width: 100%;
+}
+.flex {
+  display: flex;
+}
+.inline-flex {
+  display: inline-flex;
+}
+.h-full {
+  height: 100%;
+}
+.h-screen {
+  height: 100vh;
+}
+.flex-col {
+  flex-direction: column;
+}
+.items-center {
+  align-items: center;
+}
+.justify-center {
+  justify-content: center;
+}
+.justify-start {
+  justify-content: flex-start;
+}
+.overflow-hidden {
+  overflow: hidden;
+}
+.rounded-\[50px\] {
+  border-radius: 50px;
+}
+.rounded-\[100px\] {
+  border-radius: 100px;
+}
+.bg-transparent {
+  background-color: transparent;
+}
+.text-center {
+  text-align: center;
+}
+.font-\[\'Walter_Turncoat\'\] {
+  font-family: 'Walter Turncoat';
+}
+.tracking-\[2px\] {
+  --tw-tracking: 2px;
+  letter-spacing: 2px;
+}
+.tracking-\[5px\] {
+  --tw-tracking: 5px;
+  letter-spacing: 5px;
+}
+.outline {
+  outline-style: var(--tw-outline-style);
+  outline-width: 1px;
+}
+.outline-2 {
+  outline-style: var(--tw-outline-style);
+  outline-width: 2px;
+}
+.outline-offset-\[-2px\] {
+  outline-offset: -2px;
+}
+.transition-all {
+  transition-property: all;
+  transition-timing-function: var(--tw-ease, ease);
+  transition-duration: var(--tw-duration, 0s);
+}
+.duration-200 {
+  --tw-duration: 200ms;
+  transition-duration: 200ms;
+}
+.hover\:bg-\[rgb\(0\,0\,255\)\] {
+  &:hover {
+    @media (hover: hover) {
+      background-color: rgb(0,0,255);
+    }
+  }
+}
+.hover\:bg-\[rgb\(255\,0\,0\)\] {
+  &:hover {
+    @media (hover: hover) {
+      background-color: rgb(255,0,0);
+    }
+  }
+}
+.active\:scale-95 {
+  &:active {
+    --tw-scale-x: 95%;
+    --tw-scale-y: 95%;
+    --tw-scale-z: 95%;
+    scale: var(--tw-scale-x) var(--tw-scale-y);
+  }
+}
+.active\:bg-\[rgb\(0\,255\,0\)\] {
+  &:active {
+    background-color: rgb(0,255,0);
+  }
+}
+.active\:bg-\[rgb\(255\,255\,0\)\] {
+  &:active {
+    background-color: rgb(255,255,0);
+  }
+}
+@property --tw-tracking {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-outline-style {
+  syntax: "*";
+  inherits: false;
+  initial-value: solid;
+}
+@property --tw-duration {
+  syntax: "*";
+  inherits: false;
+}
+@property --tw-scale-x {
+  syntax: "*";
+  inherits: false;
+  initial-value: 1;
+}
+@property --tw-scale-y {
+  syntax: "*";
+  inherits: false;
+  initial-value: 1;
+}
+@property --tw-scale-z {
+  syntax: "*";
+  inherits: false;
+  initial-value: 1;
+}
+@layer properties {
+  @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
+    *, ::before, ::after, ::backdrop {
+      --tw-tracking: initial;
+      --tw-outline-style: solid;
+      --tw-duration: initial;
+      --tw-scale-x: 1;
+      --tw-scale-y: 1;
+      --tw-scale-z: 1;
+    }
+  }
+}
