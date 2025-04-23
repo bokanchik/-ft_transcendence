@@ -1,30 +1,30 @@
 // Gère les requêtes Fastify (req, reply)
-import { registerUser, loginUser } from '../services/userService.js';
+import { createUserAccount, loginUser } from '../services/userService.js';
 
 export async function registerHandler(req, reply) {
-  try {
-    const { username, email, password, display_name } = req.body;
-    const user = await registerUser({ username, email, password, display_name });
-    return reply.send({ message: 'User registered successfully', userId: user.id });
-  } catch (err) {
-    if (err.message === 'Username already exists') {
-      return reply.status(400).send({ error: err.message });
-    }
-    return reply.status(500).send({ error: 'Erreur serveur', detail: err.message });
-  }
+	try {
+		const newUser = await createUserAccount(req.body);
+		return reply.status(201).send(newUser);
+	} catch (err) {
+		console.error('Error while inscription:', err);
+		if (err.message.includes('already exists')) {
+			return reply.status(409).send({ error: err.message });
+		} else {
+			return reply.status(400).send({ error: err.message });
+		}
+	}
 }
 
 export async function loginHandler(req, reply) {
-  const { username, password } = req.body;
-
-  try {
-    const token = await loginUser({ username, password });
-    return reply.send({ token });
-  } catch (err) {
-    if (err.message === 'Invalid credentials') {
-      return reply.status(401).send({ error: err.message });
-    }
-    return reply.status(500).send({ error: 'Erreur serveur', detail: err.message });
-  }
+	try {
+		const token = await loginUser(req.body);
+		return reply.send({ token });
+	} catch (err) {
+		console.error('Error while login:', err);
+		if (err.message.includes('Invalid credentials')) {
+			return reply.status(401).send({ error: err.message });
+		}
+		return reply.status(500).send({ error: 'Erreur serveur', detail: err.message });
+	}
 }
 
