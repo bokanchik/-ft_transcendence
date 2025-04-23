@@ -1,4 +1,5 @@
 import { HomePage } from './components/homePage.js';
+import { LoginPage } from './components/loginPage.js'
 import { UsersPage } from './pages/userPage.js';
 
 // 1. Conteneur où le contenu de la page sera injecté
@@ -21,6 +22,7 @@ function renderNotFoundPage(): HTMLElement {
 const routes: { [key: string]: () => HTMLElement | Promise<HTMLElement>} = {
     '/': HomePage,
     '/users': UsersPage,
+    '/login': LoginPage,
 };
 
 // 4. La fonction principale du routeur
