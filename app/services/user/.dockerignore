@@ -1,4 +1,0 @@
-# ignore git history
-.git
-# ignore cache directory
-.DS_Store

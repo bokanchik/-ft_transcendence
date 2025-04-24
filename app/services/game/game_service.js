@@ -16,9 +16,10 @@ fastify.register(matchRoutes, {
 
 const start = async () => {
   try {
-    if (!db) {
-      throw new Error('Failed to connect to the database');
-    }
+    await db;
+    // if (!db) {
+    //   throw new Error('Failed to connect to the database');
+    // }
     await fastify.listen({
       port: 3001,
       host: '0.0.0.0',
