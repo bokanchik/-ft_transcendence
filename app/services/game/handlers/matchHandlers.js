@@ -13,7 +13,7 @@ export async function getMatchHandler(req, reply) {
     }
 
     //reply.set('Content-Type', 'application/json');
-    let sql = "SELECT * FROM matches WHERE id = ?";
+    let sql = "SELECT * FROM matches WHERE id = ?"; // refaire avec model
     try {
         db.get(sql, [matchId], (err, row) => {
             if (err) {

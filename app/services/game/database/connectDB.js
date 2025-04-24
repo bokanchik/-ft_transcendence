@@ -18,8 +18,11 @@ let matchTable = `
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         player1_id TEXT NOT NULL,
         player2_id TEXT NOT NULL,
+        player1_score INTEGER NOT NULL,
+        player2_score INTEGER NOT NULL,
         winner_id TEXT,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        match_end_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         state TEXT NOT NULL CHECK (state IN ('pending', 'active', 'finished'))
     )`;
 

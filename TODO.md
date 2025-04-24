@@ -1,34 +1,17 @@
-# ✅ Microservices TODO List
-
-Cette liste regroupe les tâches à accomplir pour construire l'architecture backend du projet **Ping Pong Game** en microservices, avec Nginx comme API Gateway.
+# ✅ TODO List
 
 ---
 
 ## 📌 Tâches initiales
 
-- [✅] Rajouter un service OpenAPI  
-- [✅] Changer le HTTP pour du HTTPS  
-- [ ] Bien comprendre les tâches de l’API Gateway (Nginx)  
-- [ ] Comprendre comment implémenter le framework frontend  
-- [ ] Regarder comment tester les APIs des microservices  
-- [ ] Regarder comment fonctionne le routage avec Fastify + méthode microservice  
-- [ ] Faire un routage propre même si provisoire  
-
----
-
-## 🧱 Architecture et séparation des services
-
-- [ ] Définir précisément les responsabilités de chaque microservice (ex : `user`, `game`, etc.)
-- [ ] Documenter les entrées/sorties (contrats API) entre services
-- [ ] Créer un dossier `shared/` si besoin pour du code commun (types, utilitaires...)
-
----
-
-## 🔁 Communication entre microservices
-
-- [ ] Tester la communication REST entre services
-- [ ] Gérer les erreurs de communication (timeouts, 500, etc.)
-- [ ] Ajouter un système de retry ou fallback simple en cas d’échec d’un service
+- [ ] Merge avec la branche d'Arthur (ajuster les versions, bien verifier tous les configs)
+- [ ] Pino-Pretty pour le debbuging avec Fastify
+- [ ] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde)
+- [ ] La gestion d'erreurs 
+- [ ] JWT --> decorate + options dans les routes
+- [ ] Implementer les models pour les appels a la base de donnee
+- [ ] POST a Artur avec les donnees du match
+- [ ] Regarder a quoi sert le web-socket
 
 ---
 
@@ -43,7 +26,6 @@ Cette liste regroupe les tâches à accomplir pour construire l'architecture bac
 
 - [ ] Écrire des tests unitaires pour chaque microservice
 - [ ] Ajouter des tests d’intégration (communication entre services)
-- [ ] Faire un test de charge simple (ex : Artillery ou K6)
 
 ---
 
@@ -51,22 +33,14 @@ Cette liste regroupe les tâches à accomplir pour construire l'architecture bac
 
 - [ ] Ajouter des logs lisibles et structurés dans chaque service
 - [ ] Exposer des métriques simples (nombre de requêtes, erreurs, latence)
-- [ ] Vérifier les logs de tous les containers via `docker logs` ou outil tiers
 - [ ] Ajouter des healthchecks pour chaque microservice
 
 ---
 
 ## 📝 Documentation & outils
 
-- [ ] Générer automatiquement la documentation API via OpenAPI
-- [ ] Ajouter des scripts dans `Makefile` pour lancer, arrêter ou tester les services
 - [ ] Écrire une documentation claire pour le démarrage local et les contributions
 
 ---
-
-## 🌱 Pour aller plus loin (bonus)
-
-- [ ] Gérer la configuration avec des variables d’environnement
-- [ ] Automatiser les déploiements avec CI/CD (GitHub Actions ou GitLab CI)
 
 ---
