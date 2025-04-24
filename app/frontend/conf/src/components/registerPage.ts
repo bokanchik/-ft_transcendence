@@ -1,14 +1,13 @@
-// src/components/registerPage.ts
 import { attemptRegister, RegisterCredentials, RegisterSuccessData } from '../services/authService.js';
 
 export function RegisterPage(): HTMLElement {
-    const container = document.createElement('div');
-    container.className = 'bg-gradient-to-r from-blue-500 to-purple-600 flex justify-center items-center min-h-screen p-8';
+	const container = document.createElement('div');
+	container.className = 'bg-gradient-to-r from-blue-500 to-purple-600 flex justify-center items-center min-h-screen p-8';
 
-    const formContainer = document.createElement('div');
-    formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';
+	const formContainer = document.createElement('div');
+	formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';
 
-    formContainer.innerHTML = `
+	formContainer.innerHTML = `
         <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">Register</h2>
         <form id="register-form">
             <div class="mb-4">
@@ -51,7 +50,7 @@ export function RegisterPage(): HTMLElement {
                 </button>
             </div>
         </form>
-        <div id="register-message" class="mt-4 text-center text-sm"></div> <!-- Pour les messages -->
+        <div id="register-message" class="mt-4 text-center text-sm"></div>
         <div class="mt-6 text-center">
           <a href="/" data-link class="text-blue-600 hover:text-blue-800 text-sm">
             Back to Home
@@ -63,108 +62,108 @@ export function RegisterPage(): HTMLElement {
         </div>
     `;
 
-    container.appendChild(formContainer);
+	container.appendChild(formContainer);
 
-    // --- Logique du formulaire d'inscription ---
-    const form = container.querySelector('#register-form') as HTMLFormElement;
-    const usernameInput = container.querySelector('#username') as HTMLInputElement;
-    const emailInput = container.querySelector('#email') as HTMLInputElement;
-    const displayNameInput = container.querySelector('#display_name') as HTMLInputElement;
-    const passwordInput = container.querySelector('#password') as HTMLInputElement;
-    const confirmPasswordInput = container.querySelector('#confirm_password') as HTMLInputElement;
-    const avatarUrlInput = container.querySelector('#avatar_url') as HTMLInputElement;
-    const messageDiv = container.querySelector('#register-message') as HTMLDivElement;
-    const registerButton = container.querySelector('#register-button') as HTMLButtonElement;
+	// --- Logique du formulaire d'inscription ---
+	const form = container.querySelector('#register-form') as HTMLFormElement;
+	const usernameInput = container.querySelector('#username') as HTMLInputElement;
+	const emailInput = container.querySelector('#email') as HTMLInputElement;
+	const displayNameInput = container.querySelector('#display_name') as HTMLInputElement;
+	const passwordInput = container.querySelector('#password') as HTMLInputElement;
+	const confirmPasswordInput = container.querySelector('#confirm_password') as HTMLInputElement;
+	const avatarUrlInput = container.querySelector('#avatar_url') as HTMLInputElement;
+	const messageDiv = container.querySelector('#register-message') as HTMLDivElement;
+	const registerButton = container.querySelector('#register-button') as HTMLButtonElement;
 
-    form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        messageDiv.textContent = ''; // Clear previous messages
-        messageDiv.className = 'mt-4 text-center text-sm'; // Reset style
+	form.addEventListener('submit', async (event) => {
+		event.preventDefault();
+		messageDiv.textContent = ''; // Clear previous messages
+		messageDiv.className = 'mt-4 text-center text-sm'; // Reset style
 
-        const username = usernameInput.value.trim();
-        const email = emailInput.value.trim();
-        const displayName = displayNameInput.value.trim();
-        const password = passwordInput.value; // No trim on password
-        const confirmPassword = confirmPasswordInput.value;
-        const avatarUrl = avatarUrlInput.value.trim();
+		const username = usernameInput.value.trim();
+		const email = emailInput.value.trim();
+		const displayName = displayNameInput.value.trim();
+		const password = passwordInput.value; // No trim on password
+		const confirmPassword = confirmPasswordInput.value;
+		const avatarUrl = avatarUrlInput.value.trim();
 
-        // --- Validation côté client (basique) ---
-        if (!username || !email || !displayName || !password || !confirmPassword) {
-            messageDiv.textContent = 'Please fill in all required fields.';
-            messageDiv.className = 'mt-4 text-center text-sm text-red-600';
-            return;
-        }
-        if (password !== confirmPassword) {
-            messageDiv.textContent = 'Passwords do not match.';
-            messageDiv.className = 'mt-4 text-center text-sm text-red-600';
-            passwordInput.value = ''; // Clear passwords
-            confirmPasswordInput.value = '';
-            return;
-        }
-        if (password.length < 8) {
-            messageDiv.textContent = 'Password must be at least 8 characters long.';
-             messageDiv.className = 'mt-4 text-center text-sm text-red-600';
-            return;
-        }
-        // Simple check for avatar URL format if provided
-        if (avatarUrl && !isValidHttpUrl(avatarUrl)) {
-             messageDiv.textContent = 'Avatar URL must be a valid HTTP/HTTPS URL.';
-             messageDiv.className = 'mt-4 text-center text-sm text-red-600';
-             return;
-        }
+		// --- Validation côté client (basique) ---
+		if (!username || !email || !displayName || !password || !confirmPassword) {
+			messageDiv.textContent = 'Please fill in all required fields.';
+			messageDiv.className = 'mt-4 text-center text-sm text-red-600';
+			return;
+		}
+		if (password !== confirmPassword) {
+			messageDiv.textContent = 'Passwords do not match.';
+			messageDiv.className = 'mt-4 text-center text-sm text-red-600';
+			passwordInput.value = ''; // Clear passwords
+			confirmPasswordInput.value = '';
+			return;
+		}
+		if (password.length < 8) {
+			messageDiv.textContent = 'Password must be at least 8 characters long.';
+			messageDiv.className = 'mt-4 text-center text-sm text-red-600';
+			return;
+		}
+		// Simple check for avatar URL format if provided
+		if (avatarUrl && !isValidHttpUrl(avatarUrl)) {
+			messageDiv.textContent = 'Avatar URL must be a valid HTTP/HTTPS URL.';
+			messageDiv.className = 'mt-4 text-center text-sm text-red-600';
+			return;
+		}
 
-        // --- Appel à l'API ---
-        messageDiv.textContent = 'Attempting registration...';
-        messageDiv.className = 'mt-4 text-center text-sm text-gray-600';
-        registerButton.disabled = true;
-        registerButton.textContent = 'Registering...';
+		// --- Appel à l'API ---
+		messageDiv.textContent = 'Attempting registration...';
+		messageDiv.className = 'mt-4 text-center text-sm text-gray-600';
+		registerButton.disabled = true;
+		registerButton.textContent = 'Registering...';
 
-        const credentials: RegisterCredentials = {
-            username,
-            email,
-            password,
-            display_name: displayName,
-        };
-        // Only add avatar_url if it's not empty
-        if (avatarUrl) {
-            credentials.avatar_url = avatarUrl;
-        }
+		const credentials: RegisterCredentials = {
+			username,
+			email,
+			password,
+			display_name: displayName,
+		};
+		// Only add avatar_url if it's not empty
+		if (avatarUrl) {
+			credentials.avatar_url = avatarUrl;
+		}
 
-        const registeredUser = await attemptRegister(credentials);
+		const registeredUser = await attemptRegister(credentials);
 
-        registerButton.disabled = false; // Re-enable button
-        registerButton.textContent = 'Register';
+		registerButton.disabled = false; // Re-enable button
+		registerButton.textContent = 'Register';
 
-        if (registeredUser) {
-            // Succès (message déjà affiché par alert dans attemptRegister)
-            messageDiv.textContent = `Registration successful for ${registeredUser.username}! Redirecting to login...`;
-            messageDiv.className = 'mt-4 text-center text-sm text-green-600';
-            form.reset(); // Clear the form fields
+		if (registeredUser) {
+			// Succès (message déjà affiché par alert dans attemptRegister)
+			messageDiv.textContent = `Registration successful for ${registeredUser.username}! Redirecting to login...`;
+			messageDiv.className = 'mt-4 text-center text-sm text-green-600';
+			form.reset(); // Clear the form fields
 
-            // Rediriger vers la page de connexion après un délai
-            setTimeout(() => {
-                 window.location.href = '/login'; // Ou utilisez votre système de routage: router.navigate('/login');
-            }, 2000); // Délai de 2 secondes
+			// Rediriger vers la page de connexion après un délai
+			setTimeout(() => {
+				window.location.href = '/login'; // Ou utilisez votre système de routage: router.navigate('/login');
+			}, 2000); // Délai de 2 secondes
 
-        } else {
-            // Échec (message déjà affiché par alert)
-            messageDiv.textContent = 'Registration failed. Please check the details and try again.'; // Message générique post-alert
-            messageDiv.className = 'mt-4 text-center text-sm text-red-600';
-            passwordInput.value = ''; // Clear password fields on failure
-            confirmPasswordInput.value = '';
-        }
-    });
+		} else {
+			// Échec (message déjà affiché par alert)
+			messageDiv.textContent = 'Registration failed. Please check the details and try again.'; // Message générique post-alert
+			messageDiv.className = 'mt-4 text-center text-sm text-red-600';
+			passwordInput.value = ''; // Clear password fields on failure
+			confirmPasswordInput.value = '';
+		}
+	});
 
-    return container;
+	return container;
 }
 
 // Helper function for basic URL validation
 function isValidHttpUrl(string: string): boolean {
-  let url;
-  try {
-    url = new URL(string);
-  } catch (_) {
-    return false;
-  }
-  return url.protocol === "http:" || url.protocol === "https:";
+	let url;
+	try {
+		url = new URL(string);
+	} catch (_) {
+		return false;
+	}
+	return url.protocol === "http:" || url.protocol === "https:";
 }

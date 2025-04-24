@@ -4,7 +4,8 @@ import { registerJWTPlugin } from './utils/jwtUtils.js'
 import userRoutes from './routes/users.js';
 import authRoutes from './routes/auth.js'
 
-const fastify = Fastify({ logger: true });
+const fastify = Fastify({ logger: { level: 'debug' }, }); // level info
+// const fastify = Fastify({ logger: { level: 'info', transport: { target: 'pino-pretty',options: { colorize: true, translateTime: 'SYS:standard', }, }, }, })
 
 async function buildUser() {
 	try {

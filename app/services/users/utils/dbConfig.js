@@ -18,18 +18,17 @@ export async function initializeDb() {
 			filename: dbPath,
 			driver: sqlite3.Database
 		});
-		console.log('Base de données connectée !');
-
+		console.log('Database connected!');
 		const initSQLPath = path.join(__dirname, '..', 'db', 'init.sql');
 		if (fs.existsSync(initSQLPath)) {
 			const sql = fs.readFileSync(initSQLPath, 'utf-8');
 			await db.exec(sql);
-			console.log('Base de données initialisée.');
+			console.log('Database initialized.');
 		} else {
-			console.warn('init.sql non trouvé. Base non initialisée.');
+			console.warn('init.sql not found. Database not initialized.');
 		}
 	} catch (err) {
-		console.error('Erreur lors de la connexion à la base de données:', err.message);
+		console.error('Error while connecting to the database:', err.message);
 	}
 };
 

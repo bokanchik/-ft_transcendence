@@ -18,9 +18,9 @@ export async function registerHandler(req, reply) {
 export async function loginHandler(req, reply) {
 	try {
 		const user = await loginUser(req.body);
-        const tokenPayload = { id: user.id, username: user.username };
-        const token = req.server.jwt.sign(tokenPayload);
-        console.log(`Token generated for ${user.username}`);
+		const tokenPayload = { id: user.id, username: user.username };
+		const token = req.server.jwt.sign(tokenPayload);
+		console.log(`Token generated for ${user.username}`);
 		return reply.send({ message: 'Connexion accepted', token: token, user: user });
 	} catch (err) {
 		console.error('Error while login:', err);
