@@ -1,26 +1,6 @@
 // Logique métier (authentification, validation, etc.), sans reply
 import * as userModel from '../models/userModel.js';
 import * as passwordUtils from '../utils/pswdUtils.js';
-import * as jwtUtils from '../utils/jwtUtils.js';
-
-export async function registerUser(username, email, password, display_name) {
-	console.log('Registering a new user');
-	const existingUser = await userModel.getUserByUsernameFromDb(username);
-	if (existingUser) {
-		throw new Error('Username already exists');
-	}
-	const existingEmail = await userModel.getUserByEmailFromDb(email);
-	if (existingEmail) {
-		throw new Error('Email already exists');
-	}
-	const hashedPassword = await passwordUtils.hashPassword(password);
-	const newUser = await userModel.createUser({ username, email, password_hash: hashedPassword, display_name });
-	if (newUser) {
-		return newUser;
-	} else {
-		throw new Error('Failed to create user');
-	}
-}
 
 export async function loginUser({ username, password }) {
 	console.log('Logging in user');
@@ -38,6 +18,10 @@ export async function createUserAccount(userData) {
 	const existingUser = await userModel.getUserByUsernameFromDb(username);
 	if (existingUser) {
 		throw new Error('Username already exists');
+	}
+	const existingEmail = await userModel.getUserByEmailFromDb(email);
+	if (existingEmail) {
+		throw new Error('Email already exists');
 	}
 	const hashedPassword = await passwordUtils.hashPassword(password);
 	const newUser = await userModel.createUser({ username, email, password_hash: hashedPassword, display_name });

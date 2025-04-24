@@ -20,8 +20,8 @@ async function buildUser() {
 				reply.code(401).send({ error: 'Unauthorized' });
 			}
 		});
-		fastify.register(userRoutes, { prefix: '/api' });
-		fastify.register(authRoutes, { prefix: '/api' });
+		fastify.register(userRoutes, { prefix: '/api/users' });
+		fastify.register(authRoutes, { prefix: '/api/users/auth' });
 		return fastify;
 	} catch (err) {
 		fastify.log.error('Error initializing database: ', err);
