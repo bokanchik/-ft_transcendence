@@ -1,6 +1,6 @@
 import Fastify from 'fastify'
 import db from './database/connectDB.js'
-import matchRoutes from './routes/match.js'
+import matchRoutes from './routes/matches.js'
 // import settingsRoutes from './routes/settings.js'
 
 const fastify = Fastify({
@@ -8,7 +8,9 @@ const fastify = Fastify({
 });
 
 // declare routes for game service
-fastify.register(matchRoutes);
+fastify.register(matchRoutes, {
+    prefix: '/api/game/1v1'
+});
 
 // fastify.register(settingsRoutes); ?
 

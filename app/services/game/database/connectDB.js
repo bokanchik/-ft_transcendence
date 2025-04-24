@@ -20,7 +20,7 @@ let matchTable = `
         player2_id TEXT NOT NULL,
         winner_id TEXT,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        status TEXT NOT NULL CHECK (status IN ('pending', 'active', 'finished'))
+        state TEXT NOT NULL CHECK (state IN ('pending', 'active', 'finished'))
     )`;
 
 db.run(matchTable, [], (err) => {

@@ -1,11 +1,23 @@
-export const createMatchSchema = {
-    body: {
-      type: 'object',
-      required: ['player1', 'player2'],
-      properties: {
-        player1: { type: 'string' },
-        player2: { type: 'string' }
-      }
-    }
-  };
-  
+export const create = {
+
+};
+
+// validate the gameId for security
+export const idOnly = {
+
+};
+
+export const accept = {
+
+};
+
+export const reject = {
+};
+
+export const start = {
+
+};
+
+export const quit = {
+
+};
