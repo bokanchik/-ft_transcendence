@@ -31,8 +31,8 @@ async function router() {
 		return;
 	}
 	const path = window.location.pathname;
-	console.log(`Navigation vers: ${path}`);
-	const renderFunction = routes[path] || renderNotFoundPage;
+	console.log(`Navigation vers: ${path}`); // read actual URL after domain name
+	const renderFunction = routes[path] || renderNotFoundPage; // Check if this URL is in route else display not found page
 	appContainer.innerHTML = '';
 	try {
 		const pageContent = await renderFunction();
