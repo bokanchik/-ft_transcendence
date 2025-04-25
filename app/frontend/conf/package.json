@@ -1,0 +1,25 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:clean": "rm -rf ./dist/*",
+    "build:html": "mkdir -p ./dist && cp ./src/index.html ./dist/index.html",
+    "build:ts": "tsc",
+    "build:css": "./node_modules/.bin/tailwindcss -i ./src/style/input.css -o ./dist/css/style.css --minify",
+    "build": "npm run build:clean && mkdir -p ./dist/css ./dist/js && npm run build:html && npm run build:ts && npm run build:css",
+    "watch:ts": "tsc --watch",
+    "watch:css": "./node_modules/.bin/tailwindcss -i ./src/style/input.css -o ./dist/css/style.css --watch",
+    "dev": "npm run build:clean && mkdir -p ./dist/css ./dist/js && npm run build:html && concurrently \"npm:watch:ts\" \"npm:watch:css\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.4",
+    "concurrently": "^9.1.2",
+    "tailwindcss": "^4.1.4",
+    "typescript": "^5.8.3"
+  }
+}

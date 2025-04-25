@@ -1,20 +1,18 @@
-FROM nginx:alpine
+FROM alpine:3.20
 
-RUN apk update && apk add openssl
+RUN apk update && apk add --no-cache \
+        nginx \
+        openssl \
+        procps
 
-COPY gateaway/nginx/default.conf /etc/nginx/conf.d/default.conf
-COPY gateaway/nginx/nginx.conf /etc/nginx/nginx.conf
-COPY gateaway/nginx/api_json_errors.conf /etc/nginx/
+COPY conf/nginx.conf /etc/nginx/nginx.conf
+COPY conf/default.conf /etc/nginx/conf.d/default.conf
+COPY conf/api_json_errors.conf /etc/nginx/api_json_errors.conf
 
-RUN mkdir -p /etc/nginx/ssl && \
-    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-    -out /etc/nginx/ssl/api_nginx.crt \
-    -keyout /etc/nginx/ssl/api_nginx.key \
-    -subj "/C=FR/ST=IDF/L=Paris/O=KingPong/OU=Dev/CN=king-pong.com"
+#COPY index.html /usr/share/nginx/html/index.html
 
-# Copie brute du dossier src dans nginx
-COPY ../frontend/src /usr/share/nginx/html
+COPY --chmod=0755 tools/script.sh /usr/local/bin/
 
-EXPOSE 8443
+EXPOSE 443
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/usr/local/bin/script.sh"]
