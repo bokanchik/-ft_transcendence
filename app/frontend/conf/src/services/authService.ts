@@ -18,7 +18,7 @@ export interface RegisterSuccessData {
 }
 
 export interface LoginCredentials {
-	username: string;
+	identifier: string;
 	password: string;
 }
 

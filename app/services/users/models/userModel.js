@@ -9,12 +9,11 @@ export async function getAllUsersFromDb() {
 export async function getUserByUsernameFromDb(username) {
 	const db = getDb();
 	return db.get('SELECT * FROM users WHERE username = ?', [username]);
-	// return db.get('SELECT id, username, email, display_name, avatar_url, wins, losses, status, created_at, updated_at FROM users WHERE username = ?', [username]);
 }
 
 export async function getUserByEmailFromDb(email) {
 	const db = getDb();
-	return db.get('SELECT id, username, email, display_name, avatar_url, wins, losses, status, created_at, updated_at FROM users WHERE email = ?', [email]);
+	return db.get('SELECT * FROM users WHERE email = ?', [email]);
 }
 
 export async function getUserByIdFromDb(userId) {

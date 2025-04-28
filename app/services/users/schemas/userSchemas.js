@@ -29,9 +29,9 @@ export const registerSchema = {
 export const loginSchema = {
 	body: {
 		type: 'object',
-		required: ['username', 'password'],
+		required: ['identifier', 'password'],
 		properties: {
-			username: { type: 'string' },
+			identifier: { type: 'string' },
 			password: { type: 'string' }
 		}
 	}

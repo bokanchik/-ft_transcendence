@@ -3,6 +3,7 @@ import { initializeDb } from './utils/dbConfig.js';
 import { registerJWTPlugin } from './utils/jwtUtils.js'
 import userRoutes from './routes/users.js';
 import authRoutes from './routes/auth.js'
+import { AppError } from './utils/appError.js';
 
 const fastify = Fastify({ logger: { level: 'debug' }, }); // level info
 // const fastify = Fastify({ logger: { level: 'info', transport: { target: 'pino-pretty',options: { colorize: true, translateTime: 'SYS:standard', }, }, }, })
@@ -12,7 +13,7 @@ async function buildUser() {
 		await initializeDb();
 		fastify.log.info('Database initialized');
 		await registerJWTPlugin(fastify);
-		fastify.decorate("authenticate", async function(request, reply) {
+		fastify.decorate("authenticate", async function (request, reply) {
 			try {
 				await request.jwtVerify();
 			} catch (err) {
@@ -22,6 +23,15 @@ async function buildUser() {
 		});
 		fastify.register(userRoutes, { prefix: '/api/users' });
 		fastify.register(authRoutes, { prefix: '/api/users/auth' });
+		fastify.setErrorHandler(function (error, request, reply) {
+			request.log.error(error);
+			const statusCode = error instanceof AppError ? error.statusCode : 500;
+			const message = error.message || 'Internal Server Error';
+			reply.code(statusCode).send({
+				error: message,
+				statusCode: statusCode
+			});
+		});
 		return fastify;
 	} catch (err) {
 		fastify.log.error('Error initializing database: ', err);
@@ -30,12 +40,12 @@ async function buildUser() {
 }
 
 async function start() {
-	const app = await buildUser();
 	try {
-		await app.listen({ port: 4000, host: '0.0.0.0' });
-		app.log.info(`Server listening on ${app.server.address().port}`);
+	const app = await buildUser();
+	await app.listen({ port: 4000, host: '0.0.0.0' });
+	app.log.info(`Server listening on ${app.server.address().port}`);
 	} catch (err) {
-		app.log.error(err);
+		app.log.error('Failed to start server:', err);
 		process.exit(1);
 	}
 };

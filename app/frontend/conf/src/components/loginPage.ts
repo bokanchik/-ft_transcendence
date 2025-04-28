@@ -11,8 +11,8 @@ export function LoginPage(): HTMLElement {
         <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">Login</h2>
         <form id="login-form">
             <div class="mb-4">
-                <label for="username" class="block text-gray-700 text-sm font-bold mb-2">Username</label>
-                <input type="text" id="username" name="username" required
+                <label for="identifier" class="block text-gray-700 text-sm font-bold mb-2">Username or Email</label>
+                <input type="text" id="identifier" name="identifier" required placeholder="Enter your username or email"
                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
             </div>
             <div class="mb-6">
@@ -43,7 +43,7 @@ export function LoginPage(): HTMLElement {
 
 	// --- Ajout de la logique du formulaire ---
 	const form = container.querySelector('#login-form') as HTMLFormElement;
-	const usernameInput = container.querySelector('#username') as HTMLInputElement;
+	const identifierInput = container.querySelector('#identifier') as HTMLInputElement;
 	const passwordInput = container.querySelector('#password') as HTMLInputElement;
 	const messageDiv = container.querySelector('#login-message') as HTMLDivElement;
 	const loginButton = container.querySelector('#login-button') as HTMLButtonElement;
@@ -55,18 +55,18 @@ export function LoginPage(): HTMLElement {
 		loginButton.disabled = true; // Désactive le bouton pendant la requête
 		loginButton.textContent = 'Signing In...';
 
-		const username = usernameInput.value.trim();
+		const identifier = identifierInput.value.trim();
 		const password = passwordInput.value; // Pas de .trim() pour le mot de passe
 
-		if (!username || !password) {
-			messageDiv.textContent = 'Please enter both username and password.';
+		if (!identifier || !password) {
+			messageDiv.textContent = 'Please enter both username/email and password.';
 			messageDiv.className = 'mt-4 text-center text-sm text-red-600'; // Style erreur
 			loginButton.disabled = false;
 			loginButton.textContent = 'Sign In';
 			return;
 		}
 
-		const result: LoginSuccessResponse | null = await attemptLogin({ username, password });
+		const result: LoginSuccessResponse | null = await attemptLogin({ identifier, password });
 
 		loginButton.disabled = false; // Réactive le bouton
 		loginButton.textContent = 'Sign In';
