@@ -18,6 +18,7 @@ export async function loginHandler(req, reply) {
 			id: user.id,
 			username: user.username,
 			email: user.email,
+			display_name: user.display_name,
 		}
 	});
 }

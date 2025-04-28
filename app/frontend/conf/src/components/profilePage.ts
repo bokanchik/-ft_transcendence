@@ -7,9 +7,23 @@ export function ProfilePage(): HTMLElement {
 	const authData = getUserDataFromStorage();
 
 	if (!authData) {
-		console.warn('Accès à la page de profil refusé : utilisateur non connecté.');
-		return document.createElement('div'); // Retourne un conteneur vide
-	}
+        console.warn('Accès à la page de profil refusé : utilisateur non connecté.');
+        // Optionnel : rediriger vers la page de connexion
+        // navigateTo('/login');
+        // Retourne un conteneur vide ou un message
+        const deniedContainer = document.createElement('div');
+        deniedContainer.className = 'min-h-screen bg-gray-100 p-4 md:p-8 flex items-center justify-center';
+        deniedContainer.innerHTML = `
+            <div class="bg-white rounded-xl shadow-lg p-8 text-center">
+                <h1 class="text-2xl font-bold text-red-600 mb-4">Accès Refusé</h1>
+                <p class="text-gray-700 mb-4">Vous devez être connecté pour accéder à votre profil.</p>
+                <a href="/login" data-link class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Se connecter
+                </a>
+            </div>
+        `;
+        return deniedContainer;
+    }
 
 	const user = authData.user;
 
@@ -80,7 +94,6 @@ export function ProfilePage(): HTMLElement {
 	container.appendChild(formContainer);
 
 	const form = formContainer.querySelector('#profile-form') as HTMLFormElement;
-	// const usernameInput = formContainer.querySelector('#username') as HTMLInputElement; // Non modifiable
 	const emailInput = formContainer.querySelector('#email') as HTMLInputElement;
 	const displayNameInput = formContainer.querySelector('#display_name') as HTMLInputElement;
 	const avatarUrlInput = formContainer.querySelector('#avatar_url') as HTMLInputElement; // Ajouté
@@ -96,7 +109,7 @@ export function ProfilePage(): HTMLElement {
 
 		const updatedEmail = emailInput.value.trim();
 		const updatedDisplayName = displayNameInput.value.trim();
-		const updatedAvatarUrl = avatarUrlInput.value.trim(); // Récupérer la valeur
+		const updatedAvatarUrl = avatarUrlInput.value.trim();
 
 		// Validation simple (ajoutez plus si nécessaire)
 		if (!updatedEmail || !updatedDisplayName) {
