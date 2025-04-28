@@ -6,6 +6,11 @@ export async function getAllUsersFromDb() {
 	return db.all('SELECT id, username, email, display_name, avatar_url, wins, losses, status, created_at, updated_at FROM users');
 }
 
+export async function getUserByDisplayNameFromDb(displayName) {
+	const db = getDb();
+	return db.get('SELECT * FROM users WHERE display_name = ?', [displayName]);
+}
+
 export async function getUserByUsernameFromDb(username) {
 	const db = getDb();
 	return db.get('SELECT * FROM users WHERE username = ?', [username]);
@@ -48,4 +53,24 @@ export async function insertUserIntoDb({ username, email, password_hash, display
 		display_name,
 		avatar_url
 	};
+}
+
+export async function updateUserInDb(userId, updates) {
+	const db = getDb();
+	const fields = Object.keys(updates);
+	if (fields.length === 0) {
+		return { changes: 0 };
+	}
+	const setClause = fields.map((field) => `${field} = ?`).join(', ');
+	const values = fields.map((field) => updates[field]);
+	const sql = `UPDATE users SET ${setClause}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
+	values.push(userId);
+	try {
+		const result = await db.run(sql, values);
+		return result;
+	}
+	catch (error) {
+		console.error('Error updating user:', error);
+		throw error;
+	}
 }

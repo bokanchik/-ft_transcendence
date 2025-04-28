@@ -36,3 +36,16 @@ export const loginSchema = {
 		}
 	}
 };
+
+export const updateUserSchema = {
+	body: {
+		type: 'object',
+		properties: {
+			email: { type: 'string', format: 'email' },
+			display_name: { type: 'string', minLength: 3, maxLength: 20 },
+			avatar_url: { type: 'string', format: 'url', nullable: true },
+		},
+		minProperties: 1,
+		additionalProperties: false
+	}
+};

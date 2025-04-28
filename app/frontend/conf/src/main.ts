@@ -2,9 +2,17 @@ import { HomePage } from './components/homePage.js';
 import { LoginPage } from './components/loginPage.js'
 import { RegisterPage } from './components/registerPage.js'
 import { UsersPage } from './pages/userPage.js';
+import { DashboardPage } from './components/dashboardPage.js'
+import { ProfilePage } from './components/profilePage.js';
+import { getUserDataFromStorage } from './services/authService.js';
 
 // Conteneur où le contenu de la page sera injecté
 const appContainer = document.getElementById('main');
+
+interface RouteConfig {
+	component: () => HTMLElement | Promise<HTMLElement>;
+	requiredAuth?: boolean;
+}
 
 function renderNotFoundPage(): HTMLElement {
 	const div = document.createElement('div');
@@ -18,11 +26,13 @@ function renderNotFoundPage(): HTMLElement {
 	return div;
 }
 
-const routes: { [key: string]: () => HTMLElement | Promise<HTMLElement> } = {
-	'/': HomePage,
-	'/users': UsersPage,
-	'/login': LoginPage,
-	'/register': RegisterPage,
+const routes: { [key: string]: RouteConfig } = {
+	'/': { component: HomePage },
+	'/users': { component: UsersPage },
+	'/login': { component: LoginPage },
+	'/register': { component: RegisterPage },
+	'/dashboard': { component: DashboardPage, requiredAuth: true },
+	'/profile': { component: ProfilePage, requiredAuth: true },
 };
 
 async function router() {
@@ -31,8 +41,22 @@ async function router() {
 		return;
 	}
 	const path = window.location.pathname;
-	console.log(`Navigation vers: ${path}`); // read actual URL after domain name
-	const renderFunction = routes[path] || renderNotFoundPage; // Check if this URL is in route else display not found page
+	console.log(`navigateTo: ${path}`); // Read actual URL after domain name
+	const routeCfg = routes[path];
+	if (!routeCfg) {
+		appContainer.innerHTML = '';
+		appContainer.appendChild(renderNotFoundPage());
+		return;
+	}
+	if (routeCfg.requiredAuth) {
+		const authData = getUserDataFromStorage();
+		if (!authData) {
+			console.log('Utilisateur non authentifié, redirection vers la page de connexion.');
+			navigateTo('/login');
+			return;
+		}
+	}
+	const renderFunction = routeCfg.component;
 	appContainer.innerHTML = '';
 	try {
 		const pageContent = await renderFunction();
@@ -43,7 +67,7 @@ async function router() {
 	}
 }
 
-function navigateTo(url: string) {
+export function navigateTo(url: string) {
 	window.history.pushState({}, '', url);	// Met à jour l'URL dans la barre d'adresse sans recharger
 	router();
 }

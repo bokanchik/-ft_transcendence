@@ -1,4 +1,5 @@
 import { attemptRegister, RegisterCredentials, RegisterSuccessData } from '../services/authService.js';
+import type { RegisterResult } from '../services/authService.js';
 
 export function RegisterPage(): HTMLElement {
 	const container = document.createElement('div');
@@ -129,14 +130,14 @@ export function RegisterPage(): HTMLElement {
 			credentials.avatar_url = avatarUrl;
 		}
 
-		const registeredUser = await attemptRegister(credentials);
+		const registrationResult: RegisterResult = await attemptRegister(credentials);
 
 		registerButton.disabled = false; // Re-enable button
 		registerButton.textContent = 'Register';
 
-		if (registeredUser) {
+		if (registrationResult.success) {
 			// Succès (message déjà affiché par alert dans attemptRegister)
-			messageDiv.textContent = `Registration successful for ${registeredUser.username}! Redirecting to login...`;
+			messageDiv.textContent = `Registration successful for ${registrationResult.data.user.username}! Redirecting to login...`;
 			messageDiv.className = 'mt-4 text-center text-sm text-green-600';
 			form.reset(); // Clear the form fields
 

@@ -43,5 +43,5 @@ CREATE TABLE IF NOT EXISTS matches (
 INSERT OR IGNORE INTO users (username, email, password_hash, display_name, avatar_url)
 VALUES
   ('john_doe', 'john@example.com', 'hashed_password_123', 'John Doe', 'https://gravatar.com/avatar/3bd177d6fdf72eecc626c6cc19dfbdc6?s=400&d=identicon&r=g'),
-  ('jane_doe', 'jane@example.com', 'hashed_password_456', 'Jane Doe', 'https://example.com/avatar2.jpg'),
-  ('alice_smith', 'alice@example.com', 'hashed_password_789', 'Alice Smith', 'https://example.com/avatar3.jpg');
+  ('jane_doe', 'jane@example.com', 'hashed_password_456', 'Jane Doe', 'https://ui-avatars.com/api/?name=Jane+Doe&background=random&color=fff&size=128'),
+  ('alice_smith', 'alice@example.com', 'hashed_password_789', 'Alice Smith', 'https://ui-avatars.com/api/?name=Alice+Smith&background=random&color=fff&size=128');
