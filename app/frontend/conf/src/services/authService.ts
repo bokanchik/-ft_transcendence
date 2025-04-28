@@ -1,3 +1,11 @@
+export interface UserData {
+    id: number;
+    username: string;
+    email: string;
+    display_name: string;
+    avatar_url: string | null;
+}
+
 export interface RegisterCredentials {
 	username: string;
 	email: string;
@@ -8,13 +16,7 @@ export interface RegisterCredentials {
 
 export interface RegisterSuccessData {
 	message: string;
-	user: {
-		id: number;
-		username: string;
-		email: string;
-		display_name: string;
-		avatar_url: string | null;
-	};
+	user: UserData;
 }
 
 export interface LoginCredentials {
@@ -25,13 +27,7 @@ export interface LoginCredentials {
 export interface LoginSuccessResponse {
 	message: string;
 	token: string;
-	user: {
-		id: number;
-		username: string;
-		email: string;
-		display_name: string;
-		avatar_url: string | null;
-	};
+	user: UserData;
 }
 
 export interface ApiErrorResponse {
@@ -39,27 +35,18 @@ export interface ApiErrorResponse {
 }
 
 export interface UpdateProfilePayload {
-	// Champs modifiables - Adaptez selon votre API
 	email?: string;
 	display_name?: string;
-	avatar_url?: string | null; // Permettre null si l'API le gère pour suppression/vide
-	// Ne pas inclure username si non modifiable
-	// Ne pas inclure password ici (devrait être un endpoint/formulaire séparé)
+	avatar_url?: string | null;
 }
 
 export interface UpdateProfileSuccessData {
-	message: string; // Message de l'API
-	user: { // L'utilisateur mis à jour retourné par l'API
-		id: number;
-		username: string;
-		email: string;
-		display_name: string;
-		avatar_url: string | null;
-	};
+	message: string;
+	user: UserData;
 }
 
 export type UpdateProfileResult =
-	| { success: true; data: UpdateProfileSuccessData['user'] } // Retourne seulement l'user mis à jour
+	| { success: true; data: UpdateProfileSuccessData['user'] }
 	| { success: false; error: string };
 
 export type LoginResult =
@@ -75,16 +62,15 @@ const AUTH_KEY = 'authDataKey'
 export function getUserDataFromStorage(): { token: string; user: LoginSuccessResponse['user'] } | null {
 	const data = localStorage.getItem(AUTH_KEY);
 	try {
-		//const parsedData = JSON.parse(data || '');
 		const parsedData = data ? JSON.parse(data) : null;
 		if (parsedData && parsedData.token && parsedData.user) {
 			return parsedData;
 		}
-		localStorage.removeItem(AUTH_KEY); // Nettoyer si corrompu
+		localStorage.removeItem(AUTH_KEY);
 		return null;
 	} catch (e) {
 		console.error("Erreur lors de la lecture des données d'authentification", e);
-		localStorage.removeItem(AUTH_KEY); // Nettoyer si corrompu
+		localStorage.removeItem(AUTH_KEY);
 		return null;
 	}
 }

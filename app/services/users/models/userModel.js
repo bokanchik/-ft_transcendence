@@ -37,15 +37,9 @@ export async function createUser({ username, email, password_hash, display_name,
 		`INSERT INTO users (username, email, password_hash, display_name, avatar_url) VALUES (?, ?, ?, ?, ?)`,
 		[username, email, password_hash, display_name, avatar_url]
 	);
-	return { id: result.lastID };
-}
-
-export async function insertUserIntoDb({ username, email, password_hash, display_name, avatar_url = null }) {
-	const db = getDb();
-	const result = await db.run(
-		`INSERT INTO users (username, email, password_hash, display_name, avatar_url) VALUES (?, ?, ?, ?, ?)`,
-		[username, email, password_hash, display_name, avatar_url]
-	);
+	// return {
+	// 	id: result.lastID,
+	// };
 	return {
 		id: result.lastID,
 		username,

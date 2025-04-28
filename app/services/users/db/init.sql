@@ -42,6 +42,8 @@ CREATE TABLE IF NOT EXISTS matches (
 
 INSERT OR IGNORE INTO users (username, email, password_hash, display_name, avatar_url)
 VALUES
-  ('john_doe', 'john@example.com', 'hashed_password_123', 'John Doe', 'https://gravatar.com/avatar/3bd177d6fdf72eecc626c6cc19dfbdc6?s=400&d=identicon&r=g'),
-  ('jane_doe', 'jane@example.com', 'hashed_password_456', 'Jane Doe', 'https://ui-avatars.com/api/?name=Jane+Doe&background=random&color=fff&size=128'),
-  ('alice_smith', 'alice@example.com', 'hashed_password_789', 'Alice Smith', 'https://ui-avatars.com/api/?name=Alice+Smith&background=random&color=fff&size=128');
+  ('Serge', 'serge@student.42.fr', 'pourquoi', 'Serge P', 'https://gravatar.com/avatar/3bd177d6fdf72eecc626c6cc19dfbdc6?s=400&d=identicon&r=g'),
+  ('Xavier', 'xavier@student.42.fr', 'pourquoi', 'Xavier N', 'https://www.lemediaplus.com/wp-content/uploads/2023/02/Xavier-niel-fortune.png'),
+  ('Donkey_kong', 'donkeyKong@nitendo.com', 'pourquoi', 'Donkey Kong', 'https://m1.quebecormedia.com/emp/emp/dk1b93f6bb-34a1-498c-8234-fb9c7c6f794a_ORIGINAL.jpg?impolicy=crop-resize&x=0&y=0&w=1200&h=675&width=925'),
+  ('jane_doe', 'jane@example.com', 'pourquoi', 'Jane Doe', 'https://ui-avatars.com/api/?name=Jane+Doe&background=random&color=fff&size=128'),
+  ('alice_smith', 'alice@example.com', 'pourquoi', 'Alice Smith', 'https://ui-avatars.com/api/?name=Alice+Smith&background=random&color=fff&size=128');
