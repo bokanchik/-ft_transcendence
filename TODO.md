@@ -4,7 +4,7 @@
 
 ## 📌 Tâches initiales
 
-- [ ] Merge avec la branche d'Arthur (ajuster les versions, bien verifier tous les configs)
+- [✅] Merge avec la branche d'Arthur (ajuster les versions, bien verifier tous les configs)
 - [ ] Pino-Pretty pour le debbuging avec Fastify
 - [ ] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde)
 - [ ] La gestion d'erreurs 
@@ -12,6 +12,8 @@
 - [ ] Implementer les models pour les appels a la base de donnee
 - [ ] POST a Artur avec les donnees du match
 - [ ] Regarder a quoi sert le web-socket
+- [ ] Matchmaking system
+
 
 ---
 

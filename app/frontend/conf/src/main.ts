@@ -2,6 +2,7 @@ import { HomePage } from './components/homePage.js';
 import { LoginPage } from './components/loginPage.js'
 import { RegisterPage } from './components/registerPage.js'
 import { UsersPage } from './pages/userPage.js';
+import { GamePage } from './components/gamePage.js';
 
 // Conteneur où le contenu de la page sera injecté
 const appContainer = document.getElementById('main');
@@ -23,6 +24,7 @@ const routes: { [key: string]: () => HTMLElement | Promise<HTMLElement> } = {
 	'/users': UsersPage,
 	'/login': LoginPage,
 	'/register': RegisterPage,
+	'/game': GamePage,
 };
 
 async function router() {

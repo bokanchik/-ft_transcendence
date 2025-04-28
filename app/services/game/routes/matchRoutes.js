@@ -1,10 +1,10 @@
-import { createMatchHandler, getMatchHandler, getMatchStateHandler,
+import { createMatchHandler, getMatchHandler, getMatchIdHandler, getMatchStateHandler,
    acceptMatchHandler, rejectMatchHandler, startMatchHandler, quitMatchHandler } from '../handlers/matchHandlers.js'
 import * as matchSchemas from '../schemas/matchSchemas.js'
 
 async function matchRoutes(fastify, options) {
-   fastify.post('/match', { schema: matchSchemas.create }, createMatchHandler);
-   fastify.get('/match/:matchId', { schema: matchSchemas.idOnly}, getMatchHandler);
+   fastify.post('/match', createMatchHandler); // button Start
+   fastify.get('/match/:matchId', { schema: matchSchemas.idOnly}, getMatchIdHandler);
    fastify.get('/match/:matchId/state', { schema: matchSchemas.idOnly }, getMatchStateHandler);
    fastify.post('/match/:matchId/accept', { schema: matchSchemas.accept }, acceptMatchHandler);
    fastify.post('/match/:matchId/reject', { schema: matchSchemas.reject }, rejectMatchHandler);

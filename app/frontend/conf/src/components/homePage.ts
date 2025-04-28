@@ -7,14 +7,14 @@ export function HomePage(): HTMLElement {
 
 	innerDiv.innerHTML = `
         <h1 class="text-5xl font-bold mb-8 drop-shadow-lg">
-          Welcome to King-Pong! 🏓
+          Welcome to Ping-Pong! 🏓
         </h1>
         <p class="text-xl mb-10 drop-shadow-md">
           The ultimate online Pong experience. Ready to play?
         </p>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <a href="/users" data-link class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
-            View Users List
+            View User List
           </a>
           <a href="/login" data-link class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
             Login
@@ -22,7 +22,7 @@ export function HomePage(): HTMLElement {
           <a href="/register" data-link class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
             Register
           </a>
-          <a href="/api/games/" target="_blank" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+          <a href="/game" data-link class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
             Check Game API
           </a>
         </div>

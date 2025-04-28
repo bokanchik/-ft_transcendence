@@ -13,6 +13,6 @@ COPY conf/api_json_errors.conf /etc/nginx/api_json_errors.conf
 
 COPY --chmod=0755 tools/script.sh /usr/local/bin/
 
-EXPOSE 443
+EXPOSE 8443
 
 CMD ["/usr/local/bin/script.sh"]

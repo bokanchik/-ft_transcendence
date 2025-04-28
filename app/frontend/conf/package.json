@@ -4,14 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "prepare:dist": "mkdir -p ./dist/css ./dist/js",
     "build:clean": "rm -rf ./dist/*",
-    "build:html": "mkdir -p ./dist && cp ./src/index.html ./dist/index.html",
+    "build:html": "cp ./src/index.html ./dist/index.html",
     "build:ts": "tsc",
     "build:css": "./node_modules/.bin/tailwindcss -i ./src/style/input.css -o ./dist/css/style.css --minify",
-    "build": "npm run build:clean && mkdir -p ./dist/css ./dist/js && npm run build:html && npm run build:ts && npm run build:css",
-    "watch:ts": "tsc --watch",
-    "watch:css": "./node_modules/.bin/tailwindcss -i ./src/style/input.css -o ./dist/css/style.css --watch",
-    "dev": "npm run build:clean && mkdir -p ./dist/css ./dist/js && npm run build:html && concurrently \"npm:watch:ts\" \"npm:watch:css\""
+    "build": "npm run build:clean && npm run prepare:dist && npm run build:html && npm run build:ts && npm run build:css",
+    "watch:ts": "tsc --watch > ./logs/tsc.log 2>&1",
+    "watch:css": "./node_modules/.bin/tailwindcss -i ./src/style/input.css -o ./dist/css/style.css --watch > ./logs/tailwind.log 2>&1",
+    "dev": "npm run build && mkdir -p ./logs && concurrently \"npm run watch:ts\" \"npm run watch:css\""
   },
   "keywords": [],
   "author": "",

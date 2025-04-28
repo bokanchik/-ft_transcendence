@@ -23,7 +23,7 @@ up			:
 #	@cat $(CREDENTIALS) >> $(ENV_FILE).tmp
 #	@mv $(ENV_FILE).tmp $(ENV_FILE)
 #	@mkdir -p ~/data/mariadb ~/data/wordpress
-	docker compose -f $(DC_FILE) up -d
+	docker compose -f $(DC_FILE) up --remove-orphans
 #	@grep -Fvx -f $(CREDENTIALS) $(ENV_FILE) > $(ENV_FILE).tmp || true
 #	@mv $(ENV_FILE).tmp $(ENV_FILE)
 

@@ -1,18 +1,37 @@
 import db from '../database/connectDB.js'
+import { waitingRoom } from '../utils/waitingRoom.js'
 
 export async function createMatchHandler(req, reply) {
-    
+    // check JWT token of a player 
+
+    try {
+        // creation du lobby avec player1_id et player2_id
+
+        // la file d'attente est gérée par le service de matchmaking
+        const matchId = await waitingRoom(req.body);
+
+        return reply.code(201).send({ message: 'Player added to waiting room' });
+
+    } catch (err) {
+        req.log.error(err);
+        return reply.code(500).send({ error: err.message });
+    }
+
+
+}
+
+export async function getMatchHandler(req, reply) {
+    return reply.code(200).send({ message: 'Game service is running' });
 }
 
 // Handler to get match details by matchId
-export async function getMatchHandler(req, reply) {
+export async function getMatchIdHandler(req, reply) {
     const matchId = req.params.matchId;
-
+   // req.log.info(`Fetching match details for matchId: ${matchId}`);
     if (!matchId) {
         return reply.status(400).send({ error: 'Match ID is required' });
     }
 
-    //reply.set('Content-Type', 'application/json');
     let sql = "SELECT * FROM matches WHERE id = ?"; // refaire avec model
     try {
         db.get(sql, [matchId], (err, row) => {

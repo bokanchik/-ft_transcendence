@@ -1,19 +1,16 @@
 services:
   gateaway: # entrypoint for services
     container_name: gateaway
-    build:
-      context: .
-      dockerfile: gateaway/Dockerfile
+    build: ./gateaway
     ports:
       - "8443:8443"
-      - "443:443"
     restart: always
     env_file: .env
     volumes:
       - frontdata:/usr/share/nginx/html:ro
     depends_on:
-      - user_service
-      - game_service
+      - users
+      - game
       - frontend
     networks:
       - tranet
@@ -22,12 +19,14 @@ services:
     container_name: frontend
     build: ./frontend
     restart: always
+    ports:
+      - "5000:5000" # for development (live-server)
     volumes:
       - frontdata:/app/dist
     networks:
       - tranet
 
-  user_service:
+  users:
     build: ./services/users
     container_name: users
     ports:
@@ -37,15 +36,15 @@ services:
     networks:
       - tranet
 
-  game_service:
+  game:
     build: ./services/game
     ports:
       - "3001:3001"
     restart: always
     networks:
       - tranet
-
-  openapi_service:
+    
+  openapi:
     build: ./services/openapi
     ports:
       - "8080:8080" # for internal use
