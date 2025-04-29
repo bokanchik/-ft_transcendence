@@ -44,12 +44,12 @@ services:
     networks:
       - tranet
     
-  openapi:
-    build: ./services/openapi
-    ports:
-      - "8080:8080" # for internal use
-    networks:
-      - tranet
+  #openapi:
+    #build: ./services/openapi
+    #ports:
+   #   - "8080:8080" # for internal use
+  #  networks:
+    #  - tranet
     
 networks:
   tranet:

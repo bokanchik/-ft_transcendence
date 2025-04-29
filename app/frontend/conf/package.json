@@ -19,8 +19,12 @@
   "license": "ISC",
   "devDependencies": {
     "@tailwindcss/cli": "^4.1.4",
+    "@types/socket.io-client": "^1.4.36",
     "concurrently": "^9.1.2",
     "tailwindcss": "^4.1.4",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "socket.io-client": "^4.8.1"
   }
 }

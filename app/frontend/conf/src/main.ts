@@ -3,6 +3,8 @@ import { LoginPage } from './components/loginPage.js'
 import { RegisterPage } from './components/registerPage.js'
 import { UsersPage } from './pages/userPage.js';
 import { GamePage } from './components/gamePage.js';
+import { GameInterfacePage } from './pages/gameInterfacePage.js';
+import { navigateTo } from './services/router.js'; // à ajouter en haut
 
 // Conteneur où le contenu de la page sera injecté
 const appContainer = document.getElementById('main');
@@ -25,9 +27,10 @@ const routes: { [key: string]: () => HTMLElement | Promise<HTMLElement> } = {
 	'/login': LoginPage,
 	'/register': RegisterPage,
 	'/game': GamePage,
+	'/game-interface': GameInterfacePage
 };
 
-async function router() {
+export async function router() {
 	if (!appContainer) {
 		console.error("ERREUR: Le conteneur #app est introuvable dans le DOM !");
 		return;
@@ -43,11 +46,6 @@ async function router() {
 		console.error(`Erreur lors du rendu de la route ${path}:`, error);
 		appContainer.innerHTML = `<p class="text-red-500 text-center p-8">Une erreur est survenue lors du chargement de la page.</p>`;
 	}
-}
-
-function navigateTo(url: string) {
-	window.history.pushState({}, '', url);	// Met à jour l'URL dans la barre d'adresse sans recharger
-	router();
 }
 
 // Se déclenche lorsque le HTML initial est chargé

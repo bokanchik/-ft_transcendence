@@ -2,16 +2,20 @@ import Fastify from 'fastify'
 import { Server } from 'socket.io';
 import db from './database/connectDB.js'
 import matchRoutes from './routes/matchRoutes.js'
-import { matchSocketHandler } from '../sockets/matchSocketHandler.js';
+import { matchSocketHandler } from './sockets/matchSocketHandler.js';
 // import settingsRoutes from './routes/settings.js'
 
 const fastify = Fastify({
     logger:true
 });
 
+// initilize socket server
 const io = new Server(fastify.server, {
     cors: {
-      origin: "*",
+      origin: "*", // test
+      methods: ["GET", "POST"],
+      allowedHeaders: ["Content-Type"],
+      credentials: true,
     }
 });
 
@@ -20,14 +24,16 @@ fastify.decorate('io', io);
 
 // declare routes for game service
 fastify.register(matchRoutes, {
-    prefix: '/api/game/1v1'
+    prefix: '/1v1'
 });
 
 fastify.ready().then(() => {
-  matchSocketHandler(io);
+  console.log('Socket server is ready');
+  fastify.io.on('connection', matchSocketHandler)
 })
 // fastify.register(settingsRoutes); ?
 
+// start server game
 const start = async () => {
   try {
     await db;

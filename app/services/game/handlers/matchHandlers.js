@@ -1,22 +1,23 @@
 import db from '../database/connectDB.js'
-import { waitingRoom } from '../utils/waitingRoom.js'
 
+// http post /api/game/1v1/match
 export async function createMatchHandler(req, reply) {
     // check JWT token of a player 
-
+    req.log.info('createMatchHandler activated');
     try {
+        // need to check with JWT 
+        // const playerId = req.user.id;
+        // const socketId = getSocketId(playerId);
+        // if (!socketId) {
+        //     return reply.code(400).send({ error: 'Socket not connected' });
+        // }
         // creation du lobby avec player1_id et player2_id
 
-        // la file d'attente est gérée par le service de matchmaking
-        const matchId = await waitingRoom(req.body);
-
         return reply.code(201).send({ message: 'Player added to waiting room' });
-
     } catch (err) {
         req.log.error(err);
         return reply.code(500).send({ error: err.message });
     }
-
 
 }
 
@@ -65,18 +66,20 @@ export async function getMatchStateHandler(req, reply) {
 
 }
 
+export async function quitMatchHandler(req, reply) {
+
+}
+
+// MAYBE BE DEPRECATED
+export async function startMatchHandler(req, reply) {
+
+}
+
+// FOR INVITATION FUNCTIONALITY
 export async function acceptMatchHandler(req, reply) {
 
 }
 
 export async function rejectMatchHandler(req, reply) {
-
-}
-
-export async function startMatchHandler(req, reply) {
-
-}
-
-export async function quitMatchHandler(req, reply) {
 
 }
