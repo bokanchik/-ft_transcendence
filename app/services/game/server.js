@@ -3,6 +3,7 @@ import { Server } from 'socket.io';
 import db from './database/connectDB.js'
 import matchRoutes from './routes/matchRoutes.js'
 import { matchSocketHandler } from './sockets/matchSocketHandler.js';
+import authPlugin from 'shared-auth-plugin';
 // import settingsRoutes from './routes/settings.js' TODO
 
 const fastify = Fastify({
@@ -44,6 +45,8 @@ fastify.ready()
 const start = async () => {
   try {
     await db; // connect to database
+    await fastify.register(authPlugin);
+    fastify.log.info('Auth plugin registered');
 
     await fastify.listen({
       port: 3001,

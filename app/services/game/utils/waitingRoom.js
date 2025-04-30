@@ -1,7 +1,7 @@
 import fastify from "../server.js";
 import db from "../database/connectDB.js";
 import { create } from "../schemas/matchSchemas.js";
-import Game from "../models/gameModel.js";
+// import Game from "../models/gameModel.js";
 
 let waitingList = [];
 

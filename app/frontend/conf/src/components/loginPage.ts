@@ -1,4 +1,5 @@
-import { attemptLogin, LoginSuccessResponse } from '../services/authService.js';
+import { attemptLogin, LoginResult } from '../services/authService.js';
+import { navigateTo } from '../services/router.js';
 
 export function LoginPage(): HTMLElement {
 	const container = document.createElement('div');
@@ -11,8 +12,8 @@ export function LoginPage(): HTMLElement {
         <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">Login</h2>
         <form id="login-form">
             <div class="mb-4">
-                <label for="username" class="block text-gray-700 text-sm font-bold mb-2">Username</label>
-                <input type="text" id="username" name="username" required
+                <label for="identifier" class="block text-gray-700 text-sm font-bold mb-2">Username or Email</label>
+                <input type="text" id="identifier" name="identifier" required placeholder="Enter your username or email"
                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
             </div>
             <div class="mb-6">
@@ -41,53 +42,43 @@ export function LoginPage(): HTMLElement {
 
 	container.appendChild(formContainer);
 
-	// --- Ajout de la logique du formulaire ---
 	const form = container.querySelector('#login-form') as HTMLFormElement;
-	const usernameInput = container.querySelector('#username') as HTMLInputElement;
+	const identifierInput = container.querySelector('#identifier') as HTMLInputElement;
 	const passwordInput = container.querySelector('#password') as HTMLInputElement;
 	const messageDiv = container.querySelector('#login-message') as HTMLDivElement;
 	const loginButton = container.querySelector('#login-button') as HTMLButtonElement;
 
 	form.addEventListener('submit', async (event) => {
 		event.preventDefault(); // Empêche le rechargement de la page
-		messageDiv.textContent = 'Attempting login...'; // Message d'attente
-		messageDiv.className = 'mt-4 text-center text-sm text-gray-600'; // Style neutre
+		messageDiv.textContent = 'Attempting login...';
+		messageDiv.className = 'mt-4 text-center text-sm text-gray-600';
 		loginButton.disabled = true; // Désactive le bouton pendant la requête
 		loginButton.textContent = 'Signing In...';
 
-		const username = usernameInput.value.trim();
-		const password = passwordInput.value; // Pas de .trim() pour le mot de passe
+		const identifier = identifierInput.value.trim();
+		const password = passwordInput.value;
 
-		if (!username || !password) {
-			messageDiv.textContent = 'Please enter both username and password.';
-			messageDiv.className = 'mt-4 text-center text-sm text-red-600'; // Style erreur
+		if (!identifier || !password) {
+			messageDiv.textContent = 'Please enter both username/email and password.';
+			messageDiv.className = 'mt-4 text-center text-sm text-red-600';
 			loginButton.disabled = false;
 			loginButton.textContent = 'Sign In';
 			return;
 		}
 
-		const result: LoginSuccessResponse | null = await attemptLogin({ username, password });
+		const result: LoginResult = await attemptLogin({ identifier, password });
 
-		loginButton.disabled = false; // Réactive le bouton
+		loginButton.disabled = false; // Disable button after login attempt
 		loginButton.textContent = 'Sign In';
 
-
-		if (result && result.token) {
-			// Succès !
-			messageDiv.textContent = `Login successful! Welcome ${result.user.display_name || result.user.username}! Token stored.`;
-			messageDiv.className = 'mt-4 text-center text-sm text-green-600'; // Style succès
-
-			// Optionnel : Rediriger l'utilisateur après un court délai
-			setTimeout(() => {
-				// Rediriger vers une page protégée, ex: tableau de bord ou page d'accueil si elle change après login
-				window.location.href = '/dashboard'; // Ou utilisez votre système de routage: router.navigate('/dashboard');
-			}, 1500); // Délai de 1.5 secondes
-
+		if (result.success) {
+			messageDiv.textContent = `Login successful! Welcome ${result.data.user.display_name || result.data.user.username}! Token stored.`;
+			messageDiv.className = 'mt-4 text-center text-sm text-green-600';
+			setTimeout(() => { navigateTo('/dashboard'); }, 500); // 0.5 second of delay
 		} else {
-			// Échec (géré par alert dans attemptLogin, mais on peut aussi mettre à jour messageDiv)
-			messageDiv.textContent = 'Login failed. Please check your credentials.'; // Message générique post-alert
-			messageDiv.className = 'mt-4 text-center text-sm text-red-600'; // Style erreur
-			passwordInput.value = ''; // Vide le champ mot de passe par sécurité
+			messageDiv.textContent = result.error || 'Login failed. Please try again.';
+			messageDiv.className = 'mt-4 text-center text-sm text-red-600';
+			passwordInput.value = '';
 		}
 	});
 	return container;

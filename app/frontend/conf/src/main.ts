@@ -5,9 +5,17 @@ import { UsersPage } from './pages/userPage.js';
 import { GamePage } from './components/gamePage.js';
 import { GameInterfacePage } from './pages/gameInterfacePage.js';
 import { navigateTo } from './services/router.js'; // à ajouter en haut
+import { DashboardPage } from './components/dashboardPage.js'
+import { ProfilePage } from './components/profilePage.js';
+import { getUserDataFromStorage } from './services/authService.js';
 
 // Conteneur où le contenu de la page sera injecté
 const appContainer = document.getElementById('main');
+
+interface RouteConfig {
+	component: () => HTMLElement | Promise<HTMLElement>;
+	requiredAuth?: boolean;
+}
 
 function renderNotFoundPage(): HTMLElement {
 	const div = document.createElement('div');
@@ -21,13 +29,15 @@ function renderNotFoundPage(): HTMLElement {
 	return div;
 }
 
-const routes: { [key: string]: () => HTMLElement | Promise<HTMLElement> } = {
-	'/': HomePage,
-	'/users': UsersPage,
-	'/login': LoginPage,
-	'/register': RegisterPage,
-	'/game': GamePage,
-	'/game-interface': GameInterfacePage
+const routes: { [key: string]: RouteConfig } = {
+	'/': { component: HomePage },
+	'/users': { component: UsersPage },
+	'/login': { component: LoginPage },
+	'/register': { component: RegisterPage },
+	'/dashboard': { component: DashboardPage, requiredAuth: true },
+	'/profile': { component: ProfilePage, requiredAuth: true },
+	'/game': { component: GamePage, requiredAuth: true },
+	'/game-interface': { component: GameInterfacePage, requiredAuth: true },
 };
 
 export async function router() {
@@ -36,8 +46,22 @@ export async function router() {
 		return;
 	}
 	const path = window.location.pathname;
-	console.log(`Navigation vers: ${path}`); // read actual URL after domain name
-	const renderFunction = routes[path] || renderNotFoundPage; // Check if this URL is in route else display not found page
+	console.log(`navigateTo: ${path}`); // Read actual URL after domain name
+	const routeCfg = routes[path];
+	if (!routeCfg) {
+		appContainer.innerHTML = '';
+		appContainer.appendChild(renderNotFoundPage());
+		return;
+	}
+	if (routeCfg.requiredAuth) {
+		const authData = getUserDataFromStorage();
+		if (!authData) {
+			console.log('Utilisateur non authentifié, redirection vers la page de connexion.');
+			navigateTo('/login');
+			return;
+		}
+	}
+	const renderFunction = routeCfg.component;
 	appContainer.innerHTML = '';
 	try {
 		const pageContent = await renderFunction();
@@ -47,6 +71,12 @@ export async function router() {
 		appContainer.innerHTML = `<p class="text-red-500 text-center p-8">Une erreur est survenue lors du chargement de la page.</p>`;
 	}
 }
+
+// !! fonction est hebernée dans le fichier service/router.ts parce que j'ai besoin de l'utiliser dans d'autres fichiers
+// export function navigateTo(url: string) {
+// 	window.history.pushState({}, '', url);	// Met à jour l'URL dans la barre d'adresse sans recharger
+// 	router();
+// }
 
 // Se déclenche lorsque le HTML initial est chargé
 document.addEventListener('DOMContentLoaded', () => {

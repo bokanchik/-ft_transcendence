@@ -1,0 +1,11 @@
+{
+    "name": "shared-auth-plugin",
+    "version": "1.0.0",
+    "type": "module",
+    "main": "./index.js",
+    "dependencies": {
+      "@fastify/jwt": "^9.1.0",
+      "fastify-plugin": "^4.0.0"
+    }
+  }
+  

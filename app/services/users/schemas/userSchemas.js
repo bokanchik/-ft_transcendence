@@ -29,10 +29,23 @@ export const registerSchema = {
 export const loginSchema = {
 	body: {
 		type: 'object',
-		required: ['username', 'password'],
+		required: ['identifier', 'password'],
 		properties: {
-			username: { type: 'string' },
+			identifier: { type: 'string' },
 			password: { type: 'string' }
 		}
+	}
+};
+
+export const updateUserSchema = {
+	body: {
+		type: 'object',
+		properties: {
+			email: { type: 'string', format: 'email' },
+			display_name: { type: 'string', minLength: 3, maxLength: 20 },
+			avatar_url: { type: 'string', format: 'url', nullable: true },
+		},
+		minProperties: 1,
+		additionalProperties: false
 	}
 };
