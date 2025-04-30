@@ -3,7 +3,7 @@ import { Server } from 'socket.io';
 import db from './database/connectDB.js'
 import matchRoutes from './routes/matchRoutes.js'
 import { matchSocketHandler } from './sockets/matchSocketHandler.js';
-// import settingsRoutes from './routes/settings.js'
+// import settingsRoutes from './routes/settings.js' TODO
 
 const fastify = Fastify({
     logger:true
@@ -12,10 +12,10 @@ const fastify = Fastify({
 // initilize socket server
 const io = new Server(fastify.server, {
     cors: {
-      origin: "*", // test
+      origin: "*", // dev option
       methods: ["GET", "POST"],
       allowedHeaders: ["Content-Type"],
-      credentials: true,
+     // credentials: true, rajouter a la production + changer le origin
     }
 });
 
@@ -27,16 +27,23 @@ fastify.register(matchRoutes, {
     prefix: '/1v1'
 });
 
-fastify.ready().then(() => {
-  console.log('Socket server is ready');
-  fastify.io.on('connection', matchSocketHandler)
+// fastify.register(settingsRoutes); TODO
+
+// start socket server when server is ready
+fastify.ready()
+  .then(() => {
+    fastify.log.info('Socket server is ready');
+    fastify.io.on('connection', matchSocketHandler)
 })
-// fastify.register(settingsRoutes); ?
+.catch((err) => {
+  fastify.log.error(err);
+  process.exit(1);
+});
 
 // start server game
 const start = async () => {
   try {
-    await db;
+    await db; // connect to database
 
     await fastify.listen({
       port: 3001,

@@ -4,6 +4,7 @@ import db from '../database/connectDB.js'
 export async function createMatchHandler(req, reply) {
     // check JWT token of a player 
     req.log.info('createMatchHandler activated');
+    // on peut verifier si le joueur est authentifié avec JWT ici, et l'enregistrer dans la base de données
     try {
         // need to check with JWT 
         // const playerId = req.user.id;

@@ -26,11 +26,10 @@ export function GamePage(): HTMLElement {
         `;
         container.appendChild(formContainer);
         
-        // initialize socket client 
+        // initialize socket client and establish connection to the server
         const socket = io('wss://localhost:8443', {
             transports: ['websocket'],
         });
-        // a voi si faut mettre un autre URL
         
 
         socket.on('connect', () => {
@@ -47,6 +46,10 @@ export function GamePage(): HTMLElement {
         
         socket.on('disconnect', () => { 
             console.log('Disconnected from the server');
+        });
+
+        socket.on('error', (error: Error) => {
+            console.error('Socket error:', error);
         });
         
         // make an HTTP POST request to your backend to create a match (triggered by the start button)
