@@ -4,13 +4,6 @@ import { navigateTo } from '../services/router.js';
 export function GamePage(): HTMLElement {
     const authData = getUserDataFromStorage();
 
-    if (!authData) {
-        // optionnel: mettre un message d'erreur ou une alerte ?
-        alert('You must be logged in to access this page.');
-        navigateTo('/login');
-        return document.createElement('div');
-    }
-
     // --- Conteneur principal ---
     const container = document.createElement('div');
     container.className = 'bg-gradient-to-r from-blue-500 to-purple-600 flex justify-center items-center min-h-screen p-8';
@@ -118,8 +111,8 @@ function initSocketClient(playerId: number | undefined, buttonsContainer: HTMLEl
     });
     
     // TODO check for TypeError for data && timeout ?
-    socket.on('matchFound', (data: { opponentId: string}) => {
-        console.log('Match found with opponent:', data.opponentId);
+    socket.on('matchFound', (data: { opponentId: number, gameid: string }) => {
+        console.log(`Match found with opponent ${data.opponentId}, gameId is ${data.gameid}`);
         navigateTo('/game-room');
     });
             

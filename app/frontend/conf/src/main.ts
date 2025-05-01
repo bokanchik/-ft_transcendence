@@ -57,6 +57,7 @@ export async function router() {
 		const authData = getUserDataFromStorage();
 		if (!authData) {
 			console.log('Utilisateur non authentifié, redirection vers la page de connexion.');
+
 			navigateTo('/login');
 			return;
 		}
