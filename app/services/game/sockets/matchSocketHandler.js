@@ -6,10 +6,13 @@ export async function matchSocketHandler(socket) {
     fastify.log.info('Player connected: ' + socket.id); 
    
     socket.on('authenticate', async (playerId) => {
-
-        // store playerId and socket.id in waiting list        
-        await addPlayerToWaitingList(playerId, socket.id);
+        // store playerId and socket.id in waiting list if not already in        
+        const newlyAdded = await addPlayerToWaitingList(playerId, socket.id);
         
+        if (!newlyAdded) {
+            fastify.log.info(`Player ${playerId} is already in waiting list. List size: ${await getWaitingListSize()}`);
+            return;
+        }
         // join a waiting room
         socket.join('waitingRoom');
         
@@ -23,7 +26,7 @@ export async function matchSocketHandler(socket) {
     socket.on('disconnect', () => {
         fastify.log.info('Player disconnected: ' + socket.id);
         // remove player from waiting list
-        removePlayerFromWaitingList(socket);
+        removePlayerFromWaitingList(socket.id);
         // TODO: maybe need a full check of a game room (if player is disconnected --> need to stop the game 
         // and notify the other player)
         fastify.log.info('Player ' + socket.id + ' removed from waiting room');

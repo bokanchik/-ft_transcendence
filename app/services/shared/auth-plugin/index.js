@@ -20,6 +20,8 @@ export default fp(async (fastify, options) => {
     fastify.log.error({ err }, 'FAILED to register @fastify/jwt plugin!');
     throw err; // Relancer bonne pratique ?
   }
+  // to test
+  fastify.log.info(`JWT_SECRET used: ${secret}`);
   // fastify.authenticate pour vérifier le token JWT 
   fastify.decorate("authenticate", async function (request, reply) {
       try {

@@ -40,8 +40,10 @@ services:
 
   game:
     build: ./services/game
+    container_name: game
     ports:
       - "3001:3001"
+    env_file: .env
     restart: always
     volumes:
       - ./services/shared:/app/shared:ro

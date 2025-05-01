@@ -59,6 +59,7 @@ export type RegisterResult =
 
 const AUTH_KEY = 'authDataKey'
 
+// Recupere le token et les données utilisateur depuis localStorage (objet global du navigateur Web)
 export function getUserDataFromStorage(): { token: string; user: LoginSuccessResponse['user'] } | null {
 	const data = localStorage.getItem(AUTH_KEY);
 	try {
@@ -75,6 +76,7 @@ export function getUserDataFromStorage(): { token: string; user: LoginSuccessRes
 	}
 }
 
+// Fait un fetch POST /api/users/auth/login et stocke le token JWT dans localStorage en cas du succès
 export async function attemptLogin(credentials: LoginCredentials): Promise<LoginResult> {
 	const loginUrl = '/api/users/auth/login';
 
@@ -102,6 +104,15 @@ export async function attemptLogin(credentials: LoginCredentials): Promise<Login
 		// localStorage est simple mais vulnérable au XSS. sessionStorage est légèrement mieux.
 		// Les cookies HttpOnly gérés par le backend sont l'option la plus sûre.
 		// Pour cet exemple, utilisons localStorage.
+
+
+		/** Lorsque l'attribut HttpOnly est indiqué, le cookie est inaccessible
+		 *  en JavaScript et ne peut pas être manipulé avec l'API Document.cookie, 
+		 * 	il est uniquement envoyé au serveur. Ainsi, les cookies qui persistent
+		 *  côté serveur pour les sessions n'ont pas besoin d'être disponibles en 
+		 * 	JavaScript et devraient être paramétrés avec l'attribut HttpOnly.
+		 *  Cette précaution permet de réduire les risque d'attaque XSS. */
+
 		if (data && data.token && data.user) {
 			const dataToStore = { token: data.token, user: data.user };
 			localStorage.setItem(AUTH_KEY, JSON.stringify(dataToStore));
@@ -119,11 +130,13 @@ export async function attemptLogin(credentials: LoginCredentials): Promise<Login
 	}
 }
 
+// Supprime le token JWT du localStorage
 export function logout(): void {
 	localStorage.removeItem(AUTH_KEY);
 	console.log("Token JWT supprimé.");
 }
 
+// POST vers /api/users/auth/register
 export async function attemptRegister(credentials: RegisterCredentials): Promise<RegisterResult> {
 	const registerUrl = '/api/users/auth/register';
 
@@ -164,6 +177,7 @@ export async function attemptRegister(credentials: RegisterCredentials): Promise
 	}
 }
 
+// PATCH vers /api/users/me avec le token JWT dans le header
 export async function updateUserProfile(payload: UpdateProfilePayload): Promise<UpdateProfileResult> {
 	// Déterminez l'URL de votre endpoint API pour la mise à jour
 	const profileUpdateUrl = '/api/users/me'; // Commun, mais adaptez ! (pourrait être /api/users/:id)

@@ -35,13 +35,13 @@ export function GameInterfacePage(): HTMLElement {
 	const leftUsername = document.createElement('div');
 	leftUsername.className = 'absolute left-[20px] top-[20px] text-black font-semibold text-xl';
 	leftUsername.id = 'left-username';
-	leftUsername.textContent = 'Player 1';
+	leftUsername.textContent = 'Player 1'; // fetch from server ? GET /api/1v1/game/match/:matchId
 
 	// Right username
 	const rightUsername = document.createElement('div');
 	rightUsername.className = 'absolute right-[20px] top-[20px] text-black font-semibold text-xl text-right';
 	rightUsername.id = 'right-username';
-	rightUsername.textContent = 'Player 2';
+	rightUsername.textContent = 'Player 2'; // fetch from server ?
 
 	// Score display
 	const scoreDisplay = document.createElement('div');

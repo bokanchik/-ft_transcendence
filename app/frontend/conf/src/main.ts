@@ -37,7 +37,7 @@ const routes: { [key: string]: RouteConfig } = {
 	'/dashboard': { component: DashboardPage, requiredAuth: true },
 	'/profile': { component: ProfilePage, requiredAuth: true },
 	'/game': { component: GamePage, requiredAuth: true },
-	'/game-interface': { component: GameInterfacePage, requiredAuth: true },
+	'/game-room': { component: GameInterfacePage, requiredAuth: true },
 };
 
 export async function router() {
