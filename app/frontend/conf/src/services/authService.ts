@@ -60,7 +60,7 @@ export type RegisterResult =
 const AUTH_KEY = 'authDataKey'
 
 // Recupere le token et les données utilisateur depuis localStorage (objet global du navigateur Web)
-export function getUserDataFromStorage(): { token: string; user: LoginSuccessResponse['user'] } | null {
+export function getUserDataFromStorage(): { token: string; user: LoginSuccessResponse['user'] } {
 	const data = localStorage.getItem(AUTH_KEY);
 	try {
 		const parsedData = data ? JSON.parse(data) : null;
@@ -68,11 +68,13 @@ export function getUserDataFromStorage(): { token: string; user: LoginSuccessRes
 			return parsedData;
 		}
 		localStorage.removeItem(AUTH_KEY);
-		return null;
+		return parsedData;
+		//return null;
 	} catch (e) {
 		console.error("Erreur lors de la lecture des données d'authentification", e);
 		localStorage.removeItem(AUTH_KEY);
-		return null;
+		throw new Error;
+		//return null;
 	}
 }
 

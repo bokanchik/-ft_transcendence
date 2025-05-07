@@ -1,0 +1,78 @@
+import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
+import { Server, Socket } from 'socket.io';
+// @ts-ignore
+import authPlugin from './shared/auth-plugin/index.ts';
+import db from './database/connectDB.ts'
+// import { gameShemas } from './schemas/matchSchemas.ts'; TODO
+import matchRoutes from './routes/matchRoutes.ts'
+import { matchSocketHandler } from './sockets/matchSocketHandler.ts';
+// import settingsRoutes from './routes/settings.ts' TODO
+
+
+const fastify: FastifyInstance = Fastify({ logger: true });
+
+// Initilize socket.io
+const io: Server = new Server(fastify.server, {
+    cors: {
+      origin: "*", // dev option --> le url du frontend
+      methods: ["GET", "POST"],
+      allowedHeaders: ["Content-Type"],
+     // credentials: true, rajouter a la production + changer le origin
+    }
+});
+
+// Attach io to fastify instance
+fastify.decorate('io', io);
+
+// Register auth plugin
+const registerAuthPlugin = async () => {
+  try {
+    await fastify.register(authPlugin);
+    fastify.log.info('Auth plugin registered');
+  } catch (err) {
+    fastify.log.error({ err }, 'Failed to register auth plugin.');
+    process.exit(1);
+  }
+};
+
+// TODO: Add schemas to fastify server
+// for (const schema of Object.values(gameShemas)) {
+  // fastify.addSchema(schema);
+// }
+
+// Register routes
+const registerRoutes = () => {
+  fastify.register(matchRoutes, { prefix: '/1v1' });
+  // fastify.register(settingsRoutes); TODO
+};
+
+// Start server game and setup socket.io
+const start = async () => {
+  try {
+    await db; // connect to database
+    fastify.log.info('Connected to database');
+      
+    await fastify.ready(); // wait for all plugins to be ready
+    
+    fastify.io.on('connection', (socket: Socket) => {
+      matchSocketHandler(socket);
+    });
+      
+    fastify.log.info('Socket server is ready');
+      
+    await fastify.listen({ port: 3001, host: '0.0.0.0' });
+  } catch (err) {
+      fastify.log.error(err);
+      process.exit(1);
+  }
+};
+
+const run = async() => {
+  await registerAuthPlugin();
+  registerRoutes();
+  start();
+};
+
+run();
+
+export { fastify } ; // Export the io instance for use in other modules

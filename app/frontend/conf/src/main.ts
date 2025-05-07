@@ -3,11 +3,12 @@ import { LoginPage } from './components/loginPage.js'
 import { RegisterPage } from './components/registerPage.js'
 import { UsersPage } from './pages/userPage.js';
 import { GamePage } from './components/gamePage.js';
-import { GameInterfacePage } from './pages/gameInterfacePage.js';
+import { GameRoomPage } from './pages/gameRoomPage.js';
 import { navigateTo } from './services/router.js'; // à ajouter en haut
 import { DashboardPage } from './components/dashboardPage.js'
 import { ProfilePage } from './components/profilePage.js';
 import { getUserDataFromStorage } from './services/authService.js';
+import { promptAliasForm } from './components/aliasFormPage.js';
 
 // Conteneur où le contenu de la page sera injecté
 const appContainer = document.getElementById('main');
@@ -37,7 +38,8 @@ const routes: { [key: string]: RouteConfig } = {
 	'/dashboard': { component: DashboardPage, requiredAuth: true },
 	'/profile': { component: ProfilePage, requiredAuth: true },
 	'/game': { component: GamePage, requiredAuth: true },
-	'/game-room': { component: GameInterfacePage, requiredAuth: true },
+	'/local-game': { component: promptAliasForm},
+	'/game-room': { component: GameRoomPage, requiredAuth: true },
 };
 
 export async function router() {

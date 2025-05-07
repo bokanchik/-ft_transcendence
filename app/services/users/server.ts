@@ -4,7 +4,8 @@ import { initializeDb } from './utils/dbConfig.js';
 import userRoutes from './routes/users.js';
 import authRoutes from './routes/auth.js'
 import { AppError } from './utils/appError.js';
-import authPlugin from 'shared-auth-plugin';
+// @ts-ignore
+import authPlugin from './shared/auth-plugin/index.ts';
 
 
 const fastify = Fastify({ logger: { level: 'debug' }, }); // level info

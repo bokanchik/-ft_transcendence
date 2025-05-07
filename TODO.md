@@ -4,15 +4,16 @@
 
 ## 📌 Tâches initiales
 
-- [✅] Merge avec la branche d'Arthur (ajuster les versions, bien verifier tous les configs)
-- [ ] Pino-Pretty pour le debbuging avec Fastify
+- [ ] jeu en local
+- [ ] redis pour les scores
+- [ ] Confirmation par mail
+- [ ] Create Data Models + put match to DB (how we're handling data for score, etc ? -> local variable sent with socket to front
+at the end of a match -> call to database if need matchhistory)
 - [ ] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde)
 - [ ] La gestion d'erreurs 
-- [ ] JWT --> decorate + options dans les routes
 - [ ] Implementer les models pour les appels a la base de donnee
 - [ ] POST a Artur avec les donnees du match
-- [ ] Regarder a quoi sert le web-socket
-- [ ] Matchmaking system
+- [ ] httpOnly cookie for server-side ?
 
 
 ---

@@ -4,7 +4,7 @@ import sqlite3 from 'sqlite3';
 const sql3 = sqlite3.verbose();
 
 // connect to DB and create a new database if it doesn't exist
-const db = new sql3.Database('./game.db', (err) => {
+const db: sqlite3.Database = new sql3.Database('./game.db', (err: Error | null) => {
     if (err) {
         console.error('Error opening database ' + err.message);
     } else {
@@ -13,7 +13,7 @@ const db = new sql3.Database('./game.db', (err) => {
 });
 
 // player1_id and player2_id must be extracted from the authenticated user's JWTs
-let matchTable = `
+const matchTable: string = `
     CREATE TABLE IF NOT EXISTS matches (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         player1_id TEXT NOT NULL,
@@ -26,9 +26,9 @@ let matchTable = `
         state TEXT NOT NULL CHECK (state IN ('pending', 'active', 'finished'))
     )`;
 
-db.run(matchTable, [], (err) => {
+db.run(matchTable, [], (err: Error | null) => {
     if (err) {
-        console.error('Error creating matches table: ' + err.message);
+        console.error(`Error creating matches table: ${err.message}`);
     } else {
         console.log('Matches table created or already exists.');
     }
