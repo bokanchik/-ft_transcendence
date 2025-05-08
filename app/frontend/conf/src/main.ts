@@ -9,6 +9,7 @@ import { DashboardPage } from './components/dashboardPage.js'
 import { ProfilePage } from './components/profilePage.js';
 import { getUserDataFromStorage } from './services/authService.js';
 import { promptAliasForm } from './components/aliasFormPage.js';
+import { GameMode } from './components/gamePage.js'
 
 // Conteneur où le contenu de la page sera injecté
 const appContainer = document.getElementById('main');
@@ -37,10 +38,16 @@ const routes: { [key: string]: RouteConfig } = {
 	'/register': { component: RegisterPage },
 	'/dashboard': { component: DashboardPage, requiredAuth: true },
 	'/profile': { component: ProfilePage, requiredAuth: true },
-	'/game': { component: GamePage, requiredAuth: true },
+	'/game': { component: GamePage },
 	'/local-game': { component: promptAliasForm},
-	'/game-room': { component: GameRoomPage, requiredAuth: true },
+	'/game-room': { component: () => GameRoomPageFromParams() },
 };
+
+function GameRoomPageFromParams(): HTMLElement {
+	const urlParams = new URLSearchParams(window.location.search);
+	const mode = urlParams.get('mode') as GameMode || 'local';
+	return GameRoomPage(mode);
+}
 
 export async function router() {
 	if (!appContainer) {

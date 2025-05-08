@@ -6,5 +6,8 @@ declare module 'fastify' {
     io: Server;
     authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
   }
+  interface FastifyRequest {
+    validatedBody: { player1: string; player2: string; isLocal: boolean };
+  }
 }
 

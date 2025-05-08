@@ -2,10 +2,26 @@
 import type { FastifyInstance } from 'fastify';
 import { createMatchHandler, getMatchIdHandler, getMatchStateHandler,
    acceptMatchHandler, rejectMatchHandler, startMatchHandler, quitMatchHandler } from '../handlers/matchHandlers.ts'
+import { createMatchSchema } from '../schemas/matchSchemas.ts';
 
-async function matchRoutes(fastify: FastifyInstance, options: any) {
-   fastify.post('/match', { onRequest: [fastify.authenticate] }, createMatchHandler); // button Start
-  
+async function matchRemoteRoutes(fastify: FastifyInstance, options: any) {
+   fastify.post('/', {  
+      // local --> no need for JWT verification, remote --> authenticate
+      preHandler: async (req, reply) => {
+         const reqValidation = createMatchSchema.safeParse(req.body);
+         if (!reqValidation.success) {
+            return reply.code(400).send({ errors: reqValidation.error.errors});
+        }
+
+        const { isLocal } = reqValidation.data;
+        if (!isLocal) {
+         await fastify.authenticate(req, reply);
+        }
+
+        req.validatedBody = reqValidation.data;
+      },
+      handler: createMatchHandler,
+   }); // button Start
    // fastify.get('/match/:matchId', { schema: matchSchemas.idOnly}, getMatchIdHandler);
    // fastify.get('/match/:matchId/state', { schema: matchSchemas.idOnly }, getMatchStateHandler);
    // fastify.post('/match/:matchId/accept', { schema: matchSchemas.accept }, acceptMatchHandler);
@@ -13,8 +29,8 @@ async function matchRoutes(fastify: FastifyInstance, options: any) {
    // fastify.post('/match/:matchId/start', { schema: matchSchemas.start }, startMatchHandler);
    // fastify.post('/match/:matchId/quit', { schema: matchSchemas.quit }, quitMatchHandler);
 
-   fastify.log.info('Match routes registered');
+   fastify.log.info('Remote Match routes registered');
 
 }
 
-export default matchRoutes;
+export default matchRemoteRoutes;

@@ -1,4 +1,6 @@
-export function GameRoomPage(): HTMLElement {
+import { GameMode } from "../components/gamePage";
+
+export function GameRoomPage(mode: GameMode): HTMLElement {
 	const container = document.createElement('div');
 	container.className = 'w-full h-screen flex flex-col items-center justify-center bg-gray-900';
 
@@ -80,8 +82,23 @@ export function GameRoomPage(): HTMLElement {
 		} else {
 			countdown.remove(); // remove overlay
 			clearInterval(interval);
+
+			// if (mode === 'local') {
+			// 	startLocalGame(gameBox);
+			// } else {
+			// 	startRemoteGame(gameBox);
+			// }
 		}
 	}, 1000);
 
+
 	return container;
 }
+
+// function startLocalGame(gameBox: HTMLDivElement) {
+
+// }
+
+// function startRemoteGame(gameBox: HTMLDivElement) {
+
+// }

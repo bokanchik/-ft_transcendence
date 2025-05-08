@@ -42,7 +42,7 @@ const registerAuthPlugin = async () => {
 
 // Register routes
 const registerRoutes = () => {
-  fastify.register(matchRoutes, { prefix: '/1v1' });
+  fastify.register(matchRoutes, { prefix: '/match' });
   // fastify.register(settingsRoutes); TODO
 };
 

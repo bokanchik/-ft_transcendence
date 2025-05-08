@@ -1,20 +1,19 @@
-import type { FastifyReply, FastifyRequest } from 'fastify';
+import { fastify, type FastifyReply, type FastifyRequest } from 'fastify';
 import { createMatchSchema } from '../schemas/matchSchemas.ts';
 import db from '../database/connectDB.ts'
 import type { Match } from '../models/gameModel.ts';
 
-// http post /api/game/1v1/match
+// http post /api/game/match
 export async function createMatchHandler(req: FastifyRequest, reply: FastifyReply) {
-    // check JWT token of a player
-    const reqValidation = createMatchSchema.safeParse(req.body);
-    if (!reqValidation.success) {
-        return reply.code(400).send({ errors: reqValidation.error.errors});
-    }
+    req.log.info(`Client envoie: ${JSON.stringify(req.validatedBody)}`);
+    
+    const { player1, player2 } = req.validatedBody;
+
+    // reponse envoyee au client
     const match = {
         matchId: crypto.randomUUID(),
-        player1: reqValidation.data.player1,
-        player2: reqValidation.data.player2 ?? null,
-        gameMode: reqValidation.data.gameMode,
+        player1,
+        player2, // TODO extract players id for remote
         startTime: new Date().toISOString(),
     };
 
