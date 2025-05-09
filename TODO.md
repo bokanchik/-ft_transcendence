@@ -7,6 +7,8 @@
 - [ ] jeu en local
 - [ ] redis pour les scores
 - [ ] Confirmation par mail
+- [ ] Pages && components && services in frontend to clean !
+- [ ] Les touches sensibles au click + Enter plus les fleches (experience user agreable)
 - [ ] Create Data Models + put match to DB (how we're handling data for score, etc ? -> local variable sent with socket to front
 at the end of a match -> call to database if need matchhistory)
 - [ ] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde)

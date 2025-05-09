@@ -14,10 +14,10 @@ const fastify: FastifyInstance = Fastify({ logger: true });
 // Initilize socket.io
 const io: Server = new Server(fastify.server, {
     cors: {
-      origin: "*", // dev option --> le url du frontend
+      origin: "http://localhost:5000", // dev option --> le url du frontend
       methods: ["GET", "POST"],
       allowedHeaders: ["Content-Type"],
-     // credentials: true, rajouter a la production + changer le origin
+      credentials: true,
     }
 });
 

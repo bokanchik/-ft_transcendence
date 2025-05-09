@@ -1,6 +1,6 @@
 module.exports = {
     content: [
-      './src/**/*.{html,js,ts}',  // Assure-toi que tous les fichiers sont inclus
+      './src/**/*.{html,js,ts}',
       './dist/**/*.html',
     ],
     theme: {

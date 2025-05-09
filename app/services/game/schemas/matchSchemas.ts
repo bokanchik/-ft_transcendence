@@ -3,8 +3,8 @@ import { z } from 'zod';
 
 //-- Match creation schema
 export const createMatchSchema = z.object({
-    player1: z.string(),
-    player2: z.string(),
+    player1: z.string().optional(),
+    player2: z.string().optional(),
     isLocal: z.boolean(),
 });
 

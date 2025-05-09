@@ -1,7 +1,8 @@
 {
   "name": "frontend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Frontend application for Ping-Pong",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "prepare:dist": "mkdir -p ./dist/css ./dist/js",
@@ -19,12 +20,14 @@
   "license": "ISC",
   "devDependencies": {
     "@tailwindcss/cli": "^4.1.4",
+    "@types/node": "^22.15.17",
     "@types/socket.io-client": "^1.4.36",
     "concurrently": "^9.1.2",
     "tailwindcss": "^4.1.4",
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "commander": "^13.1.0",
     "socket.io-client": "^4.8.1"
   }
 }

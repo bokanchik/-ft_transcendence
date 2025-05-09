@@ -1,5 +1,7 @@
 import { navigateTo } from "../services/router.js";
 
+const _ensureTailwindIncludes = 'animate-fade-in';
+
 export function promptAliasForm(): HTMLDivElement {
 
     // --- Main Container ---
@@ -86,7 +88,7 @@ export function promptAliasForm(): HTMLDivElement {
 
             inputElement.addEventListener('input', () => {
                 aliasFields.innerHTML = ''; // reset a chaque changement
-                const count = parseInt(inputElement.value);
+                const count = parseInt(inputElement.value); // !! check for case 60, 100 etc
                 if (isNaN(count) || count < 3 || count > 10) return;
 
                 let timeoutId: ReturnType<typeof setTimeout> = setTimeout(() => {
@@ -122,12 +124,7 @@ export function promptAliasForm(): HTMLDivElement {
                 alert('Please enter aliases for both players.');
                 return;
             }
-
-        
-            // TODO ??: stocke les aliases pour GameRoomPage
-            // sessionStorage.setItem('player1Alias', alias1);
-            // sessionStorage.setItem('player2Alias', alias2);
-            // sessionStorage.setItem('gameMode', gameMode.value);
+            // check if aliases are the same ?
             
             await createLocalMatch(alias1, alias2);
         } else { // TODO: les rooms pour le tournement et le battle royal
@@ -139,10 +136,11 @@ export function promptAliasForm(): HTMLDivElement {
     return container;
 }
 
+
 // --- Helper function to call an API
 async function createLocalMatch(alias1: string, alias2: string) {
     try {
-        const res = await fetch('/api/game/match/', {
+        const response = await fetch('/api/game/match/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -154,16 +152,22 @@ async function createLocalMatch(alias1: string, alias2: string) {
             }),
         });
         
-        if (!res.ok) {
+        if (!response.ok) {
             throw new Error('Failed to create local match');
         }
         
-        const data = await res.json();
+        const data = await response.json();
         const matchId = data.matchId;
-        
+
+        // ! sessionStorage store all data locally 
+        // + not erased after page refresh (but after closing the tab)
+        sessionStorage.setItem('player1', data.player1);
+        sessionStorage.setItem('player2', data.player2);
+        sessionStorage.setItem('gameMode', 'local');
+
         navigateTo(`/game-room?matchId=${matchId}`);
 
-    } catch (err) {
+    } catch (err: unknown) {
         alert('Error starting local match');
         console.log(err);
     }

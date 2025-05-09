@@ -1,6 +1,6 @@
 import { getUserDataFromStorage } from '../services/authService.js';
 import { navigateTo } from '../services/router.js';
-import { initSocketClient } from '../services/initSocket.js';
+import { handleOnlineGame } from '../services/initOnlineGame.js';
 
 export type GameMode = 'local' | 'remote';
 
@@ -60,56 +60,24 @@ export function GamePage(): HTMLElement {
 
     // --- Event: Local button clicked 
     localGameButton.addEventListener('click', async () =>  {
-        navigateTo('/local-game'); // la page avec un formulaire a remplir
+        navigateTo('/local-game'); // la page avec un formulaire a remplir pour le jeu en local
     });
 
     // --- Event: Online button clicked ---
     onlineGameButton.addEventListener('click', async () => { 
       
-        if (!authData?.user?.id || !authData?.token) {
+        if (!authData?.token) {
             alert("You must be logged in to play online.");
             return;
         }
 
-        const playerId = authData.user.id;
+        // maybe displayName here --> from WebToken
         const token = authData.token;
+        const display_name = authData.user.display_name;
 
-        await handleOnlineGame(playerId, token, buttonsContainer, onlineGameButton);
+        await handleOnlineGame(display_name, token, buttonsContainer, onlineGameButton);
     });
 
         return container;
 }
     
-    
-async function handleOnlineGame(playerId: number, token: string, container: HTMLElement, button: HTMLButtonElement): Promise<void> {
-    const controller: AbortController = new AbortController();
-    const signal: AbortSignal = controller.signal;
-    
-    button.disabled = true;
-    try {
-        //  await createMatch(authData?.token, playerId, signal);
-        initSocketClient(playerId, container, controller);
-    } catch (err: unknown) {
-        // handle error for user feedback maybe redirect to error page ?
-        alert('Error creating waiting room. Please try again.');
-        navigateTo('/game'); // !! maybe redirect to error page
-    } finally {
-        button.disabled = false;
-    }
-}
-
-// --- Fonction pour créer une salle d'attente ---
-async function createMatch(token: string, playerId: number, signal: AbortSignal) {
-    const response = await fetch('/api/game/match', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-        },
-        signal: signal,
-    });
-    
-    if (!response.ok) {
-        throw new Error('Failed to create waiting room');
-    };
-    // const data = await response.json();  
-}

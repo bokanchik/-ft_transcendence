@@ -1,10 +1,9 @@
 import { fastify } from "../server.ts";
-import { randomUUID, UUID } from 'crypto';
 import db from "../database/connectDB.ts";
 import { createMatchSchema } from "../schemas/matchSchemas.ts";
 // import Game from "../models/gameModel.js";
 
-let waitingList: Map<number, string> = new Map();
+let waitingList: Map<string, string> = new Map();
 let isMatchmakingActive: boolean = false; // to prevent a race condition when two players are added to the waiting list at the same time
 
 // --- Waiting room system ---
@@ -25,16 +24,11 @@ export async function waitingRoom() {
             return;
         }
 
-        // TODO: put players id in database, generate a gameId and store it in the database
-        const gameId: UUID = randomUUID();
-        fastify.log.info(`Match created: ${player1.playerId} vs ${player2.playerId}`);
-        fastify.log.info(`Game ID: ${gameId}`);
-
         // put to DB (plutot a la fin)
 
         // notify players that they are matched
-        fastify.io.to(player1.socketId).emit('matchFound', { opponentId: player2.playerId, gameId });
-        fastify.io.to(player2.socketId).emit('matchFound', { opponentId: player1.playerId, gameId });
+        fastify.io.to(player1.socketId).emit('matchFound', { opponentId: player2.playerId });
+        fastify.io.to(player2.socketId).emit('matchFound', { opponentId: player1.playerId });
         
 
         // TODO: create a game room for the players
@@ -52,10 +46,10 @@ export async function waitingRoom() {
 
 // --- Simple mathcmaking system : first in first out ---
 function firstInFirstOut() {
-    for (const [id, socket] of waitingList.entries()){
-        waitingList.delete(id);
-        fastify.log.info(`Player ${id} with socket ${socket} removed from waiting list. List size: ${waitingList.size}`);
-        return { playerId: id, socketId: socket };
+    for (const [display_name, socket] of waitingList.entries()){
+        waitingList.delete(display_name);
+        fastify.log.info(`Player ${display_name} with socket ${socket} removed from waiting list. List size: ${waitingList.size}`);
+        return { playerId: display_name, socketId: socket };
     }
     return null;
 }
@@ -80,14 +74,14 @@ export async function removePlayerFromWaitingList(socketId: string) {
     fastify.log.warn(`Player with socket ID ${socketId} not found in waiting list.`);
 }
 
-export async function addPlayerToWaitingList(playerId: number, socketId: string) {
-   // check if playerId is already in waiting list
-   if (waitingList.has(playerId)) {
-        fastify.log.info(`Player ${playerId} with socket: ${socketId} is already in waiting list. List size: ${waitingList.size}`);
+export async function addPlayerToWaitingList(display_name: string, socketId: string) {
+   // check if display_name is already in waiting list
+   if (waitingList.has(display_name)) {
+        fastify.log.info(`Player ${display_name} with socket: ${socketId} is already in waiting list. List size: ${waitingList.size}`);
         return false;
     }
-    // add playerId and socketId to waiting list
-    waitingList.set(playerId, socketId );
-    fastify.log.info(`Player ${playerId} with socket: ${socketId} added to waiting list. List size: ${waitingList.size}`);
+    // add display_name and socketId to waiting list
+    waitingList.set(display_name, socketId );
+    fastify.log.info(`Player ${display_name} with socket: ${socketId} added to waiting list. List size: ${waitingList.size}`);
     return true;
 }

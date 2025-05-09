@@ -6,14 +6,26 @@ import { waitingRoom, removePlayerFromWaitingList, addPlayerToWaitingList, getWa
 export async function matchSocketHandler(socket: Socket): Promise<void> {
    
     fastify.log.info(`Player connected: ${socket.id}`); 
-   
-    socket.on('authenticate', async (playerId: number) => {
-        // store playerId and socket.id in waiting list if not already in        
+    
+    // --- !!! TESTING FOR LOCAL ----
+    socket.on('startLocalGame', async () => {
+        fastify.log.info('Game started locally');
+        socket.emit('gameStarted');
+    });
+
+    socket.on('playerMove', (movement) => {
+        fastify.log.info(movement);
+        //handlePlayerMove();
+    });
+    // -----------------------------------
+    
+    socket.on('authenticate', async (display_name: string) => {
+        // store display_name and socket.id in waiting list if not already in        
         try {
-            const newlyAdded = await addPlayerToWaitingList(playerId, socket.id);
+            const newlyAdded = await addPlayerToWaitingList(display_name, socket.id);
             
             if (!newlyAdded) {
-                fastify.log.info(`Player ${playerId} is already in waiting list. List size: ${await getWaitingListSize()}`);
+                fastify.log.info(`Player ${display_name} is already in waiting list. List size: ${await getWaitingListSize()}`);
                 return;
             }
             
@@ -36,6 +48,18 @@ export async function matchSocketHandler(socket: Socket): Promise<void> {
             // TODO: maybe need a full check of a game room (if player is disconnected --> need to stop the game 
             // and notify the other player)
             fastify.log.info(`Player removed: ${socket.id}`);
+        } catch (error) {
+            fastify.log.error(`Error during disconnection: ${error}`);
+        }
+    });
+
+    // "cancel" button clicked on frontend
+    socket.on('cancelMatch', () => {
+        try {
+            fastify.log.info(`Player disconnected: ${socket.id}`);
+            removePlayerFromWaitingList(socket.id);
+            fastify.log.info(`Player removed: ${socket.id}`);
+
         } catch (error) {
             fastify.log.error(`Error during disconnection: ${error}`);
         }
