@@ -1,6 +1,6 @@
 import { fastify } from "../server.ts";
 import db from "../database/connectDB.ts";
-import { createMatchSchema } from "../schemas/matchSchemas.ts";
+import { createMatchSchema } from "../middleware/matchSchemas.ts";
 // import Game from "../models/gameModel.js";
 
 let waitingList: Map<string, string> = new Map();

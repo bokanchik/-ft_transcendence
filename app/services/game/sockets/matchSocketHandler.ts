@@ -5,6 +5,8 @@ import { waitingRoom, removePlayerFromWaitingList, addPlayerToWaitingList, getWa
 // --- Socket.io handler for matchmaking ---
 export async function matchSocketHandler(socket: Socket): Promise<void> {
    
+    // TODO: check pour le timout -> emit('matchTimeout')
+    
     fastify.log.info(`Player connected: ${socket.id}`); 
     
     // --- !!! TESTING FOR LOCAL ----

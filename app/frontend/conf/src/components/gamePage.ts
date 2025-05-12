@@ -71,7 +71,6 @@ export function GamePage(): HTMLElement {
             return;
         }
 
-        // maybe displayName here --> from WebToken
         const token = authData.token;
         const display_name = authData.user.display_name;
 

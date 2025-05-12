@@ -1,13 +1,14 @@
 //import fastify from '../server.ts';
 import type { FastifyInstance } from 'fastify';
-import { createMatchHandler, getMatchIdHandler, getMatchStateHandler,
+import { createMatchHandler, getMatchStateHandler,
    acceptMatchHandler, rejectMatchHandler, startMatchHandler, quitMatchHandler } from '../handlers/matchHandlers.ts'
-import { createMatchSchema } from '../schemas/matchSchemas.ts';
+import { createMatchSchema } from '../middleware/matchSchemas.ts';
 
 async function matchRemoteRoutes(fastify: FastifyInstance, options: any) {
    fastify.post('/', {  
       // local --> no need for JWT verification, remote --> authenticate
       preHandler: async (req, reply) => {
+         // sanitaze incoming data with zod (--> middleware)
          const reqValidation = createMatchSchema.safeParse(req.body);
          if (!reqValidation.success) {
             return reply.code(400).send({ errors: reqValidation.error.errors});
@@ -22,6 +23,7 @@ async function matchRemoteRoutes(fastify: FastifyInstance, options: any) {
       },
       handler: createMatchHandler,
    }); // button Start
+   
    // fastify.get('/match/:matchId', { schema: matchSchemas.idOnly}, getMatchIdHandler);
    // fastify.get('/match/:matchId/state', { schema: matchSchemas.idOnly }, getMatchStateHandler);
    // fastify.post('/match/:matchId/accept', { schema: matchSchemas.accept }, acceptMatchHandler);
