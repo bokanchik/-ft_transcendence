@@ -10,8 +10,6 @@ export interface FriendRequestUserData {
 
 export interface PendingFriendRequest {
     friendship_id: number;
-    // Pour les demandes reçues, 'requester' contient les infos de celui qui a envoyé
-    // Pour les demandes envoyées, 'receiver' contient les infos de celui à qui on a envoyé
     requester?: FriendRequestUserData; // Utilisé pour les demandes reçues
     receiver?: FriendRequestUserData; // Utilisé pour les demandes envoyées
     created_at: string;
@@ -20,6 +18,17 @@ export interface PendingFriendRequest {
 export interface ApiErrorResponse {
 	error: string;
     details?: any;
+}
+
+export interface Friend {
+    id: number;
+    username: string;
+    display_name?: string;
+    avatar_url?: string;
+    status?: 'online' | 'offline' | 'in-game';
+    wins?: number;
+    loses?: number;
+    // Ajoutez d'autres champs si nécessaire (ex: date d'amitié, etc.)
 }
 
 type FriendRequestResult =
@@ -59,6 +68,18 @@ export async function getReceivedFriendRequests(): Promise<PendingFriendRequest[
 }
 
 /**
+ * Récupère la liste des amis de l'utilisateur connecté.
+ */
+export async function getFriendsList(): Promise<Friend[]> {
+    const response = await fetch('/api/friends/', { // Adaptez l'URL de l'API si besoin
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+    });
+    return handleApiResponse(response); // Réutilise votre gestionnaire de réponse
+}
+
+/**
  * Récupère les demandes d'amitié envoyées par l'utilisateur connecté.
  */
 export async function getSentFriendRequests(): Promise<PendingFriendRequest[]> {
@@ -77,7 +98,7 @@ export async function getSentFriendRequests(): Promise<PendingFriendRequest[]> {
 export async function acceptFriendRequest(friendshipId: number): Promise<{ message: string }> {
     const response = await fetch(`/api/friends/requests/${friendshipId}/accept`, { // Adaptez l'URL
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        //headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
     });
     return handleApiResponse(response);
@@ -90,7 +111,7 @@ export async function acceptFriendRequest(friendshipId: number): Promise<{ messa
 export async function declineFriendRequest(friendshipId: number): Promise<{ message: string }> {
     const response = await fetch(`/api/friends/requests/${friendshipId}/decline`, { // Adaptez l'URL
         method: 'POST', // ou DELETE selon votre API
-        headers: { 'Content-Type': 'application/json' },
+        //headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
     });
     return handleApiResponse(response);
@@ -103,7 +124,7 @@ export async function declineFriendRequest(friendshipId: number): Promise<{ mess
 export async function cancelFriendRequest(friendshipId: number): Promise<{ message: string }> {
     const response = await fetch(`/api/friends/requests/${friendshipId}/cancel`, { // Adaptez l'URL
         method: 'POST', // ou DELETE selon votre API
-        headers: { 'Content-Type': 'application/json' },
+        //headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
     });
     return handleApiResponse(response);
