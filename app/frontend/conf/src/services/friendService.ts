@@ -20,15 +20,27 @@ export interface ApiErrorResponse {
     details?: any;
 }
 
+// export interface Friend {
+//     id: number;
+//     username: string;
+//     display_name?: string;
+//     avatar_url?: string;
+//     status?: 'online' | 'offline' | 'in-game';
+//     wins?: number;
+//     loses?: number;
+//     // Ajoutez d'autres champs si nécessaire (ex: date d'amitié, etc.)
+// }
+
 export interface Friend {
-    id: number;
-    username: string;
-    display_name?: string;
-    avatar_url?: string;
-    status?: 'online' | 'offline' | 'in-game';
-    wins?: number;
-    loses?: number;
-    // Ajoutez d'autres champs si nécessaire (ex: date d'amitié, etc.)
+    friendship_id: number;
+    friendship_status: string;
+    friend_id: number;             // Utilisé pour data-friend-id et data-user-id
+    friend_username: string;       // Utilisé pour l'affichage
+    friend_display_name?: string;  // Utilisé pour l'affichage
+    friend_avatar_url?: string;    // Utilisé pour l'avatar
+    friend_wins?: number;
+    friend_losses?: number;
+    friend_online_status?: 'online' | 'offline' | 'in-game'; // Utilisé pour l'indicateur de statut
 }
 
 type FriendRequestResult =
@@ -71,7 +83,7 @@ export async function getReceivedFriendRequests(): Promise<PendingFriendRequest[
  * Récupère la liste des amis de l'utilisateur connecté.
  */
 export async function getFriendsList(): Promise<Friend[]> {
-    const response = await fetch('/api/friends/', { // Adaptez l'URL de l'API si besoin
+    const response = await fetch('/api/friends/friends', { // Adaptez l'URL de l'API si besoin
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
