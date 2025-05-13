@@ -12,6 +12,12 @@ export class ValidationError extends AppError {
     }
 }
 
+export class ForbiddenError extends AppError {
+    constructor(message) {
+        super(message, 403); // 403 Forbidden
+    }
+}
+
 export class NotFoundError extends AppError {
     constructor(message) {
         super(message, 404);

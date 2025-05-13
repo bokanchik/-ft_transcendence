@@ -1,19 +1,17 @@
 // src/components/profilePage.ts ou un chemin similaire
 
-import { getUserDataFromStorage, updateUserProfile, UpdateProfilePayload, UpdateProfileResult } from '../services/authService.js';
+import { getUserDataFromStorage, updateUserProfile, UpdateProfilePayload, UpdateProfileResult, UserData } from '../services/authService.js';
 import { navigateTo } from '../main.js';
 
 export function ProfilePage(): HTMLElement {
-	const authData = getUserDataFromStorage();
+	const user: UserData | null = getUserDataFromStorage();
 
-	if (!authData) {
-        console.warn('Accès à la page de profil refusé : utilisateur non connecté.');
-        // Optionnel : rediriger vers la page de connexion
-        // navigateTo('/login');
-        // Retourne un conteneur vide ou un message
-        const deniedContainer = document.createElement('div');
-        deniedContainer.className = 'min-h-screen bg-gray-100 p-4 md:p-8 flex items-center justify-center';
-        deniedContainer.innerHTML = `
+	if (!user) {
+		console.warn('Access unauthorized: User not authenticated.');
+		navigateTo('/login');
+		const deniedContainer = document.createElement('div');
+		deniedContainer.className = 'min-h-screen bg-gray-100 p-4 md:p-8 flex items-center justify-center';
+		deniedContainer.innerHTML = `
             <div class="bg-white rounded-xl shadow-lg p-8 text-center">
                 <h1 class="text-2xl font-bold text-red-600 mb-4">Accès Refusé</h1>
                 <p class="text-gray-700 mb-4">Vous devez être connecté pour accéder à votre profil.</p>
@@ -22,12 +20,9 @@ export function ProfilePage(): HTMLElement {
                 </a>
             </div>
         `;
-        return deniedContainer;
-    }
+		return deniedContainer;
+	}
 
-	const user = authData.user;
-
-	// --- Conteneur principal ---
 	const container = document.createElement('div');
 	container.className = 'min-h-screen bg-gray-100 p-4 md:p-8';
 
