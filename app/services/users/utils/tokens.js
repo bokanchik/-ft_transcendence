@@ -27,9 +27,10 @@ export async function registerCsrfPlugin(fastify) {
 		cookieKey: 'csrf-secret',
 		cookieOpts: {
 			signed: true,
-			httpOnly: true,
+			httpOnly: false,
 			secure: process.env.NODE_ENV === 'production',
-			sameSite: 'Strict',
+			sameSite: 'Lax', // <-- Change Strict
+			path: '/',
 		},
 	});
 	fastify.log.info('CSRF protection registered');

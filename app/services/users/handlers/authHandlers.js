@@ -9,7 +9,7 @@ import {
 	cookieOptions,
 } from '../utils/tokens.js';
 
-import { ERROR_MESSAGES } from '../utils/errorMessages.js';
+import { ERROR_MESSAGES } from '../utils/appError.js';
 
 export async function registerHandler(req, reply) {
 	const newUser = await createUserAccount(req.body);

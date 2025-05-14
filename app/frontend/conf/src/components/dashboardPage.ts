@@ -14,6 +14,7 @@ import {
 	PendingFriendRequest,
 	getFriendsList,
 	Friend,
+	fetchCsrfToken,
 } from '../services/friendService.js';
 
 export function DashboardPage(): HTMLElement {
@@ -310,8 +311,10 @@ export function DashboardPage(): HTMLElement {
 		}
 	});
 
-	// Charger toutes les données d'amis au chargement de la page
-	loadAllFriendData();
+	(async () => {
+		await fetchCsrfToken();
+		loadAllFriendData();
+	})();
 
 	return container;
 }

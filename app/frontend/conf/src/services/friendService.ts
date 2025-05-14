@@ -1,6 +1,6 @@
 import { UserData } from './authService.js'; // Or the correct path
 
-let csrfToken = null;
+let csrfToken: string | null = null;
 
 export interface FriendRequestUserData {
     id: number;
@@ -107,17 +107,8 @@ export async function getSentFriendRequests(): Promise<PendingFriendRequest[]> {
  * @returns A message indicating the result of the operation.
  */
 export async function acceptFriendRequest(friendshipId: number): Promise<{ message: string }> {
-    if (!csrfToken) {
-        console.error('CSRF token not available for acceptFriendRequest');
-        await fetchCsrfToken();
-        if (!csrfToken) {
-            throw new Error('CSRF token missing. Please Refresh');
-        }
-    }
-    const response = await fetch(`/api/friends/requests/${friendshipId}/accept`, {
+    const response = await fetchWithCsrf(`/api/friends/requests/${friendshipId}/accept`, {
         method: 'POST',
-        headers: { 'CSRF-Token': csrfToken, },
-        credentials: 'include',
     });
     return handleApiResponse(response);
 }
@@ -128,9 +119,8 @@ export async function acceptFriendRequest(friendshipId: number): Promise<{ messa
  * @returns A message indicating the result of the operation.
  */
 export async function declineFriendRequest(friendshipId: number): Promise<{ message: string }> {
-    const response = await fetch(`/api/friends/requests/${friendshipId}/decline`, {
-        method: 'POST', // or DELETE -> depends on API
-        credentials: 'include',
+    const response = await fetchWithCsrf(`/api/friends/requests/${friendshipId}/decline`, {
+        method: 'POST',
     });
     return handleApiResponse(response);
 }
@@ -141,9 +131,8 @@ export async function declineFriendRequest(friendshipId: number): Promise<{ mess
  * @returns A message indicating the result of the operation.
  */
 export async function cancelFriendRequest(friendshipId: number): Promise<{ message: string }> {
-    const response = await fetch(`/api/friends/requests/${friendshipId}/cancel`, {
-        method: 'POST', // or DELETE -> depends on API
-        credentials: 'include',
+    const response = await fetchWithCsrf(`/api/friends/requests/${friendshipId}/cancel`, {
+        method: 'POST',
     });
     return handleApiResponse(response);
 }
@@ -162,42 +151,30 @@ export async function sendFriendRequest(friendId: number): Promise<{ message: st
     return handleApiResponse(response);
 }
 
-function getCsrfTokenFromCookies(): string | null {
-    const cookies = document.cookie.split(';');
-    for (const cookie of cookies) {
-        const [name, value] = cookie.trim().split('=');
-        if (name === 'csrf-token') {
-            return decodeURIComponent(value);
-        }
-    }
-    return null;
-}
-
-async function fetchWithCsrf(url: string, options: RequestInit = {}): Promise<Response> {
-    const csrfToken = getCsrfTokenFromCookies();
-    if (!csrfToken) {
-        throw new Error('CSRF token not found in cookies');
-    }
-
-    const headers = new Headers(options.headers || {});
-    headers.set('x-csrf-token', csrfToken);
-
-    return fetch(url, {
-        ...options,
-        headers,
-        credentials: 'include', // Inclut les cookies dans la requête
-    });
-}
-
 export async function fetchCsrfToken() {
     try {
-        const response = await fetch('/api/users/csrf-token');
+        const response = await fetch('/api/users/csrf-token', { credentials: 'include' });
         if (!response.ok) throw new Error('Failed to fetch CSRF token');
         const data = await response.json();
         csrfToken = data.csrfToken;
         console.log('CSRF Token fetched and stored:', csrfToken);
     } catch (error) {
         console.error('Error fetching CSRF token:', error);
-        // Gérer l'erreur, peut-être empêcher les actions modifiant l'état
     }
+}
+
+function getCsrfTokenOrThrow(): string {
+    if (!csrfToken) throw new Error('CSRF token missing. Please refresh the page.');
+    return csrfToken;
+}
+
+async function fetchWithCsrf(url: string, options: RequestInit = {}): Promise<Response> {
+    const token = getCsrfTokenOrThrow();
+    const headers = new Headers(options.headers || {});
+    headers.set('x-csrf-token', token);
+    return fetch(url, {
+        ...options,
+        headers,
+        credentials: 'include',
+    });
 }

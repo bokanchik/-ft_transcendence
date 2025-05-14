@@ -1,7 +1,7 @@
 // handlers/friendsHandlers.js
 import * as friendService from '../services/friendService.js';
 import { AppError } from '../utils/appError.js'; // Si vous utilisez une classe d'erreur personnalisée
-import { ERROR_MESSAGES } from '../utils/errorMessages.js';
+import { ERROR_MESSAGES } from '../utils/appError.js';
 
 /**
  * Handler pour envoyer une demande d'amitié.
