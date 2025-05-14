@@ -1,4 +1,6 @@
 import fastifyJwt from '@fastify/jwt';
+import fastifyCookie from '@fastify/cookie';
+import fastifyCsrf from '@fastify/csrf-protection';
 
 export const jwtToken = 'jwt_token';
 
@@ -9,6 +11,28 @@ export const cookieOptions = {
 	secure: true,
 	sameSite: 'Strict', // Prevent CSRF attacks
 	maxAge: 60 * 60 * 24 * 7, // 1 week in seconds
+}
+
+export async function registerCookiePlugin(fastify) {
+	const cookieSecret = process.env.COOKIE_SECRET || 'COOKIE_SECRET_DUR';
+	await fastify.register(fastifyCookie, {
+		secret: cookieSecret,
+		parseOptions: {},
+	});
+	fastify.log.info('Cookie plugin registered');
+}
+
+export async function registerCsrfPlugin(fastify) {
+	await fastify.register(fastifyCsrf, {
+		cookieKey: 'csrf-secret',
+		cookieOpts: {
+			signed: true,
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'production',
+			sameSite: 'Strict',
+		},
+	});
+	fastify.log.info('CSRF protection registered');
 }
 
 export async function registerJWTPlugin(fastify) {
@@ -27,26 +51,4 @@ export async function registerJWTPlugin(fastify) {
 		fastify.log.error({ err }, 'FAILED to register @fastify/jwt plugin!');
 		throw err;
 	}
-}
-
-export function generateJWT(fastify, payload, options = {}) {
-	return fastify.jwt.sign(payload, options);
-}
-
-export function verifyJWT(fastify, token) {
-	try {
-		return fastify.jwt.verify(token);
-	} catch (err) {
-		fastify.log.warn({ err }, 'Manual verification error:');
-		throw new AppError('Token invalid or expired', 401);
-	}
-}
-
-export function getJWTSecret() {
-	const secret = process.env.JWT_SECRET;
-	if (!secret) {
-		console.warn("JWT secret is not set. Using default");
-		return "super-secret-change-me";
-	}
-	return secret;
 }
