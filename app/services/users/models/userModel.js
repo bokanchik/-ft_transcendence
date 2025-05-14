@@ -107,6 +107,6 @@ export async function updateUserInDb(userId, updates) {
         return result;
     } catch (error) {
         console.error('Error updating user:', error);
-        throw error;
+        throw new Error(ERROR_MESSAGES.DATABASE_ERROR);
     }
 }

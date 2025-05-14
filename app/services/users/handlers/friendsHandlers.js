@@ -1,6 +1,7 @@
 // handlers/friendsHandlers.js
 import * as friendService from '../services/friendService.js';
 import { AppError } from '../utils/appError.js'; // Si vous utilisez une classe d'erreur personnalisée
+import { ERROR_MESSAGES } from '../utils/errorMessages.js';
 
 /**
  * Handler pour envoyer une demande d'amitié.
@@ -45,7 +46,7 @@ export async function acceptFriendRequestHandler(req, reply) {
 	const friendshipId = parseInt(req.params.friendshipId, 10); // Assurer que c'est un nombre
 
 	if (isNaN(friendshipId)) {
-		throw new AppError('Invalid friendship ID format.', 400); // Ou utilisez la validation de schéma Fastify
+		throw new AppError(ERROR_MESSAGES.INVALID_FRIENDSHIP_ID, 400); // Ou utilisez la validation de schéma Fastify
 	}
 
 	req.log.info({ currentUserId, friendshipId }, 'Attempting to accept friend request');

@@ -127,11 +127,12 @@ export async function getPendingReceivedFriendRequestsInDb(userId) {
     const query = `
         SELECT
             f.id as friendship_id,
-            u_initiator.id as requester_id,
-            u_initiator.username as requester_username,
-            u_initiator.display_name as requester_display_name,
-            u_initiator.avatar_url as requester_avatar_url,
-            f.created_at
+            f.created_at,
+            u_initiator.id as id,
+            u_initiator.username,
+            u_initiator.email,
+            u_initiator.display_name,
+            u_initiator.avatar_url
         FROM friendships f
         JOIN users u_initiator ON f.initiator_id = u_initiator.id
         WHERE
@@ -140,7 +141,18 @@ export async function getPendingReceivedFriendRequestsInDb(userId) {
             AND f.initiator_id != ?
         ORDER BY f.created_at DESC;
     `;
-    return db.all(query, [userId, userId, userId]);
+    const rows = await db.all(query, [userId, userId, userId]);
+    return rows.map(row => ({
+        friendship_id: row.friendship_id,
+        created_at: row.created_at,
+        requester: {
+            id: row.id,
+            username: row.username,
+            email: row.email,
+            display_name: row.display_name,
+            avatar_url: row.avatar_url,
+        },
+    }));
 }
 
 /**
@@ -151,26 +163,30 @@ export async function getPendingReceivedFriendRequestsInDb(userId) {
  */
 export async function getPendingSentFriendRequestsInDb(userId) {
     const db = getDb();
-    const queryWithInitiator = `
+    const query = `
         SELECT
             f.id as friendship_id,
+            f.created_at,
             CASE
                 WHEN f.user1_id = f.initiator_id THEN u2.id
                 ELSE u1.id
-            END as receiver_id,
+            END as id,
             CASE
                 WHEN f.user1_id = f.initiator_id THEN u2.username
                 ELSE u1.username
-            END as receiver_username,
+            END as username,
+            CASE
+                WHEN f.user1_id = f.initiator_id THEN u2.email
+                ELSE u1.email
+            END as email,
             CASE
                 WHEN f.user1_id = f.initiator_id THEN u2.display_name
                 ELSE u1.display_name
-            END as receiver_display_name,
+            END as display_name,
             CASE
                 WHEN f.user1_id = f.initiator_id THEN u2.avatar_url
                 ELSE u1.avatar_url
-            END as receiver_avatar_url,
-            f.created_at
+            END as avatar_url
         FROM friendships f
         JOIN users u1 ON f.user1_id = u1.id
         JOIN users u2 ON f.user2_id = u2.id
@@ -179,7 +195,18 @@ export async function getPendingSentFriendRequestsInDb(userId) {
             AND f.status = 'pending'
         ORDER BY f.created_at DESC;
     `;
-    return db.all(queryWithInitiator, [userId]);
+    const rows = await db.all(query, [userId]);
+    return rows.map(row => ({
+        friendship_id: row.friendship_id,
+        created_at: row.created_at,
+        receiver: {
+            id: row.id,
+            username: row.username,
+            email: row.email,
+            display_name: row.display_name,
+            avatar_url: row.avatar_url,
+        },
+    }));
 }
 
 /**
@@ -200,4 +227,21 @@ export async function getAllFriendshipsInDb() {
         JOIN users u2 ON f.user2_id = u2.id
         JOIN users ui ON f.initiator_id = ui.id
     `);
+}
+
+/**
+ * Retrieves a paginated list of friends for a specific user.
+ * @param {number} userId - ID of the user.
+ * @param {number} limit - Maximum number of friends to retrieve.
+ * @param {number} offset - Number of records to skip.
+ * @returns {Promise<Array<object>>} List of friends with their details.
+ */
+export async function getFriends(userId, limit = 10, offset = 0) {
+    const db = getDb();
+    const query = `
+        SELECT * FROM friendships
+        WHERE (user1_id = ? OR user2_id = ?) AND status = 'accepted'
+        LIMIT ? OFFSET ?
+    `;
+    return db.all(query, [userId, userId, limit, offset]);
 }

@@ -4,6 +4,7 @@ import {
 	getUserMeMatchHandler,
 	updateUserMeHandler,
 } from '../handlers/userHandlers.js';
+
 import { updateUserSchema } from '../schemas/userSchemas.js';
 
 export default async function userRoutes(fastify, options) {
@@ -15,7 +16,7 @@ export default async function userRoutes(fastify, options) {
 		getUserMeHandler
 	);
 	fastify.patch('/me',
-		{ onRequest: [fastify.authenticate], schema: updateUserSchema },
+		{ onRequest: [fastify.authenticate, fastify.csrfProtection], schema: updateUserSchema },
 		updateUserMeHandler
 	);
 	fastify.get('/me/matches',

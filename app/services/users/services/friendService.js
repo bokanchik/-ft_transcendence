@@ -2,6 +2,7 @@
 import * as friendModel from '../models/friendModel.js';
 import * as userModel from '../models/userModel.js'; // To verify user existence
 import { ConflictError, NotFoundError, ValidationError, ForbiddenError } from '../utils/appError.js';
+import { ERROR_MESSAGES } from '../utils/errorMessages.js';
 
 /**
  * Creates a friend request.

@@ -1,5 +1,6 @@
 import fastifyJwt from '@fastify/jwt';
-import fastifyCookie from '@fastify/cookie';
+
+export const jwtToken = 'jwt_token';
 
 export const cookieOptions = {
 	path: '/', // Allow the cookie to be sent to all routes
@@ -10,22 +11,11 @@ export const cookieOptions = {
 	maxAge: 60 * 60 * 24 * 7, // 1 week in seconds
 }
 
-export const jwtToken = 'jwt_token';
-
 export async function registerJWTPlugin(fastify) {
-	const jwtSecret = process.env.JWT_SECRET; // A GERER DANS ENV
-	const cookieSecret = process.env.COOKIE_SECRET; // A GERER DANS ENV
-	if (!jwtSecret || !cookieSecret) {
-		fastify.log.warn('JWT_SECRET OR COOKIE_SECRET NOT SET : OCCUPE TOI DES DOCKER SECRETS !!');
-	}
-	await fastify.register(fastifyCookie, {
-		secret: process.env.COOKIE_SECRET || 'COOKIE_SECRET_DUR',
-		parseOptions: {},
-	});
-
+	const jwtSecret = process.env.JWT_SECRET || 'SECRET_EN_DUR';
 	try {
 		await fastify.register(fastifyJwt, {
-			secret: jwtSecret || 'SECRET_EN_DUR',// Utilise le secret ou une valeur par défaut (à changer absolument en production)
+			secret: jwtSecret,
 			sign: { expiresIn: '7d' },
 			cookie: {
 				cookieName: jwtToken,
@@ -35,7 +25,7 @@ export async function registerJWTPlugin(fastify) {
 		fastify.log.debug('JWT plugin registered successfully');
 	} catch (err) {
 		fastify.log.error({ err }, 'FAILED to register @fastify/jwt plugin!');
-		throw err; // Relancer bonne pratique ?
+		throw err;
 	}
 }
 

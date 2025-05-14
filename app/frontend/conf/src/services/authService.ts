@@ -60,6 +60,7 @@ export type RegisterResult =
 // only user data
 const USER_DATA_KEY = 'userDataKey';
 const USER_DATA_EXPIRATION_KEY = 'userDataExpiration';
+const CSRF_TOKEN_KEY = 'csrfToken';
 
 /**
  * Retrieves user data (not the token) from localStorage.
@@ -94,6 +95,14 @@ export function setUserDataInStorage(userData: UserData): void {
     localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
     const expiration = new Date().getTime() + 24 * 60 * 60 * 1000; // 24 hours
     localStorage.setItem(USER_DATA_EXPIRATION_KEY, expiration.toString());
+}
+
+function setCsrfToken(token: string): void {
+    localStorage.setItem(CSRF_TOKEN_KEY, token);
+}
+
+function getCsrfToken(): string | null {
+    return localStorage.getItem(CSRF_TOKEN_KEY);
 }
 
 /**
@@ -136,13 +145,9 @@ export async function attemptLogin(credentials: LoginCredentials): Promise<Login
     const loginUrl = '/api/users/auth/login';
 
     try {
-//        const csrfToken = localStorage.getItem('csrfToken'); // Exemple de récupération du token
         const response = await fetch(loginUrl, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-//                'X-CSRF-Token': csrfToken || '',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(credentials),
             credentials: 'include',
         });
@@ -157,12 +162,12 @@ export async function attemptLogin(credentials: LoginCredentials): Promise<Login
             }
             return { success: false, error: errorData.error || response.statusText };
         }
-        const data: LoginSuccessResponse = await response.json();
-        console.log("Login successful.");
+
+        const data: LoginSuccessResponse & { csrfToken: string } = await response.json();
 
         if (data && data.user) {
             localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.user));
-            console.log("User data stored in localStorage.");
+            setCsrfToken(data.csrfToken); // Stocker le token CSRF
             return { success: true, data: data };
         } else {
             console.warn("No user data received in login response.");
@@ -230,10 +235,15 @@ export async function attemptRegister(credentials: RegisterCredentials): Promise
             return { success: false, error: errorData.error || response.statusText };
         }
 
-        const data: RegisterSuccessData = await response.json();
-        console.log("Registration successful:", data);
-        return { success: true, data: data };
+        const data: RegisterSuccessData & { csrfToken: string } = await response.json();
 
+        if (data && data.user) {
+            localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.user));
+            setCsrfToken(data.csrfToken); // Stocker le token CSRF
+            return { success: true, data: data };
+        } else {
+            return { success: false, error: "Problem receiving user data." };
+        }
     } catch (error) {
         console.error("Network error during registration:", error);
         const errorMessage = error instanceof Error ? error.message : "Unknown error";

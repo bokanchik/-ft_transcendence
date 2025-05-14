@@ -20,6 +20,7 @@ services:
     container_name: frontend
     build: ./frontend
     restart: always
+    env_file: .env
     volumes:
       - frontdata:/app/dist
     networks:
