@@ -1,7 +1,11 @@
 // dashboardPage.ts
 
-import { getUserDataFromStorage, logout, UserData } from '../services/authService.js';
 import { navigateTo } from '../main.js';
+import {
+    getUserDataFromStorage,
+    logout,
+    UserData,
+} from '../services/authService.js';
 import {
     getReceivedFriendRequests,
     getSentFriendRequests,
@@ -9,15 +13,14 @@ import {
     declineFriendRequest,
     cancelFriendRequest,
     PendingFriendRequest,
-    getFriendsList, // <-- Importer la nouvelle fonction
-    Friend         // <-- Importer le nouveau type
+    getFriendsList,
+    Friend,
 } from '../services/friendService.js';
 
 export function DashboardPage(): HTMLElement {
     const userData: UserData | null = getUserDataFromStorage();
 
     if (!userData) {
-        // ... (redirection inchangée)
         console.warn('Access unauthorized: User not authenticated.');
 		navigateTo('/login');
 		const redirectMsg = document.createElement('div');

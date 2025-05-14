@@ -1,13 +1,17 @@
-import { getUserDataFromStorage, logout, UserData } from '../services/authService.js';
 import { navigateTo } from '../main.js';
 import {
-    getReceivedFriendRequests,
-    getSentFriendRequests,
-    getFriendsList,
-    acceptFriendRequest,
-    declineFriendRequest,
-    cancelFriendRequest,
-    PendingFriendRequest
+	getUserDataFromStorage,
+	logout,
+	UserData,
+} from '../services/authService.js';
+import {
+	getReceivedFriendRequests,
+	getSentFriendRequests,
+	getFriendsList,
+	acceptFriendRequest,
+	declineFriendRequest,
+	cancelFriendRequest,
+	PendingFriendRequest
 } from '../services/friendService.js';
 
 export function DashboardPage(): HTMLElement {
@@ -28,11 +32,11 @@ export function DashboardPage(): HTMLElement {
 	const contentWrapper = document.createElement('div');
 	contentWrapper.className = 'max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6 md:p-8';
 
-    // --- Section pour les demandes d'amis ---
-    const friendRequestsSection = document.createElement('div');
-    friendRequestsSection.id = 'friend-requests-section';
-    friendRequestsSection.className = 'mt-8 p-6 bg-indigo-50 border border-indigo-200 rounded-lg shadow-sm';
-    friendRequestsSection.innerHTML = `
+	// --- Section pour les demandes d'amis ---
+	const friendRequestsSection = document.createElement('div');
+	friendRequestsSection.id = 'friend-requests-section';
+	friendRequestsSection.className = 'mt-8 p-6 bg-indigo-50 border border-indigo-200 rounded-lg shadow-sm';
+	friendRequestsSection.innerHTML = `
         <h2 class="text-2xl font-semibold text-indigo-800 mb-4">Demandes d'amis</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -88,13 +92,13 @@ export function DashboardPage(): HTMLElement {
         </div>
     `;
 
-    // Insérer la section des demandes d'amis avant la dernière div (liens de pied de page)
-    const mainGrid = contentWrapper.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3');
-    if (mainGrid && mainGrid.parentNode) {
-        mainGrid.parentNode.insertBefore(friendRequestsSection, mainGrid.nextSibling);
-    } else {
-        contentWrapper.appendChild(friendRequestsSection); // Fallback
-    }
+	// Insérer la section des demandes d'amis avant la dernière div (liens de pied de page)
+	const mainGrid = contentWrapper.querySelector('.grid.grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3');
+	if (mainGrid && mainGrid.parentNode) {
+		mainGrid.parentNode.insertBefore(friendRequestsSection, mainGrid.nextSibling);
+	} else {
+		contentWrapper.appendChild(friendRequestsSection); // Fallback
+	}
 
 	container.appendChild(contentWrapper);
 
@@ -103,48 +107,48 @@ export function DashboardPage(): HTMLElement {
 	if (logoutButton) {
 		logoutButton.addEventListener('click', async () => { // Rendre async pour logout
 			console.log('Déconnexion demandée...');
-            try {
-                await logout(); // Appelle la fonction logout() du service (qui est async)
-                alert('Vous avez été déconnecté.');
-            } catch (error) {
-                console.error('Erreur pendant la déconnexion:', error);
-                alert('Une erreur est survenue lors de la déconnexion.');
-            } finally {
-                navigateTo('/login');
-            }
+			try {
+				await logout(); // Appelle la fonction logout() du service (qui est async)
+				alert('Vous avez été déconnecté.');
+			} catch (error) {
+				console.error('Erreur pendant la déconnexion:', error);
+				alert('Une erreur est survenue lors de la déconnexion.');
+			} finally {
+				navigateTo('/login');
+			}
 		});
 	}
 
-    // --- Logique pour les demandes d'amis ---
-    const receivedList = friendRequestsSection.querySelector('#received-requests-list') as HTMLUListElement;
-    const sentList = friendRequestsSection.querySelector('#sent-requests-list') as HTMLUListElement;
-    const receivedCountSpan = friendRequestsSection.querySelector('#received-requests-count') as HTMLSpanElement;
-    const sentCountSpan = friendRequestsSection.querySelector('#sent-requests-count') as HTMLSpanElement;
+	// --- Logique pour les demandes d'amis ---
+	const receivedList = friendRequestsSection.querySelector('#received-requests-list') as HTMLUListElement;
+	const sentList = friendRequestsSection.querySelector('#sent-requests-list') as HTMLUListElement;
+	const receivedCountSpan = friendRequestsSection.querySelector('#received-requests-count') as HTMLSpanElement;
+	const sentCountSpan = friendRequestsSection.querySelector('#sent-requests-count') as HTMLSpanElement;
 
-    async function loadFriendRequests() {
-        try {
-            const [received, sent] = await Promise.all([
-                getReceivedFriendRequests(),
-                getSentFriendRequests()
-            ]);
+	async function loadFriendRequests() {
+		try {
+			const [received, sent] = await Promise.all([
+				getReceivedFriendRequests(),
+				getSentFriendRequests()
+			]);
 
-            renderReceivedRequests(received);
-            renderSentRequests(sent);
+			renderReceivedRequests(received);
+			renderSentRequests(sent);
 
-        } catch (error) {
-            console.error("Erreur lors du chargement des demandes d'amis:", error);
-            receivedList.innerHTML = `<li class="text-red-500 italic">Erreur de chargement.</li>`;
-            sentList.innerHTML = `<li class="text-red-500 italic">Erreur de chargement.</li>`;
-        }
-    }
+		} catch (error) {
+			console.error("Erreur lors du chargement des demandes d'amis:", error);
+			receivedList.innerHTML = `<li class="text-red-500 italic">Erreur de chargement.</li>`;
+			sentList.innerHTML = `<li class="text-red-500 italic">Erreur de chargement.</li>`;
+		}
+	}
 
-    function renderReceivedRequests(requests: PendingFriendRequest[]) {
-        receivedCountSpan.textContent = requests.length.toString();
-        if (!requests.length) {
-            receivedList.innerHTML = `<li class="text-gray-500 italic">Aucune demande reçue.</li>`;
-            return;
-        }
-        receivedList.innerHTML = requests.map(req => `
+	function renderReceivedRequests(requests: PendingFriendRequest[]) {
+		receivedCountSpan.textContent = requests.length.toString();
+		if (!requests.length) {
+			receivedList.innerHTML = `<li class="text-gray-500 italic">Aucune demande reçue.</li>`;
+			return;
+		}
+		receivedList.innerHTML = requests.map(req => `
             <li data-friendship-id="${req.friendship_id}" class="p-3 bg-white border border-gray-200 rounded-md shadow-sm flex justify-between items-center">
                 <div>
                     <strong class="text-indigo-600">${req.requester?.display_name || req.requester?.username}</strong>
@@ -156,15 +160,15 @@ export function DashboardPage(): HTMLElement {
                 </div>
             </li>
         `).join('');
-    }
+	}
 
-    function renderSentRequests(requests: PendingFriendRequest[]) {
-        sentCountSpan.textContent = requests.length.toString();
-        if (!requests.length) {
-            sentList.innerHTML = `<li class="text-gray-500 italic">Aucune demande envoyée.</li>`;
-            return;
-        }
-        sentList.innerHTML = requests.map(req => `
+	function renderSentRequests(requests: PendingFriendRequest[]) {
+		sentCountSpan.textContent = requests.length.toString();
+		if (!requests.length) {
+			sentList.innerHTML = `<li class="text-gray-500 italic">Aucune demande envoyée.</li>`;
+			return;
+		}
+		sentList.innerHTML = requests.map(req => `
             <li data-friendship-id="${req.friendship_id}" class="p-3 bg-white border border-gray-200 rounded-md shadow-sm flex justify-between items-center">
                  <div>
                     <strong class="text-indigo-600">${req.receiver?.display_name || req.receiver?.username}</strong>
@@ -173,46 +177,46 @@ export function DashboardPage(): HTMLElement {
                 <button data-action="cancel" class="text-xs bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-1 px-2 rounded">Annuler</button>
             </li>
         `).join('');
-    }
+	}
 
-    // Gestionnaires d'événements pour les actions sur les demandes
-    friendRequestsSection.addEventListener('click', async (event) => {
-        const target = event.target as HTMLElement;
-        if (target.tagName !== 'BUTTON' || !target.dataset.action) return;
+	// Gestionnaires d'événements pour les actions sur les demandes
+	friendRequestsSection.addEventListener('click', async (event) => {
+		const target = event.target as HTMLElement;
+		if (target.tagName !== 'BUTTON' || !target.dataset.action) return;
 
-        const listItem = target.closest('li[data-friendship-id]') as HTMLLIElement;
-        if (!listItem) return;
+		const listItem = target.closest('li[data-friendship-id]') as HTMLLIElement;
+		if (!listItem) return;
 
-        const friendshipId = parseInt(listItem.dataset.friendshipId || '', 10);
-        if (isNaN(friendshipId)) return;
+		const friendshipId = parseInt(listItem.dataset.friendshipId || '', 10);
+		if (isNaN(friendshipId)) return;
 
-        const action = target.dataset.action;
-        target.disabled = true; // Désactiver le bouton pendant l'action
-        target.textContent = '...';
+		const action = target.dataset.action;
+		target.disabled = true; // Désactiver le bouton pendant l'action
+		target.textContent = '...';
 
 
-        try {
-            let message = '';
-            if (action === 'accept') {
-                message = (await acceptFriendRequest(friendshipId)).message;
-            } else if (action === 'decline') {
-                message = (await declineFriendRequest(friendshipId)).message;
-            } else if (action === 'cancel') {
-                message = (await cancelFriendRequest(friendshipId)).message;
-            }
-            console.log(message); // Pourrait être affiché dans un toast/notification
-            alert(message); // Simple alerte pour le feedback
-            loadFriendRequests(); // Recharger la liste
-        } catch (error: any) {
-            console.error(`Erreur lors de l'action '${action}':`, error);
-            alert(`Erreur: ${error.message || 'Une erreur est survenue.'}`);
-            target.disabled = false; // Réactiver si erreur
-            target.textContent = action.charAt(0).toUpperCase() + action.slice(1); // Restaurer le texte
-        }
-    });
+		try {
+			let message = '';
+			if (action === 'accept') {
+				message = (await acceptFriendRequest(friendshipId)).message;
+			} else if (action === 'decline') {
+				message = (await declineFriendRequest(friendshipId)).message;
+			} else if (action === 'cancel') {
+				message = (await cancelFriendRequest(friendshipId)).message;
+			}
+			console.log(message); // Pourrait être affiché dans un toast/notification
+			alert(message); // Simple alerte pour le feedback
+			loadFriendRequests(); // Recharger la liste
+		} catch (error: any) {
+			console.error(`Erreur lors de l'action '${action}':`, error);
+			alert(`Erreur: ${error.message || 'Une erreur est survenue.'}`);
+			target.disabled = false; // Réactiver si erreur
+			target.textContent = action.charAt(0).toUpperCase() + action.slice(1); // Restaurer le texte
+		}
+	});
 
-    // Charger les demandes d'amis au chargement de la page
-    loadFriendRequests();
+	// Charger les demandes d'amis au chargement de la page
+	loadFriendRequests();
 
 	return container;
 }

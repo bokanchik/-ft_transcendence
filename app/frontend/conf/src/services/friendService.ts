@@ -1,101 +1,96 @@
-import { UserData } from './authService.js'; // Ou le chemin correct
+import { UserData } from './authService.js'; // Or the correct path
 
-// Interfaces pour les données d'amitié (adaptez selon ce que votre API renvoie)
 export interface FriendRequestUserData {
     id: number;
     username: string;
+    email: string;
     display_name: string;
     avatar_url: string | null;
 }
 
 export interface PendingFriendRequest {
     friendship_id: number;
-    requester?: FriendRequestUserData; // Utilisé pour les demandes reçues
-    receiver?: FriendRequestUserData; // Utilisé pour les demandes envoyées
+    requester?: FriendRequestUserData; // Used for received requests
+    receiver?: FriendRequestUserData; // Used for sent requests
     created_at: string;
 }
 
 export interface ApiErrorResponse {
-	error: string;
+    error: string;
     details?: any;
 }
-
-// export interface Friend {
-//     id: number;
-//     username: string;
-//     display_name?: string;
-//     avatar_url?: string;
-//     status?: 'online' | 'offline' | 'in-game';
-//     wins?: number;
-//     loses?: number;
-//     // Ajoutez d'autres champs si nécessaire (ex: date d'amitié, etc.)
-// }
 
 export interface Friend {
     friendship_id: number;
     friendship_status: string;
-    friend_id: number;             // Utilisé pour data-friend-id et data-user-id
-    friend_username: string;       // Utilisé pour l'affichage
-    friend_display_name?: string;  // Utilisé pour l'affichage
-    friend_avatar_url?: string;    // Utilisé pour l'avatar
+    friend_id: number;             // Used for data-friend-id and data-user-id
+    friend_username: string;       // Used for display
+    friend_display_name?: string;  // Used for display
+    friend_avatar_url?: string;    // Used for avatar
     friend_wins?: number;
     friend_losses?: number;
-    friend_online_status?: 'online' | 'offline' | 'in-game'; // Utilisé pour l'indicateur de statut
+    friend_online_status?: 'online' | 'offline' | 'in-game'; // Used for status indicator
 }
 
 type FriendRequestResult =
-	| { success: true; data: PendingFriendRequest[] }
-	| { success: false; error: string };
+    | { success: true; data: PendingFriendRequest[] }
+    | { success: false; error: string };
 
 type FriendActionResult =
     | { success: true; message: string }
     | { success: false; error: string };
 
-
+/**
+ * Handles API responses by checking for errors and parsing the response JSON.
+ * @param response The HTTP response object.
+ * @returns The parsed JSON data if the response is successful.
+ * @throws An error if the response is not successful.
+ */
 const handleApiResponse = async (response: Response) => {
     if (!response.ok) {
         let errorData: ApiErrorResponse = { error: `Server error (${response.status})` };
         try {
             errorData = await response.json();
         } catch (jsonError) {
-            // L'erreur n'est pas du JSON, utiliser le statusText
+            // The error is not JSON, fallback to statusText
         }
         throw new Error(errorData.error || response.statusText);
     }
     return response.json();
 };
 
-// --- Fonctions pour interagir avec l'API des amis ---
-
 /**
- * Récupère les demandes d'amitié reçues par l'utilisateur connecté.
+ * Retrieves the friend requests received by the logged-in user.
+ * @returns A list of pending friend requests.
  */
 export async function getReceivedFriendRequests(): Promise<PendingFriendRequest[]> {
-    const response = await fetch('/api/friends/requests/received', { // Adaptez l'URL
+    const response = await fetch('/api/friends/requests/received', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // Important pour les cookies
+        credentials: 'include',
     });
     return handleApiResponse(response);
 }
 
 /**
- * Récupère la liste des amis de l'utilisateur connecté.
+ * Retrieves the list of friends of the logged-in user.
+ * @returns A list of friends.
  */
 export async function getFriendsList(): Promise<Friend[]> {
-    const response = await fetch('/api/friends/friends', { // Adaptez l'URL de l'API si besoin
+    const response = await fetch('/api/friends/friends', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
     });
-    return handleApiResponse(response); // Réutilise votre gestionnaire de réponse
+    return handleApiResponse(response);
 }
 
 /**
- * Récupère les demandes d'amitié envoyées par l'utilisateur connecté.
+ * Retrieves the friend requests sent by the logged-in user.
+ * @returns A list of sent friend requests.
  */
 export async function getSentFriendRequests(): Promise<PendingFriendRequest[]> {
-     const response = await fetch('/api/friends/requests/sent', { // Adaptez l'URL
+    const response = await fetch('/api/friends/requests/sent', {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -104,39 +99,39 @@ export async function getSentFriendRequests(): Promise<PendingFriendRequest[]> {
 }
 
 /**
- * Accepte une demande d'amitié.
- * @param friendshipId ID de la relation d'amitié (obtenu d'une demande reçue)
+ * Accepts a friend request.
+ * @param friendshipId The ID of the friendship (obtained from a received request).
+ * @returns A message indicating the result of the operation.
  */
 export async function acceptFriendRequest(friendshipId: number): Promise<{ message: string }> {
-    const response = await fetch(`/api/friends/requests/${friendshipId}/accept`, { // Adaptez l'URL
+    const response = await fetch(`/api/friends/requests/${friendshipId}/accept`, {
         method: 'POST',
-        //headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
     });
     return handleApiResponse(response);
 }
 
 /**
- * Refuse une demande d'amitié reçue.
- * @param friendshipId ID de la relation d'amitié
+ * Declines a received friend request.
+ * @param friendshipId The ID of the friendship.
+ * @returns A message indicating the result of the operation.
  */
 export async function declineFriendRequest(friendshipId: number): Promise<{ message: string }> {
-    const response = await fetch(`/api/friends/requests/${friendshipId}/decline`, { // Adaptez l'URL
-        method: 'POST', // ou DELETE selon votre API
-        //headers: { 'Content-Type': 'application/json' },
+    const response = await fetch(`/api/friends/requests/${friendshipId}/decline`, {
+        method: 'POST', // or DELETE -> depends on API
         credentials: 'include',
     });
     return handleApiResponse(response);
 }
 
 /**
- * Annule une demande d'amitié envoyée.
- * @param friendshipId ID de la relation d'amitié
+ * Cancels a sent friend request.
+ * @param friendshipId The ID of the friendship.
+ * @returns A message indicating the result of the operation.
  */
 export async function cancelFriendRequest(friendshipId: number): Promise<{ message: string }> {
-    const response = await fetch(`/api/friends/requests/${friendshipId}/cancel`, { // Adaptez l'URL
-        method: 'POST', // ou DELETE selon votre API
-        //headers: { 'Content-Type': 'application/json' },
+    const response = await fetch(`/api/friends/requests/${friendshipId}/cancel`, {
+        method: 'POST', // or DELETE -> depends on API
         credentials: 'include',
     });
     return handleApiResponse(response);
