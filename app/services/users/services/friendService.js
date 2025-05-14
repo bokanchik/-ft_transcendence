@@ -1,12 +1,16 @@
 // services/friendService.js
 import * as friendModel from '../models/friendModel.js';
-import * as userModel from '../models/userModel.js'; // Pour vérifier l'existence des utilisateurs
+import * as userModel from '../models/userModel.js'; // To verify user existence
 import { ConflictError, NotFoundError, ValidationError, ForbiddenError } from '../utils/appError.js';
 
 /**
- * Crée une demande d'amitié.
- * @param {number} requesterId - ID de l'utilisateur qui fait la demande.
- * @param {number} receiverUsername - Username de l'utilisateur qui reçoit la demande.
+ * Creates a friend request.
+ * @param {number} requesterId - ID of the user sending the request.
+ * @param {string} receiverUsername - Username of the user receiving the request.
+ * @throws {ValidationError} If required parameters are missing or invalid.
+ * @throws {NotFoundError} If the receiver does not exist.
+ * @throws {ConflictError} If a friendship or request already exists.
+ * @returns {Promise<Object>} The created friendship request.
  */
 export async function sendFriendRequest(requesterId, receiverUsername) {
     if (requesterId === undefined || !receiverUsername) {
@@ -31,7 +35,7 @@ export async function sendFriendRequest(requesterId, receiverUsername) {
             throw new ConflictError('You are already friends with this user.');
         } else if (existingFriendship.status === 'pending') {
             if (existingFriendship.initiator_id === requesterId) {
-                 throw new ConflictError('A friend request to this user is already pending from you.');
+                throw new ConflictError('A friend request to this user is already pending from you.');
             } else {
                 throw new ConflictError('This user has already sent you a friend request. Please respond to it.');
             }
@@ -43,9 +47,13 @@ export async function sendFriendRequest(requesterId, receiverUsername) {
 }
 
 /**
- * Accepte une demande d'amitié.
- * @param {number} friendshipId - ID de la relation d'amitié.
- * @param {number} currentUserId - ID de l'utilisateur qui accepte la demande (doit être le destinataire).
+ * Accepts a friend request.
+ * @param {number} friendshipId - ID of the friendship request.
+ * @param {number} currentUserId - ID of the user accepting the request.
+ * @throws {NotFoundError} If the friendship request does not exist.
+ * @throws {ConflictError} If the request is not pending.
+ * @throws {ForbiddenError} If the user is not authorized to accept the request.
+ * @returns {Promise<Object>} A success message.
  */
 export async function acceptFriendRequest(friendshipId, currentUserId) {
     const friendship = await friendModel.getFriendshipByIdInDb(friendshipId);
@@ -71,9 +79,12 @@ export async function acceptFriendRequest(friendshipId, currentUserId) {
 }
 
 /**
- * Refuse ou annule une demande d'amitié (ou supprime une amitié existante).
- * @param {number} friendshipId - ID de la relation d'amitié.
- * @param {number} currentUserId - ID de l'utilisateur qui effectue l'action.
+ * Declines or cancels a friend request, or removes an existing friendship.
+ * @param {number} friendshipId - ID of the friendship.
+ * @param {number} currentUserId - ID of the user performing the action.
+ * @throws {NotFoundError} If the friendship does not exist.
+ * @throws {ForbiddenError} If the user is not part of the friendship.
+ * @returns {Promise<Object>} A success message.
  */
 export async function declineOrCancelFriendRequest(friendshipId, currentUserId) {
     const friendship = await friendModel.getFriendshipByIdInDb(friendshipId);
@@ -103,10 +114,11 @@ export async function declineOrCancelFriendRequest(friendshipId, currentUserId) 
     return { message: actionMessage };
 }
 
-
 /**
- * Récupère la liste des amis acceptés d'un utilisateur.
- * @param {number} userId
+ * Retrieves the list of accepted friends for a user.
+ * @param {number} userId - ID of the user.
+ * @throws {NotFoundError} If the user does not exist.
+ * @returns {Promise<Array>} List of friends.
  */
 export async function getFriends(userId) {
     const user = await userModel.getUserByIdFromDb(userId);
@@ -117,8 +129,10 @@ export async function getFriends(userId) {
 }
 
 /**
- * Récupère les demandes d'amitié reçues et en attente pour un utilisateur.
- * @param {number} userId
+ * Retrieves pending friend requests received by a user.
+ * @param {number} userId - ID of the user.
+ * @throws {NotFoundError} If the user does not exist.
+ * @returns {Promise<Array>} List of received friend requests.
  */
 export async function getReceivedFriendRequests(userId) {
     const user = await userModel.getUserByIdFromDb(userId);
@@ -129,8 +143,10 @@ export async function getReceivedFriendRequests(userId) {
 }
 
 /**
- * Récupère les demandes d'amitié envoyées et en attente par un utilisateur.
- * @param {number} userId
+ * Retrieves pending friend requests sent by a user.
+ * @param {number} userId - ID of the user.
+ * @throws {NotFoundError} If the user does not exist.
+ * @returns {Promise<Array>} List of sent friend requests.
  */
 export async function getSentFriendRequests(userId) {
     const user = await userModel.getUserByIdFromDb(userId);
@@ -141,17 +157,20 @@ export async function getSentFriendRequests(userId) {
 }
 
 /**
- * Récupère toutes les relations d'amitié (admin).
+ * Retrieves all friendships (admin only).
+ * @returns {Promise<Array>} List of all friendships.
  */
 export async function getAllFriendships() {
     return friendModel.getAllFriendshipsInDb();
 }
 
 /**
- * Bloque un utilisateur.
- * Cela pourrait créer une relation avec status 'blocked' ou mettre à jour une existante.
- * @param {number} blockerId - ID de l'utilisateur qui bloque.
- * @param {number} blockedUserId - ID de l'utilisateur à bloquer.
+ * Blocks a user.
+ * @param {number} blockerId - ID of the user blocking.
+ * @param {number} blockedUserId - ID of the user to block.
+ * @throws {ValidationError} If the blocker tries to block themselves.
+ * @throws {NotFoundError} If the user to block does not exist.
+ * @returns {Promise<Object>} A success message.
  */
 export async function blockUser(blockerId, blockedUserId) {
     if (blockerId === blockedUserId) {
@@ -175,9 +194,11 @@ export async function blockUser(blockerId, blockedUserId) {
 }
 
 /**
- * Débloque un utilisateur.
- * @param {number} unblockerId - ID de l'utilisateur qui débloque.
- * @param {number} unblockedUserId - ID de l'utilisateur à débloquer.
+ * Unblocks a user.
+ * @param {number} unblockerId - ID of the user unblocking.
+ * @param {number} unblockedUserId - ID of the user to unblock.
+ * @throws {NotFoundError} If no active block exists.
+ * @returns {Promise<Object>} A success message.
  */
 export async function unblockUser(unblockerId, unblockedUserId) {
     const [id1, id2] = unblockerId < unblockedUserId ? [unblockerId, unblockedUserId] : [unblockedUserId, unblockerId];

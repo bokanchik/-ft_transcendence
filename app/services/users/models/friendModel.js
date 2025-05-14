@@ -2,10 +2,11 @@
 import { getDb } from '../utils/dbConfig.js';
 
 /**
- * Crée une nouvelle demande d'amitié dans la base de données.
- * @param {number} user1Id - ID de l'utilisateur qui envoie la demande.
- * @param {number} user2Id - ID de l'utilisateur qui reçoit la demande.
- * @returns {Promise<object>} L'objet de l'amitié créée avec son ID.
+ * Creates a new friendship request in the database.
+ * @param {number} user1Id - ID of the first user.
+ * @param {number} user2Id - ID of the second user.
+ * @param {number} initiatorId - ID of the user initiating the request.
+ * @returns {Promise<object>} The created friendship object with its ID.
  */
 export async function createFriendshipRequestInDb(user1Id, user2Id, initiatorId) {
     const db = getDb();
@@ -19,10 +20,10 @@ export async function createFriendshipRequestInDb(user1Id, user2Id, initiatorId)
 }
 
 /**
- * Récupère une amitié spécifique par les IDs des deux utilisateurs.
- * @param {number} user1Id
- * @param {number} user2Id
- * @returns {Promise<object|undefined>} L'objet amitié ou undefined si non trouvé.
+ * Retrieves a specific friendship by the IDs of the two users.
+ * @param {number} user1Id - ID of the first user.
+ * @param {number} user2Id - ID of the second user.
+ * @returns {Promise<object|undefined>} The friendship object or undefined if not found.
  */
 export async function getFriendshipByUsersInDb(user1Id, user2Id) {
     const db = getDb();
@@ -34,21 +35,20 @@ export async function getFriendshipByUsersInDb(user1Id, user2Id) {
 }
 
 /**
- * Récupère une amitié par son ID.
- * @param {number} friendshipId
- * @returns {Promise<object|undefined>} L'objet amitié ou undefined si non trouvé.
+ * Retrieves a friendship by its ID.
+ * @param {number} friendshipId - ID of the friendship.
+ * @returns {Promise<object|undefined>} The friendship object or undefined if not found.
  */
 export async function getFriendshipByIdInDb(friendshipId) {
     const db = getDb();
     return db.get(`SELECT * FROM friendships WHERE id = ?`, [friendshipId]);
 }
 
-
 /**
- * Met à jour le statut d'une amitié.
- * @param {number} friendshipId - ID de l'amitié à mettre à jour.
- * @param {string} status - Nouveau statut ('accepted', 'declined', 'blocked').
- * @returns {Promise<object>} Résultat de l'opération de base de données.
+ * Updates the status of a friendship.
+ * @param {number} friendshipId - ID of the friendship to update.
+ * @param {string} status - New status ('accepted', 'declined', 'blocked').
+ * @returns {Promise<object>} The result of the database operation.
  */
 export async function updateFriendshipStatusInDb(friendshipId, status) {
     const db = getDb();
@@ -59,9 +59,9 @@ export async function updateFriendshipStatusInDb(friendshipId, status) {
 }
 
 /**
- * Supprime une amitié de la base de données.
- * @param {number} friendshipId - ID de l'amitié à supprimer.
- * @returns {Promise<object>} Résultat de l'opération de base de données.
+ * Deletes a friendship from the database.
+ * @param {number} friendshipId - ID of the friendship to delete.
+ * @returns {Promise<object>} The result of the database operation.
  */
 export async function deleteFriendshipInDb(friendshipId) {
     const db = getDb();
@@ -69,15 +69,13 @@ export async function deleteFriendshipInDb(friendshipId) {
 }
 
 /**
- * Récupère toutes les amitiés acceptées d'un utilisateur spécifique.
- * Inclut les informations de l'ami (display_name, wins, losses, status, avatar_url).
- * @param {number} userId - ID de l'utilisateur.
- * @returns {Promise<Array<object>>} Liste des amis avec leurs détails.
+ * Retrieves all accepted friendships for a specific user.
+ * Includes details about the friend (display_name, wins, losses, status, avatar_url).
+ * @param {number} userId - ID of the user.
+ * @returns {Promise<Array<object>>} List of friends with their details.
  */
 export async function getAcceptedFriendsForUserInDb(userId) {
     const db = getDb();
-    // On doit joindre la table users deux fois, une pour user1_id et une pour user2_id
-    // et sélectionner les infos de l'autre utilisateur dans l'amitié.
     const query = `
         SELECT
             f.id as friendship_id,
@@ -91,7 +89,7 @@ export async function getAcceptedFriendsForUserInDb(userId) {
                 ELSE u1.display_name
             END as friend_display_name,
             CASE
-                WHEN f.user1_id = ? THEN u2.username -- Ajout du username de l'ami
+                WHEN f.user1_id = ? THEN u2.username
                 ELSE u1.username
             END as friend_username,
             CASE
@@ -103,7 +101,7 @@ export async function getAcceptedFriendsForUserInDb(userId) {
                 ELSE u1.losses
             END as friend_losses,
             CASE
-                WHEN f.user1_id = ? THEN u2.status -- status en ligne/hors ligne de l'ami
+                WHEN f.user1_id = ? THEN u2.status
                 ELSE u1.status
             END as friend_online_status,
             CASE
@@ -115,15 +113,14 @@ export async function getAcceptedFriendsForUserInDb(userId) {
         JOIN users u2 ON f.user2_id = u2.id
         WHERE (f.user1_id = ? OR f.user2_id = ?) AND f.status = 'accepted'
     `;
-    // On répète userId pour chaque ? dans la clause CASE et WHERE
     return db.all(query, [userId, userId, userId, userId, userId, userId, userId, userId, userId]);
 }
 
 /**
- * Récupère toutes les demandes d'amitié reçues (en attente) par un utilisateur.
- * Inclut les informations du demandeur.
- * @param {number} userId - ID de l'utilisateur qui a reçu les demandes.
- * @returns {Promise<Array<object>>} Liste des demandes reçues avec détails du demandeur.
+ * Retrieves all pending friend requests received by a user.
+ * Includes details about the requester.
+ * @param {number} userId - ID of the user who received the requests.
+ * @returns {Promise<Array<object>>} List of received requests with requester details.
  */
 export async function getPendingReceivedFriendRequestsInDb(userId) {
     const db = getDb();
@@ -138,26 +135,25 @@ export async function getPendingReceivedFriendRequestsInDb(userId) {
         FROM friendships f
         JOIN users u_initiator ON f.initiator_id = u_initiator.id
         WHERE
-            (f.user1_id = ? OR f.user2_id = ?) -- L'utilisateur est impliqué
+            (f.user1_id = ? OR f.user2_id = ?)
             AND f.status = 'pending'
-            AND f.initiator_id != ? -- La demande n'a pas été initiée par l'utilisateur actuel
+            AND f.initiator_id != ?
         ORDER BY f.created_at DESC;
     `;
     return db.all(query, [userId, userId, userId]);
 }
 
 /**
- * Récupère toutes les demandes d'amitié envoyées (en attente) par un utilisateur.
- * Inclut les informations du destinataire.
- * @param {number} userId - ID de l'utilisateur qui a envoyé les demandes.
- * @returns {Promise<Array<object>>} Liste des demandes envoyées avec détails du destinataire.
+ * Retrieves all pending friend requests sent by a user.
+ * Includes details about the receiver.
+ * @param {number} userId - ID of the user who sent the requests.
+ * @returns {Promise<Array<object>>} List of sent requests with receiver details.
  */
 export async function getPendingSentFriendRequestsInDb(userId) {
     const db = getDb();
     const queryWithInitiator = `
         SELECT
             f.id as friendship_id,
-            -- Sélectionner l'utilisateur qui N'EST PAS l'initiateur
             CASE
                 WHEN f.user1_id = f.initiator_id THEN u2.id
                 ELSE u1.id
@@ -187,9 +183,9 @@ export async function getPendingSentFriendRequestsInDb(userId) {
 }
 
 /**
- * Récupère toutes les relations d'amitié, quel que soit leur statut.
- * Utile pour l'admin ou le debug.
- * @returns {Promise<Array<object>>}
+ * Retrieves all friendships, regardless of their status.
+ * Useful for admin or debugging purposes.
+ * @returns {Promise<Array<object>>} List of all friendships.
  */
 export async function getAllFriendshipsInDb() {
     const db = getDb();
