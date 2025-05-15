@@ -1,7 +1,7 @@
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
 import { Server, Socket } from 'socket.io';
 import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
-import fastifyRateLimit from '@fastify/rate-limit'
+import fastifyRateLimit from '@fastify/rate-limit';
 // @ts-ignore
 import authPlugin from './shared/auth-plugin/index.ts';
 import db from './database/connectDB.ts'

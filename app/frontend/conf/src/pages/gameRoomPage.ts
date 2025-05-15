@@ -99,9 +99,14 @@ function setBoard(leftUsername: HTMLDivElement, rightUsername: HTMLDivElement) {
 
 function initGame(container: HTMLButtonElement) {
 	const gameMode = sessionStorage.getItem('gameMode');
+	console.log("Game mode: ", gameMode);
 
-
+	if (!socket.connected) {
+		socket.connect();
+	}
+	
 	socket.on('connect', () => {
+		console.log('emit startLocal');
 		if (gameMode === 'local') {
 			socket.emit('startLocalGame');
 		}
