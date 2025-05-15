@@ -34,7 +34,7 @@ re			: down up
 
 fdown		:
 #	@sudo rm -rf ~/data
-	docker compose -f $(DC_FILE) down --rmi all -v
+	docker compose -f $(DC_FILE) down --rmi all -v --remove-orphans
 
 prune		: fdown
 	docker system prune -a --volumes --force
