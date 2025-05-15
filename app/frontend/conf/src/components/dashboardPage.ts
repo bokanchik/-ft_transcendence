@@ -14,8 +14,8 @@ import {
 	PendingFriendRequest,
 	getFriendsList,
 	Friend,
-	fetchCsrfToken,
 } from '../services/friendService.js';
+import { fetchCsrfToken } from '../services/csrf.js';
 
 export function DashboardPage(): HTMLElement {
 	const userData: UserData | null = getUserDataFromStorage();
@@ -161,7 +161,7 @@ export function DashboardPage(): HTMLElement {
 		}
 	}
 
-	function renderReceivedRequests(requests: PendingFriendRequest[]) {
+	function renderReceivedRequests(requests: PendingFriendRequest[]): void {
 		receivedCountSpan.textContent = requests.length.toString();
 		if (!requests.length) {
 			receivedList.innerHTML = `<li class="text-gray-500 italic">Aucune demande reçue.</li>`;
@@ -181,7 +181,7 @@ export function DashboardPage(): HTMLElement {
         `).join('');
 	}
 
-	function renderSentRequests(requests: PendingFriendRequest[]) {
+	function renderSentRequests(requests: PendingFriendRequest[]): void {
 		sentCountSpan.textContent = requests.length.toString();
 		if (!requests.length) {
 			sentList.innerHTML = `<li class="text-gray-500 italic">Aucune demande envoyée.</li>`;
@@ -198,7 +198,7 @@ export function DashboardPage(): HTMLElement {
         `).join('');
 	}
 
-	function renderFriendsList(friends: Friend[]) {
+	function renderFriendsList(friends: Friend[]): void {
 		friendsCountSpan.textContent = friends.length.toString();
 		if (!friends.length) {
 			friendsListEl.innerHTML = `<li class="text-gray-500 italic">Vous n'avez pas encore d'amis.</li>`;
@@ -244,6 +244,8 @@ export function DashboardPage(): HTMLElement {
 		const target = event.target as HTMLElement;
 		if (target.tagName !== 'BUTTON' || !target.dataset.action) return;
 
+		const button = target as HTMLButtonElement;
+
 		const listItem = target.closest('li[data-friendship-id]') as HTMLLIElement;
 		if (!listItem) return;
 
@@ -251,8 +253,8 @@ export function DashboardPage(): HTMLElement {
 		if (isNaN(friendshipId)) return;
 
 		const action = target.dataset.action;
-		target.disabled = true;
-		target.textContent = '...';
+		button.disabled = true;
+		button.textContent = '...';
 
 		try {
 			let message = '';
@@ -265,12 +267,12 @@ export function DashboardPage(): HTMLElement {
 			}
 			console.log(message);
 			alert(message);
-			loadAllFriendData(); // Recharger TOUTES les listes (amis et demandes)
+			loadAllFriendData();
 		} catch (error: any) {
 			console.error(`Erreur lors de l'action '${action}':`, error);
 			alert(`Erreur: ${error.message || 'Une erreur est survenue.'}`);
-			target.disabled = false;
-			target.textContent = action.charAt(0).toUpperCase() + action.slice(1);
+			button.disabled = false;
+			button.textContent = action.charAt(0).toUpperCase() + action.slice(1);
 		}
 	});
 
@@ -278,6 +280,8 @@ export function DashboardPage(): HTMLElement {
 	friendsListEl.addEventListener('click', async (event) => {
 		const target = event.target as HTMLElement;
 		if (target.tagName !== 'BUTTON' || !target.dataset.action) return;
+
+		const button = target as HTMLButtonElement;
 
 		const listItem = target.closest('li[data-friend-id]') as HTMLLIElement;
 		if (!listItem) return;
@@ -288,24 +292,19 @@ export function DashboardPage(): HTMLElement {
 		const action = target.dataset.action;
 
 		if (action === 'view-profile') {
-			// Supposons que vous ayez une route /profile/:id ou /users/:id
-			// Adapter le chemin si nécessaire
-			navigateTo(`/profile/${friendId}`); // Ou /users/${friendId}
+			navigateTo(`/profile/${friendId}`);
 		} else if (action === 'remove-friend') {
 			if (confirm(`Êtes-vous sûr de vouloir supprimer cet ami ?`)) {
-				target.disabled = true;
-				target.textContent = '...';
+				button.disabled = true;
+				button.textContent = '...';
 				try {
-					// Vous aurez besoin d'une fonction removeFriend(friendId) dans friendService.js
-					// const result = await removeFriend(friendId);
-					// alert(result.message);
 					alert(`Ami ${friendId} supprimé (simulation). Implémentez removeFriend dans friendService.`);
-					loadAllFriendData(); // Recharger les listes
+					loadAllFriendData();
 				} catch (error: any) {
 					console.error('Erreur lors de la suppression de l\'ami:', error);
 					alert(`Erreur: ${error.message || 'Impossible de supprimer l\'ami.'}`);
-					target.disabled = false;
-					target.textContent = 'Supprimer';
+					button.disabled = false;
+					button.textContent = 'Supprimer';
 				}
 			}
 		}
