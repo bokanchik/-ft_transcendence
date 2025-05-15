@@ -50,6 +50,6 @@ export async function registerJWTPlugin(fastify) {
 		fastify.log.debug('JWT plugin registered successfully');
 	} catch (err) {
 		fastify.log.error({ err }, 'FAILED to register @fastify/jwt plugin!');
-		throw err;
+		throw new Error(err);
 	}
 }

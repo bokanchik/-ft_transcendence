@@ -29,7 +29,7 @@ export default fp(async (fastify: FastifyInstance, options: any) => {
     fastify.log.info('JWT plugin successfully registered');
   } catch (err) {
     fastify.log.error({ err }, 'FAILED to register @fastify/jwt plugin!');
-    throw err;
+   // throw new Error(err);
   }
   // to test
   fastify.log.info(`JWT_SECRET used: ${secret}`);

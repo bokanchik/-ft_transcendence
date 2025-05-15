@@ -5,10 +5,10 @@ import socket from "./socket.js";
 // --- Main Fonction for online game: 
 // post /api/game/match + socket initialisaztion + waiting room + 
 // matchmaking + then navigaTo(/game-room)
-export async function handleOnlineGame(display_name: string, token: string, container: HTMLElement, button: HTMLButtonElement): Promise<void> {
+export async function handleOnlineGame(display_name: string, container: HTMLElement, button: HTMLButtonElement): Promise<void> {
     button.disabled = true; // pour eviter les multiples click (data race)
     try {
-        await initOnlineGame(display_name, token, container);
+        await initOnlineGame(display_name, container);
     } catch (err: unknown) {
         console.log(err);
         alert('Error creating waiting room. Please try again.');
@@ -19,7 +19,7 @@ export async function handleOnlineGame(display_name: string, token: string, cont
 }
 
 // --- Fonction pour initialiser le client socket et le mettre dans le waiting room ---
-export async function initOnlineGame(display_name: string, token: string, buttonsContainer: HTMLElement) {
+export async function initOnlineGame(display_name: string, buttonsContainer: HTMLElement) {
     const controller: AbortController = new AbortController();
 
     if (!socket.connected) {
