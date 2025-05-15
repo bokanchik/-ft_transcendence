@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2016",          // Cible JavaScript moderne mais compatible
+    "target": "ES2020",          // Cible JavaScript moderne mais compatible
     "module": "ESNext",          // Utilise les modules ES natifs
     "moduleResolution": "node",  // Comment résoudre les modules
     "outDir": "./dist/js",       // Où mettre le JS compilé

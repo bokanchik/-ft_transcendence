@@ -16,3 +16,9 @@ if [ ! -f "$SSL_KEY" ] || [ ! -f "$SSL_CERT" ]; then
 fi
 
 exec nginx -g "daemon off;"
+
+# nginx -t
+# if [ $? -ne 0 ]; then
+#     echo "Nginx configuration is invalid!"
+#     exit 1
+# fi

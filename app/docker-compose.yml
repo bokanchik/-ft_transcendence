@@ -10,8 +10,8 @@ services:
     volumes:
       - frontdata:/usr/share/nginx/html:ro
     depends_on:
-      - user_service
-      - game_service
+      - users
+      - game
       - frontend
     networks:
       - tranet
@@ -21,35 +21,43 @@ services:
     build: ./frontend
     restart: always
     env_file: .env
+    ports:
+      - "5000:5000" # for development (live-server)
     volumes:
       - frontdata:/app/dist
     networks:
       - tranet
 
-  user_service:
+  users:
     build: ./services/users
     container_name: users
     ports:
       - "4000:4000"
     env_file: .env
     restart: always
+    volumes:
+      - ./services/shared:/app/shared:ro
     networks:
       - tranet
 
-  game_service:
+  game:
     build: ./services/game
+    container_name: game
     ports:
       - "3001:3001"
+    env_file: .env
     restart: always
+    volumes:
+      - ./services/shared:/app/shared:ro
     networks:
       - tranet
-
-  openapi_service:
-    build: ./services/openapi
-    ports:
-      - "8080:8080" # for internal use
-    networks:
-      - tranet
+    
+  #openapi:
+    #build: ./services/openapi
+    #ports:
+   #   - "8080:8080" # for internal use
+  #  networks:
+    #  - tranet
     
 networks:
   tranet:

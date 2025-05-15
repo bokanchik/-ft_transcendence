@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "nodenext",
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true, // TS 5.8+
+    "strict": true,
+    "baseUrl": ".",  // Base directory for imports in the service
+    "paths": {
+      "@shared/*": ["../shared/*"]  // Adjusted path to go up to shared folder
+    },
+    "esModuleInterop": true
+  },
+  "include": ["./**/*"],  // Include all TypeScript files in this service
+  "exclude": ["node_modules"]
+}

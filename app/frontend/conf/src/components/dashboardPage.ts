@@ -1,5 +1,7 @@
 // dashboardPage.ts
-import { navigateTo } from '../main.js';
+import { navigateTo } from '../services/router.js';
+//import { navigateTo } from '../main.js';
+
 import {
 	getUserDataFromStorage,
 	logout,

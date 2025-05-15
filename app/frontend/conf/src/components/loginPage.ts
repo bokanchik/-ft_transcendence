@@ -1,5 +1,5 @@
 import { attemptLogin, LoginResult } from '../services/authService.js';
-import { navigateTo } from '../main.js';
+import { navigateTo } from '../services/router.js';
 
 export function LoginPage(): HTMLElement {
 	const container = document.createElement('div');

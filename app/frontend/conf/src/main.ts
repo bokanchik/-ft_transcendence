@@ -2,9 +2,14 @@ import { HomePage } from './components/homePage.js';
 import { LoginPage } from './components/loginPage.js'
 import { RegisterPage } from './components/registerPage.js'
 import { UsersPage } from './pages/userPage.js';
+import { GamePage } from './components/gamePage.js';
+import { GameRoomPage } from './pages/gameRoomPage.js';
+import { navigateTo } from './services/router.js'; // à ajouter en haut
 import { DashboardPage } from './components/dashboardPage.js'
 import { ProfilePage } from './components/profilePage.js';
 import { getUserDataFromStorage } from './services/authService.js';
+import { promptAliasForm } from './components/aliasFormPage.js';
+import { GameMode } from './components/gamePage.js'
 
 // Conteneur où le contenu de la page sera injecté
 const appContainer = document.getElementById('main');
@@ -33,9 +38,18 @@ const routes: { [key: string]: RouteConfig } = {
 	'/register': { component: RegisterPage },
 	'/dashboard': { component: DashboardPage, requiredAuth: true },
 	'/profile': { component: ProfilePage, requiredAuth: true },
+	'/game': { component: GamePage },
+	'/local-game': { component: promptAliasForm},
+	'/game-room': { component: () => GameRoomPageFromParams() },
 };
 
-async function router() {
+function GameRoomPageFromParams(): HTMLElement {
+	const urlParams = new URLSearchParams(window.location.search);
+	const mode = urlParams.get('mode') as GameMode || 'local';
+	return GameRoomPage(mode);
+}
+
+export async function router() {
 	if (!appContainer) {
 		console.error("ERREUR: Le conteneur #app est introuvable dans le DOM !");
 		return;
@@ -52,6 +66,7 @@ async function router() {
 		const authData = getUserDataFromStorage();
 		if (!authData) {
 			console.log('Utilisateur non authentifié, redirection vers la page de connexion.');
+
 			navigateTo('/login');
 			return;
 		}
@@ -67,10 +82,11 @@ async function router() {
 	}
 }
 
-export function navigateTo(url: string) {
-	window.history.pushState({}, '', url);	// Met à jour l'URL dans la barre d'adresse sans recharger
-	router();
-}
+// !! fonction est hebernée dans le fichier service/router.ts parce que j'ai besoin de l'utiliser dans d'autres fichiers
+// export function navigateTo(url: string) {
+// 	window.history.pushState({}, '', url);	// Met à jour l'URL dans la barre d'adresse sans recharger
+// 	router();
+// }
 
 // Se déclenche lorsque le HTML initial est chargé
 document.addEventListener('DOMContentLoaded', () => {
