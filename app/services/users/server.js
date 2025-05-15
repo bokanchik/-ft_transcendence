@@ -52,7 +52,7 @@ function setupRoutes() {
 
     fastify.register(userRoutes, { prefix: '/api/users' });
     fastify.register(authRoutes, { prefix: '/api/users/auth' });
-    fastify.register(friendRoutes, { prefix: '/api/friends' });
+    fastify.register(friendRoutes, { prefix: '/api/users/friends' });
     fastify.log.info('Routes registered');
 }
 

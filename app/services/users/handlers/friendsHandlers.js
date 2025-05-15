@@ -100,7 +100,7 @@ export async function getMyFriendsHandler(req, reply) {
 
 /**
  * Handler pour bloquer un utilisateur (exemple).
- * Vous aurez besoin d'une route pour cela, ex: POST /api/friends/block/:userIdToBlock
+ * Vous aurez besoin d'une route pour cela, ex: POST /api/users/friends/block/:userIdToBlock
  */
 export async function blockUserHandler(req, reply) {
 	const blockerId = req.user.id;

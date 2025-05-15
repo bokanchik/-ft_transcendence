@@ -65,7 +65,7 @@ const handleApiResponse = async (response: Response) => {
  * @returns A list of pending friend requests.
  */
 export async function getReceivedFriendRequests(): Promise<PendingFriendRequest[]> {
-	const response = await fetch('/api/friends/requests/received', {
+	const response = await fetch('/api/users/friends/requests/received', {
 		method: 'GET',
 		headers: { 'Content-Type': 'application/json' },
 		credentials: 'include',
@@ -78,7 +78,7 @@ export async function getReceivedFriendRequests(): Promise<PendingFriendRequest[
  * @returns A list of friends.
  */
 export async function getFriendsList(): Promise<Friend[]> {
-	const response = await fetch('/api/friends/friends', {
+	const response = await fetch('/api/users/friends/friends', {
 		method: 'GET',
 		headers: { 'Content-Type': 'application/json' },
 		credentials: 'include',
@@ -91,7 +91,7 @@ export async function getFriendsList(): Promise<Friend[]> {
  * @returns A list of sent friend requests.
  */
 export async function getSentFriendRequests(): Promise<PendingFriendRequest[]> {
-	const response = await fetch('/api/friends/requests/sent', {
+	const response = await fetch('/api/users/friends/requests/sent', {
 		method: 'GET',
 		headers: { 'Content-Type': 'application/json' },
 		credentials: 'include',
@@ -105,7 +105,7 @@ export async function getSentFriendRequests(): Promise<PendingFriendRequest[]> {
  * @returns A message indicating the result of the operation.
  */
 export async function acceptFriendRequest(friendshipId: number): Promise<{ message: string }> {
-	const response = await fetchWithCsrf(`/api/friends/requests/${friendshipId}/accept`, {
+	const response = await fetchWithCsrf(`/api/users/friends/requests/${friendshipId}/accept`, {
 		method: 'POST',
 	});
 	return handleApiResponse(response);
@@ -117,7 +117,7 @@ export async function acceptFriendRequest(friendshipId: number): Promise<{ messa
  * @returns A message indicating the result of the operation.
  */
 export async function declineFriendRequest(friendshipId: number): Promise<{ message: string }> {
-	const response = await fetchWithCsrf(`/api/friends/requests/${friendshipId}/decline`, {
+	const response = await fetchWithCsrf(`/api/users/friends/requests/${friendshipId}/decline`, {
 		method: 'POST',
 	});
 	return handleApiResponse(response);
@@ -129,7 +129,7 @@ export async function declineFriendRequest(friendshipId: number): Promise<{ mess
  * @returns A message indicating the result of the operation.
  */
 export async function cancelFriendRequest(friendshipId: number): Promise<{ message: string }> {
-	const response = await fetchWithCsrf(`/api/friends/requests/${friendshipId}/cancel`, {
+	const response = await fetchWithCsrf(`/api/users/friends/requests/${friendshipId}/cancel`, {
 		method: 'POST',
 	});
 	return handleApiResponse(response);
@@ -141,7 +141,7 @@ export async function cancelFriendRequest(friendshipId: number): Promise<{ messa
  * @returns A message indicating the result of the operation.
  */
 export async function sendFriendRequest(friendId: number): Promise<{ message: string }> {
-	const response = await fetchWithCsrf('/api/friends/requests', {
+	const response = await fetchWithCsrf('/api/users/friends/requests', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ friendId }),
