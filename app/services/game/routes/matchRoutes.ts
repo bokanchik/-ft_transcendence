@@ -3,26 +3,31 @@ import type { FastifyInstance } from 'fastify';
 import { createMatchHandler, getMatchStateHandler,
    acceptMatchHandler, rejectMatchHandler, startMatchHandler, quitMatchHandler } from '../handlers/matchHandlers.ts'
 import { createMatchSchema } from '../middleware/matchSchemas.ts';
+import { ZodTypeProvider } from "fastify-type-provider-zod"
 
-async function matchRemoteRoutes(fastify: FastifyInstance, options: any) {
-   fastify.post('/', {  
-      // local --> no need for JWT verification, remote --> authenticate
+async function matchRoutes(fastify: FastifyInstance, _options: unknown) {
+   fastify.withTypeProvider<ZodTypeProvider>().post('/', {  
       preHandler: async (req, reply) => {
-         // sanitaze incoming data with zod (--> middleware)
+         // validate incoming data with zod (--> middleware)
          const reqValidation = createMatchSchema.safeParse(req.body);
          if (!reqValidation.success) {
-            return reply.code(400).send({ errors: reqValidation.error.errors});
-        }
-
-        const { isLocal } = reqValidation.data;
-        if (!isLocal) {
-         await fastify.authenticate(req, reply);
-        }
+            req.log.error('Validation failed:', reqValidation.error.errors); // for debugging
+            return reply.code(400).send({
+               message: 'Invalid request body',
+               errors: reqValidation.error.errors
+            });
+         }
+        // local --> no need for JWT verification, remote --> authenticate
+      //   const { isLocal } = reqValidation.data;
+      //   if (!isLocal) {
+      //    await fastify.authenticate(req, reply);
+      //   }
 
         req.validatedBody = reqValidation.data;
       },
       handler: createMatchHandler,
-   }); // button Start
+   
+   });
    
    // fastify.get('/match/:matchId', { schema: matchSchemas.idOnly}, getMatchIdHandler);
    // fastify.get('/match/:matchId/state', { schema: matchSchemas.idOnly }, getMatchStateHandler);
@@ -35,4 +40,4 @@ async function matchRemoteRoutes(fastify: FastifyInstance, options: any) {
 
 }
 
-export default matchRemoteRoutes;
+export default matchRoutes;

@@ -13,7 +13,7 @@ export async function createMatchHandler(req: FastifyRequest, reply: FastifyRepl
     const match = {
         matchId: crypto.randomUUID(),
         player1,
-        player2, // TODO extract players id for remote
+        player2,
         startTime: new Date().toISOString(),
     };
 

@@ -1,18 +1,13 @@
 import { fastify } from "../server.ts";
 import db from "../database/connectDB.ts";
-import { createMatchSchema } from "../middleware/matchSchemas.ts";
 // import Game from "../models/gameModel.js";
+import { clearMatchTimeout } from "../sockets/matchSocketHandler.ts";
 
 let waitingList: Map<string, string> = new Map();
-let isMatchmakingActive: boolean = false; // to prevent a race condition when two players are added to the waiting list at the same time
 
 // --- Waiting room system ---
 export async function waitingRoom() {
-    if (isMatchmakingActive && waitingList.size < 2) {
-        return;
-    };
-    isMatchmakingActive = true;
-    
+
     fastify.log.info('Matchmaking process activated');
     
     try {
@@ -23,14 +18,44 @@ export async function waitingRoom() {
             fastify.log.error('Matchmaking failed: one or both players not found');
             return;
         }
-
-        // put to DB (plutot a la fin)
-
-        // notify players that they are matched
-        fastify.io.to(player1.socketId).emit('matchFound', { opponentId: player2.playerId });
-        fastify.io.to(player2.socketId).emit('matchFound', { opponentId: player1.playerId });
         
+        const matchId = crypto.randomUUID();
+        
+        
+        // assign sides random function ?
+        const player1Data = {
+            matchId,
+            displayName: player1.playerId,
+            side: 'left',
+            opponent: player2.playerId,
+        };
+        
+        const player2Data = {
+            matchId,
+            displayName: player2.playerId,
+            side: 'right',
+            opponent: player1.playerId,
+        }
+        
+        if (player1 && player2) { // si les jouers sont toujours dans le waiting room
+            
+            // put to DB (plutot a la fin?)
+            // db
 
+            clearMatchTimeout(player1.socketId);
+            clearMatchTimeout(player2.socketId);
+
+            // notify players that they are matched
+            fastify.io.to(player1.socketId).emit('matchFound', player1Data);
+            fastify.io.to(player2.socketId).emit('matchFound', player2Data);
+
+            removePlayerFromWaitingList(player1.socketId);
+            removePlayerFromWaitingList(player2.socketId);
+            return;
+        } else {
+            fastify.log.error('Matchmaking aborted: one or both players disconnected');
+            return;
+        }
         // TODO: create a game room for the players
         // dans le game room a verifier si le joueur est bien dans la room (si il a pas deconnecte avant)
         // const gameId = new Game(player1.playerId, player2.playerId);
@@ -38,8 +63,6 @@ export async function waitingRoom() {
         
     } catch (error) {
         fastify.log.error('Error during matchmaking:', error);
-    } finally {
-        isMatchmakingActive = false;
     }
         
 }
@@ -59,7 +82,7 @@ export async function getWaitingList() {
     return waitingList;
 }
 
-export async function getWaitingListSize() {
+export function getWaitingListSize() {
     return waitingList.size;
 }
 

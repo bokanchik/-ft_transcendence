@@ -1,5 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { Server } from 'socket.io';
+import { createMatchSchema } from '../middleware/matchSchemas.ts';
+import z from "zod";
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -7,7 +9,7 @@ declare module 'fastify' {
     authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
   }
   interface FastifyRequest {
-    validatedBody: { player1: string; player2: string; isLocal: boolean };
+    validatedBody: z.infer<typeof createMatchSchema>;
   }
 }
 

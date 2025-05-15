@@ -73,6 +73,8 @@ export function GamePage(): HTMLElement {
 
         const token = authData.token;
         const display_name = authData.user.display_name;
+        
+        sessionStorage.setItem('gameMode', 'online');
 
         await handleOnlineGame(display_name, token, buttonsContainer, onlineGameButton);
     });

@@ -1,4 +1,4 @@
-import { navigateTo } from "./router";
+import { navigateTo } from "./router.js";
 
 export async function initLocalGame(form: HTMLFormElement) {
     const gameMode = form.querySelector<HTMLSelectElement>('#gameMode');

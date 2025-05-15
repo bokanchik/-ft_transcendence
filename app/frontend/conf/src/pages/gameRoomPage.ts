@@ -1,5 +1,7 @@
 import { GameMode } from "../components/gamePage.js";
+import { cleanupSocket } from "../services/initOnlineGame.js";
 import { navigateTo } from "../services/router.js";
+import socket from '../services/socket.js'
 
 export function GameRoomPage(mode: GameMode): HTMLElement {
 	const container = document.createElement('div');
@@ -66,12 +68,12 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 	
 	container.append(gameBox, quitButton);
 
-	// si local --> on recupere depuis sessionStorage
 	if (sessionStorage.getItem('gameMode') === 'local'){
 		rightUsername.textContent = sessionStorage.getItem('player1');
 		leftUsername.textContent = sessionStorage.getItem('player2');
+	} else {
+		setBoard(leftUsername, rightUsername);
 	}
-	
 	
 	// --- Countdown function
 	initCountdown(countdown);
@@ -82,33 +84,145 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 	return container;
 }
 
+function setBoard(leftUsername: HTMLDivElement, rightUsername: HTMLDivElement) {
+	const side = sessionStorage.getItem('side');
+	const displayName = sessionStorage.getItem('displayName');
+	const opponent = sessionStorage.getItem('opponent');
+	if (side === 'left') {
+		leftUsername.textContent = displayName;
+		rightUsername.textContent = opponent;
+	} else if (side === 'right') {
+		leftUsername.textContent = opponent;
+		rightUsername.textContent = displayName;
+	}
+}
+
 function initGame(container: HTMLButtonElement) {
 	const gameMode = sessionStorage.getItem('gameMode');
-	const socket: SocketIOClient.Socket = io('wss://localhost:8443', {
-		transports: ['websocket'],
-	});
+
 
 	socket.on('connect', () => {
 		if (gameMode === 'local') {
 			socket.emit('startLocalGame');
-		} else if (gameMode === 'remote') {
-			// look to initSocketClient
 		}
 	});
 
 	// after connexion to the server
 	socket.on('gameStarted', () => {
-		startLocalGame(socket);
+		if (gameMode === 'local') {
+			startLocalGame(socket);
+		}
 	});
 
+	if (gameMode === 'online') {
+		startOnlineGame(socket);
+	}
+	
 	// --- Event: quit button ---
 	container.addEventListener('click', () => {
+		socket.emit('quit', socket.id);
 		console.log('Quit game clicked');
-		socket.emit('disconnect');
+		cleanupSocket(socket);
 		sessionStorage.clear(); // clean storage --> users have to put there aliases again
 		navigateTo('/game');
 	});
 
+	socket.on('gameFinished', () => {
+		// jaffiche une petit message avec le gangnant ?
+		alert('You won!');
+	});
+
+}
+
+function startOnlineGame(socket: SocketIOClient.Socket) {
+
+	const side = sessionStorage.getItem('side');
+	console.log('SIDE:', side);
+	let paddleMovement = 0;
+
+	document.addEventListener('keydown', (event) => {
+		if (event.key === 'ArrowUp') {
+			paddleMovement = -1;
+		} else if (event.key === 'ArrowDown') {
+			paddleMovement = 1;
+		}
+		socket.emit('playerMove', {
+			side,
+			paddleMovement,
+		});
+	})
+
+
+	document.addEventListener('keyup', (event) => {
+		if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+			paddleMovement = 0;
+			socket.emit('playerMove', {
+				side,
+				paddleMovement,
+			});
+		}
+	});
+
+	// socket.on('stateUpdate', (data: string) => {
+	// 	const { leftPaddleUpdated, rightPaddleUpdated, ballUpdated } = JSON.parse(data);
+	// 	document.getElementById('left-paddle')!.style.top = `${leftPaddleUpdated}px`;
+	// 	document.getElementById('right-paddle')!.style.top = `${rightPaddleUpdated}px`;
+	// 	document.getElementById('ball')!.style.left = `${ballUpdated.x}px`;
+	// 	document.getElementById('ball')!.style.top = `${ballUpdated.y}px`;
+	// });
+
+}
+
+function startLocalGame(socket: SocketIOClient.Socket) {
+	let leftPaddleMovement = 0;
+	let rightPaddleMovement = 0;
+
+	document.addEventListener('keydown', (event) => {
+		if (event.key === 'w' || event.key === 'W') {
+			leftPaddleMovement = -1; // deplacer vers le haut
+		} else if (event.key === 's' || event.key === 'S') {
+			leftPaddleMovement = 1; // deplacer vers le bas
+		}
+		
+		if (event.key === 'ArrowUp') {
+			rightPaddleMovement = -1;
+		} else if (event.key === 'ArrowDown') {
+			rightPaddleMovement = 1;
+		}
+		sendPlayerMovement(socket, leftPaddleMovement, rightPaddleMovement);
+			
+	})
+	
+	document.addEventListener('keyup', (event) => {
+		if (event.key === 'w' || event.key === 's' || event.key === 'W' || event.key == 'S') {
+			leftPaddleMovement = 0;
+		}
+		if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+			rightPaddleMovement = 0;
+		}
+
+		sendPlayerMovement(socket, leftPaddleMovement, rightPaddleMovement);
+	})
+
+	// TODO
+	// socket.on('stateUpdate', (data: string) => {
+	// 	const { leftPaddleUpdated, rightPaddleUpdated } = JSON.parse(data);
+	// 	const leftPaddleElem = document.getElementById('left-paddle');
+	// 	const rightPaddleElem = document.getElementById('right-paddle');
+		
+	// 	if (leftPaddleElem && rightPaddleElem) {
+	// 		leftPaddleElem.style.top = `${leftPaddleUpdated}px`;
+	// 		rightPaddleElem.style.top = `${rightPaddleUpdated}px`;
+	// 	}
+	// });
+	
+}
+
+function sendPlayerMovement(socket: SocketIOClient.Socket, leftPaddle: number, rightPaddle: number) {
+	socket.emit('playerMove', ({
+		leftPaddle,
+		rightPaddle,
+	}));
 }
 
 async function initCountdown(container: HTMLDivElement) {
@@ -132,58 +246,6 @@ async function initCountdown(container: HTMLDivElement) {
 	}
 
 }
-
-function startLocalGame(socket: SocketIOClient.Socket) {
-	let leftPaddleMovement = 0;
-	let rightPaddleMovement = 0;
-
-	document.addEventListener('keydown', (event) => {
-		if (event.key === 'w' || event.key === 'W') {
-			leftPaddleMovement = -1; // deplacer vers le haut
-		} else if (event.key === 's' || event.key === 'S') {
-			leftPaddleMovement = 1; // deplacer vers le bas
-		}
-
-		if (event.key === 'ArrowUp') {
-			rightPaddleMovement = -1;
-		} else if (event.key === 'ArrowDown') {
-			rightPaddleMovement = 1;
-		}
-
-		sendPlayerMouvement(socket, leftPaddleMovement, rightPaddleMovement);
-	})
-
-	document.addEventListener('keyup', (event) => {
-		if (event.key === 'w' || event.key === 's' || event.key === 'W' || event.key == 'S') {
-			leftPaddleMovement = 0;
-		}
-		if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-			rightPaddleMovement = 0;
-		}
-
-		sendPlayerMouvement(socket, leftPaddleMovement, rightPaddleMovement);
-	})
-
-	socket.on('message', (data: string) => {
-		const { leftPaddleUpdated, rightPaddleUpdated } = JSON.parse(data);
-		const leftPaddleElem = document.getElementById('left-paddle');
-		const rightPaddleElem = document.getElementById('right-paddle');
-
-		if (leftPaddleElem && rightPaddleElem) {
-			leftPaddleElem.style.top = `${leftPaddleUpdated}px`;
-			rightPaddleElem.style.top = `${rightPaddleUpdated}px`;
-		}
-	});
-	
-}
-
-function sendPlayerMouvement(socket: SocketIOClient.Socket, leftPaddle: number, rightPaddle: number) {
-	socket.emit('playerMove', ({
-		leftPaddle,
-		rightPaddle,
-	}));
-}
-
 // function startRemoteGame(gameBox: HTMLDivElement) {
-
+	
 // }

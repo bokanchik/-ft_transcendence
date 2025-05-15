@@ -1,5 +1,7 @@
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
 import { Server, Socket } from 'socket.io';
+import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
+import fastifyRateLimit from '@fastify/rate-limit'
 // @ts-ignore
 import authPlugin from './shared/auth-plugin/index.ts';
 import db from './database/connectDB.ts'
@@ -13,12 +15,13 @@ const fastify: FastifyInstance = Fastify({ logger: true });
 
 // Initilize socket.io
 const io: Server = new Server(fastify.server, {
+  // cors -> dit au server depuis quels domains/ports il peut charger les resources 
     cors: {
-      origin: "http://localhost:5000", // dev option --> le url du frontend
+      origin: "http://localhost:5000", // l'url du frontend
       methods: ["GET", "POST"],
-      allowedHeaders: ["Content-Type"],
+      allowedHeaders: ["Content-Type, Authorization"],
       credentials: true,
-    }
+    },
 });
 
 // Attach io to fastify instance
@@ -35,10 +38,15 @@ const registerAuthPlugin = async () => {
   }
 };
 
-// TODO: Add schemas to fastify server
-// for (const schema of Object.values(gameShemas)) {
-  // fastify.addSchema(schema);
-// }
+// Set rate-limit to avoid too many requests (protection)
+fastify.register(fastifyRateLimit, {
+  max: 10,
+  timeWindow: '1 minute',
+});
+
+// Add schema validator and serializer
+fastify.setValidatorCompiler(validatorCompiler);
+fastify.setSerializerCompiler(serializerCompiler);
 
 // Register routes
 const registerRoutes = () => {

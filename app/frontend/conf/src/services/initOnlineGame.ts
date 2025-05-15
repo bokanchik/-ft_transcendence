@@ -1,4 +1,6 @@
+import { UUID } from "crypto";
 import { navigateTo } from "./router.js";
+import socket from "./socket.js";
 
 // --- Main Fonction for online game: 
 // post /api/game/match + socket initialisaztion + waiting room + 
@@ -18,12 +20,12 @@ export async function handleOnlineGame(display_name: string, token: string, cont
 
 // --- Fonction pour initialiser le client socket et le mettre dans le waiting room ---
 export async function initOnlineGame(display_name: string, token: string, buttonsContainer: HTMLElement) {
-    const socket: SocketIOClient.Socket = io('wss://localhost:8443', { // faut pas que ca soit en clair 
-        transports: ['websocket'],
-    });
     const controller: AbortController = new AbortController();
-    const signal: AbortSignal = controller.signal;
 
+    if (!socket.connected) {
+        socket.connect();
+    }
+    
     socket.on('connect', () => {
         console.log('Connected to the server');
         socket.emit('authenticate', display_name);
@@ -31,25 +33,28 @@ export async function initOnlineGame(display_name: string, token: string, button
     });
     
     // --- Socket listener on matchFound event --> if opponenet is found
-    socket.on('matchFound', async (opponentId: string) => {
-        try {
-            const matchId = await createOnlineMatch(token, opponentId, display_name, signal);
-            if (matchId){
-                // ! on garde le socket actif pour le jeu
-                navigateTo(`/game-room?matchId=${matchId}`);
-            } else {
-                console.warn('Match creation aborted or failed');
-                navigateTo('/game');
-            }
-        } catch (err: unknown) {
-            console.error(`Error in matchFound handler: ${err}`);
-            cleanupSocket(socket);
-        }
+    socket.on('matchFound', ({ matchId, displayName, side, opponent }: { matchId: UUID; displayName: string, side: 'left' | 'right'; opponent: string}) => {
+
+        // FOR DEBUGGING
+        console.log(matchId);
+        console.log(side);
+        console.log(opponent);
+        // -------------------
+        
+        sessionStorage.setItem('matchId', matchId);
+        sessionStorage.setItem('displayName', displayName);
+        sessionStorage.setItem('side', side);
+        sessionStorage.setItem('opponent', opponent);
+
+        socket.emit('startOnlineGame');
+        navigateTo(`/game-room?matchId=${matchId}`);
+
     });
     
     // --- Socket listeners on errors from the server side
-    socket.on('disconnect', () => { 
-        console.log('Disconnected from the server');
+    socket.on('disconnect', (reason: string, details?: any) => { 
+        console.log(`Disconnected from the server: reason ${reason},
+            details: ${details.message}, ${details.description}, ${details.context}`);
     });
     
     socket.on('error', (err: Error) => {
@@ -57,10 +62,9 @@ export async function initOnlineGame(display_name: string, token: string, button
     });
 
     socket.on('connect_error', (err: Error) => {
-        console.error('Connection failed:', err);
+        console.error(`Connection to the server is failed: ${err.message}`);
         alert('Failed to connect to server.');
         cleanupSocket(socket);
-        navigateTo('/game');
       });
 
     // --- TODO: emit on server side ---
@@ -95,42 +99,49 @@ export function showWaitingMessage(buttonsContainer: HTMLElement, socket: Socket
     buttonsContainer.append(waitingMessage, cancelButton);
 }
 
-// --- Fonction pour créer une salle d'attente ---
-export async function createOnlineMatch(token: string, opponentId: string, display_name: string, signal: AbortSignal): Promise<string | null> {
-    try {
-        const response = await fetch('/api/game/match', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                player1: opponentId,
-                player2: display_name,
-                isLocal: false,
-            }),
-            signal: signal,
-          //  cache: 'default',
-        });
-        
-        if (!response.ok) { // la reponse echouee (true if (res > 200 && res < 299))
-            throw new Error(`Failed to create online match: ${await response.text}`);
-        };
-      
-        const data = await response.json();  
-        const matchId = data.matchId;
+// // --- Fonction pour créer une salle d'attente ---
+// export async function createOnlineMatch(token: string, opponentId: string, display_name: string, signal: AbortSignal): Promise<string | null> {
+//     try {
+//         const requestBody = {
+//             player1: display_name,
+//             player2: opponentId,
+//             isLocal: false,
+//         }
 
-        return matchId;
-    } catch (err: unknown) {
-        if (err instanceof DOMException && err.name === 'AbortError'){
-            console.log('Fetch aborted by user');
-        } else {
-            alert('Error creating online match');
-            console.log(err);
-        }
-        return null;
-    }
-}
+//         console.log("Request Body:", requestBody);
+//         const response = await fetch('/api/game/match', {
+//             method: 'POST',
+//             headers: {
+//                 'Authorization': `Bearer ${token}`,
+//                 'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify({
+//                 player1: display_name,
+//                 player2: opponentId,
+//                 isLocal: false,
+//             }),
+//             signal: signal,
+//           //  cache: 'default',
+//         });
+        
+//         if (!response.ok) { // la reponse echouee (true if (res > 200 && res < 299))
+//             throw new Error(`Failed to create online match: ${await response.text}`);
+//         };
+      
+//         const data = await response.json();  
+//         const matchId = data.matchId;
+
+//         return matchId;
+//     } catch (err: unknown) {
+//         if (err instanceof DOMException && err.name === 'AbortError'){
+//             console.log('Fetch aborted by user');
+//         } else {
+//             alert('Error creating online match');
+//             console.log(err);
+//         }
+//         return null;
+//     }
+// }
 
 
 // --- Helper to cleanup Socket connexion ---

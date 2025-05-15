@@ -1,52 +1,60 @@
 import { fastify } from "../server.ts";
 import type { Socket } from "socket.io";
 import { waitingRoom, removePlayerFromWaitingList, addPlayerToWaitingList, getWaitingListSize } from "../utils/waitingRoom.ts";
+const TIMEOUT_MS = 60000; // 1 minute
+const timeouts: Map<string, NodeJS.Timeout> = new Map();
 
-// --- Socket.io handler for matchmaking ---
+// --- Socket.io handler for local and remote games ---
 export async function matchSocketHandler(socket: Socket): Promise<void> {
    
-    // TODO: check pour le timout -> emit('matchTimeout')
-    
     fastify.log.info(`Player connected: ${socket.id}`); 
-    
-    // --- !!! TESTING FOR LOCAL ----
-    socket.on('startLocalGame', async () => {
-        fastify.log.info('Game started locally');
-        socket.emit('gameStarted');
-    });
 
-    socket.on('playerMove', (movement) => {
-        fastify.log.info(movement);
-        //handlePlayerMove();
-    });
-    // -----------------------------------
-    
+    localSocketEvents(socket);
+    onlineSocketEvents(socket);
+}
+
+
+function onlineSocketEvents(socket: Socket) {
     socket.on('authenticate', async (display_name: string) => {
         // store display_name and socket.id in waiting list if not already in        
         try {
-            const newlyAdded = await addPlayerToWaitingList(display_name, socket.id);
+            const newPlayer = await addPlayerToWaitingList(display_name, socket.id);
             
-            if (!newlyAdded) {
-                fastify.log.info(`Player ${display_name} is already in waiting list. List size: ${await getWaitingListSize()}`);
-                return;
-            }
-            
-            const size = await getWaitingListSize();
-            // matchmaking process
-            if (size >= 2){
-                // join a waiting room
-                await waitingRoom();
-            }
-        } catch (error) {
-            fastify.log.error(`Error during authentication: ${error}`);
+            if (newPlayer) {
+                tryMatchPlayers();
+                const timeout = setTimeout(() => {
+                    fastify.log.info(`Timeout of matchmaking for player: ${display_name}`);
+                    socket.emit('matchTimeout');
+                    removePlayerFromWaitingList(socket.id);
+                    timeouts.delete(socket.id);
+                }, TIMEOUT_MS);
+                timeouts.set(socket.id, timeout);
+            }         
+        } catch (err: unknown) {
+            fastify.log.error(`Error during matchmaking process: ${err}`);
         }
     });
     
+    // optionnel ? a voir si besoin de ce listener
+    socket.on('startOnlineGame', () => {
+        fastify.log.info('Online game started');
+    });
+
+    // TODO: recuperer le socket id de gagnant
+    socket.on('quit', (socketId: string) =>  {
+        fastify.log.info(`Player with socket id ${socketId} quit the game`);
+        const opponentSocketId: string | null = getOpponentSocketId(socketId);
+        if (opponentSocketId) {
+            fastify.io.to(opponentSocketId).emit('gameFinished', 'You won!');
+        }
+    });
+
     socket.on('disconnect', () => {
         try {
             fastify.log.info(`Player disconnected: ${socket.id}`);
             // remove player from waiting list
             removePlayerFromWaitingList(socket.id);
+            clearMatchTimeout(socket.id);
             // TODO: maybe need a full check of a game room (if player is disconnected --> need to stop the game 
             // and notify the other player)
             fastify.log.info(`Player removed: ${socket.id}`);
@@ -54,16 +62,59 @@ export async function matchSocketHandler(socket: Socket): Promise<void> {
             fastify.log.error(`Error during disconnection: ${error}`);
         }
     });
-
+    
     // "cancel" button clicked on frontend
     socket.on('cancelMatch', () => {
         try {
             fastify.log.info(`Player disconnected: ${socket.id}`);
             removePlayerFromWaitingList(socket.id);
+            clearMatchTimeout(socket.id);
             fastify.log.info(`Player removed: ${socket.id}`);
-
+            
         } catch (error) {
             fastify.log.error(`Error during disconnection: ${error}`);
         }
     });
+    
+    socket.on('playerMove', (movement) => {
+        fastify.log.info(movement);
+        //handlePlayerMove(); // la logique du jeu est ici (ca update le state du jeu)
+    });
+
+}
+
+function getOpponentSocketId(socketId: string): string | null {
+    // call to DB ?
+    return null;
+}
+
+function localSocketEvents(socket: Socket) {
+    
+    // --- !!! TESTING FOR LOCAL ----
+    socket.on('startLocalGame', async () => {
+        fastify.log.info('Game started locally');
+        socket.emit('gameStarted');
+    });
+    // -----------------------------------   
+}
+
+// --- Helper functions
+let matchmakingLock = false;
+
+async function tryMatchPlayers() {
+    if (matchmakingLock || getWaitingListSize() < 2) return;
+    matchmakingLock = true;
+    try {
+        await waitingRoom();
+    } finally {
+        matchmakingLock = false;
+    }
+}
+
+export function clearMatchTimeout(socketId: string) {
+    const timeout = timeouts.get(socketId);
+    if (timeout) {
+        clearTimeout(timeout);
+        timeouts.delete(socketId);
+    }
 }
