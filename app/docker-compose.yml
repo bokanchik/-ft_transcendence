@@ -35,8 +35,8 @@ services:
       - "4000:4000"
     env_file: .env
     restart: always
-    volumes:
-      - ./services/shared:/app/shared:ro
+#    volumes:
+#      - ./services/shared:/app/shared:ro
     networks:
       - tranet
 

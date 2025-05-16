@@ -1,0 +1,6 @@
+# Node modules (can be installed with npm install)
+node_modules/
+# ignore git history
+.git
+# ignore cache directory
+.DS_Store
