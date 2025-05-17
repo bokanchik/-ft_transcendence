@@ -78,10 +78,14 @@ export interface UpdatedUserResult {
 	lastID?: number; // lastID n'est pas pertinent pour UPDATE
 }
 
-export interface ApiSuccessResponse<T> {
-    message?: string;
-    data?: T;
+export interface ApiSuccessResponse {
+	message: string;
+	user: User;
 }
+
+export type ApiResult =
+	| { success: true; data: ApiSuccessResponse }
+	| { success: false; error: string };
 
 export interface FriendRequestUserData {
 	id: number;
@@ -122,7 +126,7 @@ export type FriendRequestResult =
 export type FriendActionResult =
 	| { success: true; message: string }
 	| { success: false; error: string };
-	
+
 // import { CookieSerializeOptions } from '@fastify/cookie';
 // export interface AppCookieOptions extends CookieSerializeOptions {
 // 	// Ajoutez des propriétés spécifiques si nécessaire

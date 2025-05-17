@@ -1,14 +1,12 @@
 import { HomePage } from './components/homePage.js';
 import { LoginPage } from './pages/loginPage.js'
-//import { LoginPage } from './components/loginPage.js'
 import { RegisterPage } from './components/registerPage.js'
 import { UsersPage } from './pages/userPage.js';
 import { GamePage } from './components/gamePage.js';
 import { GameRoomPage } from './pages/gameRoomPage.js';
 import { navigateTo } from './services/router.js'; // à ajouter en haut
 import { DashboardPage } from './pages/dashboardPage.js'
-//import { DashboardPage } from './components/dashboardPage.js'
-import { ProfilePage } from './components/profilePage.js';
+import { ProfilePage } from './pages/profilePage.js';
 import { getUserDataFromStorage } from './services/authService.js';
 import { promptAliasForm } from './components/aliasFormPage.js';
 import { GameMode } from './components/gamePage.js'
