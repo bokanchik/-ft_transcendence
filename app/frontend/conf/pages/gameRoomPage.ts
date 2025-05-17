@@ -2,6 +2,7 @@ import { GameMode } from "../components/gamePage.js";
 import { cleanupSocket } from "../services/initOnlineGame.js";
 import { navigateTo } from "../services/router.js";
 import socket from '../services/socket.js'
+import { showToast } from '../components/toast.js';
 
 export function GameRoomPage(mode: GameMode): HTMLElement {
 	const container = document.createElement('div');
@@ -40,18 +41,18 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 	const leftUsername = document.createElement('div');
 	leftUsername.className = 'absolute left-[20px] top-[20px] px-3 py-1 bg-white border border-black rounded text-black font-semibold text-xl shadow';
 	leftUsername.id = 'left-username';
-	
+
 	// Right username
 	const rightUsername = document.createElement('div');
 	rightUsername.className = 'absolute right-[20px] top-[20px] px-3 py-1 bg-white border border-black rounded text-black font-semibold text-xl shadow text-right';
 	rightUsername.id = 'right-username';
-	
+
 	// Score display
 	const scoreDisplay = document.createElement('div');
 	scoreDisplay.className = 'absolute top-[20px] left-1/2 transform -translate-x-1/2 text-2xl font-bold text-black';
 	scoreDisplay.id = 'score-display';
 	scoreDisplay.textContent = '0 - 0';
-	
+
 	// Quit button
 	const quitButton = document.createElement('button');
 	quitButton.className = 'mt-6 px-4 py-2 bg-red-600 text-white font-bold rounded hover:bg-red-700';
@@ -65,19 +66,19 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 	gameBox.appendChild(leftUsername);
 	gameBox.appendChild(rightUsername);
 	gameBox.appendChild(scoreDisplay);
-	
+
 	container.append(gameBox, quitButton);
 
-	if (sessionStorage.getItem('gameMode') === 'local'){
+	if (sessionStorage.getItem('gameMode') === 'local') {
 		rightUsername.textContent = sessionStorage.getItem('player1');
 		leftUsername.textContent = sessionStorage.getItem('player2');
 	} else {
 		setBoard(leftUsername, rightUsername);
 	}
-	
+
 	// --- Countdown function
 	initCountdown(countdown);
-	
+
 	// --- Main game function for socket handling and game logic
 	initGame(quitButton);
 
@@ -104,7 +105,7 @@ function initGame(container: HTMLButtonElement) {
 	if (!socket.connected) {
 		socket.connect();
 	}
-	
+
 	socket.on('connect', () => {
 		console.log('emit startLocal');
 		if (gameMode === 'local') {
@@ -122,7 +123,7 @@ function initGame(container: HTMLButtonElement) {
 	if (gameMode === 'online') {
 		startOnlineGame(socket);
 	}
-	
+
 	// --- Event: quit button ---
 	container.addEventListener('click', () => {
 		socket.emit('quit', socket.id);
@@ -134,7 +135,7 @@ function initGame(container: HTMLButtonElement) {
 
 	socket.on('gameFinished', () => {
 		// jaffiche une petit message avec le gangnant ?
-		alert('You won!');
+		showToast('You won!');
 	});
 
 }
@@ -188,16 +189,16 @@ function startLocalGame(socket: SocketIOClient.Socket) {
 		} else if (event.key === 's' || event.key === 'S') {
 			leftPaddleMovement = 1; // deplacer vers le bas
 		}
-		
+
 		if (event.key === 'ArrowUp') {
 			rightPaddleMovement = -1;
 		} else if (event.key === 'ArrowDown') {
 			rightPaddleMovement = 1;
 		}
 		sendPlayerMovement(socket, leftPaddleMovement, rightPaddleMovement);
-			
+
 	})
-	
+
 	document.addEventListener('keyup', (event) => {
 		if (event.key === 'w' || event.key === 's' || event.key === 'W' || event.key == 'S') {
 			leftPaddleMovement = 0;
@@ -214,13 +215,13 @@ function startLocalGame(socket: SocketIOClient.Socket) {
 	// 	const { leftPaddleUpdated, rightPaddleUpdated } = JSON.parse(data);
 	// 	const leftPaddleElem = document.getElementById('left-paddle');
 	// 	const rightPaddleElem = document.getElementById('right-paddle');
-		
+
 	// 	if (leftPaddleElem && rightPaddleElem) {
 	// 		leftPaddleElem.style.top = `${leftPaddleUpdated}px`;
 	// 		rightPaddleElem.style.top = `${rightPaddleUpdated}px`;
 	// 	}
 	// });
-	
+
 }
 
 function sendPlayerMovement(socket: SocketIOClient.Socket, leftPaddle: number, rightPaddle: number) {
@@ -243,7 +244,7 @@ async function initCountdown(container: HTMLDivElement) {
 				container.remove(); // remove overlay
 				clearInterval(interval);
 				sessionStorage.setItem('countdown', 'true');
-				
+
 			}
 		}, 1000);
 	} else {
@@ -252,5 +253,5 @@ async function initCountdown(container: HTMLDivElement) {
 
 }
 // function startRemoteGame(gameBox: HTMLDivElement) {
-	
+
 // }

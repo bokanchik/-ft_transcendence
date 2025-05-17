@@ -46,7 +46,7 @@ function isValidEmailFormat(emailString: string | undefined | null): boolean {
  * @throws {ValidationError} If the credentials are invalid.
  * @returns {Promise<Object>} The user object without the password hash.
  */
-export async function loginUser({ identifier, password }: LoginRequestBody): Promise<Omit<User, 'password_hash'>> {
+export async function loginUser({ identifier, password }: LoginRequestBody): Promise<User> {
 	console.log(`Attempting to log user with identifier: ${identifier}`);
 	let userEntity;
 	const isEmail = identifier.includes('@');
@@ -61,7 +61,7 @@ export async function loginUser({ identifier, password }: LoginRequestBody): Pro
 	}
 
 	const { password_hash, ...userPassLess } = userEntity;
-	return userPassLess as Omit<User, 'password_hash'>; // Cast si UserWithPasswordHash est différent de User
+	return userPassLess;
 }
 
 /**

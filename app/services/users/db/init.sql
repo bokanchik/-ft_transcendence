@@ -48,7 +48,8 @@ VALUES
   ('Xavier', 'xavier@student.42.fr', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Xavier N', 'https://www.lemediaplus.com/wp-content/uploads/2023/02/Xavier-niel-fortune.png'),
   ('Donkey_kong', 'donkeyKong@nitendo.com', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Donkey Kong', 'https://m1.quebecormedia.com/emp/emp/dk1b93f6bb-34a1-498c-8234-fb9c7c6f794a_ORIGINAL.jpg?impolicy=crop-resize&x=0&y=0&w=1200&h=675&width=925'),
   ('jane_doe', 'jane@example.com', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Jane Doe', 'https://ui-avatars.com/api/?name=Jane+Doe&background=random&color=fff&size=128'),
-  ('alice_smith', 'alice@example.com', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Alice Smith', 'https://ui-avatars.com/api/?name=Alice+Smith&background=random&color=fff&size=128');
+  ('alice_smith', 'alice@example.com', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Alice Smith', 'https://ui-avatars.com/api/?name=Alice+Smith&background=random&color=fff&size=128'),
+  ('Alexis B', 'alexb@example.com', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Alexis Brun', 'https://ui-avatars.com/api/?name=Alexis+Brun&background=random&color=fff&size=128');
 
 
 -- Serge et alice sont amis (Serge a initié)

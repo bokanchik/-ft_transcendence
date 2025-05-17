@@ -1,10 +1,10 @@
 import { fetchWithCsrf, setCsrfToken } from './csrf.js';
 import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, ApiErrorResponse, ApiSuccessResponse, ApiResult } from '../shared/types.js';
 
-// only user data
 const USER_DATA_KEY = 'userDataKey';
 const USER_DATA_EXPIRATION_KEY = 'userDataExpiration';
-const CSRF_TOKEN_KEY = 'csrfToken';
+// const USER_DATA_KEY = process.env.USER_DATA_KEY;
+// const USER_DATA_EXPIRATION_KEY = process.env.USER_DATA_EXPIRATION_KEY;
 
 /**
  * Retrieves user data (not the token) from localStorage.

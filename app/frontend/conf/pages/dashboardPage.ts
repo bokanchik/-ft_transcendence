@@ -1,8 +1,7 @@
-// /pages/dashboardPage.ts
 import { navigateTo } from '../services/router.js';
 import { getUserDataFromStorage, logout } from '../services/authService.js';
 import { fetchCsrfToken } from '../services/csrf.js';
-import { User as AuthUser, Friend, PendingFriendRequest } from '../shared/types.js'; // Renommé User en AuthUser pour éviter conflit
+import { User as AuthUserType, User as ApiUserType } from '../shared/types.js';
 import {
 	getReceivedFriendRequests,
 	getSentFriendRequests,
@@ -10,181 +9,290 @@ import {
 	declineFriendRequest,
 	cancelFriendRequest,
 	getFriendsList,
-	// Importer la fonction pour supprimer un ami depuis friendService (à créer si elle n'existe pas)
+	sendFriendRequest,
 	// removeFriend,
 } from '../services/friendService.js';
-
-// Importer les nouveaux composants
+import { fetchUsers } from '../services/api.js';
 import { FriendsListComponent } from '../components/friendsList.js';
 import { FriendRequestsComponent } from '../components/friendRequests.js';
+import { UserList, UserListProps } from '../components/userList.js';
+import { showToast } from '../components/toast.js';
 
-export async function DashboardPage(): Promise<HTMLElement> { // La page devient async car on charge le token CSRF
-	const currentUser: AuthUser | null = getUserDataFromStorage();
+// Placeholder pour l'historique des matchs
+function MatchHistoryComponent(): HTMLElement {
+	const el = document.createElement('div');
+	el.className = 'p-4 text-center';
+	el.innerHTML = '<p class="text-gray-500">L\'historique des matchs sera affiché ici.</p>';
+	return el;
+}
+
+export async function DashboardPage(): Promise<HTMLElement> {
+	const currentUser: AuthUserType | null = getUserDataFromStorage();
 
 	if (!currentUser) {
-		console.warn('Access unauthorized: User not authenticated.');
 		navigateTo('/login');
 		const redirectMsg = document.createElement('div');
-		redirectMsg.className = 'p-8 text-center';
-		redirectMsg.textContent = 'Loading or redirecting...';
+		redirectMsg.className = 'min-h-screen flex items-center justify-center text-xl';
+		redirectMsg.textContent = 'Redirecting to login...';
 		return redirectMsg;
 	}
 
-	// Charger le token CSRF une seule fois au chargement de la page
 	try {
 		await fetchCsrfToken();
 	} catch (error) {
 		console.error("Failed to fetch CSRF token:", error);
-		// Gérer l'erreur de CSRF (par exemple, afficher un message et ne pas charger les données sensibles)
 		const errorMsg = document.createElement('div');
-		errorMsg.className = 'p-8 text-center text-red-500';
+		errorMsg.className = 'min-h-screen flex items-center justify-center text-xl text-red-500';
 		errorMsg.textContent = 'Error initializing page. Please try refreshing.';
 		return errorMsg;
 	}
 
-	const container = document.createElement('div');
-	container.className = 'min-h-screen bg-gray-100 p-4 md:p-8';
+	// --- Conteneur principal de la page ---
+	const pageContainer = document.createElement('div');
+	pageContainer.className = 'min-h-screen bg-gray-200 p-4 sm:p-8 flex flex-col items-center';
 
-	const contentWrapper = document.createElement('div');
-	contentWrapper.className = 'max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6 md:p-8';
+	// --- Le "Dashboard" lui-même ---
+	const dashboardWrapper = document.createElement('div');
+	dashboardWrapper.className = 'bg-white rounded-2xl shadow-2xl w-full max-w-6xl flex flex-col overflow-hidden';
 
-	contentWrapper.innerHTML = `
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-4 border-gray-200">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-800">Tableau de Bord</h1>
-                <p class="text-xl text-gray-600 mt-1">Bienvenue, <strong class="text-blue-600">${currentUser.display_name || currentUser.username}</strong> !</p>
-            </div>
-            <button id="logout-button"
-                    class="mt-4 sm:mt-0 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300 ease-in-out">
-                Déconnexion
-            </button>
-        </div>
+	// --- Section du haut (Langue, User Header) ---
+	const topSection = document.createElement('div');
+	topSection.className = 'flex justify-between items-center p-4 border-b border-gray-200';
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="main-widgets-grid">
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 shadow-sm">
-                <h2 class="text-xl font-semibold text-blue-800 mb-3">Mon Profil</h2>
-                <p class="text-gray-700 text-sm mb-1"><span class="font-medium">Username:</span> ${currentUser.username}</p>
-                <p class="text-gray-700 text-sm mb-1"><span class="font-medium">Email:</span> ${currentUser.email || 'Non fourni'}</p>
-                <p class="text-gray-700 text-sm"><span class="font-medium">ID:</span> ${currentUser.id}</p>
-                <a href="/profile" data-link class="text-blue-600 hover:text-blue-800 text-sm mt-3 inline-block">Modifier le profil</a>
-            </div>
-            <div class="bg-green-50 border border-green-200 rounded-lg p-4 shadow-sm">
-                <h2 class="text-xl font-semibold text-green-800 mb-3">Statistiques</h2>
-                <p class="text-gray-700">Vous avez X notifications.</p>
-            </div>
-            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 shadow-sm">
-                <h2 class="text-xl font-semibold text-yellow-800 mb-3">Actions Rapides</h2>
-                <button class="bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-bold py-1 px-3 rounded mr-2 mb-2">Nouvel Article</button>
-            </div>
-        </div>
-        <!-- Placeholders pour les composants -->
-        <div id="friends-list-placeholder">
-            <p class="text-center text-gray-500 mt-8">Chargement de la liste d'amis...</p>
-        </div>
-        <div id="friend-requests-placeholder">
-            <p class="text-center text-gray-500 mt-8">Chargement des demandes d'amis...</p>
-        </div>
+	const langButton = document.createElement('button');
+	langButton.className = 'bg-blue-500 text-white font-bold py-2 px-4 rounded-lg text-sm hover:bg-blue-600 transition-colors';
+	langButton.textContent = 'ENG';
+	// langButton.addEventListener('click', () => { /* Logique de changement de langue */ });
 
-        <div class="mt-8 text-center border-t pt-4 border-gray-200">
-             <a href="/" data-link class="text-gray-600 hover:text-gray-800 text-sm">Retour à l'accueil</a>
-        </div>
-    `;
+	const userHeader = document.createElement('div');
+	userHeader.className = 'flex items-center space-x-4';
 
-	container.appendChild(contentWrapper);
+	const avatarDisplayWrapper = document.createElement('div');
+	avatarDisplayWrapper.className = 'bg-orange-400 p-2 rounded-lg flex items-center space-x-3';
+	const displayNameHeader = document.createElement('span');
+	displayNameHeader.className = 'text-white font-semibold text-sm';
+	displayNameHeader.textContent = currentUser.display_name || currentUser.username;
+	const avatarHeader = document.createElement('img');
+	avatarHeader.className = 'w-10 h-10 rounded-full object-cover border-2 border-white';
+	const avatarFallbackName = currentUser.display_name || currentUser.username;
+	avatarHeader.src = currentUser.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(avatarFallbackName)}&background=0D8ABC&color=fff&size=128`;
+	avatarHeader.alt = 'User Avatar';
+	avatarDisplayWrapper.appendChild(displayNameHeader);
+	avatarDisplayWrapper.appendChild(avatarHeader);
 
-	// Récupérer les placeholders
-	const friendsListPlaceholder = contentWrapper.querySelector('#friends-list-placeholder') as HTMLElement;
-	const friendRequestsPlaceholder = contentWrapper.querySelector('#friend-requests-placeholder') as HTMLElement;
+	const settingsButton = document.createElement('a');
+	settingsButton.href = '/profile';
+	settingsButton.setAttribute('data-link', '');
+	settingsButton.className = 'px-3 py-1.5 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition-colors';
+	settingsButton.textContent = 'Settings';
 
-	// --- Fonctions de rappel pour les composants ---
-	const handleAcceptRequest = async (friendshipId: number) => {
-		const result = await acceptFriendRequest(friendshipId);
-		alert(result.message);
-		await loadAndRenderAllFriendData(); // Recharger et réafficher
-	};
-
-	const handleDeclineRequest = async (friendshipId: number) => {
-		const result = await declineFriendRequest(friendshipId);
-		alert(result.message);
-		await loadAndRenderAllFriendData();
-	};
-
-	const handleCancelRequest = async (friendshipId: number) => {
-		const result = await cancelFriendRequest(friendshipId);
-		alert(result.message);
-		await loadAndRenderAllFriendData();
-	};
-
-	const handleRemoveFriend = async (friendId: number) => {
-		// Assurez-vous d'avoir une fonction `removeFriend` dans `friendService.ts`
-		// Exemple: export async function removeFriend(friendId: number): Promise<{ message: string }> { ... }
-		// Pour l'instant, on simule comme dans votre code original pour cette partie
-		// await removeFriend(friendId);
-		alert(`Ami ${friendId} supprimé (simulation). Implémentez removeFriend dans friendService.`);
-		await loadAndRenderAllFriendData();
-	};
-
-
-	// --- Chargement et rendu des données des amis ---
-	async function loadAndRenderAllFriendData() {
-		// Vider les placeholders pour afficher un état de chargement si nécessaire ou pour le re-rendu
-		friendsListPlaceholder.innerHTML = `<p class="text-center text-gray-500 mt-8">Mise à jour de la liste d'amis...</p>`;
-		friendRequestsPlaceholder.innerHTML = `<p class="text-center text-gray-500 mt-8">Mise à jour des demandes d'amis...</p>`;
-
+	const logoutButtonEl = document.createElement('button'); // Renommé pour éviter conflit avec la fonction logout
+	logoutButtonEl.className = 'px-3 py-1.5 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition-colors';
+	logoutButtonEl.textContent = 'Logout';
+	logoutButtonEl.addEventListener('click', async () => {
 		try {
-			const [received, sent, friends] = await Promise.all([
-				getReceivedFriendRequests(),
-				getSentFriendRequests(),
-				getFriendsList()
-			]);
-
-			// Rendre le composant Amis
-			friendsListPlaceholder.innerHTML = ''; // Vider le placeholder
-			friendsListPlaceholder.appendChild(
-				FriendsListComponent({
-					friends: friends,
-					onRemoveFriend: handleRemoveFriend,
-				})
-			);
-
-			// Rendre le composant Demandes d'amis
-			friendRequestsPlaceholder.innerHTML = ''; // Vider le placeholder
-			friendRequestsPlaceholder.appendChild(
-				FriendRequestsComponent({
-					receivedRequests: received,
-					sentRequests: sent,
-					onAcceptRequest: handleAcceptRequest,
-					onDeclineRequest: handleDeclineRequest,
-					onCancelRequest: handleCancelRequest,
-				})
-			);
-
+			await logout(); // Appel de la fonction logout importée
+			showToast('You have been logged out.', 'success');
 		} catch (error) {
-			console.error("Erreur lors du chargement des données d'amis:", error);
-			friendsListPlaceholder.innerHTML = `<p class="text-center text-red-500 mt-8">Erreur de chargement de la liste d'amis.</p>`;
-			friendRequestsPlaceholder.innerHTML = `<p class="text-center text-red-500 mt-8">Erreur de chargement des demandes.</p>`;
+			showToast('Error logging out.', 'error');
+		} finally {
+			navigateTo('/login');
+		}
+	});
+
+	userHeader.appendChild(avatarDisplayWrapper);
+	userHeader.appendChild(settingsButton);
+	userHeader.appendChild(logoutButtonEl); // Utilisation du nom de variable corrigé
+
+	topSection.appendChild(langButton);
+	topSection.appendChild(userHeader);
+
+	// --- Section principale (Sidebar + Contenu à onglets) ---
+	const mainSection = document.createElement('div');
+	mainSection.className = 'flex flex-1 min-h-[calc(100vh-150px)]'; // Hauteur minimale pour le contenu
+
+	// --- Sidebar ---
+	const sidebar = document.createElement('div');
+	sidebar.className = 'w-1/4 p-6 bg-gray-50 border-r border-gray-200 space-y-3 overflow-y-auto';
+
+	function createSidebarItem(label: string, value: string | number | Date | undefined | null): HTMLElement {
+		const item = document.createElement('div');
+		item.className = 'p-2.5 bg-white border border-gray-200 rounded-lg shadow-sm';
+		const labelEl = document.createElement('span');
+		labelEl.className = 'text-xs text-gray-500 block mb-0.5';
+		labelEl.textContent = label;
+		const valueEl = document.createElement('p');
+		valueEl.className = 'text-sm text-gray-800 font-medium truncate';
+		if (value instanceof Date) {
+			valueEl.textContent = value.toLocaleDateString();
+		} else {
+			valueEl.textContent = value?.toString() || 'N/A';
+		}
+		item.appendChild(labelEl);
+		item.appendChild(valueEl);
+		return item;
+	}
+
+	sidebar.appendChild(createSidebarItem('Username', currentUser.username));
+	sidebar.appendChild(createSidebarItem('Display Name', currentUser.display_name));
+	sidebar.appendChild(createSidebarItem('Email', currentUser.email));
+	sidebar.appendChild(createSidebarItem('Creation Date', new Date(currentUser.created_at)));
+	sidebar.appendChild(createSidebarItem('Wins', currentUser.wins ?? 'N/A'));
+	sidebar.appendChild(createSidebarItem('Losses', currentUser.losses ?? 'N/A'));
+
+	// --- Contenu à onglets ---
+	const tabContentWrapper = document.createElement('div');
+	tabContentWrapper.className = 'w-3/4 p-6 flex flex-col overflow-y-auto';
+
+	const tabNavigation = document.createElement('div');
+	tabNavigation.className = 'flex space-x-1 border-b border-gray-200 mb-6';
+
+	const TABS = [
+		{ id: 'users', label: 'All Users', componentLoader: loadUsersContent },
+		{ id: 'friends', label: 'Friends', componentLoader: loadFriendsContent },
+		{ id: 'pending', label: 'Pending', componentLoader: loadPendingRequestsContent },
+		{ id: 'history', label: 'History Match', componentLoader: loadMatchHistoryContent },
+	];
+	let activeTabId = TABS[0].id;
+
+	const activeTabContentContainer = document.createElement('div');
+	activeTabContentContainer.id = 'active-tab-content';
+	activeTabContentContainer.className = 'flex-1';
+
+	TABS.forEach(tabInfo => {
+		const tabButton = document.createElement('button');
+		tabButton.dataset.tabId = tabInfo.id;
+		tabButton.textContent = tabInfo.label;
+		tabButton.className = `py-2 px-4 text-sm font-medium focus:outline-none transition-colors`;
+		if (tabInfo.id === activeTabId) {
+			tabButton.classList.add('border-b-2', 'border-blue-600', 'text-blue-600');
+		} else {
+			tabButton.classList.add('text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+		}
+		tabButton.addEventListener('click', () => switchTab(tabInfo.id));
+		tabNavigation.appendChild(tabButton);
+	});
+
+	tabContentWrapper.appendChild(tabNavigation);
+	tabContentWrapper.appendChild(activeTabContentContainer);
+
+	mainSection.appendChild(sidebar);
+	mainSection.appendChild(tabContentWrapper);
+
+	dashboardWrapper.appendChild(topSection);
+	dashboardWrapper.appendChild(mainSection);
+	pageContainer.appendChild(dashboardWrapper);
+
+	// --- Fonctions de rappel pour les actions d'amitié (utilisées par UserList) ---
+	const handleSendFriendRequest = async (targetUserId: number) => {
+		const result = await sendFriendRequest(targetUserId);
+		showToast(result.message);
+		if (activeTabId === 'users' || activeTabId === 'pending') await loadActiveTabContent(); // Recharger si l'onglet users ou pending est actif
+	};
+
+	const handleCancelFriendRequest = async (friendshipId: number) => {
+		const result = await cancelFriendRequest(friendshipId);
+		showToast(result.message);
+		if (activeTabId === 'users' || activeTabId === 'pending') await loadActiveTabContent();
+	};
+
+	const handleAcceptFriendRequest = async (friendshipId: number) => {
+		const result = await acceptFriendRequest(friendshipId);
+		showToast(result.message, 'success');
+		if (['users', 'pending', 'friends'].includes(activeTabId)) await loadActiveTabContent();
+	};
+
+	const handleDeclineFriendRequest = async (friendshipId: number) => {
+		const result = await declineFriendRequest(friendshipId);
+		showToast(result.message, 'success');
+		if (activeTabId === 'users' || activeTabId === 'pending') await loadActiveTabContent();
+	};
+
+	// --- Logique de chargement et de changement d'onglet ---
+	async function switchTab(tabId: string) {
+		activeTabId = tabId;
+		tabNavigation.querySelectorAll('button').forEach(btn => {
+			if (btn.dataset.tabId === tabId) {
+				btn.className = 'py-2 px-4 text-sm font-medium focus:outline-none transition-colors border-b-2 border-blue-600 text-blue-600';
+			} else {
+				btn.className = 'py-2 px-4 text-sm font-medium focus:outline-none transition-colors text-gray-500 hover:text-gray-700 hover:border-gray-300';
+			}
+		});
+		await loadActiveTabContent();
+	}
+
+	async function loadActiveTabContent() {
+		activeTabContentContainer.innerHTML = '<p class="text-center text-gray-500 py-10">Loading...</p>';
+		const currentTab = TABS.find(t => t.id === activeTabId);
+		if (currentTab) {
+			try {
+				const contentElement = await currentTab.componentLoader();
+				activeTabContentContainer.innerHTML = '';
+				activeTabContentContainer.appendChild(contentElement);
+			} catch (error) {
+				console.error(`Error loading content for tab ${activeTabId}:`, error);
+				activeTabContentContainer.innerHTML = `<p class="text-center text-red-500 py-10">Error loading content for ${activeTabId}.</p>`;
+			}
 		}
 	}
 
-	// Bouton de déconnexion
-	const logoutButton = contentWrapper.querySelector('#logout-button') as HTMLButtonElement;
-	if (logoutButton) {
-		logoutButton.addEventListener('click', async () => {
-			console.log('Déconnexion demandée...');
-			try {
-				await logout(); // S'assure que logout est bien asynchrone si elle fait des appels API
-				alert('Vous avez été déconnecté.');
-			} catch (error) {
-				console.error('Erreur pendant la déconnexion:', error);
-				alert('Une erreur est survenue lors de la déconnexion.');
-			} finally {
-				navigateTo('/login');
-			}
+	// --- Fonctions de chargement spécifiques pour chaque onglet ---
+	async function loadUsersContent(): Promise<HTMLElement> {
+		const [usersData, friendsData, sentRequestsData, receivedRequestsData] = await Promise.all([
+			fetchUsers(),
+			getFriendsList(),
+			getSentFriendRequests(),
+			getReceivedFriendRequests()
+		]);
+
+		const userListProps: UserListProps = {
+			users: usersData as ApiUserType[], // S'assurer que le type correspond
+			friends: friendsData,
+			sentRequests: sentRequestsData,
+			receivedRequests: receivedRequestsData,
+			currentUserId: currentUser!.id,
+			onSendRequest: handleSendFriendRequest,
+			onCancelRequest: handleCancelFriendRequest,
+			onAcceptRequest: handleAcceptFriendRequest,
+			onDeclineRequest: handleDeclineFriendRequest,
+		};
+		return UserList(userListProps);
+	}
+
+	async function loadFriendsContent(): Promise<HTMLElement> {
+		const friends = await getFriendsList();
+		return FriendsListComponent({
+			friends: friends,
+			onRemoveFriend: async (friendId) => {
+				// TODO: Implémenter la vraie fonction removeFriend dans friendService.ts et l'importer
+				// const result = await removeFriend(friendId);
+				// showToast(result.message);
+				showToast(`Ami ${friendId} supprimé (simulation).`);
+				if (['friends', 'users'].includes(activeTabId)) await loadActiveTabContent();
+			},
 		});
 	}
 
-	// Chargement initial des données d'amis
-	loadAndRenderAllFriendData();
+	async function loadPendingRequestsContent(): Promise<HTMLElement> {
+		const [received, sent] = await Promise.all([
+			getReceivedFriendRequests(),
+			getSentFriendRequests(),
+		]);
+		return FriendRequestsComponent({
+			receivedRequests: received,
+			sentRequests: sent,
+			onAcceptRequest: handleAcceptFriendRequest, // Réutilisation du handler global
+			onDeclineRequest: handleDeclineFriendRequest, // Réutilisation du handler global
+			onCancelRequest: handleCancelFriendRequest, // Réutilisation du handler global
+		});
+	}
 
-	return container;
+	async function loadMatchHistoryContent(): Promise<HTMLElement> {
+		return MatchHistoryComponent();
+	}
+
+	// Charger le contenu de l'onglet initial
+	await loadActiveTabContent();
+
+	return pageContainer;
 }

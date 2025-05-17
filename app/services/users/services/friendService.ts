@@ -2,8 +2,7 @@
 import * as friendModel from '../models/friendModel.js';
 import * as userModel from '../models/userModel.js';
 import { ConflictError, NotFoundError, ValidationError, ForbiddenError } from '../shared/auth-plugin/appError.js';
-import { ERROR_MESSAGES } from '../shared/auth-plugin/appError.js';
-import { User, Friendship } from '../shared/types.js';
+import { Friendship } from '../shared/types.js';
 
 /**
  * Creates a friend request.
@@ -14,16 +13,15 @@ import { User, Friendship } from '../shared/types.js';
  * @throws {ConflictError} If a friendship or request already exists.
  * @returns {Promise<Object>} The created friendship request.
  */
-export async function sendFriendRequest(requesterId: number, receiverUsername: string): Promise<Friendship> {
-	if (requesterId === undefined || !receiverUsername) {
+export async function sendFriendRequest(requesterId: number, receiverId: number): Promise<Friendship> {
+	if (requesterId === undefined || receiverId === undefined) {
 		throw new ValidationError('Requester ID and receiver username are required.');
 	}
 
-	const receiver = await userModel.getUserByUsernameFromDb(receiverUsername);
+	const receiver = await userModel.getUserByIdFromDb(receiverId);
 	if (!receiver) {
-		throw new NotFoundError(`User with username '${receiverUsername}' not found.`);
+		throw new NotFoundError(`User with username '${receiverId}' not found.`);
 	}
-	const receiverId = receiver.id;
 
 	if (requesterId === receiverId) {
 		throw new ValidationError("You cannot send a friend request to yourself.");
@@ -175,27 +173,27 @@ export async function getAllFriendships(): Promise<any[]> {
  * @returns {Promise<{ message: string }>} A success message.
  */
 export async function blockUser(
-    blockerId: number,
-    blockedUserId: number
+	blockerId: number,
+	blockedUserId: number
 ): Promise<{ message: string }> {
-    if (blockerId === blockedUserId) {
-        throw new ValidationError("You cannot block yourself.");
-    }
-    const userToBlock = await userModel.getUserByIdFromDb(blockedUserId);
-    if (!userToBlock) {
-        throw new NotFoundError("User to block not found.");
-    }
+	if (blockerId === blockedUserId) {
+		throw new ValidationError("You cannot block yourself.");
+	}
+	const userToBlock = await userModel.getUserByIdFromDb(blockedUserId);
+	if (!userToBlock) {
+		throw new NotFoundError("User to block not found.");
+	}
 
-    const [id1, id2] = blockerId < blockedUserId ? [blockerId, blockedUserId] : [blockedUserId, blockerId];
-    let friendship = await friendModel.getFriendshipByUsersInDb(id1, id2);
+	const [id1, id2] = blockerId < blockedUserId ? [blockerId, blockedUserId] : [blockedUserId, blockerId];
+	let friendship = await friendModel.getFriendshipByUsersInDb(id1, id2);
 
-    if (friendship) {
-        await friendModel.updateFriendshipStatusInDb(friendship.id, 'blocked');
-    } else {
-        friendship = await friendModel.createFriendshipRequestInDb(id1, id2, blockerId);
-        await friendModel.updateFriendshipStatusInDb(friendship.id, 'blocked');
-    }
-    return { message: `User ${userToBlock.username} has been blocked.` };
+	if (friendship) {
+		await friendModel.updateFriendshipStatusInDb(friendship.id, 'blocked');
+	} else {
+		friendship = await friendModel.createFriendshipRequestInDb(id1, id2, blockerId);
+		await friendModel.updateFriendshipStatusInDb(friendship.id, 'blocked');
+	}
+	return { message: `User ${userToBlock.username} has been blocked.` };
 }
 
 /**
@@ -206,15 +204,15 @@ export async function blockUser(
  * @returns {Promise<{ message: string }>} A success message.
  */
 export async function unblockUser(
-    unblockerId: number,
-    unblockedUserId: number
+	unblockerId: number,
+	unblockedUserId: number
 ): Promise<{ message: string }> {
-    const [id1, id2] = unblockerId < unblockedUserId ? [unblockerId, unblockedUserId] : [unblockedUserId, unblockerId];
-    const friendship = await friendModel.getFriendshipByUsersInDb(id1, id2);
+	const [id1, id2] = unblockerId < unblockedUserId ? [unblockerId, unblockedUserId] : [unblockedUserId, unblockerId];
+	const friendship = await friendModel.getFriendshipByUsersInDb(id1, id2);
 
-    if (!friendship || friendship.status !== 'blocked') {
-        throw new NotFoundError("No active block found for this user or you cannot unblock.");
-    }
-    await friendModel.deleteFriendshipInDb(friendship.id);
-    return { message: "User has been unblocked. They can send/receive friend requests again." };
+	if (!friendship || friendship.status !== 'blocked') {
+		throw new NotFoundError("No active block found for this user or you cannot unblock.");
+	}
+	await friendModel.deleteFriendshipInDb(friendship.id);
+	return { message: "User has been unblocked. They can send/receive friend requests again." };
 }

@@ -12,28 +12,23 @@ export async function registerHandler(req: FastifyRequest<{ Body: RegisterReques
     });
 }
 
-export default async function loginHandler(req: FastifyRequest<{ Body: LoginRequestBody }>, reply: FastifyReply) {
-	const user = await loginUser(req.body);
-	const tokenPayload: JWTPayload = { id: user.id, username: user.username };
-	const token = reply.server.jwt.sign(tokenPayload);
-	const decodedToken = reply.server.jwt.decode(token) as { exp: number };
+export default async function loginHandler( req: FastifyRequest<{ Body: LoginRequestBody }>, reply: FastifyReply) {
+    const user = await loginUser(req.body);
+    const tokenPayload: JWTPayload = { id: user.id, username: user.username };
+    const token = reply.server.jwt.sign(tokenPayload);
+    const decodedToken = reply.server.jwt.decode(token) as { exp: number };
 
-	reply.setCookie(jwtToken, token, {
-		...cookieOptions,
-		httpOnly: true,
-		secure: process.env.NODE_ENV === 'production',
-		expires: new Date(decodedToken.exp * 1000),
-	});
+    reply.setCookie(jwtToken, token, {
+        ...cookieOptions,
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        expires: new Date(decodedToken.exp * 1000),
+    });
 
-	return reply.send({
-		message: 'Login accepted',
-		user: {
-			id: user.id,
-			username: user.username,
-			email: user.email,
-			display_name: user.display_name,
-		},
-	});
+    return reply.send({
+        message: 'Login accepted',
+        user,
+    });
 }
 
 export async function logoutHandler(req: FastifyRequest, reply: FastifyReply) {
