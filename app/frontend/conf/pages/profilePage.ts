@@ -1,7 +1,7 @@
 // /pages/profilePage.ts
-import { getUserDataFromStorage, updateUserProfile, ApiResult } from '../services/authService.js';
+import { getUserDataFromStorage, updateUserProfile } from '../services/authService.js';
 import { navigateTo } from '../services/router.js';
-import { User, UpdateUserPayload } from '../shared/types.js';
+import { User, UpdateUserPayload, ApiResult } from '../shared/types.js';
 import { ProfileForm } from '../components/profileForm.js'; // Importer le composant
 
 export function ProfilePage(): HTMLElement {
@@ -66,22 +66,22 @@ export function ProfilePage(): HTMLElement {
 	backLink.setAttribute('data-link', ''); // Pour le routeur
 	backLink.className = 'block text-center text-gray-600 hover:text-gray-800 text-sm mt-6'; // Style ajusté
 	backLink.textContent = 'Retour au Tableau de Bord';
-	
+
 	// Ajouter le lien après le formulaire dans le contentWrapper
-    // On pourrait aussi le mettre DANS le formulaire si sémantiquement plus logique,
-    // mais ici, on le garde séparé pour montrer la structure de la page.
-    const formElement = contentWrapper.querySelector('#profile-form-component');
-    if (formElement && formElement.parentNode) {
-         // Insérer le lien après la dernière div du formulaire (celle avec le bouton)
-        const lastDivInForm = formElement.children[formElement.children.length -1];
-        if (lastDivInForm && lastDivInForm.parentNode) {
-            (lastDivInForm.parentNode as HTMLElement).insertBefore(backLink, lastDivInForm.nextSibling);
-        } else {
-            contentWrapper.appendChild(backLink); // Fallback
-        }
-    } else {
-        contentWrapper.appendChild(backLink); // Fallback
-    }
+	// On pourrait aussi le mettre DANS le formulaire si sémantiquement plus logique,
+	// mais ici, on le garde séparé pour montrer la structure de la page.
+	const formElement = contentWrapper.querySelector('#profile-form-component');
+	if (formElement && formElement.parentNode) {
+		// Insérer le lien après la dernière div du formulaire (celle avec le bouton)
+		const lastDivInForm = formElement.children[formElement.children.length - 1];
+		if (lastDivInForm && lastDivInForm.parentNode) {
+			(lastDivInForm.parentNode as HTMLElement).insertBefore(backLink, lastDivInForm.nextSibling);
+		} else {
+			contentWrapper.appendChild(backLink); // Fallback
+		}
+	} else {
+		contentWrapper.appendChild(backLink); // Fallback
+	}
 
 
 	pageContainer.appendChild(contentWrapper);

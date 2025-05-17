@@ -1,6 +1,5 @@
 // /components/loginForm.ts
-import { ApiResult } from '../services/authService.js'; // Assurez-vous d'exporter LoginCredentials
-import { LoginRequestBody } from '../shared/types.js';
+import { LoginRequestBody, ApiResult } from '../shared/types.js';
 
 interface LoginFormProps {
 	onLoginAttempt: (credentials: LoginRequestBody) => Promise<ApiResult>;

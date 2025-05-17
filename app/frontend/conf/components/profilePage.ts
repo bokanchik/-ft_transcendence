@@ -1,8 +1,8 @@
 // src/components/profilePage.ts ou un chemin similaire
 
-import { ApiResult, getUserDataFromStorage, updateUserProfile } from '../services/authService.js';
+import { getUserDataFromStorage, updateUserProfile } from '../services/authService.js';
 import { navigateTo } from '../services/router.js';
-import { User, UpdateUserPayload } from '../shared/types.js';
+import { User, UpdateUserPayload, ApiResult } from '../shared/types.js';
 
 export function ProfilePage(): HTMLElement {
 	const user: User | null = getUserDataFromStorage();

@@ -1,18 +1,5 @@
 import { fetchWithCsrf, setCsrfToken } from './csrf.js';
-import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload } from '../shared/types.js';
-
-export interface ApiErrorResponse {
-	error: string;
-}
-
-export interface ApiSuccessResponse {
-	message: string;
-	user: User;
-}
-
-export type ApiResult =
-	| { success: true; data: ApiSuccessResponse }
-	| { success: false; error: string };
+import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, ApiErrorResponse, ApiSuccessResponse, ApiResult } from '../shared/types.js';
 
 // only user data
 const USER_DATA_KEY = 'userDataKey';

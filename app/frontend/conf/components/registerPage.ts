@@ -1,6 +1,5 @@
 import { attemptRegister } from '../services/authService.js';
-import type { ApiResult } from '../services/authService.js';
-import { RegisterRequestBody } from '../shared/types.js'
+import { RegisterRequestBody, ApiResult } from '../shared/types.js'
 
 export function RegisterPage(): HTMLElement {
 	const container = document.createElement('div');

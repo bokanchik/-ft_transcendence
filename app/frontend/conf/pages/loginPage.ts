@@ -1,8 +1,8 @@
 // /pages/loginPage.ts
-import { attemptLogin, ApiResult } from '../services/authService.js';
+import { attemptLogin } from '../services/authService.js';
 import { navigateTo } from '../services/router.js';
 import { LoginForm } from '../components/loginForm.js';
-import { LoginRequestBody } from '../shared/types.js';
+import { LoginRequestBody, ApiResult } from '../shared/types.js';
 
 export function LoginPage(): HTMLElement {
 	const container = document.createElement('div');
@@ -24,8 +24,8 @@ export function LoginPage(): HTMLElement {
 
 	// Fonction de rappel pour le succès de la connexion
 	const handleLoginSuccess = (userData: any) => {
-        // Le message de succès est déjà affiché dans le composant LoginForm.
-        // La page se charge uniquement de la redirection.
+		// Le message de succès est déjà affiché dans le composant LoginForm.
+		// La page se charge uniquement de la redirection.
 		setTimeout(() => {
 			navigateTo('/dashboard');
 		}, 500); // Délai pour que l'utilisateur voie le message de succès

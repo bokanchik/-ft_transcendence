@@ -1,4 +1,5 @@
-import { attemptLogin, ApiResult } from '../services/authService.js';
+import { attemptLogin } from '../services/authService.js';
+import { ApiResult } from '../shared/types.js'
 import { navigateTo } from '../services/router.js';
 
 export function LoginPage(): HTMLElement {
