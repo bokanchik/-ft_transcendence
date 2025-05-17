@@ -25,6 +25,7 @@ services:
       - "5000:5000" # for development (live-server)
     volumes:
       - frontdata:/app/dist
+      - ./services/shared/types.ts:/app/shared/types.ts:ro
     networks:
       - tranet
 

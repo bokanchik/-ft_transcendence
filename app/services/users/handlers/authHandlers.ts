@@ -1,39 +1,18 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import {
-	createUserAccount,
-	loginUser,
-} from '../services/userService.js';
-
-import {
-	jwtToken,
-	cookieOptions,
-} from '../shared/auth-plugin/tokens.js';
-
+import { createUserAccount, loginUser } from '../services/userService.js';
+import { jwtToken, cookieOptions } from '../shared/auth-plugin/tokens.js';
 import { ERROR_MESSAGES } from '../shared/auth-plugin/appError.js';
-import { JWTPayload, User } from '../shared/types.js';
-
-interface LoginRequestBody {
-	identifier: string;
-	password: string;
-}
-interface RegisterRequestBody {
-	username: string;
-	email: string;
-	password: string;
-	display_name: string;
-	avatar_url?: string;
-}
+import { JWTPayload, User, RegisterRequestBody, LoginRequestBody } from '../shared/types.js';
 
 export async function registerHandler(req: FastifyRequest<{ Body: RegisterRequestBody }>, reply: FastifyReply) {
-	const newUser = await createUserAccount(req.body);
+    await createUserAccount(req.body);
 
-	return reply.code(201).send({
-		message: 'Registration successful',
-		user: newUser,
-	});
+    return reply.code(201).send({
+        message: 'Registration successful. Please log in.'
+    });
 }
 
-export async function loginHandler(req: FastifyRequest<{ Body: LoginRequestBody }>, reply: FastifyReply) {
+export default async function loginHandler(req: FastifyRequest<{ Body: LoginRequestBody }>, reply: FastifyReply) {
 	const user = await loginUser(req.body);
 	const tokenPayload: JWTPayload = { id: user.id, username: user.username };
 	const token = reply.server.jwt.sign(tokenPayload);

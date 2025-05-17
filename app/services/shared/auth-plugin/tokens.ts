@@ -75,3 +75,21 @@ export function authenticateDecorator(fastify: FastifyInstance): void {
 	});
 	fastify.log.info('JWT & authenticate plugin registered');
 }
+
+declare module 'fastify' {
+	interface FastifyInstance {
+		authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
+	}
+
+	interface FastifyRequest {
+		user: JWTPayload;
+	}
+}
+
+
+declare module '@fastify/jwt' {
+	interface FastifyJWT {
+		payload: JWTPayload;
+		user: JWTPayload;
+	}
+}

@@ -1,8 +1,6 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
-import {
-	registerHandler,
-	loginHandler
-} from '../handlers/authHandlers.js';
+import loginHandler, {
+	registerHandler} from '../handlers/authHandlers.js';
 import {
 	registerSchema,
 	loginSchema

@@ -2,24 +2,16 @@
 import * as userModel from '../models/userModel.js';
 import * as passwordUtils from '../shared/auth-plugin/pswdUtils.js';
 import { ConflictError, ValidationError, NotFoundError } from '../shared/auth-plugin/appError.js';
-import { User } from '../shared/types.js';
+import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload } from '../shared/types.js';
 
-import { CreateUserPayload as ModelCreateUserPayload, UpdateUserPayload as ModelUpdateUserPayload } from '../models/userModel.js';
-
-export interface CreateUserAccountData extends Omit<ModelCreateUserPayload, 'password_hash' | 'avatar_url'> {
-    password: string;
-    avatar_url?: string; // Optionnel à ce niveau, sera géré
-}
-
-export type UpdateUserProfileData = ModelUpdateUserPayload;
 /**
  * Generates a default avatar URL using ui-avatars.com.
  * @param {string} name - The name to use for generating the avatar.
  * @returns {string} The generated avatar URL.
  */
 function generateDefaultAvatarUrl(name: string): string {
-    const encodedName = encodeURIComponent(name);
-    return `https://ui-avatars.com/api/?name=${encodedName}&background=random&color=fff&size=128`;
+	const encodedName = encodeURIComponent(name);
+	return `https://ui-avatars.com/api/?name=${encodedName}&background=random&color=fff&size=128`;
 }
 
 /**
@@ -28,18 +20,13 @@ function generateDefaultAvatarUrl(name: string): string {
  * @returns {boolean} True if valid, false otherwise.
  */
 function isValidHttpUrl(urlString: string | undefined | null): boolean {
-    if (typeof urlString !== 'string' || !urlString) return false;
-    try {
-        const url = new URL(urlString);
-        return url.protocol === "http:" || url.protocol === "https:";
-    } catch (_) {
-        return false;
-    }
-}
-
-function isValidEmailFormat(emailString: string | undefined | null): boolean {
-    if (typeof emailString !== 'string' || !emailString) return false;
-    return emailString.includes('@') && emailString.length > 3;
+	if (typeof urlString !== 'string' || !urlString) return false;
+	try {
+		const url = new URL(urlString);
+		return url.protocol === "http:" || url.protocol === "https:";
+	} catch (_) {
+		return false;
+	}
 }
 
 /**
@@ -47,9 +34,9 @@ function isValidEmailFormat(emailString: string | undefined | null): boolean {
  * @param {string} emailString - The string to validate.
  * @returns {boolean} True if valid, false otherwise.
  */
-export interface LoginUserPayload {
-    identifier: string;
-    password: string;
+function isValidEmailFormat(emailString: string | undefined | null): boolean {
+	if (typeof emailString !== 'string' || !emailString) return false;
+	return emailString.includes('@') && emailString.length > 3;
 }
 
 /**
@@ -59,58 +46,57 @@ export interface LoginUserPayload {
  * @throws {ValidationError} If the credentials are invalid.
  * @returns {Promise<Object>} The user object without the password hash.
  */
-export async function loginUser({ identifier, password }: LoginUserPayload): Promise<Omit<User, 'password_hash'>> {
-    console.log(`Attempting to log user with identifier: ${identifier}`);
-    let userEntity;
-    const isEmail = identifier.includes('@');
-    if (isEmail) {
-        userEntity = await userModel.getUserByEmailFromDb(identifier);
-    } else {
-        userEntity = await userModel.getUserByUsernameFromDb(identifier);
-    }
+export async function loginUser({ identifier, password }: LoginRequestBody): Promise<Omit<User, 'password_hash'>> {
+	console.log(`Attempting to log user with identifier: ${identifier}`);
+	let userEntity;
+	const isEmail = identifier.includes('@');
+	if (isEmail) {
+		userEntity = await userModel.getUserByEmailFromDb(identifier);
+	} else {
+		userEntity = await userModel.getUserByUsernameFromDb(identifier);
+	}
 
-    if (!userEntity || !(await passwordUtils.comparePassword(password, userEntity.password_hash))) {
-        throw new ValidationError('Invalid username/email or password.');
-    }
+	if (!userEntity || !(await passwordUtils.comparePassword(password, userEntity.password_hash))) {
+		throw new ValidationError('Invalid username/email or password.');
+	}
 
-    const { password_hash, ...userPassLess } = userEntity;
-    return userPassLess as Omit<User, 'password_hash'>; // Cast si UserWithPasswordHash est différent de User
+	const { password_hash, ...userPassLess } = userEntity;
+	return userPassLess as Omit<User, 'password_hash'>; // Cast si UserWithPasswordHash est différent de User
 }
 
 /**
  * Creates a new user account.
  * @param {Object} userData - The user data for account creation.
  * @throws {ConflictError} If the username or email already exists.
- * @returns {Promise<Object>} The created user object.
+ * @returns {Promise<void>}
  */
-export async function createUserAccount(userData: CreateUserAccountData): Promise<Omit<User, 'wins'|'losses'|'status'|'created_at'|'updated_at'>> {
-    console.log('Creating a new user account');
-    const { username, email, password, display_name } = userData;
-    let { avatar_url } = userData; // mutable
+export async function createUserAccount(userData: RegisterRequestBody): Promise<void> {
+	console.log('Creating a new user account');
+	const { username, email, password, display_name } = userData;
+	let { avatar_url } = userData; // mutable
 
-    const existingUser = await userModel.getUserByUsernameFromDb(username);
-    if (existingUser) {
-        throw new ConflictError('Username already exists.');
-    }
+	const existingUser = await userModel.getUserByUsernameFromDb(username);
+	if (existingUser) {
+		throw new ConflictError('Username already exists.');
+	}
 
-    const existingEmail = await userModel.getUserByEmailFromDb(email);
-    if (existingEmail) {
-        throw new ConflictError('Email already exists.');
-    }
-    const hashedPassword = await passwordUtils.hashPassword(password);
+	const existingEmail = await userModel.getUserByEmailFromDb(email);
+	if (existingEmail) {
+		throw new ConflictError('Email already exists.');
+	}
+	const hashedPassword = await passwordUtils.hashPassword(password);
 
-    if (!avatar_url || avatar_url.trim() === "") {
-        avatar_url = generateDefaultAvatarUrl(display_name);
-        console.log(`No avatar provided for ${username}. Using default: ${avatar_url}`);
-    }
-    const newUser = await userModel.createUser({
-        username,
-        email,
-        password_hash: hashedPassword,
-        display_name,
-        avatar_url
-    });
-    return newUser;
+	if (!avatar_url || avatar_url.trim() === "") {
+		avatar_url = generateDefaultAvatarUrl(display_name);
+		console.log(`No avatar provided for ${username}. Using default: ${avatar_url}`);
+	}
+	await userModel.createUser({
+		username,
+		email,
+		password_hash: hashedPassword,
+		display_name,
+		avatar_url
+	});
 }
 
 /**
@@ -118,8 +104,8 @@ export async function createUserAccount(userData: CreateUserAccountData): Promis
  * @returns {Promise<Array>} A list of all users.
  */
 export async function getAllUsers(): Promise<User[]> {
-    console.log('Fetching all users from the database');
-    return userModel.getAllUsersFromDb();
+	console.log('Fetching all users from the database');
+	return userModel.getAllUsersFromDb();
 }
 
 /**
@@ -129,12 +115,12 @@ export async function getAllUsers(): Promise<User[]> {
  * @returns {Promise<Object>} The user object.
  */
 export async function getUserById(userId: number): Promise<User> {
-    console.log('Fetching user by ID from the database');
-    const user = await userModel.getUserByIdFromDb(userId);
-    if (!user) {
-        throw new NotFoundError('User not found');
-    }
-    return user;
+	console.log('Fetching user by ID from the database');
+	const user = await userModel.getUserByIdFromDb(userId);
+	if (!user) {
+		throw new NotFoundError('User not found');
+	}
+	return user;
 }
 
 /**
@@ -144,15 +130,15 @@ export async function getUserById(userId: number): Promise<User> {
  * @returns {Promise<Object>} The user object.
  */
 export async function getUserByUsername(username: string): Promise<User> {
-    console.log('Fetching user by username from the database');
-    // Note: getUserByUsernameFromDb retourne UserWithPasswordHash, mais on ne veut pas exposer le hash.
-    // Il faudrait une version de getUserByUsernameFromDb qui omet le hash, ou le filtrer ici.
-    const userWithHash = await userModel.getUserByUsernameFromDb(username);
-    if (!userWithHash) {
-        throw new NotFoundError('User not found');
-    }
-    const { password_hash, ...user } = userWithHash;
-    return user as User;
+	console.log('Fetching user by username from the database');
+	// Note: getUserByUsernameFromDb retourne UserWithPasswordHash, mais on ne veut pas exposer le hash.
+	// Il faudrait une version de getUserByUsernameFromDb qui omet le hash, ou le filtrer ici.
+	const userWithHash = await userModel.getUserByUsernameFromDb(username);
+	if (!userWithHash) {
+		throw new NotFoundError('User not found');
+	}
+	const { password_hash, ...user } = userWithHash;
+	return user as User;
 }
 
 /**
@@ -162,13 +148,13 @@ export async function getUserByUsername(username: string): Promise<User> {
  * @returns {Promise<Object>} The user object.
  */
 export async function getUserByEmail(email: string): Promise<User> {
-    console.log('Fetching user by email from the database');
-    const userWithHash = await userModel.getUserByEmailFromDb(email);
-    if (!userWithHash) {
-        throw new NotFoundError('User not found');
-    }
-    const { password_hash, ...user } = userWithHash;
-    return user as User;
+	console.log('Fetching user by email from the database');
+	const userWithHash = await userModel.getUserByEmailFromDb(email);
+	if (!userWithHash) {
+		throw new NotFoundError('User not found');
+	}
+	const { password_hash, ...user } = userWithHash;
+	return user as User;
 }
 
 /**
@@ -178,12 +164,12 @@ export async function getUserByEmail(email: string): Promise<User> {
  * @returns {Promise<Array>} A list of matches for the user.
  */
 export async function getUserMatches(userId: number): Promise<any[]> { // TODO: Use Match[] type
-    console.log('Fetching user matches from the database');
-    const matches = await userModel.getUserMatchesFromDb(userId);
-    if (!matches) {
-        throw new NotFoundError('No matches found for this user'); // TODO: virer le if car matches deja undefined si vide
-    }
-    return matches;
+	console.log('Fetching user matches from the database');
+	const matches = await userModel.getUserMatchesFromDb(userId);
+	if (!matches) {
+		throw new NotFoundError('No matches found for this user'); // TODO: virer le if car matches deja undefined si vide
+	}
+	return matches;
 }
 
 /**
@@ -195,84 +181,84 @@ export async function getUserMatches(userId: number): Promise<any[]> { // TODO: 
  * @throws {ConflictError} If the updated email or display name is already taken.
  * @returns {Promise<Object>} The updated user object without the password hash.
  */
-export async function updateUserProfile(userId: number, updates: UpdateUserProfileData): Promise<Omit<User, 'password_hash'>> {
-    console.log(`Attempting to update profile for user ID: ${userId}`);
+export async function updateUserProfile(userId: number, updates: UpdateUserPayload): Promise<Omit<User, 'password_hash'>> {
+	console.log(`Attempting to update profile for user ID: ${userId}`);
 
-    const currentUser = await userModel.getUserByIdFromDb(userId);
-    if (!currentUser) {
-        throw new NotFoundError(`User with ID ${userId} not found`);
-    }
+	const currentUser = await userModel.getUserByIdFromDb(userId);
+	if (!currentUser) {
+		throw new NotFoundError(`User with ID ${userId} not found`);
+	}
 
-    const processedUpdates: ModelUpdateUserPayload = {};
+	const processedUpdates: UpdateUserPayload = {};
 
-    if (updates.display_name !== undefined) {
-        if (typeof updates.display_name === 'string' && updates.display_name.trim().length > 0) {
-            processedUpdates.display_name = updates.display_name.trim();
-        } else {
-            throw new ValidationError('Display name cannot be empty');
-        }
-    }
+	if (updates.display_name !== undefined) {
+		if (typeof updates.display_name === 'string' && updates.display_name.trim().length > 0) {
+			processedUpdates.display_name = updates.display_name.trim();
+		} else {
+			throw new ValidationError('Display name cannot be empty');
+		}
+	}
 
-    if (updates.email !== undefined) {
-        const potentialEmail = updates.email;
-        if (potentialEmail && isValidEmailFormat(potentialEmail)) {
-            processedUpdates.email = potentialEmail.trim();
-        } else {
-            throw new ValidationError('Invalid email format provided.');
-        }
-    }
+	if (updates.email !== undefined) {
+		const potentialEmail = updates.email;
+		if (potentialEmail && isValidEmailFormat(potentialEmail)) {
+			processedUpdates.email = potentialEmail.trim();
+		} else {
+			throw new ValidationError('Invalid email format provided.');
+		}
+	}
 
-    if (updates.avatar_url !== undefined) {
-        const potentialAvatar = updates.avatar_url;
-        if (potentialAvatar === null || (potentialAvatar && isValidHttpUrl(potentialAvatar))) {
-            processedUpdates.avatar_url = potentialAvatar;
-        } else if (potentialAvatar && !isValidHttpUrl(potentialAvatar)) {
-             throw new ValidationError('Invalid avatar URL format provided.');
-        }
-    }
+	if (updates.avatar_url !== undefined) {
+		const potentialAvatar = updates.avatar_url;
+		if (potentialAvatar === null || (potentialAvatar && isValidHttpUrl(potentialAvatar))) {
+			processedUpdates.avatar_url = potentialAvatar;
+		} else if (potentialAvatar && !isValidHttpUrl(potentialAvatar)) {
+			throw new ValidationError('Invalid avatar URL format provided.');
+		}
+	}
 
 
-    const changesToApply: ModelUpdateUserPayload = {};
-    for (const key in processedUpdates) {
-        const typedKey = key as keyof ModelUpdateUserPayload;
-        if (processedUpdates[typedKey] !== currentUser[typedKey as keyof User]) {
-            (changesToApply[typedKey] as any) = processedUpdates[typedKey];
-        }
-    }
+	const changesToApply: UpdateUserPayload = {};
+	for (const key in processedUpdates) {
+		const typedKey = key as keyof UpdateUserPayload;
+		if (processedUpdates[typedKey] !== currentUser[typedKey as keyof User]) {
+			(changesToApply[typedKey] as any) = processedUpdates[typedKey];
+		}
+	}
 
-    if (Object.keys(changesToApply).length === 0) {
-        console.log(`No effective changes detected for user ${userId}. Profile remains unchanged.`);
-        return currentUser;
-    }
+	if (Object.keys(changesToApply).length === 0) {
+		console.log(`No effective changes detected for user ${userId}. Profile remains unchanged.`);
+		return currentUser;
+	}
 
-    if (changesToApply.display_name) {
-        const existingUser = await userModel.getUserByDisplayNameFromDb(changesToApply.display_name);
-        if (existingUser && existingUser.id !== userId) {
-            throw new ConflictError(`Display name '${changesToApply.display_name}' is already taken.`);
-        }
-    }
-    if (changesToApply.email) {
-        const existingUser = await userModel.getUserByEmailFromDb(changesToApply.email);
-        if (existingUser && existingUser.id !== userId) {
-            throw new ConflictError(`Email '${changesToApply.email}' is already taken.`);
-        }
-    }
+	if (changesToApply.display_name) {
+		const existingUser = await userModel.getUserByDisplayNameFromDb(changesToApply.display_name);
+		if (existingUser && existingUser.id !== userId) {
+			throw new ConflictError(`Display name '${changesToApply.display_name}' is already taken.`);
+		}
+	}
+	if (changesToApply.email) {
+		const existingUser = await userModel.getUserByEmailFromDb(changesToApply.email);
+		if (existingUser && existingUser.id !== userId) {
+			throw new ConflictError(`Email '${changesToApply.email}' is already taken.`);
+		}
+	}
 
-    try {
-        const result = await userModel.updateUserInDb(userId, changesToApply);
-        if (!result.changes || result.changes === 0) {
-            const finalUserCheck = await userModel.getUserByIdFromDb(userId);
-            if (!finalUserCheck) throw new NotFoundError(`User ${userId} disappeared after update attempt or no changes made.`);
-            return finalUserCheck;
-        }
-    } catch (dbError: any) {
-        console.error(`Database error during profile update for user ${userId}:`, dbError);
-        throw new Error(`Failed to update profile for user ${userId} due to a database issue.`);
-    }
+	try {
+		const result = await userModel.updateUserInDb(userId, changesToApply);
+		if (!result.changes || result.changes === 0) {
+			const finalUserCheck = await userModel.getUserByIdFromDb(userId);
+			if (!finalUserCheck) throw new NotFoundError(`User ${userId} disappeared after update attempt or no changes made.`);
+			return finalUserCheck;
+		}
+	} catch (dbError: any) {
+		console.error(`Database error during profile update for user ${userId}:`, dbError);
+		throw new Error(`Failed to update profile for user ${userId} due to a database issue.`);
+	}
 
-    const updatedUser = await userModel.getUserByIdFromDb(userId);
-    if (!updatedUser) {
-        throw new Error(`Failed to retrieve user ${userId} immediately after successful update.`);
-    }
-    return updatedUser;
+	const updatedUser = await userModel.getUserByIdFromDb(userId);
+	if (!updatedUser) {
+		throw new Error(`Failed to retrieve user ${userId} immediately after successful update.`);
+	}
+	return updatedUser;
 }
