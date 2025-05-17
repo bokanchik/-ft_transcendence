@@ -23,7 +23,7 @@ export interface Friendship {
   user2_id: number;
   initiator_id: number;
   status: 'pending' | 'accepted' | 'declined' | 'blocked';
-  created_at?: string; // <-- optionnel ou DATE
+  created_at?: string;
 }
 
 export interface Match {
