@@ -78,6 +78,15 @@ export interface UpdatedUserResult {
 	lastID?: number; // lastID n'est pas pertinent pour UPDATE
 }
 
+export interface ApiErrorResponse {
+    error: string;
+    details?: any;
+}
+
+export interface ApiSuccessResponse<T> {
+    message?: string;
+    data?: T;
+}
 
 // import { CookieSerializeOptions } from '@fastify/cookie';
 // export interface AppCookieOptions extends CookieSerializeOptions {
