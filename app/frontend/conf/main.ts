@@ -5,7 +5,8 @@ import { UsersPage } from './pages/userPage.js';
 import { GamePage } from './components/gamePage.js';
 import { GameRoomPage } from './pages/gameRoomPage.js';
 import { navigateTo } from './services/router.js'; // à ajouter en haut
-import { DashboardPage } from './components/dashboardPage.js'
+import { DashboardPage } from './pages/dashboardPage.js'
+//import { DashboardPage } from './components/dashboardPage.js'
 import { ProfilePage } from './components/profilePage.js';
 import { getUserDataFromStorage } from './services/authService.js';
 import { promptAliasForm } from './components/aliasFormPage.js';

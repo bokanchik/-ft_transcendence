@@ -1,23 +1,16 @@
 // dashboardPage.ts
 import { navigateTo } from '../services/router.js';
-//import { navigateTo } from '../main.js';
-
-import {
-	getUserDataFromStorage,
-	logout,
-} from '../services/authService.js';
+import { getUserDataFromStorage, logout } from '../services/authService.js';
+import { fetchCsrfToken } from '../services/csrf.js';
+import { User, Friend, PendingFriendRequest } from '../shared/types.js';
 import {
 	getReceivedFriendRequests,
 	getSentFriendRequests,
 	acceptFriendRequest,
 	declineFriendRequest,
 	cancelFriendRequest,
-	PendingFriendRequest,
 	getFriendsList,
-	Friend,
 } from '../services/friendService.js';
-import { fetchCsrfToken } from '../services/csrf.js';
-import { User } from '../shared/types.js';
 
 export function DashboardPage(): HTMLElement {
 	const User: User | null = getUserDataFromStorage();
