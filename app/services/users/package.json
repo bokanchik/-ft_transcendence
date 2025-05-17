@@ -8,7 +8,7 @@
     "clean": "rm -rf dist",
     "build": "npm run clean && tsc",
     "start": "node dist/server.js",
-    "dev": "npm run build && concurrently \"tsc -w\" \"nodemon dist/server.js\"",
+    "dev": "npm run build && concurrently \"tsc -w\" \"nodemon dist/server.js\" | pino-pretty",
     "start:dev": "node --inspect dist/server.js"
 },
   "dependencies": {
@@ -28,6 +28,8 @@
     "@types/node": "^22.15.18",
     "@types/bcrypt": "^5.0.2",
     "@types/sqlite3": "^5.1.0",
+	"pino": "^9.6.0",
+	"pino-pretty": "^13.0.0",
     "nodemon": "^3.1.10",
     "dotenv-cli": "^8.0.0"
   }
