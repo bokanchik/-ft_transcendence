@@ -1,8 +1,8 @@
 // app/services/users/services/userService.ts
 import * as userModel from '../models/userModel.js';
-import * as passwordUtils from '../utils/pswdUtils.js';
-import { ConflictError, ValidationError, NotFoundError } from '../utils/appError.js';
-import { User } from './types.js';
+import * as passwordUtils from '../shared/auth-plugin/pswdUtils.js';
+import { ConflictError, ValidationError, NotFoundError } from '../shared/auth-plugin/appError.js';
+import { User } from '../shared/types.js';
 
 import { CreateUserPayload as ModelCreateUserPayload, UpdateUserPayload as ModelUpdateUserPayload } from '../models/userModel.js';
 

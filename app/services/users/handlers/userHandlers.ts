@@ -1,7 +1,7 @@
 // Gère les requêtes Fastify (req, reply)
 import { FastifyRequest, FastifyReply } from 'fastify';
 import * as userService from '../services/userService.js'; // userService avec alias
-import { User } from '../services/types.js';
+import { User } from '../shared/types.js';
 import { UpdateUserProfileData } from '../services/userService.js'; // Importez le type du payload de mise à jour
 
 // Pour getUsersHandler, le type de retour est implicite par le service

@@ -1,9 +1,9 @@
 // services/friendService.js
 import * as friendModel from '../models/friendModel.js';
 import * as userModel from '../models/userModel.js';
-import { ConflictError, NotFoundError, ValidationError, ForbiddenError } from '../utils/appError.js';
-import { ERROR_MESSAGES } from '../utils/appError.js';
-import { User, Friendship } from '../services/types.js';
+import { ConflictError, NotFoundError, ValidationError, ForbiddenError } from '../shared/auth-plugin/appError.js';
+import { ERROR_MESSAGES } from '../shared/auth-plugin/appError.js';
+import { User, Friendship } from '../shared/types.js';
 
 /**
  * Creates a friend request.

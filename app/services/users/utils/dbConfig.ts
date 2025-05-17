@@ -16,46 +16,42 @@ export function getDb(): Database {
 }
 
 export async function initializeDb(): Promise<Database> {
-    if (db) return db;
+	if (db) return db;
 
-    const dbDir = path.join(__dirname, '..', 'db');
-    const dbPath = path.join(dbDir, 'database.sqlite');
+	const dbDir = path.join(__dirname, '..', 'db');
+	const dbPath = path.join(dbDir, 'database.sqlite');
 
-    // Crée le dossier si besoin
-    if (!fs.existsSync(dbDir)) {
-        fs.mkdirSync(dbDir, { recursive: true });
-    }
+	if (!fs.existsSync(dbDir)) {
+		fs.mkdirSync(dbDir, { recursive: true });
+	}
 
-    if (fs.existsSync(dbPath)) {
-        fs.unlinkSync(dbPath);
-        console.log('Old database.sqlite removed.');
-    }
+	if (fs.existsSync(dbPath)) {
+		fs.unlinkSync(dbPath);
+		console.log('Old database.sqlite removed.');
+	}
 
-    try {
-        db = await open({
-            filename: dbPath,
-            driver: sqlite3.Database
-        });
-        console.log('Database connected!');
+	try {
+		db = await open({
+			filename: dbPath,
+			driver: sqlite3.Database
+		});
+		console.log('Database connected!');
 
-        // Correction du chemin pour init.sql
-        // On cherche d'abord dans ../db (dev), puis dans ../../db (prod/dist)
-        let initSQLPath = path.join(__dirname, '..', 'db', 'init.sql');
-        if (!fs.existsSync(initSQLPath)) {
-            // Si on est dans dist/utils, il faut peut-être monter plus haut
-            initSQLPath = path.join(__dirname, '..', '..', 'db', 'init.sql');
-        }
-        if (fs.existsSync(initSQLPath)) {
-            const sql = fs.readFileSync(initSQLPath, 'utf-8');
-            await db.exec(sql);
-            console.log('Database initialized from init.sql.');
-        } else {
-            console.warn('init.sql not found. Database not initialized.');
-        }
-        if (!db) throw new Error("DB failed to initialize after setup.");
-        return db;
-    } catch (err: any) {
-        console.error('Error while connecting to the database:', err.message);
-        throw new Error(err.message || 'Database initialization failed');
-    }
+		let initSQLPath = path.join(__dirname, '..', 'db', 'init.sql');
+		if (!fs.existsSync(initSQLPath)) {
+			initSQLPath = path.join(__dirname, '..', '..', 'db', 'init.sql');
+		}
+		if (fs.existsSync(initSQLPath)) {
+			const sql = fs.readFileSync(initSQLPath, 'utf-8');
+			await db.exec(sql);
+			console.log('Database initialized from init.sql.');
+		} else {
+			console.warn('init.sql not found. Database not initialized.');
+		}
+		if (!db) throw new Error("DB failed to initialize after setup.");
+		return db;
+	} catch (err: any) {
+		console.error('Error while connecting to the database:', err.message);
+		throw new Error(err.message || 'Database initialization failed');
+	}
 }

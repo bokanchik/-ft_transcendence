@@ -1,6 +1,6 @@
 // app/services/users/models/friendModel.ts
 import { getDb } from '../utils/dbConfig.js';
-import { Friendship, User } from '../services/types.js'; // Importez vos types
+import { Friendship, User } from '../shared/types.js'; // Importez vos types
 
 export interface CreateFriendshipResult extends Omit<Friendship, 'created_at'> {} // `created_at` est géré par DB
 

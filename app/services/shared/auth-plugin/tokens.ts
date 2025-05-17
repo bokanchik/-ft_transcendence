@@ -1,5 +1,5 @@
-// app/services/users/utils/tokens.ts
-import { FastifyInstance } from 'fastify';
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { JWTPayload } from '../types.js';
 import fastifyJwt from '@fastify/jwt';
 import fastifyCookie, { CookieSerializeOptions } from '@fastify/cookie';
 import fastifyCsrfProtection from '@fastify/csrf-protection';
@@ -14,6 +14,13 @@ export const cookieOptions: CookieSerializeOptions = {
 	sameSite: 'strict',
 	maxAge: 60 * 60 * 24 * 7,
 };
+
+export async function setupPlugins(fastify: FastifyInstance): Promise<void> {
+	await registerCookiePlugin(fastify);
+	await registerJWTPlugin(fastify);
+	authenticateDecorator(fastify);
+	await registerCsrfPlugin(fastify);
+}
 
 export async function registerCookiePlugin(fastify: FastifyInstance): Promise<void> {
 	const cookieSecret = process.env.COOKIE_SECRET || 'COOKIE_SECRET_DUR';
@@ -54,4 +61,17 @@ export async function registerJWTPlugin(fastify: FastifyInstance): Promise<void>
 		fastify.log.error({ err: err.message }, 'FAILED to register @fastify/jwt plugin!');
 		throw new Error(err.message || 'Failed to register JWT plugin');
 	}
+}
+
+export function authenticateDecorator(fastify: FastifyInstance): void {
+	fastify.decorate('authenticate', async function(request: FastifyRequest, reply: FastifyReply) {
+		try {
+			await request.jwtVerify<JWTPayload>();
+		} catch (err) {
+			fastify.log.warn('JWT verification failed: ', err);
+			reply.clearCookie(jwtToken, cookieOptions);
+			reply.code(401).send({ error: 'Unauthorized' });
+		}
+	});
+	fastify.log.info('JWT & authenticate plugin registered');
 }

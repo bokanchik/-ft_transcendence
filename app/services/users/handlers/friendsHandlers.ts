@@ -1,8 +1,8 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import * as friendService from '../services/friendService.js';
-import { AppError } from '../utils/appError.js';
-import { ERROR_MESSAGES } from '../utils/appError.js';
-import { JWTPayload } from '../services/types.js';
+import { AppError } from '../shared/auth-plugin/appError.js';
+import { ERROR_MESSAGES } from '../shared/auth-plugin/appError.js';
+import { JWTPayload } from '../shared/types.js';
 
 // Types pour les requêtes avec params
 interface FriendshipIdRequest extends FastifyRequest<{ Params: { friendshipId: string } }> {

@@ -1,7 +1,7 @@
 // app/services/users/models/userModel.ts
 import { getDb } from '../utils/dbConfig.js';
-import { ERROR_MESSAGES } from '../utils/appError.js';
-import { User, UserWithPasswordHash } from '../services/types.js'; // Importez vos types
+import { ERROR_MESSAGES } from '../shared/auth-plugin/appError.js';
+import { User, UserWithPasswordHash } from '../shared/types.js'; // Importez vos types
 
 // Type pour les données de création d'utilisateur
 export interface CreateUserPayload {
