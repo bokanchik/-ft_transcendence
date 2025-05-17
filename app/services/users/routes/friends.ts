@@ -7,11 +7,16 @@ import {
 	sendFriendRequestHandler,
 	cancelFriendRequestHandler,
 	getMyFriendsHandler,
+	removeFriendshipHandler,
 } from "../handlers/friendsHandlers.js";
 import {
 	sendFriendRequestSchema,
 	friendshipIdParamSchema,
 } from "../schemas/friendsSchemas.js";
+
+type FriendshipIdRoute = {
+    Params: { friendshipId: string }
+};
 
 export default async function friendRoutes(fastify: FastifyInstance, options: FastifyPluginOptions) {
 	fastify.post(
@@ -48,5 +53,10 @@ export default async function friendRoutes(fastify: FastifyInstance, options: Fa
 		'/friends',
 		{ onRequest: [fastify.authenticate] },
 		getMyFriendsHandler
+	);
+	fastify.post<FriendshipIdRoute>(
+		'/:friendshipId/remove',
+		{ onRequest: [fastify.authenticate, fastify.csrfProtection], schema: friendshipIdParamSchema },
+		removeFriendshipHandler
 	);
 };

@@ -3,8 +3,6 @@ import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, ApiErro
 
 const USER_DATA_KEY = 'userDataKey';
 const USER_DATA_EXPIRATION_KEY = 'userDataExpiration';
-// const USER_DATA_KEY = process.env.USER_DATA_KEY;
-// const USER_DATA_EXPIRATION_KEY = process.env.USER_DATA_EXPIRATION_KEY;
 
 /**
  * Retrieves user data (not the token) from localStorage.
@@ -146,46 +144,38 @@ export async function logout(): Promise<void> {
  * @returns RegisterResult indicating success or failure.
  */
 export async function attemptRegister(credentials: RegisterRequestBody): Promise<ApiResult> {
-	const registerUrl = '/api/users/auth/register';
-	//	const registerUrl = process.env.URL_REGISTER;
+    const registerUrl = '/api/users/auth/register';
 
-	try {
-		const payload: any = { ...credentials };
-		if (!payload.avatar_url) {
-			delete payload.avatar_url;
-		}
+    try {
+        const payload: any = { ...credentials };
+        if (!payload.avatar_url) {
+            delete payload.avatar_url;
+        }
 
-		const response = await fetch(registerUrl, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(payload),
-		});
+        const response = await fetch(registerUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
 
-		if (!response.ok) {
-			console.error(`HTTP error! status: ${response.status} ${response.statusText}`);
-			let errorData: ApiErrorResponse = { error: `Server error (${response.status})` };
-			try {
-				errorData = await response.json();
-			} catch (jsonError) {
-				console.error("Unable to parse JSON error response:", jsonError);
-			}
-			return { success: false, error: errorData.error || response.statusText };
-		}
+        const data: ApiSuccessResponse = await response.json();
 
-		const data: ApiSuccessResponse & { csrfToken: string } = await response.json();
+        if (!response.ok) {
+            console.error(`HTTP error! status: ${response.status} ${response.statusText}`);
+            const errorMsg = (data && typeof data === 'object' && 'error' in data && typeof data.error === 'string')
+                ? data.error
+                : response.statusText;
+            return { success: false, error: errorMsg };
+        }
 
-		if (data && data.user) {
-			localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.user));
-			setCsrfToken(data.csrfToken); // Stocker le token CSRF
-			return { success: true, data: data };
-		} else {
-			return { success: false, error: "Problem receiving user data." };
-		}
-	} catch (error) {
-		console.error("Network error during registration:", error);
-		const errorMessage = error instanceof Error ? error.message : "Unknown error";
-		return { success: false, error: `Server connection error during registration (${errorMessage})` };
-	}
+        // Succès : le backend ne renvoie qu'un message
+        return { success: true, data };
+
+    } catch (error) {
+        console.error("Network error during registration:", error);
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        return { success: false, error: `Server connection error during registration (${errorMessage})` };
+    }
 }
 
 /**

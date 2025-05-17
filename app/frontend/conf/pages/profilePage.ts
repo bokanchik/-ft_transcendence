@@ -67,9 +67,7 @@ export function ProfilePage(): HTMLElement {
 	backLink.className = 'block text-center text-gray-600 hover:text-gray-800 text-sm mt-6'; // Style ajusté
 	backLink.textContent = 'Retour au Tableau de Bord';
 
-	// Ajouter le lien après le formulaire dans le contentWrapper
-	// On pourrait aussi le mettre DANS le formulaire si sémantiquement plus logique,
-	// mais ici, on le garde séparé pour montrer la structure de la page.
+	// Vérifier si le formulaire existe avant d'essayer de l'insérer
 	const formElement = contentWrapper.querySelector('#profile-form-component');
 	if (formElement && formElement.parentNode) {
 		// Insérer le lien après la dernière div du formulaire (celle avec le bouton)

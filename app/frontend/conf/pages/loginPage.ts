@@ -24,11 +24,7 @@ export function LoginPage(): HTMLElement {
 
 	// Fonction de rappel pour le succès de la connexion
 	const handleLoginSuccess = (userData: any) => {
-		// Le message de succès est déjà affiché dans le composant LoginForm.
-		// La page se charge uniquement de la redirection.
-		setTimeout(() => {
-			navigateTo('/dashboard');
-		}, 500); // Délai pour que l'utilisateur voie le message de succès
+		setTimeout(() => { navigateTo('/dashboard'); }, 500);
 	};
 
 	// Créer et ajouter le composant formulaire

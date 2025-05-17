@@ -107,3 +107,15 @@ export async function sendFriendRequest(friendId: number): Promise<{ message: st
 	});
 	return handleApiResponse(response);
 }
+
+/**
+ * Removes a friend by friendshipId.
+ * @param friendshipId The ID of the friendship to remove.
+ * @returns A message indicating the result of the operation.
+ */
+export async function removeFriend(friendshipId: number): Promise<{ message: string }> {
+    const response = await fetchWithCsrf(`/api/users/friends/${friendshipId}/remove`, {
+        method: 'POST',
+    });
+    return handleApiResponse(response);
+}

@@ -10,7 +10,7 @@ import {
 	cancelFriendRequest,
 	getFriendsList,
 	sendFriendRequest,
-	// removeFriend,
+	removeFriend,
 } from '../services/friendService.js';
 import { fetchUsers } from '../services/api.js';
 import { FriendsListComponent } from '../components/friendsList.js';

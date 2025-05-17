@@ -156,6 +156,26 @@ export async function getSentFriendRequests(userId: number): Promise<any[]> {
 	return friendModel.getPendingSentFriendRequestsInDb(userId);
 }
 
+export async function removeFriendship(friendshipId: number, currentUserId: number): Promise<{ message: string }> {
+    const friendship = await friendModel.getFriendshipByIdInDb(friendshipId);
+
+    if (!friendship) {
+        throw new NotFoundError('Friendship not found.');
+    }
+    if (friendship.user1_id !== currentUserId && friendship.user2_id !== currentUserId) {
+        throw new ForbiddenError("You are not part of this friendship.");
+    }
+    if (friendship.status !== 'accepted') {
+        throw new ConflictError('You can only remove an accepted friend.');
+    }
+
+    const result = await friendModel.deleteFriendshipInDb(friendshipId);
+    if (result.changes === 0) {
+        throw new Error('Failed to remove friend, database reported no changes.');
+    }
+    return { message: 'Friend removed successfully.' };
+}
+
 /**
  * Retrieves all friendships (admin only).
  * @returns {Promise<Array>} List of all friendships.
