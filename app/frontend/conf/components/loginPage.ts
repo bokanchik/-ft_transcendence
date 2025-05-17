@@ -1,4 +1,4 @@
-import { attemptLogin, LoginResult } from '../services/authService.js';
+import { attemptLogin, ApiResult } from '../services/authService.js';
 import { navigateTo } from '../services/router.js';
 
 export function LoginPage(): HTMLElement {
@@ -66,7 +66,7 @@ export function LoginPage(): HTMLElement {
 			return;
 		}
 
-		const result: LoginResult = await attemptLogin({ identifier, password });
+		const result: ApiResult = await attemptLogin({ identifier, password });
 
 		loginButton.disabled = false; // Disable button after login attempt
 		loginButton.textContent = 'Sign In';

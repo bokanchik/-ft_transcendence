@@ -1,4 +1,3 @@
-import { UserData } from './authService.js'; // Or the correct path
 import { fetchWithCsrf, setCsrfToken, getCsrfTokenOrThrow, csrfToken } from './csrf.js';
 
 export interface FriendRequestUserData {

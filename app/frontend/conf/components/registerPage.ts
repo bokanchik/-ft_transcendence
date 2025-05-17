@@ -1,6 +1,6 @@
-import { attemptRegister, RegisterCredentials, RegisterSuccessData } from '../services/authService.js';
-import type { RegisterResult } from '../services/authService.js';
-import { UserData } from '../services/authService.js'
+import { attemptRegister } from '../services/authService.js';
+import type { ApiResult } from '../services/authService.js';
+import { RegisterRequestBody } from '../shared/types.js'
 
 export function RegisterPage(): HTMLElement {
 	const container = document.createElement('div');
@@ -120,7 +120,7 @@ export function RegisterPage(): HTMLElement {
 		registerButton.disabled = true;
 		registerButton.textContent = 'Registering...';
 
-		const credentials: RegisterCredentials = {
+		const credentials: RegisterRequestBody = {
 			username,
 			email,
 			password,
@@ -131,7 +131,7 @@ export function RegisterPage(): HTMLElement {
 			credentials.avatar_url = avatarUrl;
 		}
 
-		const registrationResult: RegisterResult = await attemptRegister(credentials);
+		const registrationResult: ApiResult = await attemptRegister(credentials);
 
 		registerButton.disabled = false; // Re-enable button
 		registerButton.textContent = 'Register';

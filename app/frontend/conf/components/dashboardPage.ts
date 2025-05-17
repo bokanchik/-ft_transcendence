@@ -5,7 +5,6 @@ import { navigateTo } from '../services/router.js';
 import {
 	getUserDataFromStorage,
 	logout,
-	UserData,
 } from '../services/authService.js';
 import {
 	getReceivedFriendRequests,
@@ -18,11 +17,12 @@ import {
 	Friend,
 } from '../services/friendService.js';
 import { fetchCsrfToken } from '../services/csrf.js';
+import { User } from '../shared/types.js';
 
 export function DashboardPage(): HTMLElement {
-	const userData: UserData | null = getUserDataFromStorage();
+	const User: User | null = getUserDataFromStorage();
 
-	if (!userData) {
+	if (!User) {
 		console.warn('Access unauthorized: User not authenticated.');
 		navigateTo('/login');
 		const redirectMsg = document.createElement('div');
@@ -73,7 +73,7 @@ export function DashboardPage(): HTMLElement {
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-4 border-gray-200">
             <div>
                 <h1 class="text-3xl font-bold text-gray-800">Tableau de Bord</h1>
-                <p class="text-xl text-gray-600 mt-1">Bienvenue, <strong class="text-blue-600">${userData.display_name || userData.username}</strong> !</p>
+                <p class="text-xl text-gray-600 mt-1">Bienvenue, <strong class="text-blue-600">${User.display_name || User.username}</strong> !</p>
             </div>
             <button id="logout-button"
                     class="mt-4 sm:mt-0 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300 ease-in-out">
@@ -84,9 +84,9 @@ export function DashboardPage(): HTMLElement {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="main-widgets-grid">
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 shadow-sm">
                 <h2 class="text-xl font-semibold text-blue-800 mb-3">Mon Profil</h2>
-                <p class="text-gray-700 text-sm mb-1"><span class="font-medium">Username:</span> ${userData.username}</p>
-                <p class="text-gray-700 text-sm mb-1"><span class="font-medium">Email:</span> ${userData.email || 'Non fourni'}</p>
-                <p class="text-gray-700 text-sm"><span class="font-medium">ID:</span> ${userData.id}</p>
+                <p class="text-gray-700 text-sm mb-1"><span class="font-medium">Username:</span> ${User.username}</p>
+                <p class="text-gray-700 text-sm mb-1"><span class="font-medium">Email:</span> ${User.email || 'Non fourni'}</p>
+                <p class="text-gray-700 text-sm"><span class="font-medium">ID:</span> ${User.id}</p>
                 <a href="/profile" data-link class="text-blue-600 hover:text-blue-800 text-sm mt-3 inline-block">Modifier le profil</a>
             </div>
             <div class="bg-green-50 border border-green-200 rounded-lg p-4 shadow-sm">
@@ -143,7 +143,7 @@ export function DashboardPage(): HTMLElement {
 	const friendsCountSpan = friendsListSection.querySelector('#friends-count') as HTMLSpanElement;
 
 
-	async function loadAllFriendData() { // Renommée pour plus de clarté
+	async function loadAllFriendData() {
 		try {
 			const [received, sent, friends] = await Promise.all([
 				getReceivedFriendRequests(),

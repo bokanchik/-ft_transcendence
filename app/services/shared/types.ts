@@ -38,7 +38,11 @@ export interface LoginRequestBody {
 	password: string;
 }
 
-export type UpdateUserPayload = Partial<Pick<User, 'email' | 'display_name' | 'avatar_url'>>;
+export interface UpdateUserPayload {
+	email?: string;
+	display_name?: string;
+	avatar_url?: string | null;
+}
 
 export interface Friendship {
 	id: number;

@@ -1,62 +1,18 @@
 import { fetchWithCsrf, setCsrfToken } from './csrf.js';
-
-export interface UserData {
-	id: number;
-	username: string;
-	email: string;
-	display_name: string;
-	avatar_url: string | null;
-}
-
-export interface RegisterCredentials {
-	username: string;
-	email: string;
-	password: string;
-	display_name: string;
-	avatar_url?: string;
-}
-
-export interface RegisterSuccessData {
-	message: string;
-	user: UserData;
-}
-
-export interface LoginCredentials {
-	identifier: string;
-	password: string;
-}
-
-export interface LoginSuccessResponse {
-	message: string;
-	user: UserData;
-}
+import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload } from '../shared/types.js';
 
 export interface ApiErrorResponse {
 	error: string;
 }
 
-export interface UpdateProfilePayload {
-	email?: string;
-	display_name?: string;
-	avatar_url?: string | null;
-}
-
-export interface UpdateProfileSuccessData {
+export interface ApiSuccessResponse {
 	message: string;
-	user: UserData;
+	user: User;
 }
 
-export type UpdateProfileResult =
-	| { success: true; data: UpdateProfileSuccessData['user'] }
+export type ApiResult =
+	| { success: true; data: ApiSuccessResponse }
 	| { success: false; error: string };
-
-export type LoginResult =
-	| { success: true; data: LoginSuccessResponse }
-	| { success: false, error: string };
-
-export type RegisterResult =
-	| { success: true; data: RegisterSuccessData }
-	| { success: false, error: string };
 
 // only user data
 const USER_DATA_KEY = 'userDataKey';
@@ -67,9 +23,9 @@ const CSRF_TOKEN_KEY = 'csrfToken';
  * Retrieves user data (not the token) from localStorage.
  * The presence of this data does not guarantee that the user is still authenticated
  * (the JWT cookie might have expired). An API call is required to confirm authentication.
- * @returns UserData if available, null otherwise.
+ * @returns User if available, null otherwise.
  */
-export function getUserDataFromStorage(): UserData | null {
+export function getUserDataFromStorage(): User | null {
 	const expiration = localStorage.getItem(USER_DATA_EXPIRATION_KEY);
 	if (expiration && new Date().getTime() > parseInt(expiration, 10)) {
 		localStorage.removeItem(USER_DATA_KEY);
@@ -79,7 +35,7 @@ export function getUserDataFromStorage(): UserData | null {
 
 	const data = localStorage.getItem(USER_DATA_KEY);
 	try {
-		const parsedData = data ? JSON.parse(data) as UserData : null;
+		const parsedData = data ? JSON.parse(data) as User : null;
 		if (parsedData && parsedData.id && parsedData.username) {
 			return parsedData;
 		}
@@ -92,8 +48,8 @@ export function getUserDataFromStorage(): UserData | null {
 	}
 }
 
-export function setUserDataInStorage(userData: UserData): void {
-	localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData));
+export function setUserDataInStorage(User: User): void {
+	localStorage.setItem(USER_DATA_KEY, JSON.stringify(User));
 	const expiration = new Date().getTime() + 24 * 60 * 60 * 1000; // 24 hours
 	localStorage.setItem(USER_DATA_EXPIRATION_KEY, expiration.toString());
 }
@@ -101,9 +57,9 @@ export function setUserDataInStorage(userData: UserData): void {
 /**
  * Attempts to verify the authentication status by calling a protected endpoint.
  * The server will verify the JWT cookie.
- * @returns UserData if authenticated, null otherwise.
+ * @returns User if authenticated, null otherwise.
  */
-export async function checkAuthStatus(): Promise<UserData | null> {
+export async function checkAuthStatus(): Promise<User | null> {
 	const meUrl = '/api/users/me';
 	try {
 		const response = await fetch(meUrl, {
@@ -112,9 +68,9 @@ export async function checkAuthStatus(): Promise<UserData | null> {
 			credentials: 'include', // Important to send cookie
 		});
 		if (response.ok) {
-			const userData: UserData = await response.json();
-			localStorage.setItem(USER_DATA_KEY, JSON.stringify(userData)); // sync
-			return userData;
+			const User: User = await response.json();
+			localStorage.setItem(USER_DATA_KEY, JSON.stringify(User)); // sync
+			return User;
 		}
 		localStorage.removeItem(USER_DATA_KEY);
 		return null;
@@ -130,7 +86,7 @@ export async function checkAuthStatus(): Promise<UserData | null> {
  * @param credentials Login credentials (identifier and password).
  * @returns LoginResult indicating success or failure.
  */
-export async function attemptLogin(credentials: LoginCredentials): Promise<LoginResult> {
+export async function attemptLogin(credentials: LoginRequestBody): Promise<ApiResult> {
 	if (!credentials.identifier || !credentials.password) {
 		return { success: false, error: "Identifier and password are required." };
 	}
@@ -156,7 +112,7 @@ export async function attemptLogin(credentials: LoginCredentials): Promise<Login
 			return { success: false, error: errorData.error || response.statusText };
 		}
 
-		const data: LoginSuccessResponse & { csrfToken: string } = await response.json();
+		const data: ApiSuccessResponse & { csrfToken: string } = await response.json();
 
 		if (data && data.user) {
 			localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.user));
@@ -202,7 +158,7 @@ export async function logout(): Promise<void> {
  * @param credentials Registration credentials (username, email, password, etc.).
  * @returns RegisterResult indicating success or failure.
  */
-export async function attemptRegister(credentials: RegisterCredentials): Promise<RegisterResult> {
+export async function attemptRegister(credentials: RegisterRequestBody): Promise<ApiResult> {
 	const registerUrl = '/api/users/auth/register';
 	//	const registerUrl = process.env.URL_REGISTER;
 
@@ -229,7 +185,7 @@ export async function attemptRegister(credentials: RegisterCredentials): Promise
 			return { success: false, error: errorData.error || response.statusText };
 		}
 
-		const data: RegisterSuccessData & { csrfToken: string } = await response.json();
+		const data: ApiSuccessResponse & { csrfToken: string } = await response.json();
 
 		if (data && data.user) {
 			localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.user));
@@ -250,7 +206,7 @@ export async function attemptRegister(credentials: RegisterCredentials): Promise
  * @param payload Profile update payload (email, display name, avatar URL, etc.).
  * @returns UpdateProfileResult indicating success or failure.
  */
-export async function updateUserProfile(payload: UpdateProfilePayload): Promise<UpdateProfileResult> {
+export async function updateUserProfile(payload: UpdateUserPayload): Promise<ApiResult> {
 	const profileUpdateUrl = '/api/users/me';
 
 	const cleanPayload = { ...payload };
@@ -280,14 +236,14 @@ export async function updateUserProfile(payload: UpdateProfilePayload): Promise<
 			return { success: false, error: errorData.error || response.statusText };
 		}
 
-		const data: UpdateProfileSuccessData = await response.json();
+		const data: ApiSuccessResponse = await response.json();
 		console.log("Profile successfully updated via API:", data);
 
 		if (data.user) {
 			localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.user));
 			console.log("User data updated in localStorage.");
 		}
-		return { success: true, data: data.user };
+		return { success: true, data: data };
 
 	} catch (error) {
 		console.error("Network error during profile update:", error);

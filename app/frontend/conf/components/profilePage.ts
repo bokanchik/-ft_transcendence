@@ -1,12 +1,11 @@
 // src/components/profilePage.ts ou un chemin similaire
 
-import { getUserDataFromStorage, updateUserProfile, UpdateProfilePayload, UpdateProfileResult } from '../services/authService.js';
+import { ApiResult, getUserDataFromStorage, updateUserProfile } from '../services/authService.js';
 import { navigateTo } from '../services/router.js';
-//import { navigateTo } from '../main.js';
-import { UserData } from '../services/authService.js';
+import { User, UpdateUserPayload } from '../shared/types.js';
 
 export function ProfilePage(): HTMLElement {
-	const user: UserData | null = getUserDataFromStorage();
+	const user: User | null = getUserDataFromStorage();
 
 	if (!user) {
 		console.warn('Access unauthorized: User not authenticated.');
@@ -119,7 +118,7 @@ export function ProfilePage(): HTMLElement {
 
 		// Préparer le payload pour l'API
 		// N'inclure que les champs qui peuvent être modifiés
-		const payload: UpdateProfilePayload = {
+		const payload: UpdateUserPayload = {
 			email: updatedEmail,
 			display_name: updatedDisplayName,
 			// Inclure avatar_url seulement s'il n'est pas vide, sinon potentiellement null/undefined
@@ -129,7 +128,7 @@ export function ProfilePage(): HTMLElement {
 		};
 
 		// Appel à la nouvelle fonction de service
-		const result: UpdateProfileResult = await updateUserProfile(payload);
+		const result: ApiResult = await updateUserProfile(payload);
 
 		saveButton.disabled = false;
 		saveButton.textContent = 'Enregistrer les modifications';
@@ -140,9 +139,9 @@ export function ProfilePage(): HTMLElement {
 
 			// Mettre à jour les champs avec les données retournées (si elles sont différentes, ex: trim par le backend)
 			// ou après avoir mis à jour localStorage
-			emailInput.value = result.data.email;
-			displayNameInput.value = result.data.display_name;
-			avatarUrlInput.value = result.data.avatar_url || ''; // Mettre à jour l'avatar aussi
+			emailInput.value = result.data.user.email;
+			displayNameInput.value = result.data.user.display_name;
+			avatarUrlInput.value = result.data.user.avatar_url || ''; // Mettre à jour l'avatar aussi
 
 			// Optionnel: Message de succès qui disparaît après un délai
 			setTimeout(() => {
