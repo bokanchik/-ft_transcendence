@@ -1,5 +1,6 @@
 import { HomePage } from './components/homePage.js';
-import { LoginPage } from './components/loginPage.js'
+import { LoginPage } from './pages/loginPage.js'
+//import { LoginPage } from './components/loginPage.js'
 import { RegisterPage } from './components/registerPage.js'
 import { UsersPage } from './pages/userPage.js';
 import { GamePage } from './components/gamePage.js';
