@@ -12,7 +12,7 @@ const handleApiResponse = async (response: Response) => {
 		try {
 			errorData = await response.json();
 		} catch (jsonError) {
-			// The error is not JSON, fallback to statusText
+			console.error("Unable to parse JSON error response:", jsonError);
 		}
 		throw new Error(errorData.error || response.statusText);
 	}

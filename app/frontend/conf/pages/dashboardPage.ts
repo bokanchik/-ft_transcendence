@@ -65,10 +65,10 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	// langButton.addEventListener('click', () => { /* Logique de changement de langue */ });
 
 	const userHeader = document.createElement('div');
-	userHeader.className = 'flex items-center space-x-4';
+	userHeader.className = 'flex items-center space-x-4 relative';
 
 	const avatarDisplayWrapper = document.createElement('div');
-	avatarDisplayWrapper.className = 'bg-orange-400 p-2 rounded-lg flex items-center space-x-3';
+	avatarDisplayWrapper.className = 'bg-orange-400 p-2 rounded-lg flex items-center space-x-3 cursor-pointer select-none';
 	const displayNameHeader = document.createElement('span');
 	displayNameHeader.className = 'text-white font-semibold text-sm';
 	displayNameHeader.textContent = currentUser.display_name || currentUser.username;
@@ -80,29 +80,52 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	avatarDisplayWrapper.appendChild(displayNameHeader);
 	avatarDisplayWrapper.appendChild(avatarHeader);
 
-	const settingsButton = document.createElement('a');
-	settingsButton.href = '/profile';
-	settingsButton.setAttribute('data-link', '');
-	settingsButton.className = 'px-3 py-1.5 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition-colors';
-	settingsButton.textContent = 'Settings';
+		// Mini-menu caché par défaut
+		const miniMenu = document.createElement('div');
+		miniMenu.className = 'absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-50 hidden flex-col';
+		miniMenu.style.top = '110%';
 
-	const logoutButtonEl = document.createElement('button'); // Renommé pour éviter conflit avec la fonction logout
-	logoutButtonEl.className = 'px-3 py-1.5 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-100 transition-colors';
-	logoutButtonEl.textContent = 'Logout';
-	logoutButtonEl.addEventListener('click', async () => {
-		try {
-			await logout(); // Appel de la fonction logout importée
-			showToast('You have been logged out.', 'success');
-		} catch (error) {
-			showToast('Error logging out.', 'error');
-		} finally {
-			navigateTo('/login');
-		}
-	});
+		const settingsButton = document.createElement('a');
+		settingsButton.href = '/profile';
+		settingsButton.setAttribute('data-link', '');
+		settingsButton.className = 'block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-lg';
+		settingsButton.textContent = 'Settings';
 
-	userHeader.appendChild(avatarDisplayWrapper);
-	userHeader.appendChild(settingsButton);
-	userHeader.appendChild(logoutButtonEl); // Utilisation du nom de variable corrigé
+		const logoutButtonEl = document.createElement('button');
+		logoutButtonEl.className = 'block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-b-lg';
+		logoutButtonEl.textContent = 'Logout';
+		logoutButtonEl.addEventListener('click', async () => {
+				try {
+						await logout();
+						showToast('You have been logged out.', 'success');
+				} catch (error) {
+						showToast('Error logging out.', 'error');
+				} finally {
+						navigateTo('/login');
+				}
+		});
+
+		miniMenu.appendChild(settingsButton);
+		miniMenu.appendChild(logoutButtonEl);
+		userHeader.appendChild(avatarDisplayWrapper);
+		userHeader.appendChild(miniMenu);
+
+		// Gestion de l'ouverture/fermeture du mini-menu
+		let menuOpen = false;
+		avatarDisplayWrapper.addEventListener('click', (e) => {
+				e.stopPropagation();
+				menuOpen = !menuOpen;
+				miniMenu.classList.toggle('hidden', !menuOpen);
+		});
+
+		// Fermer le menu si on clique ailleurs
+		document.addEventListener('click', () => {
+				if (menuOpen) {
+						menuOpen = false;
+						miniMenu.classList.add('hidden');
+				}
+		});
+		miniMenu.addEventListener('click', (e) => e.stopPropagation());
 
 	topSection.appendChild(langButton);
 	topSection.appendChild(userHeader);

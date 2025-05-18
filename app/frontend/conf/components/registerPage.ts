@@ -1,7 +1,11 @@
 import { attemptRegister } from '../services/authService.js';
 import { RegisterRequestBody, ApiResult } from '../shared/types.js'
+import { fetchCsrfToken } from '../services/csrf.js';
+import { navigateTo } from '../services/router.js';
 
-export function RegisterPage(): HTMLElement {
+export async function RegisterPage(): Promise<HTMLElement> {
+
+	
 	const container = document.createElement('div');
 	container.className = 'bg-gradient-to-r from-blue-500 to-purple-600 flex justify-center items-center min-h-screen p-8';
 
@@ -141,9 +145,7 @@ export function RegisterPage(): HTMLElement {
 			form.reset(); // Clear the form fields
 
 			// Rediriger vers la page de connexion après un délai
-			setTimeout(() => {
-				window.location.href = '/login'; // Ou utilisez votre système de routage: router.navigate('/login');
-			}, 2000); // Délai de 2 secondes
+			setTimeout(() => { navigateTo('/dashboard'); }, 500);
 
 		} else {
 			// Échec (message déjà affiché par alert)

@@ -3,8 +3,9 @@ import { getUserDataFromStorage, updateUserProfile } from '../services/authServi
 import { navigateTo } from '../services/router.js';
 import { User, UpdateUserPayload, ApiResult } from '../shared/types.js';
 import { ProfileForm } from '../components/profileForm.js'; // Importer le composant
+import { fetchCsrfToken } from '../services/csrf.js';
 
-export function ProfilePage(): HTMLElement {
+export async function ProfilePage(): Promise<HTMLElement> {
 	const user: User | null = getUserDataFromStorage();
 
 	const pageContainer = document.createElement('div'); // Conteneur principal de la page
@@ -12,10 +13,8 @@ export function ProfilePage(): HTMLElement {
 
 	if (!user) {
 		console.warn('Access unauthorized: User not authenticated.');
-		navigateTo('/login'); // Rediriger directement pour les cas non-auth
+		navigateTo('/login');
 
-		// Ce code sera rarement atteint si navigateTo fonctionne de manière synchrone ou très rapidement
-		// Il sert de fallback au cas où la redirection prendrait un instant.
 		const deniedContainer = document.createElement('div');
 		deniedContainer.className = 'flex items-center justify-center h-full'; // Pour centrer dans pageContainer
 		deniedContainer.innerHTML = `
@@ -30,6 +29,17 @@ export function ProfilePage(): HTMLElement {
         `;
 		pageContainer.appendChild(deniedContainer);
 		return pageContainer;
+	}
+
+
+	try {
+		await fetchCsrfToken();
+	} catch (error) {
+		console.error("Failed to fetch CSRF token:", error);
+		const errorMsg = document.createElement('div');
+		errorMsg.className = 'min-h-screen flex items-center justify-center text-xl text-red-500';
+		errorMsg.textContent = 'Error initializing page. Please try refreshing.';
+		return errorMsg;
 	}
 
 	const contentWrapper = document.createElement('div');
@@ -50,6 +60,7 @@ export function ProfilePage(): HTMLElement {
 		if (result.success) {
 			console.log('Profile updated in service, local storage should be updated too.');
 		}
+		setTimeout(() => { navigateTo('/dashboard'); }, 500);
 		return result;
 	};
 
