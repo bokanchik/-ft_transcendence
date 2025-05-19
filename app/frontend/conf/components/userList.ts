@@ -11,7 +11,7 @@ export interface UserListProps {
     onCancelRequest: (friendshipId: number) => Promise<void>;
     onAcceptRequest: (friendshipId: number) => Promise<void>;
     onDeclineRequest: (friendshipId: number) => Promise<void>;
-    // Optionnel : onRemoveFriend?: (targetUserId: number) => Promise<void>; // Rendu optionnel
+    onRemoveFriend?: (targetUserId: number) => Promise<void>; // Rendu optionnel
 }
 
 export function UserList(props: UserListProps): HTMLElement {

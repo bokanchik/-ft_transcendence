@@ -27,6 +27,7 @@ export function FriendsListComponent(props: FriendsListProps): HTMLElement {
 		ul.innerHTML = `<li class="text-gray-500 italic">Vous n'avez pas encore d'amis.</li>`;
 	} else {
 		friends.forEach(friend => {
+			const actualFriendshipId = friend.friendship_id;
 			const actualDisplayName = friend.friend_display_name || friend.friend_username;
 			const actualUsername = friend.friend_username;
 			const actualAvatarUrl = friend.friend_avatar_url;
@@ -44,6 +45,7 @@ export function FriendsListComponent(props: FriendsListProps): HTMLElement {
 
 			const li = document.createElement('li');
 			li.dataset.friendId = actualFriendId.toString();
+			li.dataset.friendshipId = actualFriendshipId.toString();
 			li.className = 'p-3 bg-white border border-gray-200 rounded-md shadow-sm flex justify-between items-center';
 			li.innerHTML = `
                 <div class="flex items-center">
@@ -56,7 +58,7 @@ export function FriendsListComponent(props: FriendsListProps): HTMLElement {
                 </div>
                 <div>
                     <button data-action="view-profile" data-user-id="${actualFriendId}" class="text-xs bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-2 rounded mr-1">Profil</button>
-                    <button data-action="remove-friend" data-user-id="${actualFriendId}" class="text-xs bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded">Supprimer</button>
+                    <button data-action="remove-friend" data-user-id="${actualFriendshipId}" class="text-xs bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded">Supprimer</button>
                 </div>
             `;
 			ul.appendChild(li);
@@ -76,7 +78,8 @@ export function FriendsListComponent(props: FriendsListProps): HTMLElement {
 		if (!listItem) return;
 
 		const friendId = parseInt(listItem.dataset.friendId || '', 10);
-		if (isNaN(friendId)) return;
+		const friendshipId = parseInt(listItem.dataset.friendshipId || '', 10);
+		if (isNaN(friendId) || isNaN(friendshipId)) return;
 
 		const action = target.dataset.action;
 
@@ -87,8 +90,7 @@ export function FriendsListComponent(props: FriendsListProps): HTMLElement {
 				button.disabled = true;
 				button.textContent = '...';
 				try {
-					await onRemoveFriend(friendId); // Appel de la fonction de rappel fournie par la page
-					// Le re-rendu sera géré par la page DashboardPage
+					await onRemoveFriend(friendshipId);
 				} catch (error: any) {
 					console.error('Erreur lors de la suppression de l\'ami:', error);
 					alert(`Erreur: ${error.message || 'Impossible de supprimer l\'ami.'}`);

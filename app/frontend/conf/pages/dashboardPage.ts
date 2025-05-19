@@ -286,11 +286,11 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		const friends = await getFriendsList();
 		return FriendsListComponent({
 			friends: friends,
-			onRemoveFriend: async (friendId) => {
+			onRemoveFriend: async (friendshipId) => {
 				// TODO: Implémenter la vraie fonction removeFriend dans friendService.ts et l'importer
-				// const result = await removeFriend(friendId);
-				// showToast(result.message);
-				showToast(`Ami ${friendId} supprimé (simulation).`);
+				const result = await removeFriend(friendshipId);
+				showToast(result.message);
+				// TODO: test up ^ showToast(`Ami ${friendId} supprimé (simulation).`);
 				if (['friends', 'users'].includes(activeTabId)) await loadActiveTabContent();
 			},
 		});

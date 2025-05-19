@@ -53,10 +53,6 @@ export async function ProfilePage(): Promise<HTMLElement> {
 	// Fonction de rappel pour la mise à jour du profil
 	const handleProfileUpdate = async (payload: UpdateUserPayload): Promise<ApiResult> => {
 		const result = await updateUserProfile(payload);
-		// La logique de mise à jour du localStorage/état global de l'utilisateur
-		// devrait se trouver dans `updateUserProfile` ou être gérée ici après un succès.
-		// Par exemple, si `updateUserProfile` met à jour localStorage, c'est bon.
-		// Sinon, il faudrait le faire ici si nécessaire.
 		if (result.success) {
 			console.log('Profile updated in service, local storage should be updated too.');
 		}

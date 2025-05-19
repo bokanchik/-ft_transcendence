@@ -58,7 +58,6 @@ export function FriendRequestsComponent(props: FriendRequestsProps): HTMLElement
 			} else if (action === 'cancel') {
 				await onCancelRequest(friendshipId);
 			}
-			// Le re-rendu sera géré par la page DashboardPage
 		} catch (error: any) {
 			console.error(`Erreur lors de l'action '${action}':`, error);
 			alert(`Erreur: ${error.message || 'Une erreur est survenue.'}`);

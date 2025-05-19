@@ -157,7 +157,10 @@ export async function getSentFriendRequests(userId: number): Promise<any[]> {
 }
 
 export async function removeFriendship(friendshipId: number, currentUserId: number): Promise<{ message: string }> {
+
     const friendship = await friendModel.getFriendshipByIdInDb(friendshipId);
+	console.log('[removeFriendship] Called with friendshipId:', friendshipId, 'currentUserId:', currentUserId);
+    console.log('[removeFriendship] DB result for friendship:', friendship);
 
     if (!friendship) {
         throw new NotFoundError('Friendship not found.');

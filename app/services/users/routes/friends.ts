@@ -66,7 +66,8 @@ export default async function friendRoutes(fastify: FastifyInstance, options: Fa
 		{ onRequest: [fastify.authenticate] },
 		getMyFriendsHandler
 	);
-	fastify.post<FriendshipIdRoute>(
+	fastify.post(
+//	fastify.post<FriendshipIdRoute>(
 		'/:friendshipId/remove',
 		{
 			onRequest: [fastify.authenticate, fastify.csrfProtection],
