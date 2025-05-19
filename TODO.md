@@ -37,7 +37,7 @@ at the end of a match -> call to database if need matchhistory)
 - [ ] Ajouter des tests d’intégration (communication entre services)
 
 ---
-
+Implicit conversion of a 'symbol' to a 'string' will fail at runtime. Consider wrapping this expression in 'String(...)'.ts(2731)
 ## 🛠️ Observabilité & DevOps
 
 - [ ] Ajouter des logs lisibles et structurés dans chaque service
