@@ -1,6 +1,7 @@
 import { fastify } from "../server.ts";
 import type { Socket } from "socket.io";
 import { waitingRoom, removePlayerFromWaitingList, addPlayerToWaitingList, getWaitingListSize } from "../utils/waitingRoom.ts";
+
 const TIMEOUT_MS = 60000; // 1 minute
 const timeouts: Map<string, NodeJS.Timeout> = new Map();
 
@@ -13,15 +14,16 @@ export async function matchSocketHandler(socket: Socket): Promise<void> {
     onlineSocketEvents(socket);
 }
 
-
+// --- Main function for remote game socket handling
 function onlineSocketEvents(socket: Socket) {
+
     socket.on('authenticate', async (display_name: string) => {
-        // store display_name and socket.id in waiting list if not already in        
         try {
+            // store display_name and socket.id in waiting list if not already in        
             const newPlayer = await addPlayerToWaitingList(display_name, socket.id);
             
             if (newPlayer) {
-                tryMatchPlayers();
+                // set timeout of 1 min for matchmaking process
                 const timeout = setTimeout(() => {
                     fastify.log.info(`Timeout of matchmaking for player: ${display_name}`);
                     socket.emit('matchTimeout');
@@ -29,7 +31,9 @@ function onlineSocketEvents(socket: Socket) {
                     timeouts.delete(socket.id);
                 }, TIMEOUT_MS);
                 timeouts.set(socket.id, timeout);
-            }         
+            }
+            // call to waiting room
+            tryMatchPlayers();
         } catch (err: unknown) {
             fastify.log.error(`Error during matchmaking process: ${err}`);
         }
@@ -38,6 +42,11 @@ function onlineSocketEvents(socket: Socket) {
     // optionnel ? a voir si besoin de ce listener
     socket.on('startOnlineGame', () => {
         fastify.log.info('Online game started');
+    });
+
+    socket.on('playerMove', (movement) => {
+        fastify.log.info(movement);
+        // handlePlayerMove(); // la logique du jeu est ici (ca update le state du jeu)
     });
 
     // TODO: recuperer le socket id de gagnant
@@ -76,10 +85,6 @@ function onlineSocketEvents(socket: Socket) {
         }
     });
     
-    socket.on('playerMove', (movement) => {
-        fastify.log.info(movement);
-        //handlePlayerMove(); // la logique du jeu est ici (ca update le state du jeu)
-    });
 
 }
 
@@ -91,11 +96,11 @@ function getOpponentSocketId(socketId: string): string | null {
 function localSocketEvents(socket: Socket) {
     
     // --- !!! TESTING FOR LOCAL ----
-    socket.on('startLocalGame', async () => {
+    socket.on('startLocalGame', () => {
         fastify.log.info('Game started locally');
         socket.emit('gameStarted');
     });
-    // -----------------------------------   
+    // -------------------------------
 }
 
 // --- Helper functions
