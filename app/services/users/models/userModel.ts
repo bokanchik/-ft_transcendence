@@ -92,21 +92,68 @@ export async function createUser(
  */
 export async function updateUserInDb(userId: number, updates: UpdateUserPayload): Promise<UpdatedUserResult> {
 	const db = getDb();
-	const fields = Object.keys(updates) as Array<keyof UpdateUserPayload>; // Clés typées
+	const fields = Object.keys(updates).filter(k => typeof k === 'string') as Array<keyof UpdateUserPayload>; // Clés typées
 	if (fields.length === 0) {
 		return { changes: 0 };
 	}
-	const setClause = fields.map((field) => `${field} = ?`).join(', ');
-	const values: (string | number)[] = fields.map((field) => updates[field] as string | number);
+	const setClause = fields.map((field) => `${String(field)} = ?`).join(', ');
+	const values: (string | number )[] = fields.map((field) => updates[field] as string | number);
 
 	const sql = `UPDATE users SET ${setClause}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
 	values.push(userId);
 
 	try {
-		const result = await db.run(sql, values); // <-- PAS de spread ici
+		const result = await db.run(sql, values);
 		return { changes: result.changes };
 	} catch (error: any) {
 		console.error('Error updating user:', error);
 		throw new Error(ERROR_MESSAGES.DATABASE_ERROR);
 	}
+}
+
+export async function deleteUserFromDb(userId: number): Promise<void> {
+	const db = getDb();
+	const result = await db.run('DELETE FROM users WHERE id = ?', [userId]);
+	if (result.changes === 0) {
+		throw new Error(ERROR_MESSAGES.USER_NOT_FOUND);
+	}
+}
+
+export async function isUsernameInDb(username: string, id?: number): Promise<boolean> {
+	const db = getDb();
+	let query = 'SELECT EXISTS(SELECT 1 FROM users WHERE username = ?';
+	const params: (string | number)[] = [username];
+	if (id !== undefined) {
+		query += ' AND id != ?';
+		params.push(id);
+	}
+	query += ')';
+	const row = await db.get<{ exists: number }>(query, params);
+	return row !== undefined;
+}
+
+export async function isEmailInDb(email: string, id?: number): Promise<boolean> {
+	const db = getDb();
+	let query =	'SELECT EXISTS(SELECT 1 FROM users WHERE email = ?';
+	const params: (string | number)[] = [email];
+	if (id !== undefined) {
+		query += ' AND id != ?';
+		params.push(id);
+	}
+	query += ')';
+    const row = await db.get<{ exists: number }>(query, params);
+	return row !== undefined;
+}
+
+export async function isDisplayNameInDb(display_name: string, id?: number): Promise<boolean> {
+    const db = getDb();
+    let query = 'SELECT EXISTS(SELECT 1 FROM users WHERE display_name = ?';
+    const params: (string | number)[] = [display_name];
+    if (id !== undefined) {
+        query += ' AND id != ?';
+        params.push(id);
+    }
+    query += ')';
+    const row = await db.get<{ exists: number }>(query, params);
+    return row?.exists === 1;
 }

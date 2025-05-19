@@ -89,7 +89,7 @@ export function ProfileForm(props: ProfileFormProps): HTMLElement {
 		const payload: UpdateUserPayload = {
 			email: updatedEmail,
 			display_name: updatedDisplayName,
-			avatar_url: updatedAvatarUrl || null,
+			avatar_url: updatedAvatarUrl,
 		};
 
 		const result = await onProfileUpdate(payload);

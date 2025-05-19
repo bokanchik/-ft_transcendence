@@ -5,6 +5,7 @@ import {
 	getUserMeMatchHandler,
 	updateUserMeHandler,
 } from '../handlers/userHandlers.js';
+import { UpdateUserPayload } from '../shared/types.js';
 import { updateUserSchema } from '../schemas/userSchemas.js';
 
 export default async function userRoutes(fastify: FastifyInstance, options: FastifyPluginOptions) {
@@ -15,7 +16,7 @@ export default async function userRoutes(fastify: FastifyInstance, options: Fast
 		getUserMeHandler
 	);
 
-	fastify.patch('/me',
+	fastify.patch<{ Body: UpdateUserPayload }>('/me',
 		{
             onRequest: [fastify.authenticate, fastify.csrfProtection],
             schema: updateUserSchema

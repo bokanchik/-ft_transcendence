@@ -2,6 +2,10 @@
 
 ---
 
+## arthur
+
+- [ ] display_name unique ? soit changer edit soit register
+
 ## 📌 Tâches initiales
 
 - [ ] jeu en local

@@ -41,7 +41,7 @@ export interface LoginRequestBody {
 export interface UpdateUserPayload {
 	email?: string;
 	display_name?: string;
-	avatar_url?: string | null;
+	avatar_url?: string;
 }
 
 export interface Friendship {

@@ -1,8 +1,8 @@
 // app/services/users/services/userService.ts
 import * as userModel from '../models/userModel.js';
 import * as passwordUtils from '../shared/auth-plugin/pswdUtils.js';
-import { ConflictError, ValidationError, NotFoundError } from '../shared/auth-plugin/appError.js';
-import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload } from '../shared/types.js';
+import { ERROR_MESSAGES, ConflictError, ValidationError, NotFoundError } from '../shared/auth-plugin/appError.js';
+import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, CreateUserPayload } from '../shared/types.js';
 
 /**
  * Generates a default avatar URL using ui-avatars.com.
@@ -66,37 +66,32 @@ export async function loginUser({ identifier, password }: LoginRequestBody): Pro
 
 /**
  * Creates a new user account.
- * @param {Object} userData - The user data for account creation.
+ * @param {RegisterRequestBody} userData - The user data for account creation.
  * @throws {ConflictError} If the username or email already exists.
  * @returns {Promise<void>}
  */
 export async function createUserAccount(userData: RegisterRequestBody): Promise<void> {
 	console.log('Creating a new user account');
-	const { username, email, password, display_name } = userData;
-	let { avatar_url } = userData; // mutable
+	const { username, email, password, display_name, avatar_url } = userData;
 
-	const existingUser = await userModel.getUserByUsernameFromDb(username);
-	if (existingUser) {
-		throw new ConflictError('Username already exists.');
+	if (await userModel.isUsernameInDb(username)) {
+		throw new ConflictError(ERROR_MESSAGES.USERNAME_ALREADY_EXISTS);
+	}
+	if (await userModel.isEmailInDb(email)) {
+		throw new ConflictError(ERROR_MESSAGES.EMAIL_ALREADY_EXISTS);
 	}
 
-	const existingEmail = await userModel.getUserByEmailFromDb(email);
-	if (existingEmail) {
-		throw new ConflictError('Email already exists.');
-	}
 	const hashedPassword = await passwordUtils.hashPassword(password);
 
-	if (!avatar_url || avatar_url.trim() === "") {
-		avatar_url = generateDefaultAvatarUrl(display_name);
-		console.log(`No avatar provided for ${username}. Using default: ${avatar_url}`);
-	}
-	await userModel.createUser({
+	const payload: CreateUserPayload = {
 		username,
 		email,
 		password_hash: hashedPassword,
 		display_name,
-		avatar_url
-	});
+		avatar_url: avatar_url && avatar_url.trim() !== "" ? avatar_url : generateDefaultAvatarUrl(display_name),
+	};
+
+	await userModel.createUser(payload);
 }
 
 /**
@@ -123,39 +118,6 @@ export async function getUserById(userId: number): Promise<User> {
 	return user;
 }
 
-/**
- * Retrieves a user by their username.
- * @param {string} username - The username of the user to retrieve.
- * @throws {NotFoundError} If the user does not exist.
- * @returns {Promise<Object>} The user object.
- */
-export async function getUserByUsername(username: string): Promise<User> {
-	console.log('Fetching user by username from the database');
-	// Note: getUserByUsernameFromDb retourne UserWithPasswordHash, mais on ne veut pas exposer le hash.
-	// Il faudrait une version de getUserByUsernameFromDb qui omet le hash, ou le filtrer ici.
-	const userWithHash = await userModel.getUserByUsernameFromDb(username);
-	if (!userWithHash) {
-		throw new NotFoundError('User not found');
-	}
-	const { password_hash, ...user } = userWithHash;
-	return user as User;
-}
-
-/**
- * Retrieves a user by their email.
- * @param {string} email - The email of the user to retrieve.
- * @throws {NotFoundError} If the user does not exist.
- * @returns {Promise<Object>} The user object.
- */
-export async function getUserByEmail(email: string): Promise<User> {
-	console.log('Fetching user by email from the database');
-	const userWithHash = await userModel.getUserByEmailFromDb(email);
-	if (!userWithHash) {
-		throw new NotFoundError('User not found');
-	}
-	const { password_hash, ...user } = userWithHash;
-	return user as User;
-}
 
 /**
  * Retrieves the matches of a user by their ID.
@@ -181,7 +143,7 @@ export async function getUserMatches(userId: number): Promise<any[]> { // TODO: 
  * @throws {ConflictError} If the updated email or display name is already taken.
  * @returns {Promise<Object>} The updated user object without the password hash.
  */
-export async function updateUserProfile(userId: number, updates: UpdateUserPayload): Promise<Omit<User, 'password_hash'>> {
+export async function updateUserProfile(userId: number, updates: UpdateUserPayload): Promise<User> {
 	console.log(`Attempting to update profile for user ID: ${userId}`);
 
 	const currentUser = await userModel.getUserByIdFromDb(userId);
@@ -210,19 +172,20 @@ export async function updateUserProfile(userId: number, updates: UpdateUserPaylo
 
 	if (updates.avatar_url !== undefined) {
 		const potentialAvatar = updates.avatar_url;
-		if (potentialAvatar === null || (potentialAvatar && isValidHttpUrl(potentialAvatar))) {
+		if (potentialAvatar === null) {
+			processedUpdates.avatar_url = undefined;
+		} else if (potentialAvatar && isValidHttpUrl(potentialAvatar)) {
 			processedUpdates.avatar_url = potentialAvatar;
 		} else if (potentialAvatar && !isValidHttpUrl(potentialAvatar)) {
 			throw new ValidationError('Invalid avatar URL format provided.');
 		}
 	}
 
-
-	const changesToApply: UpdateUserPayload = {};
+	const changesToApply: Partial<UpdateUserPayload> = {};
 	for (const key in processedUpdates) {
 		const typedKey = key as keyof UpdateUserPayload;
 		if (processedUpdates[typedKey] !== currentUser[typedKey as keyof User]) {
-			(changesToApply[typedKey] as any) = processedUpdates[typedKey];
+			changesToApply[typedKey] = processedUpdates[typedKey];
 		}
 	}
 
@@ -231,17 +194,12 @@ export async function updateUserProfile(userId: number, updates: UpdateUserPaylo
 		return currentUser;
 	}
 
-	if (changesToApply.display_name) {
-		const existingUser = await userModel.getUserByDisplayNameFromDb(changesToApply.display_name);
-		if (existingUser && existingUser.id !== userId) {
-			throw new ConflictError(`Display name '${changesToApply.display_name}' is already taken.`);
-		}
+	if (changesToApply.display_name && await userModel.isDisplayNameInDb(changesToApply.display_name, userId)) {
+		throw new ConflictError(`Display name '${changesToApply.display_name}' is already taken.`);
 	}
-	if (changesToApply.email) {
-		const existingUser = await userModel.getUserByEmailFromDb(changesToApply.email);
-		if (existingUser && existingUser.id !== userId) {
-			throw new ConflictError(`Email '${changesToApply.email}' is already taken.`);
-		}
+
+	if (changesToApply.email && await userModel.isEmailInDb(changesToApply.email, userId)) {
+		throw new ConflictError(`Email '${changesToApply.email}' is already taken.`);
 	}
 
 	try {
@@ -261,4 +219,38 @@ export async function updateUserProfile(userId: number, updates: UpdateUserPaylo
 		throw new Error(`Failed to retrieve user ${userId} immediately after successful update.`);
 	}
 	return updatedUser;
+}
+
+/**
+ * Retrieves a user by their email.
+ * @param {string} email - The email of the user to retrieve.
+ * @throws {NotFoundError} If the user does not exist.
+ * @returns {Promise<Object>} The user object.
+ */
+export async function getUserByEmail(email: string): Promise<User> {
+	console.log('Fetching user by email from the database');
+	const userWithHash = await userModel.getUserByEmailFromDb(email);
+	if (!userWithHash) {
+		throw new NotFoundError('User not found');
+	}
+	const { password_hash, ...user } = userWithHash;
+	return user as User;
+}
+
+/**
+ * Retrieves a user by their username.
+ * @param {string} username - The username of the user to retrieve.
+ * @throws {NotFoundError} If the user does not exist.
+ * @returns {Promise<Object>} The user object.
+ */
+export async function getUserByUsername(username: string): Promise<User> {
+	console.log('Fetching user by username from the database');
+	// Note: getUserByUsernameFromDb retourne UserWithPasswordHash, mais on ne veut pas exposer le hash.
+	// Il faudrait une version de getUserByUsernameFromDb qui omet le hash, ou le filtrer ici.
+	const userWithHash = await userModel.getUserByUsernameFromDb(username);
+	if (!userWithHash) {
+		throw new NotFoundError('User not found');
+	}
+	const { password_hash, ...user } = userWithHash;
+	return user as User;
 }
