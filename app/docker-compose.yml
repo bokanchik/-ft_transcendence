@@ -4,7 +4,7 @@ services:
     build: ./gateaway
     ports:
       - "8443:8443"
-      - "443:443"
+#      - "443:443"
     restart: always
     env_file: .env
     volumes:
@@ -52,14 +52,14 @@ services:
       - ./services/shared:/app/shared:ro
     networks:
       - tranet
-    
+
   #openapi:
     #build: ./services/openapi
     #ports:
    #   - "8080:8080" # for internal use
   #  networks:
     #  - tranet
-    
+
 networks:
   tranet:
     name: tranet
