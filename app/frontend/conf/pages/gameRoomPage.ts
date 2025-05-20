@@ -214,7 +214,7 @@ function startLocalGame(socket: SocketIOClient.Socket) {
 		sendPlayerMovement(socket, leftPaddleMovement, rightPaddleMovement);
 	})
 
-	// TODO
+	// TODO: serveur recois 
 	// socket.on('stateUpdate', (data: string) => {
 	// 	const { leftPaddleUpdated, rightPaddleUpdated } = JSON.parse(data);
 	// 	const leftPaddleElem = document.getElementById('left-paddle');
