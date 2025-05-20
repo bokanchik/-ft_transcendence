@@ -6,7 +6,7 @@
 #    By: aduvilla <aduvilla@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/23 22:29:59 by aduvilla          #+#    #+#              #
-#    Updated: 2025/04/16 23:33:50 by aduvilla         ###   ########.fr        #
+#    Updated: 2025/05/15 23:48:57 by aduvilla         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,7 +23,7 @@ up			:
 #	@cat $(CREDENTIALS) >> $(ENV_FILE).tmp
 #	@mv $(ENV_FILE).tmp $(ENV_FILE)
 #	@mkdir -p ~/data/mariadb ~/data/wordpress
-	docker compose -f $(DC_FILE) up --remove-orphans
+	docker compose -f $(DC_FILE) up -d
 #	@grep -Fvx -f $(CREDENTIALS) $(ENV_FILE) > $(ENV_FILE).tmp || true
 #	@mv $(ENV_FILE).tmp $(ENV_FILE)
 

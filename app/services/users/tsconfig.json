@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": "./", // Tous les fichiers .ts sont à la racine ou dans des sous-dossiers
+    "outDir": "./dist", // Où les fichiers .js compilés iront
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true, // Impose la casse correcte des noms de fichiers
+    "strict": true,
+    "skipLibCheck": true, // Accélère la compilation en ne vérifiant pas les .d.ts des libs
+    "resolveJsonModule": true, // Permet d'importer des fichiers .json
+    "sourceMap": true, // Génère les sourcemaps pour le débogage
+    "allowJs": true,
+  },
+  "include": ["**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

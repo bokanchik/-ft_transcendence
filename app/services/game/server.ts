@@ -2,8 +2,9 @@ import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest }
 import { Server, Socket } from 'socket.io';
 import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
 import fastifyRateLimit from '@fastify/rate-limit';
+import { setupPlugins } from './shared/auth-plugin/tokens.js'
 // @ts-ignore
-import authPlugin from './shared/auth-plugin/index.ts';
+// import authPlugin from './shared/auth-plugin/index.ts';
 import db from './database/connectDB.ts'
 // import { gameShemas } from './schemas/matchSchemas.ts'; TODO
 import matchRoutes from './routes/matchRoutes.ts'
@@ -27,16 +28,16 @@ const io: Server = new Server(fastify.server, {
 // Attach io to fastify instance
 fastify.decorate('io', io);
 
-// Register auth plugin
-const registerAuthPlugin = async () => {
-  try {
-    await fastify.register(authPlugin);
-    fastify.log.info('Auth plugin registered');
-  } catch (err) {
-    fastify.log.error({ err }, 'Failed to register auth plugin.');
-    process.exit(1);
-  }
-};
+// // Register auth plugin -> setupPlugin in shared/auth-plugin/tokens
+// const registerAuthPlugin = async () => {
+//   try {
+//     await fastify.register(authPlugin);
+//     fastify.log.info('Auth plugin registered');
+//   } catch (err) {
+//     fastify.log.error({ err }, 'Failed to register auth plugin.');
+//     process.exit(1);
+//   }
+// };
 
 // Set rate-limit to avoid too many requests (protection)
 fastify.register(fastifyRateLimit, {
@@ -76,7 +77,8 @@ const start = async () => {
 };
 
 const run = async() => {
-  await registerAuthPlugin();
+  await setupPlugins(fastify);
+  // await registerAuthPlugin();
   registerRoutes();
   start();
 };
