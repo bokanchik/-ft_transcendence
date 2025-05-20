@@ -66,6 +66,7 @@ export function GamePage(): HTMLElement {
     // --- Event: Online button clicked ---
     onlineGameButton.addEventListener('click', async () => { 
         
+        // TODO: fetch to /api/user/me to check if registred, ca me donne le type User
         const authData = getUserDataFromStorage();
         if (!authData) {
             alert("You must be logged in to play online");

@@ -14,6 +14,22 @@ const matchTable: string = `
         status TEXT NOT NULL CHECK (status IN ('pending', 'in_progress', 'finished'))
     )`;
 
+//     CREATE TABLE IF NOT EXISTS matches (
+//     id INTEGER PRIMARY KEY AUTOINCREMENT,
+//     player1_id INTEGER NOT NULL,
+//     player2_id INTEGER NOT NULL,
+//     player1_score INTEGER NOT NULL,
+//     player2_score INTEGER NOT NULL,
+//     winner_id INTEGER NOT NULL,
+//     win_type TEXT NOT NULL DEFAULT 'score',
+//     match_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+//     game_type TEXT DEFAULT 'pong',
+//     tournament_id INTEGER,
+//     FOREIGN KEY(player1_id) REFERENCES users(id),
+//     FOREIGN KEY(player2_id) REFERENCES users(id),
+//     FOREIGN KEY(winner_id) REFERENCES users(id)
+// );
+
 // --- HELPER FUNCTIONS FOR GENERAL DB ACTIONS (all(), get(), run(), exec() etc.)
 export async function createMatchTable() {
     try {

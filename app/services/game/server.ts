@@ -2,9 +2,8 @@ import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest }
 import { Server, Socket } from 'socket.io';
 import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
 import fastifyRateLimit from '@fastify/rate-limit';
+//@ts-ignore
 import { setupPlugins } from './shared/auth-plugin/tokens.js'
-// @ts-ignore
-// import authPlugin from './shared/auth-plugin/index.ts';
 import db from './database/connectDB.ts'
 // import { gameShemas } from './schemas/matchSchemas.ts'; TODO
 import matchRoutes from './routes/matchRoutes.ts'
@@ -51,7 +50,7 @@ fastify.setSerializerCompiler(serializerCompiler);
 
 // Register routes
 const registerRoutes = () => {
-  fastify.register(matchRoutes, { prefix: '/match' });
+  fastify.register(matchRoutes, { prefix: '/api/game/match' });
   // fastify.register(settingsRoutes); TODO
 };
 

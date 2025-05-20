@@ -29,7 +29,10 @@ async function matchRoutes(fastify: FastifyInstance, _options: unknown) {
    
    });
    
+   // fastify.get('/match/:userId) -> qui donne tous les matchs pour cet user la
+   
    // fastify.get('/match/:matchId', { schema: matchSchemas.idOnly}, getMatchIdHandler);
+   
    // fastify.get('/match/:matchId/state', { schema: matchSchemas.idOnly }, getMatchStateHandler);
    // fastify.post('/match/:matchId/accept', { schema: matchSchemas.accept }, acceptMatchHandler);
    // fastify.post('/match/:matchId/reject', { schema: matchSchemas.reject }, rejectMatchHandler);
