@@ -1,7 +1,7 @@
 import { getUserDataFromStorage } from '../services/authService.js';
 import { navigateTo } from '../services/router.js';
 import { handleOnlineGame } from '../services/initOnlineGame.js';
-import { UserData } from '../services/authService.js'
+import { User } from '../shared/types.js';
 
 export type GameMode = 'local' | 'remote';
 
