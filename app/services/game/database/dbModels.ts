@@ -1,4 +1,6 @@
-import db from './connectDB.ts'
+import db from './connectDB.ts';
+
+type MatchStatus = 'pending' | 'in_progress' | 'finished';
 
 const matchTable: string = `
     CREATE TABLE IF NOT EXISTS matches (
@@ -12,6 +14,7 @@ const matchTable: string = `
         status TEXT NOT NULL CHECK (status IN ('pending', 'in_progress', 'finished'))
     )`;
 
+// --- HELPER FUNCTIONS FOR GENERAL DB ACTIONS (all(), get(), run(), exec() etc.)
 export async function createMatchTable() {
     try {
         await execute(db, matchTable);
@@ -46,12 +49,64 @@ export async function insertMatchToDB({ matchId, player1_id, player2_id, player1
     try {
         await execute(db, sql, params);
         console.log(`Match ${matchId} inserted to DB`);
+
     } catch (err: unknown) {
         console.log(`Failed to insert match into DB ${err}`);
     }
 }
+
+export async function getRowById(id: number) {
+
+    let sql = `SELECT * FROM matches WHERE id = ?`;
+
+    try {
+        const match = await fetchFirst(db, sql, [id]);
+        console.log(match);
+
+    } catch (err: unknown) {
+        console.log(`Failed to retrieve a row from DB ${err}`);
+    }
+}
+
+export async function getAllRows() {
     
+    let sql = `SELECT * FROM matches`;
+
+    try {
+        const matches = await fetchAll(db, sql, []);
+        console.log(matches);
+    } catch (err: unknown) {
+        console.log(`Failed to retrieve all rows drom DB: ${err}`);
+    }
+}
+
+export async function updateStatus(status: MatchStatus, id: number) {
+   
+    let sql = `UPDATE matches SET status = ? WHERE id = ?`;
+
+    try { 
+        await execute(db, sql, [status, id]);
+        console.log(`Status for match ${id} updated to ${status}`);
+    } catch (err: unknown){
+        console.log(`Failed to update status: ${err}`);
+    }
+}
+
+export async function deleteRow(id: number) {
+   
+    let sql = `DELETE FROM matches WHERE id = ?`;
+
+    try {
+        await execute(db, sql, [id]);
+        console.log(`Match ${id} deleted from DB`);
+    } catch (err: unknown) {
+        console.log(`Failed to delete match ${id} from DB: ${err}`);
+    }
+}
+
+// --- WRAPPERS FOR DB ACTIONS ---
 export const execute = async (db: any, sql: string, params: any[] = []): Promise<void> => {
+    // to execute an INSERT statement or UPDATE
     if (params && params.length > 0) {
         return new Promise<void>((resolve, reject) => {
             db.run(sql, params, (err: Error | null) => {
@@ -67,3 +122,22 @@ export const execute = async (db: any, sql: string, params: any[] = []): Promise
         });
     });
 };
+
+export const fetchAll = async (db: any, sql: string, params: any[]): Promise<any[]> => {
+    return new Promise<any[]>((resolve, reject) => {
+        db.all(sql, params, (err: Error | null, rows: any) => {
+            if (err) reject(err);
+            resolve(rows);
+        });
+    });
+} 
+
+export const fetchFirst = async (db: any, sql: string, params: any): Promise<any> => {
+    return new Promise<any>((resolve, reject) => {
+        // check if row: any ? or better type
+        db.get(sql, params, (err: Error | null, row: any) => {
+            if (err) reject(err);
+            resolve(row);
+        });
+    });
+}

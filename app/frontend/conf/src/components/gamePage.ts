@@ -66,20 +66,14 @@ export function GamePage(): HTMLElement {
     // --- Event: Online button clicked ---
     onlineGameButton.addEventListener('click', async () => { 
         
-        // if (!authData?.token) {
-            //     alert("You must be logged in to play online.");
-            //     return;
-            // }
-            
         const authData = getUserDataFromStorage();
-        // const token = authData.token;
-        // TODO : regeler le typage
-        let display_name: string | undefined = '';
-
-        if (authData?.display_name) {
-            display_name = authData?.display_name;
+        if (!authData) {
+            alert("You must be logged in to play online");
+            return;
         }
-        
+
+        let display_name: string = authData.display_name;
+
         sessionStorage.setItem('gameMode', 'online');
 
         await handleOnlineGame(display_name, buttonsContainer, onlineGameButton);

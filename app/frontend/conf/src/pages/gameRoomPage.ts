@@ -135,6 +135,9 @@ function initGame(container: HTMLButtonElement) {
 	socket.on('gameFinished', () => {
 		// jaffiche une petit message avec le gangnant ?
 		alert('You won!');
+		cleanupSocket(socket);
+		sessionStorage.clear();
+		navigateTo('/game');
 	});
 
 }
