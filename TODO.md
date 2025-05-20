@@ -5,6 +5,10 @@
 ## arthur
 
 - [ ] display_name unique ? soit changer edit soit register
+- [ ] logout -> supprimer token
+- [ ] login/logout maj du status
+- [ ] Affichage du status
+- [ ] tout matches
 
 ## 📌 Tâches initiales
 

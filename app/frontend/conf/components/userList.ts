@@ -58,18 +58,16 @@ export function UserList(props: UserListProps): HTMLElement {
         username.className = 'text-lg font-semibold text-blue-700';
         username.textContent = user.display_name || user.username;
         
-        const actualUsername = document.createElement('span');
-        actualUsername.className = 'text-gray-500 text-xs ml-2';
+        const displayName = document.createElement('span');
+        displayName.className = 'text-gray-500 text-xs ml-2';
         // Afficher le username seulement s'il est différent du display_name ET que display_name existe
         if (user.display_name && user.display_name !== user.username) { 
-            actualUsername.textContent = `(@${user.username})`;
+            displayName.textContent = `(@${user.username})`;
         }
 
 
         let onlineStatusIndicator = '';
-        // Utiliser user.status si c'est le bon nom de propriété, sinon user.online_status
-        // Assurez-vous que la propriété existe sur votre type ApiUser
-        const statusProperty = user.status || (user as any).online_status; // Exemple de fallback si la propriété a plusieurs noms possibles
+        const statusProperty = user.status;
         if (statusProperty) {
             const statusColor = statusProperty === 'online' ? 'bg-green-500' : (statusProperty === 'in-game' ? 'bg-yellow-500' : 'bg-gray-400');
             onlineStatusIndicator = `<span class="inline-block w-2.5 h-2.5 ${statusColor} rounded-full mr-2" title="${statusProperty}"></span>`;
@@ -79,7 +77,7 @@ export function UserList(props: UserListProps): HTMLElement {
         usernameWrapper.className = 'flex items-center';
         usernameWrapper.innerHTML = onlineStatusIndicator;
         usernameWrapper.appendChild(username);
-        usernameWrapper.appendChild(actualUsername);
+        usernameWrapper.appendChild(displayName);
 
         topInfo.appendChild(usernameWrapper);
 
