@@ -3,7 +3,7 @@ import type { Socket } from "socket.io";
 import { waitingRoom, removePlayerFromWaitingList, addPlayerToWaitingList, getWaitingListSize } from "../utils/waitingRoom.ts";
 import db from '../database/connectDB.ts';
 
-import { fetchFirst, getRowById } from "../database/dbModels.ts";
+import { fetchFirst, getRowById, updateStatus } from "../database/dbModels.ts";
 
 const TIMEOUT_MS = 60000; // 1 minute
 const timeouts: Map<string, NodeJS.Timeout> = new Map();
@@ -43,10 +43,9 @@ function onlineSocketEvents(socket: Socket) {
     });
     
     // optionnel ? a voir si besoin de ce listener
-    socket.on('startOnlineGame', () => {
-        fastify.log.info('Online game started');
-        // update game_status to 'in_progress'
-    });
+    // socket.on('startOnlineGame', matchId => {
+    //     fastify.log.info('Online game started');
+    // });
 
     socket.on('playerMove', (movement) => {
         fastify.log.info(movement);
@@ -54,7 +53,7 @@ function onlineSocketEvents(socket: Socket) {
     });
 
     // quit Button on game
-    socket.on('quit', async (socketId: string) =>  {
+    socket.on('quit', async (socketId: string, matchId: string) =>  {
 
         fastify.log.info(`Player with socket id ${socketId} quit the game`);
         // TODO: maybe need to check if game is Online ? 
@@ -62,7 +61,7 @@ function onlineSocketEvents(socket: Socket) {
             const opponentSocketId: string | null = await getOpponentSocketId(socketId);
             if (opponentSocketId) {
                 fastify.io.to(opponentSocketId).emit('gameFinished', 'You won!');
-                // update game_status to 'finished'
+                updateStatus('finished', matchId);
             }
         } catch (err: unknown) {
             fastify.log.error(`Failed to find opponentSocketId: ${err}`);
@@ -72,10 +71,9 @@ function onlineSocketEvents(socket: Socket) {
     socket.on('disconnect', () => {
         try {
             fastify.log.info(`Player disconnected: ${socket.id}`);
-            // remove player from waiting list id nedeed
+            // remove player from waiting list if nedeed
             removePlayerFromWaitingList(socket.id);
             clearMatchTimeout(socket.id);
-            fastify.log.info(`Player removed: ${socket.id}`);
         } catch (error) {
             fastify.log.error(`Error during disconnection: ${error}`);
         }

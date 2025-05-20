@@ -46,7 +46,7 @@ export async function initOnlineGame(display_name: string, buttonsContainer: HTM
         sessionStorage.setItem('side', side);
         sessionStorage.setItem('opponent', opponent);
 
-        socket.emit('startOnlineGame');
+        // socket.emit('startOnlineGame', matchId); je suis pas sure qu'on a besoin de cet emit: a voir ?
         navigateTo(`/game-room?matchId=${matchId}`);
 
     });

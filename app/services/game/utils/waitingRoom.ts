@@ -1,6 +1,7 @@
 import { fastify } from "../server.ts";
 import { clearMatchTimeout } from "../sockets/matchSocketHandler.ts";
 import { insertMatchToDB } from "../database/dbModels.ts";
+import { updateStatus } from "../database/dbModels.ts";
 
 // import Game from "../models/gameModel.js";
 
@@ -53,6 +54,7 @@ export async function waitingRoom() {
                 player2_socket: player2.socketId
             });
             
+            updateStatus('in_progress', matchId);
 
             // notify players that they are matched
             fastify.io.to(player1.socketId).emit('matchFound', player1Data);
@@ -65,15 +67,9 @@ export async function waitingRoom() {
             fastify.log.error('Matchmaking aborted: one or both players disconnected');
             return;
         }
-        // TODO: create a game room for the players
-        // dans le game room a verifier si le joueur est bien dans la room (si il a pas deconnecte avant)
-        // const gameId = new Game(player1.playerId, player2.playerId);
-        // fastify.log.info("Game created with ID:", gameId); // how to generate a gameId ?
-        
     } catch (error) {
         fastify.log.error('Error during matchmaking:', error);
     }
-        
 }
 
 // --- Simple mathcmaking system : first in first out ---
@@ -87,10 +83,6 @@ function firstInFirstOut() {
 }
 
 // --- Waiting list management ---
-export async function getWaitingList() {
-    return waitingList;
-}
-
 export function getWaitingListSize() {
     return waitingList.size;
 }
@@ -103,7 +95,7 @@ export async function removePlayerFromWaitingList(socketId: string) {
             return;
         }
     }
-    fastify.log.warn(`Player with socket ID ${socketId} not found in waiting list.`);
+   // fastify.log.warn(`Player with socket ID ${socketId} not found in waiting list.`);
 }
 
 export async function addPlayerToWaitingList(display_name: string, socketId: string) {

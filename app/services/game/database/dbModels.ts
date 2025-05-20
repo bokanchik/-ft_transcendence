@@ -68,6 +68,7 @@ export async function getRowById(id: number) {
     }
 }
 
+
 export async function getAllRows() {
     
     let sql = `SELECT * FROM matches`;
@@ -80,13 +81,13 @@ export async function getAllRows() {
     }
 }
 
-export async function updateStatus(status: MatchStatus, id: number) {
+export async function updateStatus(status: MatchStatus, matchId: string) {
    
-    let sql = `UPDATE matches SET status = ? WHERE id = ?`;
+    let sql = `UPDATE matches SET status = ? WHERE matchId = ?`;
 
     try { 
-        await execute(db, sql, [status, id]);
-        console.log(`Status for match ${id} updated to ${status}`);
+        await execute(db, sql, [status, matchId]);
+        console.log(`Status for match ${matchId} updated to ${status}`);
     } catch (err: unknown){
         console.log(`Failed to update status: ${err}`);
     }
