@@ -44,7 +44,7 @@ function isValidEmailFormat(emailString: string | undefined | null): boolean {
  * @param {string} params.identifier - The username or email of the user.
  * @param {string} params.password - The user's password.
  * @throws {ValidationError} If the credentials are invalid.
- * @returns {Promise<Object>} The user object without the password hash.
+ * @returns {Promise<User>} The user object without the password hash.
  */
 export async function loginUser({ identifier, password }: LoginRequestBody): Promise<User> {
 	console.log(`Attempting to log user with identifier: ${identifier}`);
