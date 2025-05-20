@@ -127,9 +127,9 @@ export async function isUsernameInDb(username: string, id?: number): Promise<boo
 		query += ' AND id != ?';
 		params.push(id);
 	}
-	query += ')';
+	query += ') AS "exists"';
 	const row = await db.get<{ exists: number }>(query, params);
-	return row !== undefined;
+	return row?.exists === 1;
 }
 
 export async function isEmailInDb(email: string, id?: number): Promise<boolean> {
@@ -140,9 +140,9 @@ export async function isEmailInDb(email: string, id?: number): Promise<boolean> 
 		query += ' AND id != ?';
 		params.push(id);
 	}
-	query += ')';
+	query += ') AS "exists"';
     const row = await db.get<{ exists: number }>(query, params);
-	return row !== undefined;
+	return row?.exists === 1;
 }
 
 export async function isDisplayNameInDb(display_name: string, id?: number): Promise<boolean> {
@@ -153,7 +153,7 @@ export async function isDisplayNameInDb(display_name: string, id?: number): Prom
         query += ' AND id != ?';
         params.push(id);
     }
-    query += ')';
+    query += ') AS "exists"';
     const row = await db.get<{ exists: number }>(query, params);
     return row?.exists === 1;
 }
