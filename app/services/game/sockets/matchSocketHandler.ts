@@ -3,7 +3,7 @@ import type { Socket } from "socket.io";
 import { waitingRoom, removePlayerFromWaitingList, addPlayerToWaitingList, getWaitingListSize } from "../utils/waitingRoom.ts";
 import db from '../database/connectDB.ts';
 
-import { fetchFirst, getRowById, updateStatus } from "../database/dbModels.ts";
+import { fetchFirst, getRowById, setGameResult, updateStatus } from "../database/dbModels.ts";
 
 const TIMEOUT_MS = 60000; // 1 minute
 const timeouts: Map<string, NodeJS.Timeout> = new Map();
@@ -53,15 +53,16 @@ function onlineSocketEvents(socket: Socket) {
     });
 
     // quit Button on game
-    socket.on('quit', async (socketId: string, matchId: string) =>  {
+    socket.on('quit', async (socketId: string, matchId: string, opponentId: string) =>  {
 
         fastify.log.info(`Player with socket id ${socketId} quit the game`);
         // TODO: maybe need to check if game is Online ? 
         try {
             const opponentSocketId: string | null = await getOpponentSocketId(socketId);
             if (opponentSocketId) {
-                fastify.io.to(opponentSocketId).emit('gameFinished', 'You won!');
-                updateStatus('finished', matchId);
+                fastify.io.to(opponentSocketId).emit('gameFinished', matchId);
+                // TEST: on a besoin de recuperer le score !! pour le test 0:0
+                await setGameResult(matchId, 0, 0, opponentId, 'opponent left the game');
             }
         } catch (err: unknown) {
             fastify.log.error(`Failed to find opponentSocketId: ${err}`);

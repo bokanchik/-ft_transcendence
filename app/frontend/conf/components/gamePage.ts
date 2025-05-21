@@ -67,17 +67,22 @@ export function GamePage(): HTMLElement {
     onlineGameButton.addEventListener('click', async () => { 
         
         // TODO: fetch to /api/user/me to check if registred, ca me donne le type User
-        const authData = getUserDataFromStorage();
-        if (!authData) {
-            alert("You must be logged in to play online");
-            return;
+        try {
+            const userRes = await fetch('/api/users/me');
+            if (!userRes.ok) {
+                alert("You must be logged in to play online"); // TODO: utiliser toast pour afficher le message
+                return;
+            }
+            const userData = await userRes.json();
+            const display_name: string = userData.display_name;
+
+            sessionStorage.setItem('gameMode', 'online');
+
+            await handleOnlineGame(display_name, buttonsContainer, onlineGameButton);
+        } catch (err: unknown) {
+            console.log(`Failed to fetch from user`);
+            throw err;
         }
-
-        let display_name: string = authData.display_name;
-
-        sessionStorage.setItem('gameMode', 'online');
-
-        await handleOnlineGame(display_name, buttonsContainer, onlineGameButton);
     });
 
         return container;

@@ -10,25 +10,13 @@ const matchTable: string = `
         player2_id TEXT NOT NULL,
         player1_socket TEXT NOT NULL,
         player2_socket TEXT NOT NULL,
+        player1_score INTEGER,
+        player2_score INTEGER,
+        winner_id TEXT,
+        win_type TEXT DEFAULT 'score',
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         status TEXT NOT NULL CHECK (status IN ('pending', 'in_progress', 'finished'))
     )`;
-
-//     CREATE TABLE IF NOT EXISTS matches (
-//     id INTEGER PRIMARY KEY AUTOINCREMENT,
-//     player1_id INTEGER NOT NULL,
-//     player2_id INTEGER NOT NULL,
-//     player1_score INTEGER NOT NULL,
-//     player2_score INTEGER NOT NULL,
-//     winner_id INTEGER NOT NULL,
-//     win_type TEXT NOT NULL DEFAULT 'score',
-//     match_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-//     game_type TEXT DEFAULT 'pong',
-//     tournament_id INTEGER,
-//     FOREIGN KEY(player1_id) REFERENCES users(id),
-//     FOREIGN KEY(player2_id) REFERENCES users(id),
-//     FOREIGN KEY(winner_id) REFERENCES users(id)
-// );
 
 // --- HELPER FUNCTIONS FOR GENERAL DB ACTIONS (all(), get(), run(), exec() etc.)
 export async function createMatchTable() {
@@ -39,6 +27,33 @@ export async function createMatchTable() {
         console.error(`Error creating matches table: ${err}`);
     }
 };
+
+export async function setGameResult(matchId: string, player1_score: number, player2_score: number, winner_id: string, win_type: string) {
+    const sql = `
+        UPDATE matches
+        SET player1_score = ?,
+            player2_score = ?,
+            winner_id = ?,
+            win_type = ?,
+            status = 'finished'
+        WHERE matchId = ?`;
+
+    const params = [
+        player1_score,
+        player2_score,
+        winner_id,
+        win_type,
+        matchId
+    ];
+
+    try {
+        await execute(db, sql, params);
+        console.log(`Game result saved for match ${matchId}`);
+    } catch (err: unknown) {
+        console.log(`Failed to insert game result to DB: ${err}`);
+    }
+
+}
 
 export async function insertMatchToDB({ matchId, player1_id, player2_id, player1_socket, player2_socket }: 
     { matchId: string, player1_id: string, player2_id: string, player1_socket: string, player2_socket: string }) {
@@ -71,16 +86,18 @@ export async function insertMatchToDB({ matchId, player1_id, player2_id, player1
     }
 }
 
-export async function getRowById(id: number) {
+export async function getRowByMatchId(matchId : string) {
 
-    let sql = `SELECT * FROM matches WHERE id = ?`;
+    let sql = `SELECT * FROM matches WHERE matchId = ?`;
 
     try {
-        const match = await fetchFirst(db, sql, [id]);
+        const match = await fetchFirst(db, sql, [matchId]);
         console.log(match);
+        return match;
 
     } catch (err: unknown) {
         console.log(`Failed to retrieve a row from DB ${err}`);
+        throw err;
     }
 }
 

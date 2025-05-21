@@ -36,9 +36,9 @@ export async function initOnlineGame(display_name: string, buttonsContainer: HTM
     socket.on('matchFound', ({ matchId, displayName, side, opponent }: { matchId: UUID; displayName: string, side: 'left' | 'right'; opponent: string}) => {
 
         // FOR DEBUGGING
-        console.log(matchId);
-        console.log(side);
-        console.log(opponent);
+        // console.log(matchId);
+        // console.log(side);
+        // console.log(opponent);
         // -------------------
         
         sessionStorage.setItem('matchId', matchId);
