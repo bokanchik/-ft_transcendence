@@ -1,9 +1,0 @@
-# Environment variables
-.env # A ENLEVER !!!
-
-# Node modules (can be installed with npm install)
-node_modules/
-
-.DS_Store
-.vscode/
-
