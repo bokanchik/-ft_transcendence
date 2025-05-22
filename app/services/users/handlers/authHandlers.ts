@@ -12,7 +12,7 @@ export async function registerHandler(req: FastifyRequest<{ Body: RegisterReques
 	});
 }
 
-export default async function loginHandler(req: FastifyRequest<{ Body: LoginRequestBody }>, reply: FastifyReply) {
+export async function loginHandler(req: FastifyRequest<{ Body: LoginRequestBody }>, reply: FastifyReply) {
 	const user = await loginUser(req.body);
 	const tokenPayload: JWTPayload = { id: user.id, username: user.username };
 	const token = reply.server.jwt.sign(tokenPayload);

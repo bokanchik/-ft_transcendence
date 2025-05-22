@@ -1,10 +1,6 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
-import loginHandler, {
-	registerHandler} from '../handlers/authHandlers.js';
-import {
-	registerSchema,
-	loginSchema
-} from '../schemas/userSchemas.js';
+import { loginHandler, logoutHandler, registerHandler } from '../handlers/authHandlers.js';
+import { registerSchema, loginSchema, logoutSchema } from '../schemas/userSchemas.js';
 
 export default async function authRoute(fastify: FastifyInstance, options: FastifyPluginOptions) {
 	fastify.post(
@@ -16,5 +12,10 @@ export default async function authRoute(fastify: FastifyInstance, options: Fasti
 		'/register',
 		{ schema: registerSchema },
 		registerHandler
+	);
+	fastify.post(
+		'/logout',
+		{ schema: logoutSchema },
+		logoutHandler
 	);
 }

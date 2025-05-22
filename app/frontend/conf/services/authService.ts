@@ -124,8 +124,8 @@ export async function logout(): Promise<void> {
 
 	try {
 		const response = await fetch(logoutUrl, {
-			method: 'POST', // or GET -> todo API logout
-			credentials: 'include', // send cookie to server to invalidate it
+			method: 'POST',
+			credentials: 'include',
 		});
 		if (response.ok) {
 			console.log("Server-side logout successful (cookie invalidated).");
