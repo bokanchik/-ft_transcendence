@@ -2,17 +2,46 @@ import { getUserDataFromStorage } from '../services/authService.js';
 import { navigateTo } from '../services/router.js';
 import { handleOnlineGame } from '../services/initOnlineGame.js';
 import { User } from '../shared/types.js';
+import { HeaderComponent } from './headerComponent.js'; // ajout arthur pour le header
 
 export type GameMode = 'local' | 'remote';
 
 export function GamePage(): HTMLElement {
-    
+    //ajout arthur -> on check tout de suite si l'utilisateur est connecté
+    const authData = getUserDataFromStorage();
+
+    // Le HeaderComponent attend un currentUser.
+    // Si l'utilisateur n'est pas connecté, redirigez-le ou affichez un état alternatif.
+    if (!authData) {
+        console.warn("GamePage: User not authenticated, redirecting to login.");
+        navigateTo('/login');
+        // Retourner un élément vide pour éviter les erreurs de rendu pendant la redirection
+        return document.createElement('div');
+    }
+    const currentUser: User = authData as User;
+
     // --- Main Container ---
-    const container: HTMLDivElement = document.createElement('div');
-    container.className = 'bg-gradient-to-r from-blue-500 to-purple-600 flex justify-center items-center min-h-screen p-8';
+    const pageWrapper = document.createElement('div');
+    pageWrapper.className = 'flex flex-col min-h-screen'; // Assure que la page prend toute la hauteur
+
+    // --- Header ---
+    const headerElement = HeaderComponent({ currentUser});
+    pageWrapper.appendChild(headerElement);
+
+    // --- Game Page Content ---
+    // L'ancien 'container' devient 'gameContentContainer'
+    const gameContentContainer: HTMLDivElement = document.createElement('div');
+    gameContentContainer.className = 'flex-grow bg-gradient-to-r from-blue-500 to-purple-600 flex justify-center items-center p-8';
     
     const formContainer: HTMLDivElement = document.createElement('div');
-    formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';
+    formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';   
+    // fin ajout arthur
+
+    // const container: HTMLDivElement = document.createElement('div');
+    // container.className = 'bg-gradient-to-r from-blue-500 to-purple-600 flex justify-center items-center min-h-screen p-8';
+    
+    // const formContainer: HTMLDivElement = document.createElement('div');
+    // formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';
     
     // --- Title ---
     const title: HTMLHeadElement = document.createElement('h2');
@@ -55,8 +84,14 @@ export function GamePage(): HTMLElement {
     footer.appendChild(homeLink);
     
     // --- Ajout des éléments au conteneur principal ---
-    formContainer.append(title, buttonsContainer, footer);
-    container.appendChild(formContainer); 
+    // debut ajout arthur
+        formContainer.append(title, buttonsContainer, footer);
+    gameContentContainer.appendChild(formContainer);
+    pageWrapper.appendChild(gameContentContainer);
+    // fin ajout arthur
+
+    // formContainer.append(title, buttonsContainer, footer);
+    // container.appendChild(formContainer); 
     
     // --- Event: Local button clicked 
     localGameButton.addEventListener('click', async () =>  {
@@ -67,11 +102,11 @@ export function GamePage(): HTMLElement {
     onlineGameButton.addEventListener('click', async () => { 
         
         // TODO: fetch to /api/user/me to check if registred, ca me donne le type User
-        const authData = getUserDataFromStorage();
-        if (!authData) {
-            alert("You must be logged in to play online");
-            return;
-        }
+        // const authData = getUserDataFromStorage();
+        // if (!authData) {
+        //     alert("You must be logged in to play online");
+        //     return;
+        // }
 
         let display_name: string = authData.display_name;
 
@@ -80,6 +115,7 @@ export function GamePage(): HTMLElement {
         await handleOnlineGame(display_name, buttonsContainer, onlineGameButton);
     });
 
-        return container;
+        // return container;
+        return pageWrapper; // ajout arthur
 }
     
