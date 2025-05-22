@@ -88,7 +88,6 @@ export async function ProfilePage(): Promise<HTMLElement> {
 		contentWrapper.appendChild(backLink); // Fallback
 	}
 
-
 	pageContainer.appendChild(contentWrapper);
 	return pageContainer;
 }

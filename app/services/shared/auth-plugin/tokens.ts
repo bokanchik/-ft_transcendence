@@ -5,6 +5,7 @@ import fastifyCookie, { CookieSerializeOptions } from '@fastify/cookie';
 import fastifyCsrfProtection from '@fastify/csrf-protection';
 
 export const jwtToken: string = 'jwt_token';
+export const csrfCookieName: string = 'csrf_token';
 
 export const cookieOptions: CookieSerializeOptions = {
 	path: '/',
@@ -12,6 +13,16 @@ export const cookieOptions: CookieSerializeOptions = {
 	secure: true,
 	// secure: process.env.NODE_ENV === 'production',
 	sameSite: 'strict',
+	maxAge: 60 * 60 * 24 * 7,
+};
+
+export const csrfOptions: CookieSerializeOptions = {
+	path: '/',
+	httpOnly: true,
+	secure: true,
+	// secure: process.env.NODE_ENV === 'production',
+	sameSite: 'lax',
+	signed: true,
 	maxAge: 60 * 60 * 24 * 7,
 };
 
@@ -33,14 +44,8 @@ export async function registerCookiePlugin(fastify: FastifyInstance): Promise<vo
 
 export async function registerCsrfPlugin(fastify: FastifyInstance): Promise<void> {
 	await fastify.register(fastifyCsrfProtection, {
-		cookieKey: 'csrf-secret', // Convention: _csrf
-		cookieOpts: {
-			signed: true,
-			httpOnly: true,
-			secure: process.env.NODE_ENV === 'production',
-			sameSite: 'lax',
-			path: '/',
-		},
+		cookieKey: csrfCookieName,
+		cookieOpts: csrfOptions,
 	});
 	fastify.log.info('CSRF protection registered');
 }

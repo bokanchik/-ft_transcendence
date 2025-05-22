@@ -2,7 +2,7 @@
 import * as friendModel from '../models/friendModel.js';
 import * as userModel from '../models/userModel.js';
 import { ConflictError, NotFoundError, ValidationError, ForbiddenError } from '../shared/auth-plugin/appError.js';
-import { Friendship } from '../shared/types.js';
+import { Friendship, FriendshipStatus } from '../shared/types.js';
 
 /**
  * Creates a friend request.
@@ -61,7 +61,7 @@ export async function acceptFriendRequest(friendshipId: number, currentUserId: n
 	if (!friendship) {
 		throw new NotFoundError('Friend request not found.');
 	}
-	if (friendship.status !== 'pending') {
+	if (friendship.status !== FriendshipStatus.PENDING) {
 		throw new ConflictError(`This friend request is already '${friendship.status}'.`);
 	}
 	if (friendship.initiator_id === currentUserId) {
@@ -71,7 +71,7 @@ export async function acceptFriendRequest(friendshipId: number, currentUserId: n
 		throw new ForbiddenError("You are not part of this friendship request.");
 	}
 
-	const result = await friendModel.updateFriendshipStatusInDb(friendshipId, 'accepted');
+	const result = await friendModel.updateFriendshipStatusInDb(friendshipId, FriendshipStatus.ACCEPTED);
 	if (result.changes === 0) {
 		throw new Error('Failed to accept friend request, database reported no changes.');
 	}
@@ -211,10 +211,10 @@ export async function blockUser(
 	let friendship = await friendModel.getFriendshipByUsersInDb(id1, id2);
 
 	if (friendship) {
-		await friendModel.updateFriendshipStatusInDb(friendship.id, 'blocked');
+		await friendModel.updateFriendshipStatusInDb(friendship.id, FriendshipStatus.BLOCKED);
 	} else {
 		friendship = await friendModel.createFriendshipRequestInDb(id1, id2, blockerId);
-		await friendModel.updateFriendshipStatusInDb(friendship.id, 'blocked');
+		await friendModel.updateFriendshipStatusInDb(friendship.id, FriendshipStatus.BLOCKED);
 	}
 	return { message: `User ${userToBlock.username} has been blocked.` };
 }

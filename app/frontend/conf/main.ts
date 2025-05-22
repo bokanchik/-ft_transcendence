@@ -55,7 +55,7 @@ export async function router() {
 		return;
 	}
 	const path = window.location.pathname;
-	console.log(`navigateTo: ${path}`); // Read actual URL after domain name
+	console.log(`navigateTo: ${path}`);
 	const routeCfg = routes[path];
 	if (!routeCfg) {
 		appContainer.innerHTML = '';
@@ -82,21 +82,13 @@ export async function router() {
 	}
 }
 
-// !! fonction est hebernée dans le fichier service/router.ts parce que j'ai besoin de l'utiliser dans d'autres fichiers
-// export function navigateTo(url: string) {
-// 	window.history.pushState({}, '', url);	// Met à jour l'URL dans la barre d'adresse sans recharger
-// 	router();
-// }
-
 // Se déclenche lorsque le HTML initial est chargé
 document.addEventListener('DOMContentLoaded', () => {
-	// Attache un écouteur de clic global pour intercepter les liens SPA
 	document.body.addEventListener('click', (event) => {
 		const target = event.target as HTMLElement;
-		// Trouve l'élément <a> le plus proche qui a l'attribut [data-link]
 		const linkElement = target.closest('a[data-link]') as HTMLAnchorElement | null;
 		if (linkElement) {
-			event.preventDefault(); // Empêche le navigateur de suivre le lien normalement
+			event.preventDefault();
 			const destination = linkElement.getAttribute('href');
 			if (destination) {
 				navigateTo(destination);

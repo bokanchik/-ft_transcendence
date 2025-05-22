@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { createUserAccount, loginUser } from '../services/userService.js';
-import { jwtToken, cookieOptions } from '../shared/auth-plugin/tokens.js';
+import { jwtToken, cookieOptions, csrfCookieName, csrfOptions } from '../shared/auth-plugin/tokens.js';
 import { ERROR_MESSAGES } from '../shared/auth-plugin/appError.js';
 import { JWTPayload, User, RegisterRequestBody, LoginRequestBody } from '../shared/types.js';
 
@@ -31,6 +31,7 @@ export async function loginHandler(req: FastifyRequest<{ Body: LoginRequestBody 
 
 export async function logoutHandler(req: FastifyRequest, reply: FastifyReply) {
 	reply.clearCookie(jwtToken, cookieOptions);
+	reply.clearCookie(csrfCookieName, csrfOptions);
 	return reply.send({ message: 'Logout successful' });
 }
 

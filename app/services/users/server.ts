@@ -30,7 +30,7 @@ function setupRoutes(): void {
 	});
 	fastify.log.info('CSRF token endpoint /api/users/csrf-token registered');
 
-	fastify.register(userRoutes, { prefix: '/api/users' });
+	fastify.register(userRoutes);
 	fastify.register(authRoutes, { prefix: '/api/users/auth' });
 	fastify.register(friendRoutes, { prefix: '/api/users/friends' });
 	fastify.log.info('Routes registered');
