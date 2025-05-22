@@ -91,8 +91,8 @@ export async function RegisterPage(): Promise<HTMLElement> {
 		const password = passwordInput.value; // No trim on password
 		const confirmPassword = confirmPasswordInput.value;
 		const avatarUrl = avatarUrlInput.value.trim();
-
-		// --- Validation côté client (basique) ---
+		
+		// --- Validation des champs ---
 		if (!username || !email || !displayName || !password || !confirmPassword) {
 			messageDiv.textContent = 'Please fill in all required fields.';
 			messageDiv.className = 'mt-4 text-center text-sm text-red-600';
@@ -143,12 +143,9 @@ export async function RegisterPage(): Promise<HTMLElement> {
 			messageDiv.textContent = `Registration successful for ${username}! Redirecting to login...`;
 			messageDiv.className = 'mt-4 text-center text-sm text-green-600';
 			form.reset(); // Clear the form fields
-
-			// Rediriger vers la page de connexion après un délai
-			setTimeout(() => { navigateTo('/dashboard'); }, 500);
+			setTimeout(() => { navigateTo('/login'); }, 500);
 
 		} else {
-			// Échec (message déjà affiché par alert)
 			messageDiv.textContent = 'Registration failed. Please check the details and try again.'; // Message générique post-alert
 			messageDiv.className = 'mt-4 text-center text-sm text-red-600';
 			passwordInput.value = ''; // Clear password fields on failure
