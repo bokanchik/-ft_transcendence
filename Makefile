@@ -18,6 +18,7 @@ CREDENTIALS	= secrets/credentials.txt
 
 all			: up
 
+
 up			:
 #	@grep -Fvx -f $(CREDENTIALS) $(ENV_FILE) > $(ENV_FILE).tmp || true
 #	@cat $(CREDENTIALS) >> $(ENV_FILE).tmp
@@ -26,6 +27,9 @@ up			:
 	docker compose -f $(DC_FILE) up -d
 #	@grep -Fvx -f $(CREDENTIALS) $(ENV_FILE) > $(ENV_FILE).tmp || true
 #	@mv $(ENV_FILE).tmp $(ENV_FILE)
+
+dev			: 
+	docker compose -f $(DC_FILE) up
 
 down		:
 	docker compose -f $(DC_FILE) down
@@ -61,4 +65,4 @@ ps			:
 cert		:
 	bash ./srcs/requirements/tools/copyCert.sh
 
-.PHONY		: all up down fdown prune logs re stop ps
+.PHONY		: all up dev down fdown prune logs re stop ps

@@ -3,7 +3,7 @@ import type { Socket } from "socket.io";
 import { waitingRoom, removePlayerFromWaitingList, addPlayerToWaitingList, getWaitingListSize } from "../utils/waitingRoom.ts";
 import db from '../database/connectDB.ts';
 
-import { fetchFirst, getRowById, setGameResult, updateStatus } from "../database/dbModels.ts";
+import { fetchFirst, getRowByMatchId, setGameResult, updateStatus } from "../database/dbModels.ts";
 
 const TIMEOUT_MS = 60000; // 1 minute
 const timeouts: Map<string, NodeJS.Timeout> = new Map();
@@ -19,91 +19,85 @@ export async function matchSocketHandler(socket: Socket): Promise<void> {
 
 // --- Main function for remote game socket handling
 function onlineSocketEvents(socket: Socket) {
+    waitingRoomHandler(socket);
+    gameRoutine(socket);
+    disconnectionHandler(socket);
+}
 
+async function waitingRoomHandler(socket: Socket) {
+    
     socket.on('authenticate', async (display_name: string) => {
         try {
             // store display_name and socket.id in waiting list if not already in        
             const newPlayer = await addPlayerToWaitingList(display_name, socket.id);
             
             if (newPlayer) {
+                socket.emit('inQueue');
                 // set timeout of 1 min for matchmaking process
                 const timeout = setTimeout(() => {
                     fastify.log.info(`Timeout of matchmaking for player: ${display_name}`);
                     socket.emit('matchTimeout');
-                    removePlayerFromWaitingList(socket.id);
-                    timeouts.delete(socket.id);
+                    cleanOnDisconnection(socket.id);
                 }, TIMEOUT_MS);
                 timeouts.set(socket.id, timeout);
             }
             // call to waiting room
-            tryMatchPlayers();
+            await tryMatchPlayers();
         } catch (err: unknown) {
             fastify.log.error(`Error during matchmaking process: ${err}`);
+            throw err;
         }
     });
-    
-    // optionnel ? a voir si besoin de ce listener
-    // socket.on('startOnlineGame', matchId => {
-    //     fastify.log.info('Online game started');
-    // });
+}
 
+// --- Main function for game routine handling 
+async function gameRoutine(socket: Socket) {
     socket.on('playerMove', (movement) => {
         fastify.log.info(movement);
         // handlePlayerMove(); // la logique du jeu est ici (ca update le state du jeu)
     });
+}
 
+async function disconnectionHandler(socket: Socket)  {
+    
     // quit Button on game
     socket.on('quit', async (socketId: string, matchId: string, opponentId: string) =>  {
-
+        
         fastify.log.info(`Player with socket id ${socketId} quit the game`);
-        // TODO: maybe need to check if game is Online ? 
         try {
             const opponentSocketId: string | null = await getOpponentSocketId(socketId);
             if (opponentSocketId) {
                 fastify.io.to(opponentSocketId).emit('gameFinished', matchId);
-                // TEST: on a besoin de recuperer le score !! pour le test 0:0
+                // --- TEST ---
+                // : on a besoin de recuperer le score !! pour le test 0:0
                 await setGameResult(matchId, 0, 0, opponentId, 'opponent left the game');
+                // -------------
             }
         } catch (err: unknown) {
             fastify.log.error(`Failed to find opponentSocketId: ${err}`);
+            throw err;
         }
     });
-
+    
     socket.on('disconnect', () => {
-        try {
-            fastify.log.info(`Player disconnected: ${socket.id}`);
-            // remove player from waiting list if nedeed
-            removePlayerFromWaitingList(socket.id);
-            clearMatchTimeout(socket.id);
-        } catch (error) {
-            fastify.log.error(`Error during disconnection: ${error}`);
-        }
+        cleanOnDisconnection(socket.id)
     });
     
     // "cancel" button clicked on frontend while the player is in waitingRoom
     socket.on('cancelMatch', () => {
-        try {
-            fastify.log.info(`Player disconnected: ${socket.id}`);
-            removePlayerFromWaitingList(socket.id);
-            clearMatchTimeout(socket.id);
-            fastify.log.info(`Player removed from waiting list: ${socket.id}`);
-            
-        } catch (error) {
-            fastify.log.error(`Error during disconnection: ${error}`);
-        }
+        cleanOnDisconnection(socket.id);
     });
     
-
 }
 
 async function getOpponentSocketId(socketId: string): Promise<string | null> {
     const sql = `
-        SELECT * FROM matches
-        WHERE player1_socket = ? OR player2_socket = ?
-        ORDER BY created_at DESC
-        LIMIT 1
+    SELECT * FROM matches
+    WHERE player1_socket = ? OR player2_socket = ?
+    ORDER BY created_at DESC
+    LIMIT 1
     `;
-
+    
     try {
         const match = await fetchFirst(db, sql, [socketId, socketId]);
         if (!match) return null;       
@@ -141,6 +135,12 @@ async function tryMatchPlayers() {
     } finally {
         matchmakingLock = false;
     }
+}
+
+function cleanOnDisconnection(socketId: string) {
+    fastify.log.info(`Player disconnected: ${socketId}`);
+    removePlayerFromWaitingList(socketId);
+    clearMatchTimeout(socketId);
 }
 
 export function clearMatchTimeout(socketId: string) {

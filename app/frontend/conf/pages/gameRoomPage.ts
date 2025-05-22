@@ -98,6 +98,7 @@ function setBoard(leftUsername: HTMLDivElement, rightUsername: HTMLDivElement) {
 	}
 }
 
+
 function initGame(container: HTMLButtonElement) {
 	const gameMode = sessionStorage.getItem('gameMode');
 
@@ -135,6 +136,10 @@ function initGame(container: HTMLButtonElement) {
 	});
 
 	socket.on('gameFinished', async (matchId: string) => {
+		// TODO: une fenetre avec tous les infos sur le match
+		// 1. je fais un fetch vers la route /api/game/:matchId pour recuperer les infos sur le match
+		// 2. un fetch vers la DB d'Arthur pour recuperer les photosURL des jouers
+		// 3. je passe les donnees a showGameResult()
 		try {
 			const matchRes = await fetch(`/api/game/match/${matchId}`);
 			if (!matchRes.ok) throw new Error('Failed to fetch match info');
@@ -153,10 +158,6 @@ function initGame(container: HTMLButtonElement) {
 		} catch (err: unknown) {
 			console.log(`Failed to fetch data from db: ${err}`);
 		}
-		// TODO: une fenetre avec tous les infos sur le match
-		// 1. je fais un fetch vers la route /api/game/:matchId pour recuperer les infos sur le match
-		// 2. un fetch vers la DB d'Arthur pour recuperer les photosURL des jouers
-		// 3. je passe les donnees a showGameResult()
 
 	});
 
@@ -171,8 +172,8 @@ function showGameResult(player1: string, player2: string, score1: number, score2
 		'bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-6 w-[90%] max-w-lg text-center border border-gray-300';
 
 	// TODO: recuperer les vrais URL
-	const photoUrl1 = 'https://www.zooplus.fr/magazine/wp-content/uploads/2019/06/comprendre-le-langage-des-chats.jpg';
-	const photoUrl2 = 'https://stan.bio/cdn/shop/articles/nom-de-chat_90274c55-d6b6-4521-97e4-fade14877429.jpg?v=1737368065';
+	const photoUrl1 = 'https://img4.dhresource.com/webp/m/0x0/f3/albu/km/j/13/67f2a386-fb10-405e-9c1e-47fcb8e7aab8.jpg';
+	const photoUrl2 = 'https://img.joomcdn.net/755233d1c566dcd31875df84758d818ecbb8dbc9_1024_1024.jpeg';
 
 	content.innerHTML = `
 		<h2 class="text-3xl font-bold text-gray-800 mb-6">🏓 Match Finished</h2>
