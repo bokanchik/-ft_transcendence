@@ -1,4 +1,6 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
+import { sendFriendRequestSchema, friendshipIdParamSchema } from "../schemas/friendsSchemas.js";
+import { config } from "../shared/env.js";
 import {
 	acceptFriendRequestHandler,
 	declineFriendRequestHandler,
@@ -9,18 +11,10 @@ import {
 	getMyFriendsHandler,
 	removeFriendshipHandler,
 } from "../handlers/friendsHandlers.js";
-import {
-	sendFriendRequestSchema,
-	friendshipIdParamSchema,
-} from "../schemas/friendsSchemas.js";
-
-type FriendshipIdRoute = {
-	Params: { friendshipId: string }
-};
 
 export default async function friendRoutes(fastify: FastifyInstance, options: FastifyPluginOptions) {
 	fastify.post(
-		'/requests',
+		config.URL_FRIEND_REQUEST,
 		{
 			onRequest: [fastify.authenticate, fastify.csrfProtection],
 			schema: sendFriendRequestSchema
@@ -28,17 +22,17 @@ export default async function friendRoutes(fastify: FastifyInstance, options: Fa
 		sendFriendRequestHandler
 	);
 	fastify.get(
-		'/requests/received',
+		config.URL_FRIEND_RECEIVED,
 		{ onRequest: [fastify.authenticate] },
 		getReceivedRequestsHandler
 	);
 	fastify.get(
-		'/requests/sent',
+		config.URL_FRIEND_SENT,
 		{ onRequest: [fastify.authenticate] },
 		getSentRequestsHandler
 	);
 	fastify.post(
-		'/requests/:friendshipId/accept',
+		config.URL_FRIEND_ACCEPT,
 		{
 			onRequest: [fastify.authenticate, fastify.csrfProtection],
 			schema: friendshipIdParamSchema
@@ -46,7 +40,7 @@ export default async function friendRoutes(fastify: FastifyInstance, options: Fa
 		acceptFriendRequestHandler
 	);
 	fastify.post(
-		'/requests/:friendshipId/decline',
+		config.URL_FRIEND_DECLINE,
 		{
 			onRequest: [fastify.authenticate, fastify.csrfProtection],
 			schema: friendshipIdParamSchema
@@ -54,7 +48,7 @@ export default async function friendRoutes(fastify: FastifyInstance, options: Fa
 		declineFriendRequestHandler
 	);
 	fastify.post(
-		'/requests/:friendshipId/cancel',
+		config.URL_FRIEND_CANCEL,
 		{
 			onRequest: [fastify.authenticate, fastify.csrfProtection],
 			schema: friendshipIdParamSchema
@@ -62,13 +56,12 @@ export default async function friendRoutes(fastify: FastifyInstance, options: Fa
 		cancelFriendRequestHandler
 	);
 	fastify.get(
-		'/friends',
+		config.URL_FRIEND_LIST,
 		{ onRequest: [fastify.authenticate] },
 		getMyFriendsHandler
 	);
 	fastify.post(
-//	fastify.post<FriendshipIdRoute>(
-		'/:friendshipId/remove',
+		config.URL_FRIEND_REMOVE,
 		{
 			onRequest: [fastify.authenticate, fastify.csrfProtection],
 			schema: friendshipIdParamSchema

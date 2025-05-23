@@ -1,6 +1,7 @@
 // /components/friendsList.ts
 import { Friend, UserOnlineStatus } from '../shared/types.js';
 import { navigateTo } from '../services/router.js';
+import { showCustomConfirm, showToast } from './toast.js';
 
 interface FriendsListProps {
     friends: Friend[];
@@ -90,19 +91,40 @@ export function FriendsListComponent(props: FriendsListProps): HTMLElement {
             }
         } else if (action === 'remove-friend') {
             const friendshipIdToRemove = button.dataset.friendshipId; // Get friendshipId from button
-            if (friendshipIdToRemove && confirm(`Êtes-vous sûr de vouloir supprimer cet ami ?`)) {
-                button.disabled = true;
-                button.textContent = '...';
-                try {
-                    await onRemoveFriend(parseInt(friendshipIdToRemove, 10));
-                    // button.closest('li')?.remove();
-                } catch (error: any) {
-                    console.error('Erreur lors de la suppression de l\'ami:', error);
-                    alert(`Erreur: ${error.message || 'Impossible de supprimer l\'ami.'}`);
-                    button.disabled = false;
-                    button.textContent = 'Supprimer';
+            if (friendshipIdToRemove) {
+                // Utilisation de la nouvelle boîte de dialogue personnalisée
+                const confirmed = await showCustomConfirm(
+                    'Êtes-vous sûr de vouloir supprimer cet ami de votre liste ? Cette action est irréversible.',
+                    'Supprimer l\'ami' // Titre optionnel
+                );
+
+                if (confirmed) {
+                    button.disabled = true;
+                    button.textContent = '...';
+                    try {
+                        await onRemoveFriend(parseInt(friendshipIdToRemove, 10));
+                        // showToast('Ami supprimé avec succès.', 'success'); // Exemple
+                    } catch (error: any) {
+                        console.error('Erreur lors de la suppression de l\'ami:', error);
+                        showToast(`Erreur: ${error.message || 'Impossible de supprimer l\'ami.'}`, 'error');
+                        button.disabled = false;
+                        button.textContent = 'Supprimer';
+                    }
                 }
             }
+            // if (friendshipIdToRemove && confirm(`Êtes-vous sûr de vouloir supprimer cet ami ?`)) {
+            //     button.disabled = true;
+            //     button.textContent = '...';
+            //     try {
+            //         await onRemoveFriend(parseInt(friendshipIdToRemove, 10));
+            //         // button.closest('li')?.remove();
+            //     } catch (error: any) {
+            //         console.error('Erreur lors de la suppression de l\'ami:', error);
+            //         alert(`Erreur: ${error.message || 'Impossible de supprimer l\'ami.'}`);
+            //         button.disabled = false;
+            //         button.textContent = 'Supprimer';
+            //     }
+            // }
         }
     });
 

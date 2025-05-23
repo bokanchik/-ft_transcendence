@@ -1,15 +1,15 @@
 import Fastify, { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import dotenv from 'dotenv';
+//import dotenv from 'dotenv';
+import { config } from './shared/env.js';
 import { initializeDb } from './utils/dbConfig.js';
 import { setupPlugins } from './shared/auth-plugin/tokens.js';
+import { setupErrorHandler } from './shared/auth-plugin/appError.js';
 import friendRoutes from './routes/friends.js';
 import userRoutes from './routes/users.js';
 import authRoutes from './routes/auth.js';
-import { setupErrorHandler } from './shared/auth-plugin/appError.js';
 
-dotenv.config();
 
-const fastify: FastifyInstance = Fastify({ logger: { level: process.env.LOG_LEVEL || 'debug' } });
+const fastify: FastifyInstance = Fastify({ logger: { level: config.LOG_LEVEL } });
 
 function setupHooks(): void {
 	fastify.addHook('onRequest', async (req: FastifyRequest, reply: FastifyReply) => {
@@ -31,8 +31,8 @@ function setupRoutes(): void {
 	fastify.log.info('CSRF token endpoint /api/users/csrf-token registered');
 
 	fastify.register(userRoutes);
-	fastify.register(authRoutes, { prefix: '/api/users/auth' });
-	fastify.register(friendRoutes, { prefix: '/api/users/friends' });
+	fastify.register(authRoutes);
+	fastify.register(friendRoutes);
 	fastify.log.info('Routes registered');
 }
 
@@ -55,7 +55,7 @@ async function start() {
 	let app: FastifyInstance | undefined;
 	try {
 		app = await buildApp();
-		await app.listen({ port: parseInt(process.env.PORT || "4000", 10), host: '0.0.0.0' });
+		await app.listen({ port: config.API_USER_PORT, host: '0.0.0.0' });
 		const address = app.server.address();
 		const port = typeof address === 'string' ? address : (address?.port);
 		app.log.info(`Server listening on ${port || 'unknown port'}`);

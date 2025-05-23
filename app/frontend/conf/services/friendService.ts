@@ -1,5 +1,6 @@
-import { fetchWithCsrf, setCsrfToken, getCsrfTokenOrThrow, csrfToken } from './csrf.js';
+import { fetchWithCsrf } from './csrf.js';
 import { ApiErrorResponse, Friend, PendingFriendRequest } from '../shared/types.js';
+
 /**
  * Handles API responses by checking for errors and parsing the response JSON.
  * @param response The HTTP response object.
@@ -114,8 +115,8 @@ export async function sendFriendRequest(friendId: number): Promise<{ message: st
  * @returns A message indicating the result of the operation.
  */
 export async function removeFriend(friendshipId: number): Promise<{ message: string }> {
-    const response = await fetchWithCsrf(`/api/users/friends/${friendshipId}/remove`, {
-        method: 'POST',
-    });
-    return handleApiResponse(response);
+	const response = await fetchWithCsrf(`/api/users/friends/${friendshipId}/remove`, {
+		method: 'POST',
+	});
+	return handleApiResponse(response);
 }

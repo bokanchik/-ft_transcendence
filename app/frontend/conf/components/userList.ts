@@ -1,6 +1,5 @@
-import { User as ApiUser, Friend, PendingFriendRequest, FriendRequestUserData } from '../shared/types.js'; // Ajout de FriendRequestUserData si ce n'est pas déjà dans ApiUser
+import { User as ApiUser, Friend, PendingFriendRequest, UserOnlineStatus } from '../shared/types.js';
 
-// Définition des props pour UserList
 export interface UserListProps {
     users: ApiUser[];
     friends: Friend[];
@@ -39,77 +38,63 @@ export function UserList(props: UserListProps): HTMLElement {
 
     otherUsers.forEach(user => {
         const li = document.createElement('li');
-        li.className = 'flex items-center p-4 border border-gray-200 rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow duration-200';
+        li.className = 'p-4 bg-white border border-gray-200 rounded-lg shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0 hover:shadow-md transition-shadow duration-200';
         li.dataset.userId = user.id.toString();
 
-        const avatar = document.createElement('img');
-        avatar.className = 'w-12 h-12 rounded-full object-cover mr-4';
-        const avatarFallbackName = user.display_name || user.username;
-        avatar.src = user.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(avatarFallbackName)}&background=random&color=fff&size=128`;
-        avatar.alt = `${user.username} avatar`;
+        const userPrimaryInfoContainer = document.createElement('div');
+        userPrimaryInfoContainer.className = 'flex items-center w-full sm:w-auto';
 
-        const info = document.createElement('div');
-        info.className = 'flex-1';
+        const displayName = user.display_name || user.username;
+        const avatarUrl = user.avatar_url;
+        const status: UserOnlineStatus = user.status as UserOnlineStatus;
+        const wins = user.wins ?? 0;
+        const losses = user.losses ?? 0;
 
-        const topInfo = document.createElement('div');
-        topInfo.className = 'flex items-center justify-between mb-1';
+        const avatarSrc = avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random&color=fff&size=40`;
 
-        const username = document.createElement('h2');
-        username.className = 'text-lg font-semibold text-blue-700';
-        username.textContent = user.display_name || user.username;
-        
-        const displayName = document.createElement('span');
-        displayName.className = 'text-gray-500 text-xs ml-2';
-        // Afficher le username seulement s'il est différent du display_name ET que display_name existe
-        if (user.display_name && user.display_name !== user.username) { 
-            displayName.textContent = `(@${user.username})`;
+        let statusIndicatorClass = 'bg-gray-400'; // Offline par défaut
+        let statusText = 'Offline';
+
+        if (status === UserOnlineStatus.ONLINE) {
+            statusIndicatorClass = 'bg-green-500';
+            statusText = 'Online';
+        } else if (status === UserOnlineStatus.IN_GAME) {
+            statusIndicatorClass = 'bg-yellow-500';
+            statusText = 'In Game';
         }
 
-
-        let onlineStatusIndicator = '';
-        const statusProperty = user.status;
-        if (statusProperty) {
-            const statusColor = statusProperty === 'online' ? 'bg-green-500' : (statusProperty === 'in-game' ? 'bg-yellow-500' : 'bg-gray-400');
-            onlineStatusIndicator = `<span class="inline-block w-2.5 h-2.5 ${statusColor} rounded-full mr-2" title="${statusProperty}"></span>`;
-        }
-        
-        const usernameWrapper = document.createElement('div');
-        usernameWrapper.className = 'flex items-center';
-        usernameWrapper.innerHTML = onlineStatusIndicator;
-        usernameWrapper.appendChild(username);
-        usernameWrapper.appendChild(displayName);
-
-        topInfo.appendChild(usernameWrapper);
-
-        const email = document.createElement('p');
-        email.className = 'text-gray-600 text-xs';
-        email.textContent = `📧 ${user.email}`;
-
-        info.appendChild(topInfo);
-        info.appendChild(email);
-
-        li.appendChild(avatar);
-        li.appendChild(info);
+        userPrimaryInfoContainer.innerHTML = `
+            <img src="${avatarSrc}" alt="${displayName}" class="w-12 h-12 rounded-full mr-4 object-cover">
+            <div class="flex-grow">
+                <div class="flex items-center mb-1">
+                    <span class="inline-block w-3 h-3 ${statusIndicatorClass} rounded-full mr-2" title="${statusText}"></span>
+                    <strong class="text-lg text-gray-700">${displayName}</strong>
+                    <!-- Le (@username) a été enlevé d'ici -->
+                </div>
+                <div class="text-xs text-gray-500">
+                    <span>Wins: ${wins}</span> | <span>Losses: ${losses}</span>
+                </div>
+            </div>
+        `;
+        li.appendChild(userPrimaryInfoContainer);
 
         const actionContainer = document.createElement('div');
-        actionContainer.className = 'ml-4 flex flex-col items-end space-y-1 text-sm';
+        actionContainer.className = 'flex flex-col items-end space-y-1 text-sm self-end sm:self-center pt-2 sm:pt-0 sm:ml-4';
+
 
         const friendshipStatus = document.createElement('span');
         friendshipStatus.className = 'text-xs italic text-gray-500 mb-1';
 
         let actionButton: HTMLButtonElement | null = null;
+        let actionButtonsContainer: HTMLElement | null = null;
 
         const isFriend = friends.some(f => f.friend_id === user.id);
-        // CORRECTION ICI: Accéder à .id sur l'objet receiver/requester
         const sentRequestToThisUser = sentRequests.find(r => r.receiver?.id === user.id);
         const receivedRequestFromThisUser = receivedRequests.find(r => r.requester?.id === user.id);
 
         if (isFriend) {
             friendshipStatus.textContent = 'Ami';
             friendshipStatus.className += ' text-green-600 font-semibold';
-            // if (props.onRemoveFriend) { // Vérifier si la prop est fournie
-            //     actionButton = createActionButton('Supprimer', 'bg-red-500', () => props.onRemoveFriend!(user.id));
-            // }
         } else if (sentRequestToThisUser) {
             friendshipStatus.textContent = 'Demande envoyée';
             friendshipStatus.className += ' text-yellow-600';
@@ -117,24 +102,28 @@ export function UserList(props: UserListProps): HTMLElement {
         } else if (receivedRequestFromThisUser) {
             friendshipStatus.textContent = 'Demande reçue';
             friendshipStatus.className += ' text-indigo-600';
-            const receivedButtonsContainer = document.createElement('div');
-            receivedButtonsContainer.className = 'flex space-x-1';
+            
+            actionButtonsContainer = document.createElement('div');
+            actionButtonsContainer.className = 'flex space-x-1'; // Mettre les boutons côte à côte
             const acceptBtn = createActionButton('Accepter', 'bg-green-500', () => onAcceptRequest(receivedRequestFromThisUser.friendship_id));
             const declineBtn = createActionButton('Refuser', 'bg-red-500', () => onDeclineRequest(receivedRequestFromThisUser.friendship_id));
-            receivedButtonsContainer.appendChild(acceptBtn);
-            receivedButtonsContainer.appendChild(declineBtn);
-            actionContainer.appendChild(receivedButtonsContainer);
+            actionButtonsContainer.appendChild(acceptBtn);
+            actionButtonsContainer.appendChild(declineBtn);
         } else {
-            friendshipStatus.textContent = 'Non ami';
+            friendshipStatus.textContent = 'Non ami'; // Statut par défaut si aucune des conditions
             actionButton = createActionButton('Inviter', 'bg-blue-500', () => onSendRequest(user.id));
         }
         
         actionContainer.prepend(friendshipStatus);
-        if (actionButton && !actionContainer.querySelector('button')) {
+
+        if (actionButtonsContainer) {
+            actionContainer.appendChild(actionButtonsContainer);
+        } else if (actionButton) {
             actionContainer.appendChild(actionButton);
         }
         
         li.appendChild(actionContainer);
+
         ul.appendChild(li);
     });
 
@@ -148,13 +137,12 @@ function createActionButton(text: string, baseClass: string, onClick: () => Prom
     button.addEventListener('click', async (e) => {
         e.stopPropagation();
         button.disabled = true;
-        const originalText = button.textContent; // originalText est une string ici, pas null
+        const originalText = button.textContent; 
         button.textContent = '...';
         try {
             await onClick();
         } catch (error) {
-            // CORRECTION ICI: Vérifier originalText avant .toLowerCase()
-            const actionText = originalText || 'action'; // Fournir une valeur par défaut
+            const actionText = originalText || 'action'; 
             console.error(`Error performing action "${actionText}":`, error);
             alert(`Failed to ${actionText.toLowerCase()}.`);
             button.textContent = originalText;
