@@ -2,7 +2,9 @@ import { GameMode } from "../components/gamePage.js";
 import { cleanupSocket } from "../services/initOnlineGame.js";
 import { navigateTo } from "../services/router.js";
 import socket from '../services/socket.js';
-import { showToast } from '../components/toast.js';
+import { showGameResult } from "../components/gameResults.js";
+import { initCountdown } from "../components/countdown.js";
+// import { showToast } from '../components/toast.js';
 
 export function GameRoomPage(mode: GameMode): HTMLElement {
 	const container = document.createElement('div');
@@ -68,8 +70,9 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 	gameBox.appendChild(scoreDisplay);
 
 	container.append(gameBox, quitButton);
-
-	if (sessionStorage.getItem('gameMode') === 'local') {
+	
+	const gameMode = sessionStorage.getItem('gameMode');
+	if (gameMode === 'local') {
 		rightUsername.textContent = sessionStorage.getItem('player1');
 		leftUsername.textContent = sessionStorage.getItem('player2');
 	} else {
@@ -80,7 +83,7 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 	initCountdown(countdown);
 
 	// --- Main game function for socket handling and game logic
-	initGame(quitButton);
+	gameRoutine(quitButton, gameMode);
 
 	return container;
 }
@@ -89,6 +92,7 @@ function setBoard(leftUsername: HTMLDivElement, rightUsername: HTMLDivElement) {
 	const side = sessionStorage.getItem('side');
 	const displayName = sessionStorage.getItem('displayName');
 	const opponent = sessionStorage.getItem('opponent');
+	
 	if (side === 'left') {
 		leftUsername.textContent = displayName;
 		rightUsername.textContent = opponent;
@@ -98,121 +102,78 @@ function setBoard(leftUsername: HTMLDivElement, rightUsername: HTMLDivElement) {
 	}
 }
 
+function gameRoutine(container: HTMLButtonElement, gameMode: string | null) {
 
-function initGame(container: HTMLButtonElement) {
-	const gameMode = sessionStorage.getItem('gameMode');
+	// --- Socket events handler ---
+	clientSocketHandler(gameMode);
+	
+	// --- Event: quit button ---
+	container.addEventListener('click', () => {
+		const matchId = sessionStorage.getItem('matchId');
+		const opponentId = sessionStorage.getItem('opponent');
 
+		socket.emit('quit', matchId, opponentId);
+		cleanupSocket(socket);
+		sessionStorage.clear(); // clean storage --> users have to put there aliases again
+		navigateTo('/game');
+	});
+}
+
+function clientSocketHandler(gameMode: string | null) {
+	
 	if (!socket.connected) {
 		socket.connect();
 	}
-
+	
+	if (gameMode === 'remote') {
+		startOnlineGame(socket);
+	}
+	
+	// --- Local Socket events ---
 	socket.on('connect', () => {
 		console.log('emit startLocal');
 		if (gameMode === 'local') {
 			socket.emit('startLocalGame');
 		}
 	});
-
-	// after connexion to the server
+	
 	socket.on('gameStarted', () => {
 		if (gameMode === 'local') {
 			startLocalGame(socket);
 		}
 	});
 
-	if (gameMode === 'online') {
-		startOnlineGame(socket);
-	}
-
-	// --- Event: quit button ---
-	container.addEventListener('click', () => {
-		const matchId = sessionStorage.getItem('matchId');
-		const opponentId = sessionStorage.getItem('opponent');
-		socket.emit('quit', socket.id, matchId, opponentId);
-		console.log('Quit game clicked');
-		cleanupSocket(socket);
-		sessionStorage.clear(); // clean storage --> users have to put there aliases again
-		navigateTo('/game');
-	});
-
 	socket.on('gameFinished', async (matchId: string) => {
+		
 		// TODO: une fenetre avec tous les infos sur le match
 		// 1. je fais un fetch vers la route /api/game/:matchId pour recuperer les infos sur le match
-		// 2. un fetch vers la DB d'Arthur pour recuperer les photosURL des jouers
+		// 2. un fetch vers la DB d'Arthur pour recuperer les photosURL des jouers ?
 		// 3. je passe les donnees a showGameResult()
+		
 		try {
 			const matchRes = await fetch(`/api/game/match/${matchId}`);
 			if (!matchRes.ok) throw new Error('Failed to fetch match info');
 			const matchData = await matchRes.json();
-			console.log(matchData);
 			const data = matchData.data;
 			const player1 = data.player1_id;
 			const player2 = data.player2_id;
 			const score1 = data.player1_score;
 			const score2 = data.player2_score;
-
+			
 			setTimeout(() => {
 				showGameResult(player1, player2, score1, score2);
 			}, 2000);
-
+			
 		} catch (err: unknown) {
 			console.log(`Failed to fetch data from db: ${err}`);
 		}
-
 	});
-
-}
-
-function showGameResult(player1: string, player2: string, score1: number, score2: number) {
-	const modal = document.createElement('div');
-	modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm';
-
-	const content = document.createElement('div');
-	content.className =
-		'bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-6 w-[90%] max-w-lg text-center border border-gray-300';
-
-	// TODO: recuperer les vrais URL
-	const photoUrl1 = 'https://img4.dhresource.com/webp/m/0x0/f3/albu/km/j/13/67f2a386-fb10-405e-9c1e-47fcb8e7aab8.jpg';
-	const photoUrl2 = 'https://img.joomcdn.net/755233d1c566dcd31875df84758d818ecbb8dbc9_1024_1024.jpeg';
-
-	content.innerHTML = `
-		<h2 class="text-3xl font-bold text-gray-800 mb-6">🏓 Match Finished</h2>
-		<div class="flex justify-between items-center gap-4 mb-6">
-			<div class="flex flex-col items-center flex-1">
-				<img src="${photoUrl1}" class="w-20 h-20 rounded-full mb-2 border-4 border-blue-500 shadow" />
-				<p class="font-semibold text-lg text-gray-800">${player1}</p>
-				<p class="text-2xl font-bold text-blue-600">${score1}</p>
-			</div>
-			<span class="text-3xl font-bold text-gray-700">vs</span>
-			<div class="flex flex-col items-center flex-1">
-				<img src="${photoUrl2}" class="w-20 h-20 rounded-full mb-2 border-4 border-red-500 shadow" />
-				<p class="font-semibold text-lg text-gray-800">${player2}</p>
-				<p class="text-2xl font-bold text-red-600">${score2}</p>
-			</div>
-		</div>
-		<button
-			id="close-modal"
-			class="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow transition"
-		>
-			Return to Lobby
-		</button>
-	`;
-
-	modal.appendChild(content);
-	document.body.appendChild(modal);
-
-	document.getElementById('close-modal')!.addEventListener('click', () => {
-		modal.remove();
-		cleanupSocket(socket);
-		sessionStorage.clear();
-		navigateTo('/game');
-	});
+	
 }
 
 function startOnlineGame(socket: SocketIOClient.Socket) {
 
 	const side = sessionStorage.getItem('side');
-	console.log('SIDE:', side);
 	let paddleMovement = 0;
 
 	document.addEventListener('keydown', (event) => {
@@ -300,28 +261,3 @@ function sendPlayerMovement(socket: SocketIOClient.Socket, leftPaddle: number, r
 	}));
 }
 
-async function initCountdown(container: HTMLDivElement) {
-	const countdownIsDone = sessionStorage.getItem('countdown') === 'true';
-	// Countdown logic
-	if (!countdownIsDone) {
-		let countdownValue = 3;
-		const interval = setInterval(() => {
-			if (countdownValue > 1) {
-				countdownValue--;
-				container.textContent = `Start in ${countdownValue}...`;
-			} else {
-				container.remove(); // remove overlay
-				clearInterval(interval);
-				sessionStorage.setItem('countdown', 'true');
-
-			}
-		}, 1000);
-	} else {
-		container.remove();
-	}
-
-}
-
-// function startRemoteGame(gameBox: HTMLDivElement) {
-
-// }

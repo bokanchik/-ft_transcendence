@@ -1,3 +1,4 @@
+import fastify from 'fastify';
 import db from './connectDB.ts';
 
 type MatchStatus = 'pending' | 'in_progress' | 'finished';
@@ -79,10 +80,28 @@ export async function insertMatchToDB({ matchId, player1_id, player2_id, player1
         
     try {
         await execute(db, sql, params);
+        getRowByMatchId(matchId);
         console.log(`Match ${matchId} inserted to DB`);
 
     } catch (err: unknown) {
         console.log(`Failed to insert match into DB ${err}`);
+    }
+}
+
+export async function getMatchesByUserId(userId: string) {
+    const sql = `
+        SELECT * FROM matches
+        WHERE player1_id = ? OR player2_id = ?
+        ORDER BY created_at DESC
+    `;
+
+    try {
+        const matches = await fetchAll(db, sql, [userId, userId]);
+        console.log(matches);
+        return matches;
+
+    } catch (err: unknown) {
+        console.log(`Failed to find matches for this user: ${err}`);
     }
 }
 

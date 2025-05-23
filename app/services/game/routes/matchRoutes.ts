@@ -1,12 +1,12 @@
 //import fastify from '../server.ts';
 import type { FastifyInstance } from 'fastify';
-import { createMatchHandler, getMatchIdHandler } from '../handlers/matchHandlers.ts'
+import { createMatchHandler, getMatchIdHandler, getMatchByUserHandler } from '../handlers/matchHandlers.ts'
 import { createMatchSchema } from '../middleware/matchSchemas.ts';
 import { ZodTypeProvider } from "fastify-type-provider-zod"
 
-async function matchRoutes(fastify: FastifyInstance, _options: unknown) {
+function matchRoutes(fastify: FastifyInstance, _options: unknown) {
 
-   fastify.withTypeProvider<ZodTypeProvider>().post('/', {  
+   fastify.withTypeProvider<ZodTypeProvider>().post('/match', {  
       preHandler: async (req, reply) => {
          // validate incoming data with zod (--> middleware)
          const reqValidation = createMatchSchema.safeParse(req.body);
@@ -22,9 +22,8 @@ async function matchRoutes(fastify: FastifyInstance, _options: unknown) {
       handler: createMatchHandler,
    
    });
-   fastify.get('/:matchId', { onRequest: [fastify.authenticate] }, getMatchIdHandler);
-   
-   // fastify.get('/match/:userId) -> qui donne tous les matchs pour cet user la
+   fastify.get('/match/:matchId', { onRequest: [fastify.authenticate] }, getMatchIdHandler);
+   fastify.get('/history/:userId', { onRequest: [fastify.authenticate] }, getMatchByUserHandler);
    
    // fastify.get('/match/:matchId/state', { schema: matchSchemas.idOnly }, getMatchStateHandler);
    // fastify.post('/match/:matchId/accept', { schema: matchSchemas.accept }, acceptMatchHandler);

@@ -18,7 +18,7 @@ export async function matchSocketHandler(socket: Socket): Promise<void> {
 }
 
 // --- Main function for remote game socket handling
-function onlineSocketEvents(socket: Socket) {
+async function onlineSocketEvents(socket: Socket) {
     waitingRoomHandler(socket);
     gameRoutine(socket);
     disconnectionHandler(socket);
@@ -26,10 +26,10 @@ function onlineSocketEvents(socket: Socket) {
 
 async function waitingRoomHandler(socket: Socket) {
     
-    socket.on('authenticate', async (display_name: string) => {
+    socket.on('authenticate', async ({ display_name, username }) => {
         try {
             // store display_name and socket.id in waiting list if not already in        
-            const newPlayer = await addPlayerToWaitingList(display_name, socket.id);
+            const newPlayer = await addPlayerToWaitingList(display_name,username, socket.id);
             
             if (newPlayer) {
                 socket.emit('inQueue');
@@ -61,11 +61,11 @@ async function gameRoutine(socket: Socket) {
 async function disconnectionHandler(socket: Socket)  {
     
     // quit Button on game
-    socket.on('quit', async (socketId: string, matchId: string, opponentId: string) =>  {
+    socket.on('quit', async (matchId: string, opponentId: string) =>  {
         
-        fastify.log.info(`Player with socket id ${socketId} quit the game`);
+        fastify.log.info(`Player with socket id ${socket.id} quit the game`);
         try {
-            const opponentSocketId: string | null = await getOpponentSocketId(socketId);
+            const opponentSocketId: string | null = await getOpponentSocketId(socket.id);
             if (opponentSocketId) {
                 fastify.io.to(opponentSocketId).emit('gameFinished', matchId);
                 // --- TEST ---
@@ -92,17 +92,15 @@ async function disconnectionHandler(socket: Socket)  {
 
 async function getOpponentSocketId(socketId: string): Promise<string | null> {
     const sql = `
-    SELECT * FROM matches
-    WHERE player1_socket = ? OR player2_socket = ?
-    ORDER BY created_at DESC
-    LIMIT 1
+        SELECT * FROM matches
+        WHERE player1_socket = ? OR player2_socket = ?
+        ORDER BY created_at DESC
+        LIMIT 1
     `;
     
     try {
         const match = await fetchFirst(db, sql, [socketId, socketId]);
         if (!match) return null;       
-        // fastify.log.info("PLAYER 1 SOCKET:" + match.player1_socket);
-        // fastify.log.info("PLAYER 2 SOCKET:" + match.player2_socket);
         if (match.player1_socket === socketId) {
             return match.player2_socket;
         } else {

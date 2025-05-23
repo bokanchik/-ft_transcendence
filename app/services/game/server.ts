@@ -39,7 +39,7 @@ fastify.setSerializerCompiler(serializerCompiler);
 
 // Register routes
 const registerRoutes = () => {
-  fastify.register(matchRoutes, { prefix: '/api/game/match' });
+  fastify.register(matchRoutes, { prefix: '/api/game/' });
   // fastify.register(settingsRoutes); TODO
 };
 

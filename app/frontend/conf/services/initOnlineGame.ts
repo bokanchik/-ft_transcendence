@@ -2,13 +2,12 @@ import { UUID } from "crypto";
 import { navigateTo } from "./router.js";
 import socket from "./socket.js";
 import { showToast } from "../components/toast.js";
-import { time } from "console";
 
 // --- Main Fonction for online game: 
-export async function handleOnlineGame(display_name: string, container: HTMLElement, button: HTMLButtonElement): Promise<void> {
+export async function handleOnlineGame(display_name: string, username: string, container: HTMLElement, button: HTMLButtonElement): Promise<void> {
     button.disabled = true; // pour eviter les multiples click (data race)
     try {
-        await initOnlineGame(display_name, container);
+        await initOnlineGame(display_name, username, container);
     } catch (err: unknown) {
         console.log(err);
         showToast('Error while creating a waiting room. Please, try again later', 'error');
@@ -19,7 +18,7 @@ export async function handleOnlineGame(display_name: string, container: HTMLElem
 }
 
 // --- Fonction pour initialiser le client socket et le mettre dans le waiting room ---
-export async function initOnlineGame(display_name: string, buttonsContainer: HTMLElement) {
+export async function initOnlineGame(display_name: string, username: string, buttonsContainer: HTMLElement) {
     const controller: AbortController = new AbortController();
 
     if (!socket.connected) {
@@ -29,7 +28,7 @@ export async function initOnlineGame(display_name: string, buttonsContainer: HTM
     socket.on('connect', () => {
         console.log('Connected to the server');
         // TODO: peut-etre je dois aussi envoyer userId pour apres recuperer l'url de l'avatar avec /api/users/:userId
-        socket.emit('authenticate', display_name);
+        socket.emit('authenticate', { display_name, username });
     });
     
     socket.on('inQueue', () => {

@@ -74,10 +74,13 @@ export function GamePage(): HTMLElement {
             }
             const userData = await userRes.json();
             const display_name: string = userData.display_name;
+            const username: string = userData.username;
 
-            sessionStorage.setItem('gameMode', 'online');
+            console.log(userData);
+            console.log(`username:` + username);
+            sessionStorage.setItem('gameMode', 'remote');
 
-            await handleOnlineGame(display_name, buttonsContainer, onlineGameButton);
+            await handleOnlineGame(display_name, username, buttonsContainer, onlineGameButton);
         } catch (err: unknown) {
             console.log(`Failed to fetch from user`);
             showToast('Something went wrong. Please try again later.', 'error');
