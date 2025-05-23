@@ -6,7 +6,7 @@ import { GamePage } from './components/gamePage.js';
 import { GameRoomPage } from './pages/gameRoomPage.js';
 import { navigateTo } from './services/router.js'; // à ajouter en haut
 import { DashboardPage } from './pages/dashboardPage.js'
-import { ProfilePage } from './pages/profilePage.js';
+import { SettingsPage } from './pages/settingsPage.js';
 import { getUserDataFromStorage } from './services/authService.js';
 import { promptAliasForm } from './components/aliasFormPage.js';
 import { GameMode } from './components/gamePage.js'
@@ -37,7 +37,7 @@ const routes: { [key: string]: RouteConfig } = {
 	'/login': { component: LoginPage },
 	'/register': { component: RegisterPage },
 	'/dashboard': { component: DashboardPage, requiredAuth: true },
-	'/profile': { component: ProfilePage, requiredAuth: true },
+	'/profile': { component: SettingsPage, requiredAuth: true },
 	'/game': { component: GamePage },
 	'/local-game': { component: promptAliasForm},
 	'/game-room': { component: () => GameRoomPageFromParams() },
