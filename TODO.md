@@ -4,10 +4,10 @@
 
 ## arthur
 
-- [ ] display_name unique ? soit changer edit soit register
-- [ ] logout -> supprimer token
+- [ ] display_name unique
+- [x] logout -> supprimer token
 - [ ] login/logout maj du status
-- [ ] Affichage du status
+- [x] Affichage du status
 - [ ] tout matches
 
 ## 📌 Tâches initiales
@@ -19,7 +19,7 @@
 - [ ] Les touches sensibles au click + Enter plus les fleches (experience user agreable)
 - [ ] Create Data Models + put match to DB (how we're handling data for score, etc ? -> local variable sent with socket to front
 at the end of a match -> call to database if need matchhistory)
-- [ ] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde)
+- [x] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde) -> cookie jwt_token
 - [ ] La gestion d'erreurs 
 - [ ] Implementer les models pour les appels a la base de donnee
 - [ ] POST a Artur avec les donnees du match
@@ -31,7 +31,7 @@ at the end of a match -> call to database if need matchhistory)
 ## 🔐 Sécurité & Réseau
 
 - [ ] Ajouter des headers de sécurité dans Nginx (`X-Frame-Options`, `Content-Security-Policy`, etc.)
-- [ ] Protéger les communications inter-services avec un token (ex : JWT)
+- [x] Protéger les communications inter-services avec un token (ex : JWT)
 
 ---
 
