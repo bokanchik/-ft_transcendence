@@ -68,12 +68,12 @@ export function showCustomConfirm(message: string, title: string = "Confirmation
 
         // Confirm Button
         const confirmButton = document.createElement('button');
-        confirmButton.textContent = 'Oui';
+        confirmButton.textContent = 'Yes';
         confirmButton.className = 'px-4 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2';
         
         // Cancel Button
         const cancelButton = document.createElement('button');
-        cancelButton.textContent = 'Non';
+        cancelButton.textContent = 'No';
         cancelButton.className = 'px-4 py-2 rounded-md text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2';
 
         const closeDialog = (value: boolean) => {
