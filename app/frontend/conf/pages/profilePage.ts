@@ -1,116 +1,184 @@
 // profilePage.ts
 import { navigateTo } from '../services/router.js';
 import { getUserDataFromStorage } from '../services/authService.js';
-import { fetchCsrfToken } from '../services/csrf.js';
-import { User as AuthUserType, User as ApiUserType } from '../shared/types.js'; // Assurez-vous que ApiUserType est bien défini
+import { fetchCsrfToken, fetchWithCsrf } from '../services/csrf.js'; // Supposons que fetchWithCsrf est disponible pour les appels API mutatifs si nécessaire, sinon fetch standard pour GET.
+import { User, Match, ApiErrorResponse } from '../shared/types.js';
 import { HeaderComponent } from '../components/headerComponent.js';
 import { showToast } from '../components/toast.js';
 
-// --- Supposons que vous ayez une fonction pour récupérer les détails d'un utilisateur par ID ---
-// Ceci est un MOCK. Vous devrez implémenter la vraie fonction d'API.
-async function fetchUserDetails(userId: number): Promise<ApiUserType | null> {
-    console.log(`Fetching details for user ID: ${userId}`);
-    // MOCK API call
-    // Dans une vraie application, vous feriez :
-    // const response = await fetch(`/api/users/${userId}`);
-    // if (!response.ok) return null;
-    // return await response.json();
-
-    // Pour l'exemple, si l'ID est 1, retournons un utilisateur mocké
-    // ou essayons de trouver l'utilisateur dans une liste mockée si vous en avez une
-    // Sinon, retournons un utilisateur générique.
-    const currentUser = getUserDataFromStorage();
-    if (currentUser && currentUser.id === userId) {
-        return currentUser as ApiUserType; // Cast si nécessaire, assurez-vous que les types sont compatibles
-    }
-    // Simuler la recherche d'un autre utilisateur
-    // Pour cet exemple, nous allons retourner un utilisateur mocké simple s'il n'est pas l'utilisateur actuel.
-    // Idéalement, vous auriez un endpoint API /api/users/${userId}
-    try {
-        const response = await fetch(`/api/users/${userId}`); // Assurez-vous que cet endpoint existe
-        if (!response.ok) {
-            if (response.status === 404) return null;
-            throw new Error(`Failed to fetch user: ${response.statusText}`);
+// Helper pour gérer les réponses API (similaire à celui de friendService.ts, pourrait être dans un module partagé)
+const handleApiResponse = async <T>(response: Response): Promise<T> => {
+    if (!response.ok) {
+        let errorData: ApiErrorResponse = { error: `Erreur serveur (${response.status})` };
+        try {
+            errorData = await response.json();
+        } catch (jsonError) {
+            // Si le corps de l'erreur n'est pas du JSON, ou si la réponse est vide
+            console.error("Impossible de parser la réponse d'erreur JSON:", jsonError);
         }
-        const user = await response.json();
-        // Simuler les champs wins/losses si non présents dans votre API /api/users/:id
-        return {
-            ...user,
-            wins: user.wins ?? Math.floor(Math.random() * 20),
-            losses: user.losses ?? Math.floor(Math.random() * 20),
-            created_at: user.created_at || new Date().toISOString(), // Assurez-vous que ce champ existe
-        } as ApiUserType;
+        // Utilise le message d'erreur de l'API s'il existe, sinon le statut HTTP
+        throw new Error(errorData.error || `Erreur HTTP ${response.status}: ${response.statusText}`);
+    }
+    // Gérer le cas où le statut est OK mais pas de contenu (ex: 204 No Content)
+    if (response.status === 204) {
+        return undefined as T; // Ou un objet vide, selon ce qui est attendu
+    }
+    return response.json() as Promise<T>;
+};
+
+
+// --- Service pour récupérer les détails d'un utilisateur par ID ---
+async function fetchUserDetails(userId: number): Promise<User> {
+    try {
+        const response = await fetch(`/api/users/${userId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            credentials: 'include',
+        });
+        if (response.status === 404) {
+            throw new Error('Utilisateur non trouvé');
+        }
+        return await handleApiResponse<User>(response);
     } catch (error) {
-        console.error("Mock fetchUserDetails error:", error);
-        // Retourner un utilisateur mocké pour que la page ne plante pas complètement
-        // Ou gérer l'erreur plus proprement (ex: afficher un message d'erreur)
-        return {
-            id: userId,
-            username: `user_${userId}`,
-            display_name: `User ${userId}`,
-            email: `user${userId}@example.com`,
-            avatar_url: null,
-            wins: 10,
-            losses: 5,
-            created_at: new Date().toISOString(),
-            status: 'offline',
-        } as ApiUserType;
+        console.error(`Erreur lors de la récupération des détails de l'utilisateur ${userId}:`, error);
+        // showToast(`Impossible de charger le profil : ${(error as Error).message}`, 'error'); // Optionnel: afficher un toast ici
+        throw error; // Relancer pour que ProfilePage puisse gérer l'état de chargement/erreur
     }
 }
 
-// --- Composant MatchHistory (pourrait être dans son propre fichier) ---
-// Vous devrez implémenter la logique pour récupérer et afficher l'historique des matchs
-interface MatchHistoryProps {
-    userId: number;
-    // Potentiellement, d'autres informations comme le nom d'utilisateur pour l'affichage
+// --- Service pour récupérer l'historique des matchs d'un utilisateur ---
+async function fetchMatchHistoryForUser(userId: number): Promise<Match[]> {
+    try {
+        const response = await fetch(`/api/users/${userId}/matches`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+            },
+            // credentials: 'include',
+        });
+        return await handleApiResponse<Match[]>(response);
+    } catch (error) {
+        console.error(`Erreur lors de la récupération de l'historique des matchs pour l'utilisateur ${userId}:`, error);
+        // showToast(`Impossible de charger l'historique des matchs : ${(error as Error).message}`, 'error'); // Optionnel
+        throw error;
+    }
 }
 
-async function MatchHistoryComponent(props: MatchHistoryProps): Promise<HTMLElement> {
+// --- Composant MatchHistory ---
+interface MatchHistoryComponentProps {
+    userId: number; // ID de l'utilisateur dont on affiche le profil
+    // Nous aurons besoin de récupérer les noms des adversaires.
+    // Pour cela, soit l'API `/matches` inclut les noms, soit nous devons faire d'autres appels.
+    // Simplification: pour l'instant, on suppose qu'on peut récupérer les noms ou on affiche les ID.
+    // Idéalement, votre API de matchs inclurait les noms d'affichage des joueurs.
+}
+
+async function MatchHistoryComponent(props: MatchHistoryComponentProps): Promise<HTMLElement> {
+    const { userId: profiledUserId } = props;
+
     const el = document.createElement('div');
     el.className = 'p-4';
-    el.innerHTML = `<h3 class="text-xl font-semibold mb-4">Historique des Matchs</h3>`;
+    el.innerHTML = `<h3 class="text-xl font-semibold mb-4 text-gray-800">Historique des Matchs</h3>`;
 
     const loadingMessage = document.createElement('p');
-    loadingMessage.className = 'text-gray-500';
+    loadingMessage.className = 'text-gray-500 italic';
     loadingMessage.textContent = 'Chargement de l\'historique des matchs...';
     el.appendChild(loadingMessage);
 
     try {
-        // MOCK: Simuler un appel API pour l'historique des matchs
-        // Remplacez par votre véritable appel API : await fetchMatchHistoryForUser(props.userId);
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Simuler la latence réseau
-        const matches = [ // Données mockées
-            { opponent: 'AdversaireA', result: 'Victoire', score: '10 - 5', date: '2024-07-20' },
-            { opponent: 'AdversaireB', result: 'Défaite', score: '3 - 10', date: '2024-07-19' },
-            { opponent: 'AdversaireC', result: 'Victoire', score: '10 - 8', date: '2024-07-18' },
-        ];
+        const matches = await fetchMatchHistoryForUser(profiledUserId);
+        loadingMessage.remove();
 
-        loadingMessage.remove(); // Enlever le message de chargement
-
-        if (matches.length === 0) {
+        if (!matches || matches.length === 0) {
             el.innerHTML += '<p class="text-gray-500">Aucun match trouvé pour cet utilisateur.</p>';
             return el;
         }
 
+        // Il serait bien d'avoir les noms des joueurs.
+        // Pour l'instant, nous allons afficher les ID ou un nom générique.
+        // Supposons que nous ayons besoin de récupérer les détails de tous les joueurs impliqués
+        // pour avoir leurs noms d'affichage, si non inclus dans l'objet Match.
+        // C'est une optimisation possible/nécessaire pour une meilleure UX.
+
+        // Pour cette version, nous allons essayer de construire une liste d'ID d'adversaires uniques
+        // et récupérer leurs informations si ce n'est pas trop coûteux.
+        // Une meilleure approche serait que l'API `/users/{userId}/matches` retourne déjà
+        // les informations nécessaires sur l'adversaire (ex: `opponent_display_name`).
+
+        // Pour l'exemple, nous allons le faire de manière simplifiée.
+        const opponentsDetailsCache: { [key: number]: { display_name: string } } = {};
+
         const list = document.createElement('ul');
         list.className = 'space-y-3';
-        matches.forEach(match => {
+
+        for (const match of matches) {
+            let opponentId: number;
+            let profiledUserScore: number;
+            let opponentScore: number;
+            let opponentDisplayName = 'Adversaire Inconnu';
+
+            if (match.player1_id === profiledUserId) {
+                opponentId = match.player2_id;
+                profiledUserScore = match.player1_score;
+                opponentScore = match.player2_score;
+            } else if (match.player2_id === profiledUserId) {
+                opponentId = match.player1_id;
+                profiledUserScore = match.player2_score;
+                opponentScore = match.player1_score;
+            } else {
+                // Cas étrange, le match n'implique pas l'utilisateur profilé ? À gérer.
+                console.warn("Match ne semble pas impliquer l'utilisateur profilé:", match);
+                continue;
+            }
+
+            // Tentative de récupération du nom de l'adversaire (simplifié)
+            // Idéalement, l'API des matchs fournirait cela, ou vous auriez une fonction
+            // pour récupérer plusieurs utilisateurs en une seule fois.
+            if (opponentsDetailsCache[opponentId]) {
+                opponentDisplayName = opponentsDetailsCache[opponentId].display_name;
+            } else {
+                // Ceci est inefficace si fait pour chaque match avec un nouvel adversaire.
+                // Dans une vraie app, pré-charger ou l'API devrait aider.
+                const opponentUser = await fetchUserDetails(opponentId); // ATTENTION: Peut être coûteux
+                if (opponentUser) {
+                    opponentsDetailsCache[opponentId] = { display_name: opponentUser.display_name };
+                    opponentDisplayName = opponentUser.display_name;
+                } else {
+                    opponentDisplayName = `Joueur ${opponentId}`;
+                }
+            }
+
+
+            const resultText = match.winner_id === profiledUserId ? 'Victoire' : (match.winner_id ? 'Défaite' : 'Égalité/Annulé');
+            const resultColor = match.winner_id === profiledUserId ? 'text-green-600' : (match.winner_id ? 'text-red-600' : 'text-gray-600');
+
             const item = document.createElement('li');
-            item.className = 'p-3 bg-gray-100 rounded-lg shadow-sm';
+            item.className = 'p-3 bg-gray-100 border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow';
             item.innerHTML = `
-                <div class="flex justify-between items-center">
-                    <span class="font-medium">${match.opponent}</span>
-                    <span class="${match.result === 'Victoire' ? 'text-green-600' : 'text-red-600'}">${match.result}</span>
+                <div class="flex justify-between items-center mb-1">
+                    <span class="font-medium text-gray-700">Contre : ${opponentDisplayName}</span>
+                    <span class="font-semibold ${resultColor}">${resultText}</span>
                 </div>
-                <div class="text-sm text-gray-600">Score: ${match.score} - Date: ${match.date}</div>
+                <div class="text-sm text-gray-600">
+                    Score : ${profiledUserScore} - ${opponentScore}
+                    <span class="mx-1">|</span>
+                    Type : ${match.game_type}
+                    <span class="mx-1">|</span>
+                    Date : ${new Date(match.match_date).toLocaleDateString()}
+                </div>
             `;
             list.appendChild(item);
-        });
+        }
         el.appendChild(list);
 
     } catch (error) {
-        console.error("Erreur lors du chargement de l'historique des matchs:", error);
-        loadingMessage.textContent = 'Erreur lors du chargement de l\'historique des matchs.';
+        console.error("Erreur lors du rendu de l'historique des matchs:", error);
+        loadingMessage.textContent = `Erreur lors du chargement de l'historique des matchs: ${(error as Error).message}`;
+        loadingMessage.classList.remove('text-gray-500', 'italic');
         loadingMessage.classList.add('text-red-500');
     }
     return el;
@@ -118,7 +186,7 @@ async function MatchHistoryComponent(props: MatchHistoryProps): Promise<HTMLElem
 
 
 export async function ProfilePage(params: { userId?: string }): Promise<HTMLElement> {
-    const loggedInUser: AuthUserType | null = getUserDataFromStorage();
+    const loggedInUser: User | null = getUserDataFromStorage();
 
     if (!loggedInUser) {
         navigateTo('/login');
@@ -128,7 +196,8 @@ export async function ProfilePage(params: { userId?: string }): Promise<HTMLElem
         return redirectMsg;
     }
 
-    const userIdToView = params.userId ? parseInt(params.userId, 10) : loggedInUser.id; // Par défaut, le profil de l'utilisateur connecté si aucun ID n'est fourni
+    const userIdToViewStr = params.userId;
+    const userIdToView = userIdToViewStr ? parseInt(userIdToViewStr, 10) : loggedInUser.id;
 
     if (isNaN(userIdToView)) {
         const errorMsg = document.createElement('div');
@@ -141,9 +210,11 @@ export async function ProfilePage(params: { userId?: string }): Promise<HTMLElem
         await fetchCsrfToken();
     } catch (error) {
         console.error("Échec de la récupération du jeton CSRF:", error);
+        // Gérer l'erreur CSRF plus globalement ou afficher un message permanent
+        showToast("Erreur d'initialisation de la sécurité. Veuillez rafraîchir.", 'error');
         const errorMsg = document.createElement('div');
         errorMsg.className = 'min-h-screen flex items-center justify-center text-xl text-red-500';
-        errorMsg.textContent = 'Erreur lors de l\'initialisation de la page. Veuillez rafraîchir.';
+        errorMsg.textContent = 'Erreur de sécurité. Veuillez rafraîchir la page.';
         return errorMsg;
     }
 
@@ -153,89 +224,121 @@ export async function ProfilePage(params: { userId?: string }): Promise<HTMLElem
     const profileWrapper = document.createElement('div');
     profileWrapper.className = 'bg-white rounded-2xl shadow-2xl w-full max-w-6xl flex flex-col overflow-hidden';
 
-    // --- Header (identique au dashboard) ---
-    // Le HeaderComponent affiche toujours les infos de l'utilisateur connecté (loggedInUser)
     const headerElement = HeaderComponent({ currentUser: loggedInUser });
-
-    // --- Section principale (Sidebar + Contenu Match History) ---
-    const mainSection = document.createElement('div');
-    mainSection.className = 'flex flex-1 min-h-[calc(100vh-150px)]'; // Hauteur minimale
-
-    // --- Afficher un message de chargement pendant la récupération des données du profil ---
     profileWrapper.appendChild(headerElement);
+
+    const mainSection = document.createElement('div');
+    mainSection.className = 'flex flex-1 min-h-[calc(100vh-150px)]'; // Hauteur minimale pour le contenu
     profileWrapper.appendChild(mainSection);
     pageContainer.appendChild(profileWrapper);
 
+    // Conteneur pour le chargement / erreur / contenu
+    const contentArea = document.createElement('div');
+    contentArea.className = 'flex flex-1'; // Pour que sidebar et contentWrapper prennent toute la place
+    mainSection.appendChild(contentArea);
+
     const loadingProfileMsg = document.createElement('p');
-    loadingProfileMsg.className = 'text-center text-gray-500 py-10 flex-1';
+    loadingProfileMsg.className = 'text-center text-gray-500 py-20 flex-1 text-lg';
     loadingProfileMsg.textContent = 'Chargement du profil...';
-    mainSection.appendChild(loadingProfileMsg);
+    contentArea.appendChild(loadingProfileMsg);
 
+    try {
+        const profiledUser = await fetchUserDetails(userIdToView);
 
-    // --- Récupérer les détails de l'utilisateur dont on visite le profil ---
-    const profiledUser: ApiUserType | null = await fetchUserDetails(userIdToView);
-
-    if (!profiledUser) {
-        loadingProfileMsg.remove();
-        const errorMsg = document.createElement('div');
-        errorMsg.className = 'flex-1 p-6 text-center text-red-500';
-        errorMsg.textContent = `Profil utilisateur avec ID ${userIdToView} non trouvé.`;
-        mainSection.appendChild(errorMsg);
-        return pageContainer;
-    }
-    
-    loadingProfileMsg.remove(); // Enlever le message de chargement du profil
-
-    // --- Sidebar (infos de l'utilisateur `profiledUser`) ---
-    const sidebar = document.createElement('div');
-    sidebar.className = 'w-1/4 p-6 bg-gray-50 border-r border-gray-200 space-y-3 overflow-y-auto';
-
-    // Helper pour créer les items de la sidebar (identique à celui du dashboard)
-    function createSidebarItem(label: string, value: string | number | Date | undefined | null): HTMLElement {
-        const item = document.createElement('div');
-        item.className = 'p-2.5 bg-white border border-gray-200 rounded-lg shadow-sm';
-        const labelEl = document.createElement('span');
-        labelEl.className = 'text-xs text-gray-500 block mb-0.5';
-        labelEl.textContent = label;
-        const valueEl = document.createElement('p');
-        valueEl.className = 'text-sm text-gray-800 font-medium truncate';
-        if (value instanceof Date) {
-            valueEl.textContent = value.toLocaleDateString();
-        } else {
-            valueEl.textContent = value?.toString() || 'N/A';
+        if (!profiledUser) {
+            loadingProfileMsg.textContent = `Profil utilisateur avec ID ${userIdToView} non trouvé.`;
+            loadingProfileMsg.classList.remove('text-gray-500');
+            loadingProfileMsg.classList.add('text-red-500');
+            return pageContainer;
         }
-        item.appendChild(labelEl);
-        item.appendChild(valueEl);
-        return item;
-    }
+        
+        loadingProfileMsg.remove(); // Enlever le message de chargement/erreur du profil
 
-    sidebar.appendChild(createSidebarItem('Nom d\'utilisateur', profiledUser.username));
-    sidebar.appendChild(createSidebarItem('Nom affiché', profiledUser.display_name));
-    sidebar.appendChild(createSidebarItem('Email', profiledUser.email)); // Peut-être masquer pour les autres profils ?
-    sidebar.appendChild(createSidebarItem('Date de création', new Date(profiledUser.created_at)));
-    sidebar.appendChild(createSidebarItem('Victoires', profiledUser.wins ?? 'N/A'));
-    sidebar.appendChild(createSidebarItem('Défaites', profiledUser.losses ?? 'N/A'));
-    // Vous pouvez ajouter d'autres informations si disponibles pour `profiledUser`
+        // --- Sidebar (infos de l'utilisateur `profiledUser`) ---
+        const sidebar = document.createElement('aside');
+        sidebar.className = 'w-1/4 p-6 bg-gray-50 border-r border-gray-200 space-y-4 overflow-y-auto flex flex-col';
 
-    // --- Contenu principal (Match History uniquement) ---
-    const contentWrapper = document.createElement('div');
-    contentWrapper.className = 'w-3/4 p-6 flex flex-col overflow-y-auto';
+        function createSidebarItem(label: string, value: string | number | Date | undefined | null, isSensitive: boolean = false): HTMLElement | null {
+            // Masquer l'email si ce n'est pas le profil de l'utilisateur connecté et que l'info est sensible
+            if (isSensitive && loggedInUser!.id !== profiledUser.id) {
+                return null;
+            }
 
-    // Charger le composant MatchHistory
-    const matchHistoryElement = await MatchHistoryComponent({ userId: profiledUser.id });
-    contentWrapper.appendChild(matchHistoryElement);
+            const item = document.createElement('div');
+            item.className = 'p-3 bg-white border border-gray-200 rounded-lg shadow-sm';
+            const labelEl = document.createElement('span');
+            labelEl.className = 'text-xs text-gray-500 block mb-0.5 uppercase tracking-wider';
+            labelEl.textContent = label;
+            const valueEl = document.createElement('p');
+            valueEl.className = 'text-sm text-gray-800 font-medium truncate';
+            if (value instanceof Date) {
+                valueEl.textContent = value.toLocaleDateString();
+            } else {
+                valueEl.textContent = value?.toString() || 'N/A';
+            }
+            item.appendChild(labelEl);
+            item.appendChild(valueEl);
+            return item;
+        }
+
+        // Affichage de l'avatar dans la sidebar
+        const avatarContainer = document.createElement('div');
+        avatarContainer.className = 'flex flex-col items-center mb-4';
+        const avatarImg = document.createElement('img');
+        avatarImg.src = profiledUser.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profiledUser.display_name)}&background=random&color=fff&size=128`;
+        avatarImg.alt = `Avatar de ${profiledUser.display_name}`;
+        avatarImg.className = 'w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-gray-200 shadow-md mb-2';
+        avatarContainer.appendChild(avatarImg);
+        
+        const displayNameEl = document.createElement('h2');
+        displayNameEl.className = 'text-xl font-semibold text-gray-800 text-center';
+        displayNameEl.textContent = profiledUser.display_name;
+        avatarContainer.appendChild(displayNameEl);
+
+        const usernameEl = document.createElement('p');
+        usernameEl.className = 'text-sm text-gray-500 text-center';
+        usernameEl.textContent = `@${profiledUser.username}`;
+        avatarContainer.appendChild(usernameEl);
+
+        sidebar.appendChild(avatarContainer);
+
+        const infoItems = [
+            createSidebarItem('Nom d\'utilisateur', profiledUser.username), // Peut-être redondant si déjà sous l'avatar
+            // createSidebarItem('Nom affiché', profiledUser.display_name), // Déjà au-dessus
+            createSidebarItem('Email', profiledUser.email, true), // isSensitive = true
+            createSidebarItem('Date de création', new Date(profiledUser.created_at)),
+            createSidebarItem('Victoires', profiledUser.wins ?? 0),
+            createSidebarItem('Défaites', profiledUser.losses ?? 0),
+            createSidebarItem('Statut', profiledUser.status),
+        ];
+        infoItems.forEach(item => item && sidebar.appendChild(item));
 
 
-    mainSection.appendChild(sidebar);
-    mainSection.appendChild(contentWrapper);
+        // --- Contenu principal (Match History uniquement) ---
+        const contentWrapper = document.createElement('main');
+        contentWrapper.className = 'w-3/4 p-6 flex flex-col overflow-y-auto';
 
-    // Si c'est le profil de l'utilisateur connecté, on pourrait ajouter un bouton "Editer Profil"
-    if (loggedInUser.id === profiledUser.id) {
-        const editProfileButton = document.createElement('button');
-        editProfileButton.textContent = 'Éditer mon profil';
-        editProfileButton.className = 'mt-4 ml-auto mr-auto block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md';
-        editProfileButton.onclick = () => navigateTo('/settings'); // ou une page d'édition de profil
-        sidebar.appendChild(editProfileButton); // Ajouter à la sidebar ou ailleurs
+        const matchHistoryElement = await MatchHistoryComponent({ userId: profiledUser.id });
+        contentWrapper.appendChild(matchHistoryElement);
+
+        contentArea.appendChild(sidebar);
+        contentArea.appendChild(contentWrapper);
+
+        // Bouton d'édition de profil si c'est le profil de l'utilisateur connecté
+        if (loggedInUser.id === profiledUser.id) {
+            const editProfileButton = document.createElement('button');
+            editProfileButton.textContent = 'Éditer mon profil';
+            editProfileButton.className = 'mt-auto bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md w-full';
+            editProfileButton.onclick = () => navigateTo('/settings'); // ou une page d'édition de profil dédiée
+            sidebar.appendChild(editProfileButton); // Ajouté en bas de la sidebar
+        }
+
+    } catch (error) {
+        console.error("Erreur lors de la construction de la page de profil:", error);
+        loadingProfileMsg.textContent = `Erreur lors du chargement du profil : ${(error as Error).message}. Veuillez réessayer.`;
+        loadingProfileMsg.classList.remove('text-gray-500');
+        loadingProfileMsg.classList.add('text-red-500');
+        // Le message d'erreur est déjà dans contentArea, donc pageContainer est retourné
     }
 
     return pageContainer;

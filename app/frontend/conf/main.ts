@@ -7,6 +7,7 @@ import { GameRoomPage } from './pages/gameRoomPage.js';
 import { navigateTo } from './services/router.js'; // à ajouter en haut
 import { DashboardPage } from './pages/dashboardPage.js'
 import { SettingsPage } from './pages/settingsPage.js';
+import { ProfilePage } from './pages/profilePage.js';
 import { getUserDataFromStorage } from './services/authService.js';
 import { promptAliasForm } from './components/aliasFormPage.js';
 import { GameMode } from './components/gamePage.js'
@@ -15,8 +16,8 @@ import { GameMode } from './components/gamePage.js'
 const appContainer = document.getElementById('main');
 
 interface RouteConfig {
-	component: () => HTMLElement | Promise<HTMLElement>;
-	requiredAuth?: boolean;
+    component: (params?: { [key: string]: string }) => HTMLElement | Promise<HTMLElement>;
+    requiredAuth?: boolean;
 }
 
 function renderNotFoundPage(): HTMLElement {
@@ -32,15 +33,19 @@ function renderNotFoundPage(): HTMLElement {
 }
 
 const routes: { [key: string]: RouteConfig } = {
-	'/': { component: HomePage },
-	'/users': { component: UsersPage },
-	'/login': { component: LoginPage },
-	'/register': { component: RegisterPage },
-	'/dashboard': { component: DashboardPage, requiredAuth: true },
-	'/profile': { component: SettingsPage, requiredAuth: true },
-	'/game': { component: GamePage },
-	'/local-game': { component: promptAliasForm},
-	'/game-room': { component: () => GameRoomPageFromParams() },
+    '/': { component: HomePage },
+    '/users': { component: UsersPage },
+    '/login': { component: LoginPage },
+    '/register': { component: RegisterPage },
+    '/dashboard': { component: DashboardPage, requiredAuth: true },
+    '/profile': { component: SettingsPage, requiredAuth: true },
+    '/profile/:id': {
+        component: (params) => ProfilePage(params ?? {}),
+        requiredAuth: true
+    },
+    '/game': { component: GamePage },
+    '/local-game': { component: promptAliasForm },
+    '/game-room': { component: () => GameRoomPageFromParams() },
 };
 
 function GameRoomPageFromParams(): HTMLElement {
@@ -50,36 +55,57 @@ function GameRoomPageFromParams(): HTMLElement {
 }
 
 export async function router() {
-	if (!appContainer) {
-		console.error("ERREUR: Le conteneur #app est introuvable dans le DOM !");
-		return;
-	}
-	const path = window.location.pathname;
-	console.log(`navigateTo: ${path}`);
-	const routeCfg = routes[path];
-	if (!routeCfg) {
-		appContainer.innerHTML = '';
-		appContainer.appendChild(renderNotFoundPage());
-		return;
-	}
-	if (routeCfg.requiredAuth) {
-		const authData = getUserDataFromStorage();
-		if (!authData) {
-			console.log('Utilisateur non authentifié, redirection vers la page de connexion.');
+    if (!appContainer) {
+        console.error("ERREUR: Le conteneur #app est introuvable dans le DOM !");
+        return;
+    }
+    const path = window.location.pathname;
+    console.log(`navigateTo: ${path}`);
 
-			navigateTo('/login');
-			return;
-		}
-	}
-	const renderFunction = routeCfg.component;
-	appContainer.innerHTML = '';
-	try {
-		const pageContent = await renderFunction();
-		appContainer.appendChild(pageContent);
-	} catch (error) {
-		console.error(`Erreur lors du rendu de la route ${path}:`, error);
-		appContainer.innerHTML = `<p class="text-red-500 text-center p-8">Une erreur est survenue lors du chargement de la page.</p>`;
-	}
+    let routeCfg = routes[path];
+    let params: { [key: string]: string } = {};
+
+    // Gestion des routes dynamiques (ex: /profile/:id)
+    if (!routeCfg) {
+        // Cherche une route dynamique qui matche
+        for (const routePattern in routes) {
+            if (routePattern.includes('/:')) {
+                const base = routePattern.split('/:')[0];
+                if (path.startsWith(base + '/')) {
+                    const paramName = routePattern.split('/:')[1];
+                    const paramValue = path.slice(base.length + 1);
+                    routeCfg = routes[routePattern];
+                    params[paramName] = paramValue;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (!routeCfg) {
+        appContainer.innerHTML = '';
+        appContainer.appendChild(renderNotFoundPage());
+        return;
+    }
+    if (routeCfg.requiredAuth) {
+        const authData = getUserDataFromStorage();
+        if (!authData) {
+            console.log('Utilisateur non authentifié, redirection vers la page de connexion.');
+            navigateTo('/login');
+            return;
+        }
+    }
+    const renderFunction = routeCfg.component;
+    appContainer.innerHTML = '';
+    try {
+        // Passe les params à la page si besoin
+        params.userId = params.id;
+        const pageContent = await renderFunction(params);
+        appContainer.appendChild(pageContent);
+    } catch (error) {
+        console.error(`Erreur lors du rendu de la route ${path}:`, error);
+        appContainer.innerHTML = `<p class="text-red-500 text-center p-8">Une erreur est survenue lors du chargement de la page.</p>`;
+    }
 }
 
 // Se déclenche lorsque le HTML initial est chargé

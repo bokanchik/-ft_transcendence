@@ -1,11 +1,13 @@
 // Gère les requêtes Fastify (req, reply)
 import { FastifyRequest, FastifyReply } from 'fastify';
 import * as userService from '../services/userService.js';
-import { JWTPayload, UpdateUserPayload } from '../shared/types.js';
+import { JWTPayload, UpdateUserPayload, User } from '../shared/types.js';
 
 export type AuthenticatedRequest = FastifyRequest & { user: JWTPayload };
 
 export type UpdateRequest = FastifyRequest<{ Body: UpdateUserPayload }> & { user: JWTPayload };
+
+type UserIdRequest = FastifyRequest<{ Params: { userId: string } }>;
 
 export async function getUsersHandler(req: FastifyRequest, reply: FastifyReply) {
 	const users = await userService.getAllUsers();
@@ -33,4 +35,16 @@ export async function updateUserMeHandler(req: UpdateRequest, reply: FastifyRepl
 		message: 'User updated successfully',
 		user: updatedUser
 	});
+}
+
+export async function getUserInfoHandler(req: UserIdRequest, reply: FastifyReply) {
+	const userId = parseInt(req.params.userId, 10);
+	if (isNaN(userId)) {
+		return reply.code(400).send({ error: "Invalid user ID." });
+	}
+	const user: User | undefined = await userService.getUserById(userId);
+	if (!user) {
+		return reply.code(404).send({ error: "User not found." });
+	}
+	return reply.code(200).send(user);
 }

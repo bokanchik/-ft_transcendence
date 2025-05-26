@@ -50,6 +50,16 @@ export const updateUserSchema = {
 	}
 };
 
+export const userIdParamSchema = {
+	params: {
+		type: 'object',
+		properties: {
+			userId: { type: 'string' }
+		},
+		required: ['userId']
+	}
+};
+
 export const userResponseSchema = {
     type: 'object',
     properties: {
