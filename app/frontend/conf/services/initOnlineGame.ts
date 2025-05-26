@@ -4,10 +4,10 @@ import socket from "./socket.js";
 import { showToast } from "../components/toast.js";
 
 // --- Main Fonction for online game: 
-export async function handleOnlineGame(display_name: string, username: string, container: HTMLElement, button: HTMLButtonElement): Promise<void> {
+export async function handleOnlineGame(display_name: string, username: string, container: HTMLElement, button: HTMLButtonElement, title: HTMLHeadElement): Promise<void> {
     button.disabled = true; // pour eviter les multiples click (data race)
     try {
-        await initOnlineGame(display_name, username, container);
+        await initOnlineGame(display_name, username, container, title);
     } catch (err: unknown) {
         console.log(err);
         showToast('Error while creating a waiting room. Please, try again later', 'error');
@@ -18,7 +18,7 @@ export async function handleOnlineGame(display_name: string, username: string, c
 }
 
 // --- Fonction pour initialiser le client socket et le mettre dans le waiting room ---
-export async function initOnlineGame(display_name: string, username: string, buttonsContainer: HTMLElement) {
+export async function initOnlineGame(display_name: string, username: string, buttonsContainer: HTMLElement, title: HTMLHeadElement) {
     const controller: AbortController = new AbortController();
 
     if (!socket.connected) {
@@ -32,6 +32,7 @@ export async function initOnlineGame(display_name: string, username: string, but
     });
     
     socket.on('inQueue', () => {
+        title.textContent = 'Looking for an opponent...';
         showWaitingMessage(buttonsContainer, socket, controller);
     });
 
@@ -79,37 +80,44 @@ export async function initOnlineGame(display_name: string, username: string, but
 
 // --- Fonction pour afficher le message d'attente + Cancel button ---
 export function showWaitingMessage(buttonsContainer: HTMLElement, socket: SocketIOClient.Socket, controller: AbortController) {
-    buttonsContainer.innerHTML = ''; // clear the buttons
-    
-    const waitingMessage = document.createElement('div');
-    waitingMessage.textContent = 'Waiting for an opponent...';
-    waitingMessage.className = 'text-gray-700 font-semibold text-lg animate-pulse';
-    
+    buttonsContainer.innerHTML = ''; // clear existing content
+
+    // Container centré
+    const wrapper = document.createElement('div');
+    wrapper.className = 'flex flex-col items-center justify-center space-y-6 h-full';
+
+    // Cercle vert animé
+    const circle = document.createElement('div');
+    circle.className = 'relative w-40 h-40 rounded-full bg-green-500 animate-pulse flex items-center justify-center shadow-lg';
+
+    // Timer au centre du cercle
+    const timerText = document.createElement('span');
+    timerText.className = 'text-white text-2xl font-bold';
+    timerText.textContent = '60';
+
+    circle.appendChild(timerText);
+
+    // Bouton Cancel
     const cancelButton = document.createElement('button');
     cancelButton.textContent = 'Cancel';
-    cancelButton.className = 'bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full transition duration-300 ease-in-out';
-
-    
-    const timerDisplay = document.createElement('div');
-    timerDisplay.className = 'text-gray-500 font-medium mt-2';
-    timerDisplay.textContent = 'Time remaining: 60s';
+    cancelButton.className = 'bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded transition duration-300 ease-in-out';
 
     cancelButton.addEventListener('click', () => {
-        controller.abort(); // abort the fetch request
-        socket.emit('cancelMatch'); // inform the server that client
-                                    //  is going to leave a waiting room
+        controller.abort();
+        socket.emit('cancelMatch');
         clearInterval(timer);
         cleanupSocket(socket);
         navigateTo('/game');
     });
 
-    buttonsContainer.append(waitingMessage, timerDisplay, cancelButton);
+    wrapper.append(circle, cancelButton);
+    buttonsContainer.appendChild(wrapper);
 
+    // Timer logique
     let timeleft = 60;
-    const timer =  setInterval(() => {
+    const timer = setInterval(() => {
         timeleft--;
-        timerDisplay.textContent = `Time remaining: ${timeleft}s`;
-        
+        timerText.textContent = `${timeleft}`;
         if (timeleft <= 0) {
             clearInterval(timer);
         }

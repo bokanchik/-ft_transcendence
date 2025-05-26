@@ -80,7 +80,7 @@ export function GamePage(): HTMLElement {
             console.log(`username:` + username);
             sessionStorage.setItem('gameMode', 'remote');
 
-            await handleOnlineGame(display_name, username, buttonsContainer, onlineGameButton);
+            await handleOnlineGame(display_name, username, buttonsContainer, onlineGameButton, title);
         } catch (err: unknown) {
             console.log(`Failed to fetch from user`);
             showToast('Something went wrong. Please try again later.', 'error');

@@ -7,7 +7,6 @@ export async function createMatchHandler(req: FastifyRequest, reply: FastifyRepl
     
     const { player1, player2 } = req.validatedBody;
 
-    // reponse envoyee au client
     const match = {
         matchId: crypto.randomUUID(),
         player1,

@@ -52,7 +52,7 @@ services:
       - ./services/shared:/app/shared:ro
     networks:
       - tranet
-
+  
   #openapi:
     #build: ./services/openapi
     #ports:

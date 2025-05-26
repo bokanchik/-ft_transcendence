@@ -120,7 +120,6 @@ export async function getRowByMatchId(matchId : string) {
     }
 }
 
-
 export async function getAllRows() {
     
     let sql = `SELECT * FROM matches`;
