@@ -3,6 +3,7 @@ import * as userModel from '../models/userModel.js';
 import * as passwordUtils from '../shared/auth-plugin/pswdUtils.js';
 import { ERROR_MESSAGES, ConflictError, ValidationError, NotFoundError } from '../shared/auth-plugin/appError.js';
 import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, CreateUserPayload, UserOnlineStatus } from '../shared/types.js';
+import { isValidHttpUrl, isValidEmailFormat } from '../utils/apiUtils.js';
 
 /**
  * Generates a default avatar URL using ui-avatars.com.
@@ -12,31 +13,6 @@ import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, CreateU
 function generateDefaultAvatarUrl(name: string): string {
 	const encodedName = encodeURIComponent(name);
 	return `https://ui-avatars.com/api/?name=${encodedName}&background=random&color=fff&size=128`;
-}
-
-/**
- * Checks if a string is a valid HTTP/HTTPS URL.
- * @param {string} urlString - The string to validate.
- * @returns {boolean} True if valid, false otherwise.
- */
-function isValidHttpUrl(urlString: string | undefined | null): boolean {
-	if (typeof urlString !== 'string' || !urlString) return false;
-	try {
-		const url = new URL(urlString);
-		return url.protocol === "http:" || url.protocol === "https:";
-	} catch (_) {
-		return false;
-	}
-}
-
-/**
- * Checks if a string is a valid email format.
- * @param {string} emailString - The string to validate.
- * @returns {boolean} True if valid, false otherwise.
- */
-function isValidEmailFormat(emailString: string | undefined | null): boolean {
-	if (typeof emailString !== 'string' || !emailString) return false;
-	return emailString.includes('@') && emailString.length > 3;
 }
 
 /**
@@ -228,7 +204,7 @@ export async function updateUserProfile(userId: number, updates: UpdateUserPaylo
  * @returns {Promise<void>}
  */
 export async function updateUserStatus(userId: number, status: UserOnlineStatus): Promise<void> {
-    await userModel.updateStatusInDb(userId, status);
+	await userModel.updateStatusInDb(userId, status);
 }
 
 /**
