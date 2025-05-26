@@ -4,7 +4,7 @@
 
 ## arthur
 
-- [ ] display_name unique
+- [x] display_name unique
 - [x] logout -> supprimer token
 - [x] login/logout maj du status
 - [ ] confirmation par mail
@@ -13,7 +13,8 @@
 - [ ] tout matches
 - [ ] -> zod 
 - [x] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde) -> cookie jwt_token
-- [x] httpOnly cookie for server-side ?
+- [x] httpOnly cookie for server-side ? -> yes
+- [ ] grafana
 
 ## 📌 Tâches initiales
 

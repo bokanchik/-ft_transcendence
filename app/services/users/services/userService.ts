@@ -53,6 +53,9 @@ export async function createUserAccount(userData: RegisterRequestBody): Promise<
 	if (await userModel.isUsernameInDb(username)) {
 		throw new ConflictError(ERROR_MESSAGES.USERNAME_ALREADY_EXISTS);
 	}
+	if (await userModel.isDisplayNameInDb(display_name)) {
+		throw new ConflictError(ERROR_MESSAGES.DISPLAY_NAME_ALREADY_EXISTS);
+	}
 	if (await userModel.isEmailInDb(email)) {
 		throw new ConflictError(ERROR_MESSAGES.EMAIL_ALREADY_EXISTS);
 	}
