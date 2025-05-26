@@ -178,7 +178,7 @@ export async function logout(): Promise<void> {
 	console.log("User data removed from localStorage.");
 
 	try {
-		const response = await fetch(logoutUrl, {
+		const response = await fetchWithCsrf(logoutUrl, {
 			method: 'POST',
 			credentials: 'include',
 		});

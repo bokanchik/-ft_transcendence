@@ -1,8 +1,8 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { createUserAccount, loginUser } from '../services/userService.js';
+import { createUserAccount, loginUser, updateUserStatus } from '../services/userService.js';
 import { jwtToken, cookieOptions, csrfCookieName, csrfOptions } from '../shared/auth-plugin/tokens.js';
 import { ERROR_MESSAGES } from '../shared/auth-plugin/appError.js';
-import { JWTPayload, User, RegisterRequestBody, LoginRequestBody } from '../shared/types.js';
+import { JWTPayload, User, RegisterRequestBody, LoginRequestBody, UserOnlineStatus } from '../shared/types.js';
 
 export async function registerHandler(req: FastifyRequest<{ Body: RegisterRequestBody }>, reply: FastifyReply) {
 	await createUserAccount(req.body);
@@ -17,6 +17,7 @@ export async function loginHandler(req: FastifyRequest<{ Body: LoginRequestBody 
 	const tokenPayload: JWTPayload = { id: user.id, username: user.username };
 	const token = reply.server.jwt.sign(tokenPayload);
 	const decodedToken = reply.server.jwt.decode(token) as { exp: number };
+	await updateUserStatus(user.id, UserOnlineStatus.ONLINE);
 
 	reply.setCookie(jwtToken, token, {
 		...cookieOptions,
@@ -30,6 +31,8 @@ export async function loginHandler(req: FastifyRequest<{ Body: LoginRequestBody 
 }
 
 export async function logoutHandler(req: FastifyRequest, reply: FastifyReply) {
+	const id = (req.user as JWTPayload).id;
+	await updateUserStatus(id, UserOnlineStatus.OFFLINE);
 	reply.clearCookie(jwtToken, cookieOptions);
 	reply.clearCookie(csrfCookieName, csrfOptions);
 	return reply.send({ message: 'Logout successful' });

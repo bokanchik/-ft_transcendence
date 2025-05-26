@@ -2,7 +2,7 @@
 import * as userModel from '../models/userModel.js';
 import * as passwordUtils from '../shared/auth-plugin/pswdUtils.js';
 import { ERROR_MESSAGES, ConflictError, ValidationError, NotFoundError } from '../shared/auth-plugin/appError.js';
-import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, CreateUserPayload } from '../shared/types.js';
+import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, CreateUserPayload, UserOnlineStatus } from '../shared/types.js';
 
 /**
  * Generates a default avatar URL using ui-avatars.com.
@@ -219,6 +219,16 @@ export async function updateUserProfile(userId: number, updates: UpdateUserPaylo
 		throw new Error(`Failed to retrieve user ${userId} immediately after successful update.`);
 	}
 	return updatedUser;
+}
+
+/**
+ * Updates the status of a user.
+ * @param {number} userId - The ID of the user whose status to update.
+ * @param {UserOnlineStatus} status - The new online status of the user.
+ * @returns {Promise<void>}
+ */
+export async function updateUserStatus(userId: number, status: UserOnlineStatus): Promise<void> {
+    await userModel.updateStatusInDb(userId, status);
 }
 
 /**
