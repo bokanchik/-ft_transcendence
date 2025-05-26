@@ -4,7 +4,7 @@ import { RegisterPage } from './components/registerPage.js'
 import { UsersPage } from './pages/userPage.js';
 import { GamePage } from './components/gamePage.js';
 import { GameRoomPage } from './pages/gameRoomPage.js';
-import { navigateTo } from './services/router.js'; // à ajouter en haut
+import { navigateTo } from './services/router.js';
 import { DashboardPage } from './pages/dashboardPage.js'
 import { SettingsPage } from './pages/settingsPage.js';
 import { ProfilePage } from './pages/profilePage.js';
