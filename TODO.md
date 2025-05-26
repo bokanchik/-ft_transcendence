@@ -6,24 +6,26 @@
 
 - [ ] display_name unique
 - [x] logout -> supprimer token
-- [ ] login/logout maj du status
+- [x] login/logout maj du status
+- [ ] confirmation par mail
+- [ ] changement mdp
 - [x] Affichage du status
 - [ ] tout matches
+- [ ] -> zod 
+- [x] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde) -> cookie jwt_token
+- [x] httpOnly cookie for server-side ?
 
 ## 📌 Tâches initiales
 
 - [ ] jeu en local
 - [ ] redis pour les scores
-- [ ] Confirmation par mail
 - [ ] Pages && components && services in frontend to clean !
 - [ ] Les touches sensibles au click + Enter plus les fleches (experience user agreable)
 - [ ] Create Data Models + put match to DB (how we're handling data for score, etc ? -> local variable sent with socket to front
 at the end of a match -> call to database if need matchhistory)
-- [x] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde) -> cookie jwt_token
 - [ ] La gestion d'erreurs 
 - [ ] Implementer les models pour les appels a la base de donnee
 - [ ] POST a Artur avec les donnees du match
-- [ ] httpOnly cookie for server-side ?
 
 
 ---
