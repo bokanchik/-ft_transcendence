@@ -1,7 +1,7 @@
 import { UUID } from "crypto";
 import { navigateTo } from "./router.js";
 import socket from "./socket.js";
-import { showToast } from "../components/toast.js";
+import { removeWaitingToast, showToast, showWaitingToast } from "../components/toast.js";
 
 // --- Main Fonction for online game: 
 export async function handleOnlineGame(display_name: string, userId: string, container: HTMLElement, button: HTMLButtonElement, title: HTMLHeadElement): Promise<void> {
@@ -32,8 +32,9 @@ export async function initOnlineGame(display_name: string, userId: string, butto
     });
     
     socket.on('inQueue', () => {
-        title.textContent = 'Looking for an opponent...';
-        showWaitingMessage(buttonsContainer, socket, controller);
+        showWaitingToast(socket, controller);
+       // title.textContent = 'Looking for an opponent...';
+       // showWaitingMessage(buttonsContainer, socket, controller);
     });
 
     // --- Socket listener on matchFound event --> if opponenet is found
@@ -50,14 +51,17 @@ export async function initOnlineGame(display_name: string, userId: string, butto
         sessionStorage.setItem('side', side);
         sessionStorage.setItem('opponent', opponent);
 
+        removeWaitingToast();
         navigateTo(`/game-room?matchId=${matchId}`);
 
     });
     
     // --- Socket listeners on errors from the server side
     socket.on('disconnect', (reason: string, details?: any) => { 
-        console.log(`Disconnected from the server: reason ${reason},
-            details: ${details.message}, ${details.description}, ${details.context}`);
+        console.log(`Disconnected from the server: reason ${reason}`);
+        if (details){
+            console.log(`details: ${details.message}, ${details.description}, ${details.context}`);
+        }
     });
     
     socket.on('error', (err: Error) => {
@@ -74,54 +78,9 @@ export async function initOnlineGame(display_name: string, userId: string, butto
     socket.on('matchTimeout', () => {
         showToast('No opponent found. Please try later.', 'error');
         cleanupSocket(socket);
+        removeWaitingToast();
         navigateTo('/game');
     });
-}
-
-// --- Fonction pour afficher le message d'attente + Cancel button ---
-export function showWaitingMessage(buttonsContainer: HTMLElement, socket: SocketIOClient.Socket, controller: AbortController) {
-    buttonsContainer.innerHTML = ''; // clear existing content
-
-    // Container centré
-    const wrapper = document.createElement('div');
-    wrapper.className = 'flex flex-col items-center justify-center space-y-6 h-full';
-
-    // Cercle vert animé
-    const circle = document.createElement('div');
-    circle.className = 'relative w-40 h-40 rounded-full bg-green-500 animate-pulse flex items-center justify-center shadow-lg';
-
-    // Timer au centre du cercle
-    const timerText = document.createElement('span');
-    timerText.className = 'text-white text-2xl font-bold';
-    timerText.textContent = '60';
-
-    circle.appendChild(timerText);
-
-    // Bouton Cancel
-    const cancelButton = document.createElement('button');
-    cancelButton.textContent = 'Cancel';
-    cancelButton.className = 'bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded transition duration-300 ease-in-out';
-
-    cancelButton.addEventListener('click', () => {
-        controller.abort();
-        socket.emit('cancelMatch');
-        clearInterval(timer);
-        cleanupSocket(socket);
-        navigateTo('/game');
-    });
-
-    wrapper.append(circle, cancelButton);
-    buttonsContainer.appendChild(wrapper);
-
-    // Timer logique
-    let timeleft = 60;
-    const timer = setInterval(() => {
-        timeleft--;
-        timerText.textContent = `${timeleft}`;
-        if (timeleft <= 0) {
-            clearInterval(timer);
-        }
-    }, 1000);
 }
 
 // // --- Fonction pour créer une salle d'attente ---

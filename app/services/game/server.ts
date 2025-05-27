@@ -16,7 +16,7 @@ const fastify: FastifyInstance = Fastify({ logger: true });
 
 // Initilize socket.io
 const io: Server = new Server(fastify.server, {
-  // cors -> dit au server depuis quels domains/ports il peut charger les resources 
+  // cors -> dit au server depuis quels domaine/ports il peut charger les resources 
     cors: {
       origin: "http://localhost:5000", // l'url du frontend
       methods: ["GET", "POST"],

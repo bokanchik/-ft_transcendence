@@ -31,20 +31,12 @@ export function GamePage(): HTMLElement {
     pageWrapper.appendChild(headerElement);
 
     // --- Game Page Content ---
-    // L'ancien 'container' devient 'gameContentContainer'
     const gameContentContainer: HTMLDivElement = document.createElement('div');
     gameContentContainer.className = 'flex-grow bg-gradient-to-r from-blue-500 to-purple-600 flex justify-center items-center p-8';
     
     const formContainer: HTMLDivElement = document.createElement('div');
     formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';   
-    // fin ajout arthur
 
-    // const container: HTMLDivElement = document.createElement('div');
-    // container.className = 'bg-gradient-to-r from-blue-500 to-purple-600 flex justify-center items-center min-h-screen p-8';
-    
-    // const formContainer: HTMLDivElement = document.createElement('div');
-    // formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';
-    
     // --- Title ---
     const title: HTMLHeadElement = document.createElement('h2');
     title.textContent = 'Welcome to the Game';
@@ -87,14 +79,9 @@ export function GamePage(): HTMLElement {
     footer.appendChild(homeLink);
     
     // --- Ajout des éléments au conteneur principal ---
-    // debut ajout arthur
-        formContainer.append(title, buttonsContainer, footer);
+    formContainer.append(title, buttonsContainer, footer);
     gameContentContainer.appendChild(formContainer);
     pageWrapper.appendChild(gameContentContainer);
-    // fin ajout arthur
-
-    // formContainer.append(title, buttonsContainer, footer);
-    // container.appendChild(formContainer); 
     
     // --- Event: Local game button clicked 
     localGameButton.addEventListener('click', async () =>  {
@@ -112,7 +99,7 @@ export function GamePage(): HTMLElement {
             }
             const userData = await userRes.json();
             const display_name: string = userData.display_name;
-            const userId: string = userData.userId;
+            const userId: string = userData.id;
 
             console.log(userData);
             console.log(`userId:` + userId);

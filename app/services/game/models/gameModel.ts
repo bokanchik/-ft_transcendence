@@ -1,13 +1,7 @@
-// Game class for game logic
-// class Game {
-
-    
-// }
-
 export interface Match {
     id: string;
-    player1_id: string;
-    player2_id: string;
+    player1_id: number;
+    player2_id: number;
     winner_id: string;
     created_at: string;
     state: string;

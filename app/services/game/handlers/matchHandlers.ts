@@ -50,7 +50,7 @@ export async function getMatchIdHandler(req: FastifyRequest, reply: FastifyReply
 }
 
 export async function getMatchByUserHandler(req: FastifyRequest, reply: FastifyReply) {
-    const userId = (req.params as { userId: string }).userId;
+    const userId = (req.params as { userId: number }).userId;
 
     if (!userId) {
         return reply.code(400).send({ error: 'UserId is required'});

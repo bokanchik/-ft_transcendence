@@ -1,4 +1,3 @@
-import fastify from 'fastify';
 import db from './connectDB.ts';
 
 type MatchStatus = 'pending' | 'in_progress' | 'finished';
@@ -7,8 +6,8 @@ const matchTable: string = `
     CREATE TABLE IF NOT EXISTS matches (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         matchId TEXT UNIQUE NOT NULL,
-        player1_id TEXT NOT NULL,
-        player2_id TEXT NOT NULL,
+        player1_id INTEGER NOT NULL,
+        player2_id INTEGER NOT NULL,
         player1_socket TEXT NOT NULL,
         player2_socket TEXT NOT NULL,
         player1_score INTEGER,
@@ -57,7 +56,7 @@ export async function setGameResult(matchId: string, player1_score: number, play
 }
 
 export async function insertMatchToDB({ matchId, player1_id, player2_id, player1_socket, player2_socket }: 
-    { matchId: string, player1_id: string, player2_id: string, player1_socket: string, player2_socket: string }) {
+    { matchId: string, player1_id: number, player2_id: number, player1_socket: string, player2_socket: string }) {
         
     const sql = `
         INSERT INTO matches (
@@ -88,7 +87,7 @@ export async function insertMatchToDB({ matchId, player1_id, player2_id, player1
     }
 }
 
-export async function getMatchesByUserId(userId: string) {
+export async function getMatchesByUserId(userId: number) {
     const sql = `
         SELECT * FROM matches
         WHERE player1_id = ? OR player2_id = ?

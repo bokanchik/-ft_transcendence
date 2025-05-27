@@ -2,7 +2,7 @@ import { cleanupSocket } from "../services/initOnlineGame.js";
 import { navigateTo } from "../services/router.js";
 import socket from '../services/socket.js';
 
-export function showGameResult(player1: string, player2: string, score1: number, score2: number) {
+export function showGameResult(player1: string, player2: string, score1: number, score2: number, url1: string, url2: string) {
 	const modal = document.createElement('div');
 	modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm';
 
@@ -24,8 +24,8 @@ export function showGameResult(player1: string, player2: string, score1: number,
 
 	const img1 = document.createElement('img');
     // TODO: fetch a la base de donne d'Arthur
-	img1.src = 'https://img4.dhresource.com/webp/m/0x0/f3/albu/km/j/13/67f2a386-fb10-405e-9c1e-47fcb8e7aab8.jpg';
-	img1.className = 'w-20 h-20 rounded-full mb-2 border-4 border-blue-500 shadow';
+	img1.src = url1;
+	img1.className = 'w-20 h-20 object-cover rounded-full mb-2 border-4 border-blue-500 shadow';
 
 	const name1 = document.createElement('p');
 	name1.className = 'font-semibold text-lg text-gray-800';
@@ -49,9 +49,8 @@ export function showGameResult(player1: string, player2: string, score1: number,
 	player2Container.className = 'flex flex-col items-center flex-1';
 
 	const img2 = document.createElement('img');
-    // TODO: fetch a la base de donne d'Arthur
-	img2.src = 'https://img.joomcdn.net/755233d1c566dcd31875df84758d818ecbb8dbc9_1024_1024.jpeg';
-	img2.className = 'w-20 h-20 rounded-full mb-2 border-4 border-red-500 shadow';
+	img2.src = url2;
+	img2.className = 'w-20 h-20 object-cover rounded-full mb-2 border-4 border-red-500 shadow';
 
 	const name2 = document.createElement('p');
 	name2.className = 'font-semibold text-lg text-gray-800';

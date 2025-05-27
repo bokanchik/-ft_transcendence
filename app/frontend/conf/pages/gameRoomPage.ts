@@ -4,6 +4,7 @@ import { navigateTo } from "../services/router.js";
 import socket from '../services/socket.js';
 import { showGameResult } from "../components/gameResults.js";
 import { initCountdown } from "../components/countdown.js";
+import { get } from "http";
 // import { showToast } from '../components/toast.js';
 
 export function GameRoomPage(mode: GameMode): HTMLElement {
@@ -53,7 +54,7 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 	const scoreDisplay = document.createElement('div');
 	scoreDisplay.className = 'absolute top-[20px] left-1/2 transform -translate-x-1/2 text-2xl font-bold text-black';
 	scoreDisplay.id = 'score-display';
-	scoreDisplay.textContent = '0 - 0';
+	scoreDisplay.textContent = '0 - 0';// TODO: should be apdated
 
 	// Quit button
 	const quitButton = document.createElement('button');
@@ -144,24 +145,23 @@ function clientSocketHandler(gameMode: string | null) {
 	});
 
 	socket.on('gameFinished', async (matchId: string) => {
-		
-		// TODO: une fenetre avec tous les infos sur le match
-		// 1. je fais un fetch vers la route /api/game/:matchId pour recuperer les infos sur le match
-		// 2. un fetch vers la DB d'Arthur pour recuperer les photosURL des jouers ?
-		// 3. je passe les donnees a showGameResult()
-		
 		try {
 			const matchRes = await fetch(`/api/game/match/${matchId}`);
 			if (!matchRes.ok) throw new Error('Failed to fetch match info');
 			const matchData = await matchRes.json();
 			const data = matchData.data;
-			const player1 = data.player1_id; // userid
-			const player2 = data.player2_id;
-			const score1 = data.player1_score;
-			const score2 = data.player2_score;
-			
+			const player1: number = data.player1_id; // userid
+			const player2: number = data.player2_id;
+			const score1: number = data.player1_score;
+			const score2: number = data.player2_score;
+
+			const url1: string = await getUserAvatar(player1);
+			const url2: string = await getUserAvatar(player2);
+			const name1: string = await getDisplayName(player1);
+			const name2: string = await getDisplayName(player2);
+
 			setTimeout(() => {
-				showGameResult(player1, player2, score1, score2);
+				showGameResult(name1, name2, score1, score2, url1, url2);
 			}, 2000);
 			
 		} catch (err: unknown) {
@@ -171,9 +171,22 @@ function clientSocketHandler(gameMode: string | null) {
 	
 }
 
-async function getUserAvatar(userId: number) {	
-	const userRes = await(`/api/users/${userId}`);
+async function getDisplayName(userId: number) : Promise<string> {
+	const userRes = await fetch(`api/users/${userId}`);
+	if (!userRes.ok) throw new Error('Failed to fetch user info');
+	const userData = await userRes.json();
+	const displayName = userData.display_name;
 
+	return displayName;
+}
+
+async function getUserAvatar(userId: number) : Promise<string> {
+	const userRes = await fetch(`/api/users/${userId}`);
+	if (!userRes.ok) throw new Error('Failed to fetch user info');
+	const userData = await userRes.json();
+	const url: string = userData.avatar_url;
+
+	return url;
 }
 
 function startOnlineGame(socket: SocketIOClient.Socket) {
@@ -192,7 +205,6 @@ function startOnlineGame(socket: SocketIOClient.Socket) {
 			paddleMovement,
 		});
 	})
-
 
 	document.addEventListener('keyup', (event) => {
 		if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {

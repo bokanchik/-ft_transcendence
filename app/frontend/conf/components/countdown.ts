@@ -1,17 +1,19 @@
 export async function initCountdown(container: HTMLDivElement) {
 	const countdownIsDone = sessionStorage.getItem('countdown') === 'true';
-	// Countdown logic
+
 	if (!countdownIsDone) {
 		let countdownValue = 3;
+		container.textContent = `Start in ${countdownValue}...`;
+
 		const interval = setInterval(() => {
-			if (countdownValue > 1) {
-				countdownValue--;
+			countdownValue--;
+
+			if (countdownValue > 0) {
 				container.textContent = `Start in ${countdownValue}...`;
 			} else {
-				container.remove(); // remove overlay
 				clearInterval(interval);
+				container.remove();
 				sessionStorage.setItem('countdown', 'true');
-
 			}
 		}, 1000);
 	} else {
