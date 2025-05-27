@@ -50,6 +50,16 @@ export const updateUserSchema = {
 	}
 };
 
+export const userIdParamSchema = {
+	params: {
+		type: 'object',
+		properties: {
+			userId: { type: 'string' }
+		},
+		required: ['userId']
+	}
+};
+
 export const userResponseSchema = {
     type: 'object',
     properties: {
@@ -65,4 +75,18 @@ export const userResponseSchema = {
         updated_at: { type: 'string', format: 'date-time' },
     },
     required: ['id', 'username', 'email', 'display_name', 'created_at', 'updated_at'],
+};
+
+export const logoutSchema = {
+  description: 'Logout the current user by clearing the JWT cookie',
+  tags: ['auth'],
+  response: {
+    200: {
+      type: 'object',
+      properties: {
+        message: { type: 'string' }
+      },
+      required: ['message']
+    }
+  }
 };

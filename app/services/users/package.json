@@ -21,7 +21,9 @@
     "dotenv": "^16.5.0",
     "bcrypt": "^5.1.1",
     "sqlite3": "^5.1.7",
-    "sqlite": "^5.1.1"
+    "sqlite": "^5.1.1",
+    "fastify-type-provider-zod": "^4.0.2",
+	"zod": "^3.24.4"
   },
   "devDependencies": {
     "typescript": "^5.3.3",

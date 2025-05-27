@@ -1,23 +1,6 @@
-import { fetchWithCsrf, setCsrfToken, getCsrfTokenOrThrow, csrfToken } from './csrf.js';
-import { ApiErrorResponse, Friend, PendingFriendRequest } from '../shared/types.js';
-/**
- * Handles API responses by checking for errors and parsing the response JSON.
- * @param response The HTTP response object.
- * @returns The parsed JSON data if the response is successful.
- * @throws An error if the response is not successful.
- */
-const handleApiResponse = async (response: Response) => {
-	if (!response.ok) {
-		let errorData: ApiErrorResponse = { error: `Server error (${response.status})` };
-		try {
-			errorData = await response.json();
-		} catch (jsonError) {
-			console.error("Unable to parse JSON error response:", jsonError);
-		}
-		throw new Error(errorData.error || response.statusText);
-	}
-	return response.json();
-};
+import { fetchWithCsrf } from './csrf.js';
+import { Friend, PendingFriendRequest } from '../shared/types.js';
+import { handleApiResponse } from './apiUtils.js';
 
 /**
  * Retrieves the friend requests received by the logged-in user.
@@ -114,8 +97,8 @@ export async function sendFriendRequest(friendId: number): Promise<{ message: st
  * @returns A message indicating the result of the operation.
  */
 export async function removeFriend(friendshipId: number): Promise<{ message: string }> {
-    const response = await fetchWithCsrf(`/api/users/friends/${friendshipId}/remove`, {
-        method: 'POST',
-    });
-    return handleApiResponse(response);
+	const response = await fetchWithCsrf(`/api/users/friends/${friendshipId}/remove`, {
+		method: 'POST',
+	});
+	return handleApiResponse(response);
 }

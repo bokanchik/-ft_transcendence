@@ -1,5 +1,7 @@
 import { fetchWithCsrf, setCsrfToken } from './csrf.js';
-import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, ApiErrorResponse, ApiSuccessResponse, ApiResult } from '../shared/types.js';
+import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, ApiSuccessResponse, ApiResult } from '../shared/types.js';
+import { Match } from '../shared/types.js';
+import { handleApiResponse } from './apiUtils.js';
 
 const USER_DATA_KEY = 'userDataKey';
 const USER_DATA_EXPIRATION_KEY = 'userDataExpiration';
@@ -8,7 +10,7 @@ const USER_DATA_EXPIRATION_KEY = 'userDataExpiration';
  * Retrieves user data (not the token) from localStorage.
  * The presence of this data does not guarantee that the user is still authenticated
  * (the JWT cookie might have expired). An API call is required to confirm authentication.
- * @returns User if available, null otherwise.
+ * @returns {User | null} User if available, null otherwise.
  */
 export function getUserDataFromStorage(): User | null {
 	const expiration = localStorage.getItem(USER_DATA_EXPIRATION_KEY);
@@ -33,16 +35,56 @@ export function getUserDataFromStorage(): User | null {
 	}
 }
 
-export function setUserDataInStorage(User: User): void {
-	localStorage.setItem(USER_DATA_KEY, JSON.stringify(User));
-	const expiration = new Date().getTime() + 24 * 60 * 60 * 1000; // 24 hours
-	localStorage.setItem(USER_DATA_EXPIRATION_KEY, expiration.toString());
+/**
+ * Fetches the details of a user by their ID.
+ * @param {number} userId - The ID of the user to fetch.
+ * @returns {Promise<User>} The user object.
+ * @throws {Error} If the fetch fails.
+ */
+export async function fetchUserDetails(userId: number): Promise<User> {
+	try {
+		const response = await fetch(`/api/users/${userId}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'Accept': 'application/json',
+			},
+			credentials: 'include',
+		});
+		return await handleApiResponse<User>(response);
+	} catch (error) {
+		console.error(`Error fetching details for user ${userId}:`, error);
+		throw error;
+	}
+}
+
+/**
+ * Fetches the match history for a given user.
+ * @param {number} userId - The ID of the user whose match history to fetch.
+ * @returns {Promise<Match[]>} An array of matches.
+ * @throws {Error} If the fetch fails.
+ */
+export async function fetchMatchHistoryForUser(userId: number): Promise<Match[]> {
+	try {
+		const response = await fetch(`/api/users/${userId}/matches`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'Accept': 'application/json',
+			},
+			credentials: 'include',
+		});
+		return await handleApiResponse<Match[]>(response);
+	} catch (error) {
+		console.error(`Error fetching match history for user ${userId}:`, error);
+		throw error;
+	}
 }
 
 /**
  * Attempts to verify the authentication status by calling a protected endpoint.
  * The server will verify the JWT cookie.
- * @returns User if authenticated, null otherwise.
+ * @returns {Promise<User | null>} User if authenticated, null otherwise.
  */
 export async function checkAuthStatus(): Promise<User | null> {
 	const meUrl = '/api/users/me';
@@ -50,15 +92,11 @@ export async function checkAuthStatus(): Promise<User | null> {
 		const response = await fetch(meUrl, {
 			method: 'GET',
 			headers: { 'Content-Type': 'application/json' },
-			credentials: 'include', // Important to send cookie
+			credentials: 'include',
 		});
-		if (response.ok) {
-			const User: User = await response.json();
-			localStorage.setItem(USER_DATA_KEY, JSON.stringify(User)); // sync
-			return User;
-		}
-		localStorage.removeItem(USER_DATA_KEY);
-		return null;
+		const user = await handleApiResponse<User>(response);
+		localStorage.setItem(USER_DATA_KEY, JSON.stringify(user));
+		return user;
 	} catch (error) {
 		console.error("Error verifying authentication status:", error);
 		localStorage.removeItem(USER_DATA_KEY);
@@ -68,8 +106,8 @@ export async function checkAuthStatus(): Promise<User | null> {
 
 /**
  * Attempts to log in with the provided credentials.
- * @param credentials Login credentials (identifier and password).
- * @returns LoginResult indicating success or failure.
+ * @param {LoginRequestBody} credentials - Login credentials (identifier and password).
+ * @returns {Promise<ApiResult>} LoginResult indicating success or failure.
  */
 export async function attemptLogin(credentials: LoginRequestBody): Promise<ApiResult> {
 	if (!credentials.identifier || !credentials.password) {
@@ -86,22 +124,11 @@ export async function attemptLogin(credentials: LoginRequestBody): Promise<ApiRe
 			credentials: 'include',
 		});
 
-		if (!response.ok) {
-			console.error(`HTTP error! status: ${response.status} ${response.statusText}`);
-			let errorData: ApiErrorResponse = { error: `Server error (${response.status})` };
-			try {
-				errorData = await response.json();
-			} catch (jsonError) {
-				console.error("Unable to parse JSON error response:", jsonError);
-			}
-			return { success: false, error: errorData.error || response.statusText };
-		}
-
-		const data: ApiSuccessResponse & { csrfToken: string } = await response.json();
+		const data: ApiSuccessResponse & { csrfToken: string } = await handleApiResponse(response);
 
 		if (data && data.user) {
 			localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.user));
-			setCsrfToken(data.csrfToken); // Stocker le token CSRF
+			setCsrfToken(data.csrfToken);
 			return { success: true, data: data };
 		} else {
 			console.warn("No user data received in login response.");
@@ -116,6 +143,7 @@ export async function attemptLogin(credentials: LoginRequestBody): Promise<ApiRe
 
 /**
  * Logs out the user by removing local data and invalidating the server-side session.
+ * @returns {Promise<void>}
  */
 export async function logout(): Promise<void> {
 	const logoutUrl = '/api/users/auth/logout';
@@ -123,65 +151,52 @@ export async function logout(): Promise<void> {
 	console.log("User data removed from localStorage.");
 
 	try {
-		const response = await fetch(logoutUrl, {
-			method: 'POST', // or GET -> todo API logout
-			credentials: 'include', // send cookie to server to invalidate it
+		const response = await fetchWithCsrf(logoutUrl, {
+			method: 'POST',
+			credentials: 'include',
 		});
-		if (response.ok) {
-			console.log("Server-side logout successful (cookie invalidated).");
-		} else {
-			console.warn("Server-side logout may have failed:", response.status);
-		}
+		await handleApiResponse<{ message: string }>(response);
+		console.log("Server-side logout successful (cookie invalidated).");
 	} catch (error) {
 		console.error("Error attempting server logout:", error);
 	}
-	// Redirect ?
 }
 
 /**
  * Attempts to register a new user with the provided credentials.
- * @param credentials Registration credentials (username, email, password, etc.).
- * @returns RegisterResult indicating success or failure.
+ * @param {RegisterRequestBody} credentials - Registration credentials (username, email, password, etc.).
+ * @returns {Promise<ApiResult>} RegisterResult indicating success or failure.
  */
 export async function attemptRegister(credentials: RegisterRequestBody): Promise<ApiResult> {
-    const registerUrl = '/api/users/auth/register';
+	const registerUrl = '/api/users/auth/register';
 
-    try {
-        const payload: any = { ...credentials };
-        if (!payload.avatar_url) {
-            delete payload.avatar_url;
-        }
+	try {
+		const payload: any = { ...credentials };
+		if (!payload.avatar_url) {
+			delete payload.avatar_url;
+		}
 
-        const response = await fetch(registerUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-        });
+		const response = await fetch(registerUrl, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(payload),
+		});
 
-        const data: ApiSuccessResponse = await response.json();
+		const data: ApiSuccessResponse = await handleApiResponse(response);
 
-        if (!response.ok) {
-            console.error(`HTTP error! status: ${response.status} ${response.statusText}`);
-            const errorMsg = (data && typeof data === 'object' && 'error' in data && typeof data.error === 'string')
-                ? data.error
-                : response.statusText;
-            return { success: false, error: errorMsg };
-        }
+		return { success: true, data };
 
-        // Succès : le backend ne renvoie qu'un message
-        return { success: true, data };
-
-    } catch (error) {
-        console.error("Network error during registration:", error);
-        const errorMessage = error instanceof Error ? error.message : "Unknown error";
-        return { success: false, error: `Server connection error during registration (${errorMessage})` };
-    }
+	} catch (error) {
+		console.error("Network error during registration:", error);
+		const errorMessage = error instanceof Error ? error.message : "Unknown error";
+		return { success: false, error: `Server connection error during registration (${errorMessage})` };
+	}
 }
 
 /**
  * Updates the user's profile with the provided payload.
- * @param payload Profile update payload (email, display name, avatar URL, etc.).
- * @returns UpdateProfileResult indicating success or failure.
+ * @param {UpdateUserPayload} payload - Profile update payload (email, display name, avatar URL, etc.).
+ * @returns {Promise<ApiResult>} UpdateProfileResult indicating success or failure.
  */
 export async function updateUserProfile(payload: UpdateUserPayload): Promise<ApiResult> {
 	const profileUpdateUrl = '/api/users/me';
@@ -195,26 +210,10 @@ export async function updateUserProfile(payload: UpdateUserPayload): Promise<Api
 			method: 'PATCH',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(cleanPayload),
-			credentials: 'include', // IMPORTANT
+			credentials: 'include',
 		});
 
-		if (!response.ok) {
-			console.error(`HTTP error! status: ${response.status} ${response.statusText}`);
-			let errorData: ApiErrorResponse = { error: `Server error (${response.status})` };
-			try {
-				errorData = await response.json();
-			} catch (jsonError) {
-				console.error("Unable to parse JSON error response:", jsonError);
-			}
-			if (response.status === 401) {
-				logout();
-				return { success: false, error: "Session expired or invalid. Please log in again." };
-			}
-			return { success: false, error: errorData.error || response.statusText };
-		}
-
-		const data: ApiSuccessResponse = await response.json();
-		console.log("Profile successfully updated via API:", data);
+		const data: ApiSuccessResponse = await handleApiResponse(response);
 
 		if (data.user) {
 			localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.user));

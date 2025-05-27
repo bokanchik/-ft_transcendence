@@ -1,6 +1,6 @@
 // app/services/users/models/friendModel.ts
 import { getDb } from '../utils/dbConfig.js';
-import { Friendship, User } from '../shared/types.js'; // Importez vos types
+import { Friendship, User, Friend, FriendshipStatus } from '../shared/types.js'; // Importez vos types
 
 export interface CreateFriendshipResult extends Omit<Friendship, 'created_at'> {} // `created_at` est géré par DB
 
@@ -16,13 +16,13 @@ export async function createFriendshipRequestInDb(user1Id: number, user2Id: numb
     const [id1, id2] = user1Id < user2Id ? [user1Id, user2Id] : [user2Id, user1Id];
 
     const result = await db.run(
-        `INSERT INTO friendships (user1_id, user2_id, initiator_id, status) VALUES (?, ?, ?, 'pending')`,
-        [id1, id2, initiatorId]
+        `INSERT INTO friendships (user1_id, user2_id, initiator_id, status) VALUES (?, ?, ?, ?)`,
+        [id1, id2, initiatorId, FriendshipStatus.PENDING]
     );
     if (result.lastID === undefined) {
         throw new Error("Failed to create friendship, no lastID returned.");
     }
-    return { id: result.lastID, user1_id: id1, user2_id: id2, initiator_id: initiatorId, status: 'pending' };
+    return { id: result.lastID, user1_id: id1, user2_id: id2, initiator_id: initiatorId, status: FriendshipStatus.PENDING };
 }
 
 /**
@@ -59,7 +59,7 @@ interface UpdateResult {
  * @param {string} status - New status ('accepted', 'declined', 'blocked').
  * @returns {Promise<UpdateResult>} The result of the database operation.
  */
-export async function updateFriendshipStatusInDb(friendshipId: number, status: Friendship['status']): Promise<UpdateResult> {
+export async function updateFriendshipStatusInDb(friendshipId: number, status: FriendshipStatus): Promise<UpdateResult> {
     const db = getDb();
     const result = await db.run(
         `UPDATE friendships SET status = ? WHERE id = ?`,
@@ -79,25 +79,13 @@ export async function deleteFriendshipInDb(friendshipId: number): Promise<Update
     return { changes: result.changes };
 }
 
-// Type pour les amis avec leurs détails
-export interface DetailedFriend {
-    friendship_id: number;
-    friendship_status: Friendship['status'];
-    friend_id: number;
-    friend_display_name: string;
-    friend_username: string;
-    friend_wins: number;
-    friend_losses: number;
-    friend_online_status: User['status'];
-    friend_avatar_url: string | null;
-}
 /**
  * Retrieves all accepted friendships for a specific user.
  * Includes details about the friend (display_name, wins, losses, status, avatar_url).
  * @param {number} userId - ID of the user.
  * @returns {Promise<DetailedFriend[]>} List of friends with their details.
  */
-export async function getAcceptedFriendsForUserInDb(userId: number): Promise<DetailedFriend[]> {
+export async function getAcceptedFriendsForUserInDb(userId: number): Promise<Friend[]> {
     const db = getDb();
     // Le query est long, on assume qu'il retourne les champs correspondants à DetailedFriend
     const query = `
@@ -116,7 +104,7 @@ export async function getAcceptedFriendsForUserInDb(userId: number): Promise<Det
         JOIN users u2 ON f.user2_id = u2.id
         WHERE (f.user1_id = ? OR f.user2_id = ?) AND f.status = 'accepted'
     `;
-    return db.all<DetailedFriend[]>(query, userId, userId, userId, userId, userId, userId, userId, userId, userId);
+    return db.all<Friend[]>(query, userId, userId, userId, userId, userId, userId, userId, userId, userId);
 }
 
 // Type pour les requêtes reçues

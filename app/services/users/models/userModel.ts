@@ -1,7 +1,7 @@
 // app/services/users/models/userModel.ts
 import { getDb } from '../utils/dbConfig.js';
 import { ERROR_MESSAGES } from '../shared/auth-plugin/appError.js';
-import { User, UserWithPasswordHash, CreateUserPayload, UpdatedUserResult, UpdateUserPayload } from '../shared/types.js'; // Importez vos types
+import { User, UserWithPasswordHash, CreateUserPayload, UpdatedUserResult, UpdateUserPayload, UserOnlineStatus } from '../shared/types.js'; // Importez vos types
 
 /**
  * Retrieves all users from the database.
@@ -109,6 +109,15 @@ export async function updateUserInDb(userId: number, updates: UpdateUserPayload)
 		console.error('Error updating user:', error);
 		throw new Error(ERROR_MESSAGES.DATABASE_ERROR);
 	}
+}
+
+export async function updateStatusInDb(userId: number, status: UserOnlineStatus): Promise<void> {
+    const db = getDb();
+    const sql = `UPDATE users SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
+    const result = await db.run(sql, [status, userId]);
+    if (result.changes === 0) {
+        throw new Error(`User ${userId} not found or status unchanged.`);
+    }
 }
 
 export async function deleteUserFromDb(userId: number): Promise<void> {

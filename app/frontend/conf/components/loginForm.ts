@@ -76,3 +76,91 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 
 	return formWrapper;
 }
+// app/frontend/conf/components/loginForm.ts
+// import { LoginRequestBody, ApiResult, User } from '../shared/types.js'; // Added User
+// import { createElement, createInputField, createActionButton } from '../utils/domUtils.js';
+
+// interface LoginFormProps {
+//     onLoginAttempt: (credentials: LoginRequestBody) => Promise<ApiResult>;
+//     onLoginSuccess: (userData: User) => void;
+// }
+
+// export function LoginForm(props: LoginFormProps): HTMLElement {
+//     const { onLoginAttempt, onLoginSuccess } = props;
+
+//     const messageDiv = createElement('div', {
+//         id: 'login-message-component',
+//         className: 'mt-4 text-center text-sm min-h-[1.25rem]'
+//     });
+
+//     const identifierField = createInputField('identifier', 'Username or Email', {
+//         required: true,
+//         placeholder: 'Enter your username or email'
+//     });
+
+//     const passwordField = createInputField('password', 'Password', {
+//         type: 'password',
+//         required: true,
+//         wrapperClass: 'mb-6' // Specific class for password field wrapper
+//     });
+
+//     const loginButton = createActionButton({
+//         text: 'Sign In',
+//         variant: 'success', // Using predefined variant
+//         onClick: async () => { /* Will be handled by form submit */ }
+//     });
+//     loginButton.type = 'submit';
+//     loginButton.id = 'login-button';
+//     loginButton.classList.add('w-full');
+
+
+//     const form = createElement('form', { id: 'login-form-component' }, [
+//         identifierField,
+//         passwordField,
+//         createElement('div', { className: 'flex items-center justify-between' }, [
+//             loginButton
+//         ])
+//     ]);
+    
+//     const formWrapper = createElement('div', {}, [form, messageDiv]);
+
+
+//     const getInputValue = (field: HTMLElement): string => (field.querySelector('input') as HTMLInputElement).value;
+
+//     form.addEventListener('submit', async (event) => {
+//         event.preventDefault();
+//         messageDiv.textContent = 'Attempting login...';
+//         messageDiv.className = 'mt-4 text-center text-sm text-gray-600 min-h-[1.25rem]';
+//         loginButton.disabled = true;
+//         const originalButtonText = loginButton.textContent;
+//         loginButton.textContent = 'Signing In...';
+
+//         const identifier = getInputValue(identifierField).trim();
+//         const password = getInputValue(passwordField); // No trim for password
+
+//         if (!identifier || !password) {
+//             messageDiv.textContent = 'Please enter both username/email and password.';
+//             messageDiv.className = 'mt-4 text-center text-sm text-red-600 min-h-[1.25rem]';
+//             loginButton.disabled = false;
+//             loginButton.textContent = originalButtonText;
+//             return;
+//         }
+
+//         const result = await onLoginAttempt({ identifier, password });
+
+//         loginButton.disabled = false;
+//         loginButton.textContent = originalButtonText;
+
+//         if (result.success) {
+//             messageDiv.textContent = `Login successful! Welcome ${result.data.user.display_name || result.data.user.username}!`;
+//             messageDiv.className = 'mt-4 text-center text-sm text-green-600 min-h-[1.25rem]';
+//             onLoginSuccess(result.data.user);
+//         } else {
+//             messageDiv.textContent = result.error || 'Login failed. Please try again.';
+//             messageDiv.className = 'mt-4 text-center text-sm text-red-600 min-h-[1.25rem]';
+//             (passwordField.querySelector('input') as HTMLInputElement).value = '';
+//         }
+//     });
+
+//     return formWrapper;
+// }

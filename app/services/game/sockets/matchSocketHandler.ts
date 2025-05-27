@@ -26,10 +26,10 @@ async function onlineSocketEvents(socket: Socket) {
 
 async function waitingRoomHandler(socket: Socket) {
     
-    socket.on('authenticate', async ({ display_name, username }) => {
+    socket.on('authenticate', async ({ display_name, userId }) => {
         try {
             // store display_name and socket.id in waiting list if not already in        
-            const newPlayer = await addPlayerToWaitingList(display_name,username, socket.id);
+            const newPlayer = await addPlayerToWaitingList(display_name,userId, socket.id);
             
             if (newPlayer) {
                 socket.emit('inQueue');

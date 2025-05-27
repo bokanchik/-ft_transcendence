@@ -1,17 +1,29 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { JWTPayload } from '../types.js';
+import { config } from '../env.js';
 import fastifyJwt from '@fastify/jwt';
 import fastifyCookie, { CookieSerializeOptions } from '@fastify/cookie';
 import fastifyCsrfProtection from '@fastify/csrf-protection';
 
 export const jwtToken: string = 'jwt_token';
+export const csrfCookieName: string = 'csrf_token';
 
 export const cookieOptions: CookieSerializeOptions = {
 	path: '/',
 	httpOnly: true,
 	secure: true,
-	// secure: process.env.NODE_ENV === 'production',
+	// secure: config.NODE_ENV === 'production',
 	sameSite: 'strict',
+	maxAge: 60 * 60 * 24 * 7,
+};
+
+export const csrfOptions: CookieSerializeOptions = {
+	path: '/',
+	httpOnly: true,
+	secure: true,
+	// secure: config.NODE_ENV === 'production',
+	sameSite: 'lax',
+	signed: true,
 	maxAge: 60 * 60 * 24 * 7,
 };
 
@@ -23,7 +35,7 @@ export async function setupPlugins(fastify: FastifyInstance): Promise<void> {
 }
 
 export async function registerCookiePlugin(fastify: FastifyInstance): Promise<void> {
-	const cookieSecret = process.env.COOKIE_SECRET || 'COOKIE_SECRET_DUR';
+	const cookieSecret = config.COOKIE_SECRET;
 	await fastify.register(fastifyCookie, {
 		secret: cookieSecret,
 		parseOptions: {},
@@ -33,20 +45,14 @@ export async function registerCookiePlugin(fastify: FastifyInstance): Promise<vo
 
 export async function registerCsrfPlugin(fastify: FastifyInstance): Promise<void> {
 	await fastify.register(fastifyCsrfProtection, {
-		cookieKey: 'csrf-secret', // Convention: _csrf
-		cookieOpts: {
-			signed: true,
-			httpOnly: true,
-			secure: process.env.NODE_ENV === 'production',
-			sameSite: 'lax',
-			path: '/',
-		},
+		cookieKey: csrfCookieName,
+		cookieOpts: csrfOptions,
 	});
 	fastify.log.info('CSRF protection registered');
 }
 
 export async function registerJWTPlugin(fastify: FastifyInstance): Promise<void> {
-	const jwtSecret = process.env.JWT_SECRET || 'SECRET_EN_DUR';
+	const jwtSecret = config.JWT_SECRET;
 	try {
 		await fastify.register(fastifyJwt, {
 			secret: jwtSecret,

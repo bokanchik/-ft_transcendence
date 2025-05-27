@@ -5,7 +5,7 @@ import { navigateTo } from '../services/router.js';
 
 export async function RegisterPage(): Promise<HTMLElement> {
 
-	
+
 	const container = document.createElement('div');
 	container.className = 'bg-gradient-to-r from-blue-500 to-purple-600 flex justify-center items-center min-h-screen p-8';
 
@@ -92,7 +92,7 @@ export async function RegisterPage(): Promise<HTMLElement> {
 		const confirmPassword = confirmPasswordInput.value;
 		const avatarUrl = avatarUrlInput.value.trim();
 
-		// --- Validation côté client (basique) ---
+		// --- Validation des champs ---
 		if (!username || !email || !displayName || !password || !confirmPassword) {
 			messageDiv.textContent = 'Please fill in all required fields.';
 			messageDiv.className = 'mt-4 text-center text-sm text-red-600';
@@ -143,12 +143,9 @@ export async function RegisterPage(): Promise<HTMLElement> {
 			messageDiv.textContent = `Registration successful for ${username}! Redirecting to login...`;
 			messageDiv.className = 'mt-4 text-center text-sm text-green-600';
 			form.reset(); // Clear the form fields
-
-			// Rediriger vers la page de connexion après un délai
-			setTimeout(() => { navigateTo('/dashboard'); }, 500);
+			setTimeout(() => { navigateTo('/login'); }, 500);
 
 		} else {
-			// Échec (message déjà affiché par alert)
 			messageDiv.textContent = 'Registration failed. Please check the details and try again.'; // Message générique post-alert
 			messageDiv.className = 'mt-4 text-center text-sm text-red-600';
 			passwordInput.value = ''; // Clear password fields on failure
@@ -169,3 +166,141 @@ function isValidHttpUrl(string: string): boolean {
 	}
 	return url.protocol === "http:" || url.protocol === "https:";
 }
+
+// app/frontend/conf/pages/registerPage.ts
+// import { attemptRegister } from '../services/authService.js';
+// import { RegisterRequestBody, ApiResult } from '../shared/types.js';
+// import { navigateTo } from '../services/router.js';
+// import { createElement, createInputField, createActionButton } from '../utils/domUtils.js';
+// import { isValidHttpUrl, isValidEmailFormat } from '../services/apiUtils.js'; // Import validation
+
+// export async function RegisterPage(): Promise<HTMLElement> {
+// 	const messageDiv = createElement('div', {
+// 		id: 'register-message',
+// 		className: 'mt-4 text-center text-sm min-h-[1.25rem]'
+// 	});
+
+// 	const usernameField = createInputField('username', 'Username', {
+// 		required: true, minLength: 3, maxLength: 20, helpText: '3 to 20 characters.'
+// 	});
+// 	const emailField = createInputField('email', 'Email', {
+// 		type: 'email', required: true
+// 	});
+// 	const displayNameField = createInputField('display_name', 'Display Name', {
+// 		required: true, minLength: 3, maxLength: 20, helpText: '3 to 20 characters.'
+// 	});
+// 	const passwordField = createInputField('password', 'Password', {
+// 		type: 'password', required: true, minLength: 8, maxLength: 100, helpText: '8 to 100 characters.'
+// 	});
+// 	const confirmPasswordField = createInputField('confirm_password', 'Confirm Password', {
+// 		type: 'password', required: true, minLength: 8, maxLength: 100, wrapperClass: 'mb-6'
+// 	});
+// 	const avatarUrlField = createInputField('avatar_url', 'Avatar URL (Optional)', {
+// 		type: 'url', placeholder: 'https://example.com/avatar.jpg', wrapperClass: 'mb-6'
+// 	});
+
+// 	const registerButton = createActionButton({
+// 		text: 'Register',
+// 		baseClass: 'bg-yellow-500 hover:bg-yellow-600', // Specific color
+// 		onClick: async () => { /* form submit */ }
+// 	});
+// 	registerButton.type = 'submit';
+// 	registerButton.id = 'register-button';
+// 	registerButton.classList.add('w-full');
+
+// 	const form = createElement('form', { id: 'register-form' }, [
+// 		usernameField,
+// 		emailField,
+// 		displayNameField,
+// 		passwordField,
+// 		confirmPasswordField,
+// 		avatarUrlField,
+// 		createElement('div', { className: 'flex items-center justify-between' }, [registerButton])
+// 	]);
+
+// 	const linksDiv = createElement('div', {
+// 		className: 'mt-6 text-center',
+// 		innerHTML: `
+//             <a href="/" data-link class="text-blue-600 hover:text-blue-800 text-sm">Back to Home</a>
+//             <span class="mx-2 text-gray-400">|</span>
+//             <a href="/login" data-link class="text-blue-600 hover:text-blue-800 text-sm">Already have an account? Login</a>
+//         `
+// 	});
+
+// 	const formContainer = createElement('div', {
+// 		className: 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full'
+// 	}, [
+// 		createElement('h2', { textContent: 'Register', className: 'text-3xl font-bold mb-6 text-center text-gray-800' }),
+// 		form,
+// 		messageDiv,
+// 		linksDiv
+// 	]);
+
+// 	const pageContainer = createElement('div', {
+// 		className: 'bg-gradient-to-r from-blue-500 to-purple-600 flex justify-center items-center min-h-screen p-8'
+// 	}, [formContainer]);
+
+// 	const getVal = (field: HTMLElement) => (field.querySelector('input') as HTMLInputElement).value;
+
+// 	form.addEventListener('submit', async (event) => {
+// 		event.preventDefault();
+// 		messageDiv.textContent = '';
+// 		messageDiv.className = 'mt-4 text-center text-sm min-h-[1.25rem]';
+// 		const originalButtonText = registerButton.textContent;
+
+// 		const username = getVal(usernameField).trim();
+// 		const email = getVal(emailField).trim();
+// 		const displayName = getVal(displayNameField).trim();
+// 		const password = getVal(passwordField); // No trim
+// 		const confirmPassword = getVal(confirmPasswordField);
+// 		const avatarUrl = getVal(avatarUrlField).trim();
+
+// 		const displayError = (msg: string) => {
+// 			messageDiv.textContent = msg;
+// 			messageDiv.className = 'mt-4 text-center text-sm text-red-600 min-h-[1.25rem]';
+// 		};
+
+// 		if (!username || !email || !displayName || !password || !confirmPassword) {
+// 			return displayError('Please fill in all required fields.');
+// 		}
+// 		if (!isValidEmailFormat(email)) {
+// 			return displayError('Invalid email format.');
+// 		}
+// 		if (password !== confirmPassword) {
+// 			(passwordField.querySelector('input') as HTMLInputElement).value = '';
+// 			(confirmPasswordField.querySelector('input') as HTMLInputElement).value = '';
+// 			return displayError('Passwords do not match.');
+// 		}
+// 		if (password.length < 8) {
+// 			return displayError('Password must be at least 8 characters long.');
+// 		}
+// 		if (avatarUrl && !isValidHttpUrl(avatarUrl)) {
+// 			return displayError('Avatar URL must be a valid HTTP/HTTPS URL.');
+// 		}
+
+// 		messageDiv.textContent = 'Attempting registration...';
+// 		messageDiv.className = 'mt-4 text-center text-sm text-gray-600 min-h-[1.25rem]';
+// 		registerButton.disabled = true;
+// 		registerButton.textContent = 'Registering...';
+
+// 		const credentials: RegisterRequestBody = { username, email, password, display_name: displayName };
+// 		if (avatarUrl) credentials.avatar_url = avatarUrl;
+
+// 		const registrationResult: ApiResult = await attemptRegister(credentials);
+
+// 		registerButton.disabled = false;
+// 		registerButton.textContent = originalButtonText;
+
+// 		if (registrationResult.success) {
+// 			messageDiv.textContent = `Registration successful for ${username}! Redirecting to login...`;
+// 			messageDiv.className = 'mt-4 text-center text-sm text-green-600 min-h-[1.25rem]';
+// 			form.reset();
+// 			setTimeout(() => { navigateTo('/login'); }, 1500); // Increased timeout slightly
+// 		} else {
+// 			displayError(registrationResult.error || 'Registration failed. Please try again.');
+// 			(passwordField.querySelector('input') as HTMLInputElement).value = '';
+// 			(confirmPasswordField.querySelector('input') as HTMLInputElement).value = '';
+// 		}
+// 	});
+// 	return pageContainer;
+// }

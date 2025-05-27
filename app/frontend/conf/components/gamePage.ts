@@ -1,17 +1,49 @@
 import { navigateTo } from '../services/router.js';
 import { handleOnlineGame } from '../services/initOnlineGame.js';
+// @ts-ignore
+import { User } from '../shared/types.js';
+import { HeaderComponent } from './headerComponent.js'; // ajout arthur pour le header
 import { showToast } from './toast.js';
+import { getUserDataFromStorage } from '../services/authService.js';
 
 export type GameMode = 'local' | 'remote';
 
 export function GamePage(): HTMLElement {
-    
+    //ajout arthur -> on check tout de suite si l'utilisateur est connecté
+    const authData = getUserDataFromStorage();
+
+    // Le HeaderComponent attend un currentUser.
+    // Si l'utilisateur n'est pas connecté, redirigez-le ou affichez un état alternatif.
+    if (!authData) {
+        console.warn("GamePage: User not authenticated, redirecting to login.");
+        navigateTo('/login');
+        // Retourner un élément vide pour éviter les erreurs de rendu pendant la redirection
+        return document.createElement('div');
+    }
+    const currentUser: User = authData as User;
+
     // --- Main Container ---
-    const container: HTMLDivElement = document.createElement('div');
-    container.className = 'bg-gradient-to-r from-blue-500 to-purple-600 flex justify-center items-center min-h-screen p-8';
+    const pageWrapper = document.createElement('div');
+    pageWrapper.className = 'flex flex-col min-h-screen'; // Assure que la page prend toute la hauteur
+
+    // --- Header ---
+    const headerElement = HeaderComponent({ currentUser});
+    pageWrapper.appendChild(headerElement);
+
+    // --- Game Page Content ---
+    // L'ancien 'container' devient 'gameContentContainer'
+    const gameContentContainer: HTMLDivElement = document.createElement('div');
+    gameContentContainer.className = 'flex-grow bg-gradient-to-r from-blue-500 to-purple-600 flex justify-center items-center p-8';
     
     const formContainer: HTMLDivElement = document.createElement('div');
-    formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';
+    formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';   
+    // fin ajout arthur
+
+    // const container: HTMLDivElement = document.createElement('div');
+    // container.className = 'bg-gradient-to-r from-blue-500 to-purple-600 flex justify-center items-center min-h-screen p-8';
+    
+    // const formContainer: HTMLDivElement = document.createElement('div');
+    // formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';
     
     // --- Title ---
     const title: HTMLHeadElement = document.createElement('h2');
@@ -55,8 +87,14 @@ export function GamePage(): HTMLElement {
     footer.appendChild(homeLink);
     
     // --- Ajout des éléments au conteneur principal ---
-    formContainer.append(title, buttonsContainer, footer);
-    container.appendChild(formContainer); 
+    // debut ajout arthur
+        formContainer.append(title, buttonsContainer, footer);
+    gameContentContainer.appendChild(formContainer);
+    pageWrapper.appendChild(gameContentContainer);
+    // fin ajout arthur
+
+    // formContainer.append(title, buttonsContainer, footer);
+    // container.appendChild(formContainer); 
     
     // --- Event: Local game button clicked 
     localGameButton.addEventListener('click', async () =>  {
@@ -74,13 +112,13 @@ export function GamePage(): HTMLElement {
             }
             const userData = await userRes.json();
             const display_name: string = userData.display_name;
-            const username: string = userData.username;
+            const userId: string = userData.userId;
 
             console.log(userData);
-            console.log(`username:` + username);
+            console.log(`userId:` + userId);
             sessionStorage.setItem('gameMode', 'remote');
 
-            await handleOnlineGame(display_name, username, buttonsContainer, onlineGameButton, title);
+        await handleOnlineGame(display_name, userId, buttonsContainer, onlineGameButton, title);
         } catch (err: unknown) {
             console.log(`Failed to fetch from user`);
             showToast('Something went wrong. Please try again later.', 'error');
@@ -88,6 +126,7 @@ export function GamePage(): HTMLElement {
         }
     });
 
-        return container;
+        // return container;
+        return pageWrapper; // ajout arthur
 }
     

@@ -1,105 +1,132 @@
 // /components/friendsList.ts
-import { Friend } from '../shared/types.js';
-import { navigateTo } from '../services/router.js'; // Pour l'action "view-profile"
+import { Friend, UserOnlineStatus } from '../shared/types.js';
+import { navigateTo } from '../services/router.js';
+import { showCustomConfirm, showToast } from './toast.js';
 
 interface FriendsListProps {
-	friends: Friend[];
-	onRemoveFriend: (friendId: number) => Promise<void>; // Callback pour supprimer un ami
-	// onBlockFriend: (friendId: number) => Promise<void>; // Exemple d'autre action
+    friends: Friend[];
+    onRemoveFriend: (friendshipId: number) => Promise<void>;
 }
 
 export function FriendsListComponent(props: FriendsListProps): HTMLElement {
-	const { friends, onRemoveFriend } = props;
+    const { friends, onRemoveFriend } = props;
 
-	const section = document.createElement('div');
-	section.id = 'friends-list-section';
-	section.className = 'mt-8 p-6 bg-green-50 border border-green-200 rounded-lg shadow-sm';
+    const section = document.createElement('div');
+    section.id = 'friends-list-section';
+    section.className = 'mt-8 p-6 bg-white border border-gray-200 rounded-lg shadow-lg'; // Changed background for better contrast
 
-	const title = document.createElement('h2');
-	title.className = 'text-2xl font-semibold text-green-800 mb-4';
-	title.innerHTML = `Mes Amis (<span id="friends-count">${friends.length}</span>)`;
+    const title = document.createElement('h2');
+    title.className = 'text-2xl font-semibold text-gray-800 mb-6';
+    title.innerHTML = `Mes Amis (<span id="friends-count">${friends.length}</span>)`;
 
-	const ul = document.createElement('ul');
-	ul.id = 'friends-list';
-	ul.className = 'space-y-3';
+    const ul = document.createElement('ul');
+    ul.id = 'friends-list';
+    ul.className = 'space-y-4';
 
-	if (!friends.length) {
-		ul.innerHTML = `<li class="text-gray-500 italic">Vous n'avez pas encore d'amis.</li>`;
-	} else {
-		friends.forEach(friend => {
-			const actualFriendshipId = friend.friendship_id;
-			const actualDisplayName = friend.friend_display_name || friend.friend_username;
-			const actualUsername = friend.friend_username;
-			const actualAvatarUrl = friend.friend_avatar_url;
-			const actualFriendId = friend.friend_id;
-			const actualStatus = friend.friend_online_status;
+    if (!friends.length) {
+        ul.innerHTML = `<li class="text-gray-500 italic p-4 text-center">Vous n'avez pas encore d'amis.</li>`;
+    } else {
+        friends.forEach(friend => {
+            const displayName = friend.friend_display_name;
+            const avatarUrl = friend.friend_avatar_url;
+            const friendId = friend.friend_id;
+            const friendshipId = friend.friendship_id;
+            const status = friend.friend_online_status;
+            const wins = friend.friend_wins ?? 0;
+            const losses = friend.friend_losses ?? 0;
 
-			const avatarFallbackChar = actualDisplayName ? actualDisplayName.charAt(0).toUpperCase() : 'U';
-			const avatar = actualAvatarUrl || `https://via.placeholder.com/40/007bff/ffffff?text=${avatarFallbackChar}`;
+            const avatarFallbackName = displayName.charAt(0).toUpperCase();
+            const avatar = avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random&color=fff&size=40`;
 
-			let statusIndicator = '';
-			if (actualStatus) {
-				const statusColor = actualStatus === 'online' ? 'bg-green-500' : (actualStatus === 'in-game' ? 'bg-yellow-500' : 'bg-gray-400');
-				statusIndicator = `<span class="inline-block w-3 h-3 ${statusColor} rounded-full mr-2" title="${actualStatus}"></span>`;
-			}
+            let statusIndicatorClass = 'bg-gray-400';
+            let statusText = 'Offline';
 
-			const li = document.createElement('li');
-			li.dataset.friendId = actualFriendId.toString();
-			li.dataset.friendshipId = actualFriendshipId.toString();
-			li.className = 'p-3 bg-white border border-gray-200 rounded-md shadow-sm flex justify-between items-center';
-			li.innerHTML = `
-                <div class="flex items-center">
-                    <img src="${avatar}" alt="${actualDisplayName}" class="w-10 h-10 rounded-full mr-3 object-cover">
-                    <div>
-                        ${statusIndicator}
-                        <strong class="text-green-700">${actualDisplayName}</strong>
-                        <span class="text-xs text-gray-500 block">(${actualUsername})</span>
+            if (status === UserOnlineStatus.ONLINE) {
+                statusIndicatorClass = 'bg-green-500';
+                statusText = 'Online';
+            } else if (status === UserOnlineStatus.IN_GAME) {
+                statusIndicatorClass = 'bg-yellow-500';
+                statusText = 'In Game';
+            }
+
+            const li = document.createElement('li');
+            li.dataset.friendId = friendId.toString();
+            li.dataset.friendshipId = friendshipId.toString();
+            li.className = 'p-4 bg-gray-50 border border-gray-200 rounded-lg shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0';
+            li.innerHTML = `
+                <div class="flex items-center w-full sm:w-auto">
+                    <img src="${avatar}" alt="${displayName}" class="w-12 h-12 rounded-full mr-4 object-cover">
+                    <div class="flex-grow">
+                        <div class="flex items-center mb-1">
+                            <span class="inline-block w-3 h-3 ${statusIndicatorClass} rounded-full mr-2" title="${statusText}"></span>
+                            <strong class="text-lg text-gray-700">${displayName}</strong>
+                        </div>
+                        <div class="text-xs text-gray-500">
+                            <span>Wins: ${wins}</span> | <span>Losses: ${losses}</span>
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <button data-action="view-profile" data-user-id="${actualFriendId}" class="text-xs bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-2 rounded mr-1">Profil</button>
-                    <button data-action="remove-friend" data-user-id="${actualFriendshipId}" class="text-xs bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded">Supprimer</button>
+                <div class="flex space-x-2 self-end sm:self-center pt-2 sm:pt-0">
+                    <button data-action="view-profile" data-user-id="${friendId}" class="text-xs bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1.5 px-3 rounded-md">Profil</button>
+                    <button data-action="remove-friend" data-friendship-id="${friendshipId}" class="text-xs bg-red-500 hover:bg-red-600 text-white font-semibold py-1.5 px-3 rounded-md">Supprimer</button>
                 </div>
             `;
-			ul.appendChild(li);
-		});
-	}
+            ul.appendChild(li);
+        });
+    }
 
-	section.appendChild(title);
-	section.appendChild(ul);
+    section.appendChild(title);
+    section.appendChild(ul);
 
-	// Gestionnaire d'événements pour la liste d'amis
-	ul.addEventListener('click', async (event) => {
-		const target = event.target as HTMLElement;
-		if (target.tagName !== 'BUTTON' || !target.dataset.action) return;
+    ul.addEventListener('click', async (event) => {
+        const target = event.target as HTMLElement;
+        const button = target.closest('button[data-action]') as HTMLButtonElement | null;
+        if (!button) return;
 
-		const button = target as HTMLButtonElement;
-		const listItem = target.closest('li[data-friend-id]') as HTMLLIElement;
-		if (!listItem) return;
+        const action = button.dataset.action;       
+        if (action === 'view-profile') {
+            const userIdToView = button.dataset.userId; // Get userId from button
+            if (userIdToView) {
+                navigateTo(`/profile/${userIdToView}`);
+            }
+        } else if (action === 'remove-friend') {
+            const friendshipIdToRemove = button.dataset.friendshipId; // Get friendshipId from button
+            if (friendshipIdToRemove) {
+                // Utilisation de la nouvelle boîte de dialogue personnalisée
+                const confirmed = await showCustomConfirm(
+                    'Êtes-vous sûr de vouloir supprimer cet ami de votre liste ? Cette action est irréversible.',
+                    'Supprimer l\'ami' // Titre optionnel
+                );
 
-		const friendId = parseInt(listItem.dataset.friendId || '', 10);
-		const friendshipId = parseInt(listItem.dataset.friendshipId || '', 10);
-		if (isNaN(friendId) || isNaN(friendshipId)) return;
+                if (confirmed) {
+                    button.disabled = true;
+                    button.textContent = '...';
+                    try {
+                        await onRemoveFriend(parseInt(friendshipIdToRemove, 10));
+                        // showToast('Ami supprimé avec succès.', 'success'); // Exemple
+                    } catch (error: any) {
+                        console.error('Erreur lors de la suppression de l\'ami:', error);
+                        showToast(`Erreur: ${error.message || 'Impossible de supprimer l\'ami.'}`, 'error');
+                        button.disabled = false;
+                        button.textContent = 'Supprimer';
+                    }
+                }
+            }
+            // if (friendshipIdToRemove && confirm(`Êtes-vous sûr de vouloir supprimer cet ami ?`)) {
+            //     button.disabled = true;
+            //     button.textContent = '...';
+            //     try {
+            //         await onRemoveFriend(parseInt(friendshipIdToRemove, 10));
+            //         // button.closest('li')?.remove();
+            //     } catch (error: any) {
+            //         console.error('Erreur lors de la suppression de l\'ami:', error);
+            //         alert(`Erreur: ${error.message || 'Impossible de supprimer l\'ami.'}`);
+            //         button.disabled = false;
+            //         button.textContent = 'Supprimer';
+            //     }
+            // }
+        }
+    });
 
-		const action = target.dataset.action;
-
-		if (action === 'view-profile') {
-			navigateTo(`/profile/${friendId}`);
-		} else if (action === 'remove-friend') {
-			if (confirm(`Êtes-vous sûr de vouloir supprimer cet ami ?`)) {
-				button.disabled = true;
-				button.textContent = '...';
-				try {
-					await onRemoveFriend(friendshipId);
-				} catch (error: any) {
-					console.error('Erreur lors de la suppression de l\'ami:', error);
-					alert(`Erreur: ${error.message || 'Impossible de supprimer l\'ami.'}`);
-					button.disabled = false;
-					button.textContent = 'Supprimer';
-				}
-			}
-		}
-	});
-
-	return section;
+    return section;
 }

@@ -1,4 +1,16 @@
 // app/services/users/types.ts (ou types/index.ts)
+export enum UserOnlineStatus {
+	ONLINE = 'online',
+	OFFLINE = 'offline',
+	IN_GAME = 'in-game',
+}
+
+export enum FriendshipStatus {
+	PENDING = 'pending',
+	ACCEPTED = 'accepted',
+	DECLINED = 'declined',
+	BLOCKED = 'blocked',
+}
 
 export interface User {
 	id: number;
@@ -8,7 +20,7 @@ export interface User {
 	avatar_url: string | null;
 	wins: number;
 	losses: number;
-	status: 'online' | 'offline' | 'in-game';
+	status: UserOnlineStatus;
 	created_at: string; // ou Date
 	updated_at: string; // ou Date
 }
@@ -49,7 +61,7 @@ export interface Friendship {
 	user1_id: number;
 	user2_id: number;
 	initiator_id: number;
-	status: 'pending' | 'accepted' | 'declined' | 'blocked';
+	status: FriendshipStatus;
 	created_at?: string;
 }
 
@@ -69,8 +81,8 @@ export interface Match {
 export interface JWTPayload {
 	id: number;
 	username: string;
-	// iat?: number; // Issued at
-	// exp?: number; // Expiration time
+	iat?: number; // Issued at
+	exp?: number; // Expiration time
 }
 
 export interface UpdatedUserResult {
@@ -97,8 +109,8 @@ export interface FriendRequestUserData {
 
 export interface PendingFriendRequest {
 	friendship_id: number;
-	requester?: FriendRequestUserData; // Used for received requests
-	receiver?: FriendRequestUserData; // Used for sent requests
+	requester?: FriendRequestUserData;
+	receiver?: FriendRequestUserData;
 	created_at: string;
 }
 
@@ -109,14 +121,14 @@ export interface ApiErrorResponse {
 
 export interface Friend {
 	friendship_id: number;
-	friendship_status: string;
-	friend_id: number;             // Used for data-friend-id and data-user-id
-	friend_username: string;       // Used for display
-	friend_display_name?: string;  // Used for display
-	friend_avatar_url?: string;    // Used for avatar
-	friend_wins?: number;
-	friend_losses?: number;
-	friend_online_status?: 'online' | 'offline' | 'in-game'; // Used for status indicator
+	friendship_status: FriendshipStatus;
+	friend_id: number;
+	friend_username: string;
+	friend_display_name: string;
+	friend_avatar_url?: string;
+	friend_wins: number;
+	friend_losses: number;
+	friend_online_status: UserOnlineStatus;
 }
 
 export type FriendRequestResult =

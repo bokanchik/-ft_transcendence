@@ -7,7 +7,7 @@ import { updateStatus } from "../database/dbModels.ts";
 
 type PlayerInfo = {
     display_name: string;
-    username: string;
+    userId: string;
     socketId: string;
 }
 
@@ -53,8 +53,8 @@ export async function waitingRoom() {
 
             insertMatchToDB({
                 matchId,
-                player1_id: player1.username,
-                player2_id: player2.username,
+                player1_id: player1.userId,
+                player2_id: player2.userId,
                 player1_socket: player1.socketId,
                 player2_socket: player2.socketId
             });
@@ -101,14 +101,14 @@ export async function removePlayerFromWaitingList(socketId: string) {
    // fastify.log.warn(`Player with socket ID ${socketId} not found in waiting list.`);
 }
 
-export function addPlayerToWaitingList(display_name: string, username: string, socketId: string) {
+export function addPlayerToWaitingList(display_name: string, userId: string, socketId: string) {
    // check if display_name is already in waiting list
    if (waitingList.has(socketId)) {
         fastify.log.info(`Player ${display_name} with socket: ${socketId} is already in waiting list. List size: ${waitingList.size}`);
         return false;
     }
     // add display_name and socketId to waiting list
-    waitingList.set(socketId, { display_name, username, socketId } );
+    waitingList.set(socketId, { display_name, userId, socketId } );
     fastify.log.info(`Player ${display_name} with socket: ${socketId} added to waiting list. List size: ${waitingList.size}`);
     return true;
 }

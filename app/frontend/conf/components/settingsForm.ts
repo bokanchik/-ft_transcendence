@@ -6,7 +6,7 @@ interface ProfileFormProps {
 	onProfileUpdate: (payload: UpdateUserPayload) => Promise<ApiResult>;
 }
 
-export function ProfileForm(props: ProfileFormProps): HTMLElement {
+export function SettingsForm(props: ProfileFormProps): HTMLElement {
 	const { user, onProfileUpdate } = props;
 
 	const formElement = document.createElement('form');

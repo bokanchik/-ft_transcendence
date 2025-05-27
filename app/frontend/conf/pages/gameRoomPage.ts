@@ -155,7 +155,7 @@ function clientSocketHandler(gameMode: string | null) {
 			if (!matchRes.ok) throw new Error('Failed to fetch match info');
 			const matchData = await matchRes.json();
 			const data = matchData.data;
-			const player1 = data.player1_id;
+			const player1 = data.player1_id; // userid
 			const player2 = data.player2_id;
 			const score1 = data.player1_score;
 			const score2 = data.player2_score;
@@ -169,6 +169,11 @@ function clientSocketHandler(gameMode: string | null) {
 		}
 	});
 	
+}
+
+async function getUserAvatar(userId: number) {	
+	const userRes = await(`/api/users/${userId}`);
+
 }
 
 function startOnlineGame(socket: SocketIOClient.Socket) {

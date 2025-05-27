@@ -16,6 +16,7 @@ import { fetchUsers } from '../services/api.js';
 import { FriendsListComponent } from '../components/friendsList.js';
 import { FriendRequestsComponent } from '../components/friendRequests.js';
 import { UserList, UserListProps } from '../components/userList.js';
+import { HeaderComponent } from '../components/headerComponent.js';
 import { showToast } from '../components/toast.js';
 
 // Placeholder pour l'historique des matchs
@@ -56,79 +57,8 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	dashboardWrapper.className = 'bg-white rounded-2xl shadow-2xl w-full max-w-6xl flex flex-col overflow-hidden';
 
 	// --- Section du haut (Langue, User Header) ---
-	const topSection = document.createElement('div');
-	topSection.className = 'flex justify-between items-center p-4 border-b border-gray-200';
-
-	const langButton = document.createElement('button');
-	langButton.className = 'bg-blue-500 text-white font-bold py-2 px-4 rounded-lg text-sm hover:bg-blue-600 transition-colors';
-	langButton.textContent = 'ENG';
-	// langButton.addEventListener('click', () => { /* Logique de changement de langue */ });
-
-	const userHeader = document.createElement('div');
-	userHeader.className = 'flex items-center space-x-4 relative';
-
-	const avatarDisplayWrapper = document.createElement('div');
-	avatarDisplayWrapper.className = 'bg-orange-400 p-2 rounded-lg flex items-center space-x-3 cursor-pointer select-none';
-	const displayNameHeader = document.createElement('span');
-	displayNameHeader.className = 'text-white font-semibold text-sm';
-	displayNameHeader.textContent = currentUser.display_name || currentUser.username;
-	const avatarHeader = document.createElement('img');
-	avatarHeader.className = 'w-10 h-10 rounded-full object-cover border-2 border-white';
-	const avatarFallbackName = currentUser.display_name || currentUser.username;
-	avatarHeader.src = currentUser.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(avatarFallbackName)}&background=0D8ABC&color=fff&size=128`;
-	avatarHeader.alt = 'User Avatar';
-	avatarDisplayWrapper.appendChild(displayNameHeader);
-	avatarDisplayWrapper.appendChild(avatarHeader);
-
-		// Mini-menu caché par défaut
-		const miniMenu = document.createElement('div');
-		miniMenu.className = 'absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-50 hidden flex-col';
-		miniMenu.style.top = '110%';
-
-		const settingsButton = document.createElement('a');
-		settingsButton.href = '/profile';
-		settingsButton.setAttribute('data-link', '');
-		settingsButton.className = 'block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-lg';
-		settingsButton.textContent = 'Settings';
-
-		const logoutButtonEl = document.createElement('button');
-		logoutButtonEl.className = 'block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-b-lg';
-		logoutButtonEl.textContent = 'Logout';
-		logoutButtonEl.addEventListener('click', async () => {
-				try {
-						await logout();
-						showToast('You have been logged out.', 'success');
-				} catch (error) {
-						showToast('Error logging out.', 'error');
-				} finally {
-						navigateTo('/login');
-				}
-		});
-
-		miniMenu.appendChild(settingsButton);
-		miniMenu.appendChild(logoutButtonEl);
-		userHeader.appendChild(avatarDisplayWrapper);
-		userHeader.appendChild(miniMenu);
-
-		// Gestion de l'ouverture/fermeture du mini-menu
-		let menuOpen = false;
-		avatarDisplayWrapper.addEventListener('click', (e) => {
-				e.stopPropagation();
-				menuOpen = !menuOpen;
-				miniMenu.classList.toggle('hidden', !menuOpen);
-		});
-
-		// Fermer le menu si on clique ailleurs
-		document.addEventListener('click', () => {
-				if (menuOpen) {
-						menuOpen = false;
-						miniMenu.classList.add('hidden');
-				}
-		});
-		miniMenu.addEventListener('click', (e) => e.stopPropagation());
-
-	topSection.appendChild(langButton);
-	topSection.appendChild(userHeader);
+	const headerElement = HeaderComponent({ currentUser: currentUser! });
+	// Note: The global click listener for menu close is in HeaderComponent.
 
 	// --- Section principale (Sidebar + Contenu à onglets) ---
 	const mainSection = document.createElement('div');
@@ -202,7 +132,7 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	mainSection.appendChild(sidebar);
 	mainSection.appendChild(tabContentWrapper);
 
-	dashboardWrapper.appendChild(topSection);
+	dashboardWrapper.appendChild(headerElement);
 	dashboardWrapper.appendChild(mainSection);
 	pageContainer.appendChild(dashboardWrapper);
 
@@ -269,7 +199,7 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		]);
 
 		const userListProps: UserListProps = {
-			users: usersData as ApiUserType[], // S'assurer que le type correspond
+			users: usersData as ApiUserType[],
 			friends: friendsData,
 			sentRequests: sentRequestsData,
 			receivedRequests: receivedRequestsData,
@@ -287,10 +217,8 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		return FriendsListComponent({
 			friends: friends,
 			onRemoveFriend: async (friendshipId) => {
-				// TODO: Implémenter la vraie fonction removeFriend dans friendService.ts et l'importer
 				const result = await removeFriend(friendshipId);
 				showToast(result.message);
-				// TODO: test up ^ showToast(`Ami ${friendId} supprimé (simulation).`);
 				if (['friends', 'users'].includes(activeTabId)) await loadActiveTabContent();
 			},
 		});
