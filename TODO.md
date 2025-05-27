@@ -12,15 +12,18 @@
 
 ## sasha
 
-## TO:DO 23 mai:
+## TO:DO 23 mai (finished):
 
 —> clean gameRoomPage.js
-
 —> create route /api/game/match/:userId 
 
+
+## TO:DO 26 mai
 —>  l’avatar URL (si possible)
 
-—> RedisCache pour socket
+—> RedisCache pour socket ?
+
+-> commencer le tournement ? 
 
 
 ## taches secondaires
