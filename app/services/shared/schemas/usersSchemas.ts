@@ -17,8 +17,10 @@ export const UserBaseSchema = z.object({
     wins: z.number().int().default(0),
     losses: z.number().int().default(0),
     status: UserOnlineStatusSchema.default(UserOnlineStatus.OFFLINE),
-    created_at: z.string().datetime(), // Ou z.date()
-    updated_at: z.string().datetime(), // Ou z.date()
+    created_at: z.string(), // Ou z.date()
+    updated_at: z.string(), // Ou z.date()
+    // created_at: z.string().datetime(), // Ou z.date()
+    // updated_at: z.string().datetime(), // Ou z.date()
 });
 export type User = z.infer<typeof UserBaseSchema>;
 
@@ -38,7 +40,8 @@ export const RegisterBodySchema = z.object({
     avatar_url: UserBaseSchema.shape.avatar_url.optional(),
 });
 export type RegisterRequestBody = z.infer<typeof RegisterBodySchema>;
-export const RegisterRouteSchema = { // Pour Fastify
+
+export const RegisterRouteSchema = {
     body: RegisterBodySchema,
     response: {
         201: z.object({ message: z.string() })
@@ -51,26 +54,36 @@ export const LoginBodySchema = z.object({
     password: z.string().min(1),
 });
 export type LoginRequestBody = z.infer<typeof LoginBodySchema>;
-export const LoginRouteSchema = { // Pour Fastify
+
+export const LoginRouteSchema = {
     body: LoginBodySchema,
     response: {
         200: z.object({
             message: z.string(),
-            user: UserBaseSchema // Exclure password_hash de la réponse
+            user: UserBaseSchema
         })
     }
 };
 
-// UPDATE USER (/me)
+export const LogoutRouteSchema = {
+    response: {
+        200: z.object({
+            message: z.string()
+        })
+    }
+};
+
+// UPDATE USER
 export const UpdateUserBodySchema = z.object({
     email: UserBaseSchema.shape.email.optional(),
     display_name: UserBaseSchema.shape.display_name.optional(),
-    avatar_url: UserBaseSchema.shape.avatar_url.optional(), // .nullable().optional() si vous voulez permettre d'envoyer explicitement null
+    avatar_url: UserBaseSchema.shape.avatar_url.optional(),
 }).refine(data => Object.keys(data).length > 0, {
     message: "Au moins un champ doit être fourni pour la mise à jour."
 });
 export type UpdateUserPayload = z.infer<typeof UpdateUserBodySchema>;
-export const UpdateUserRouteSchema = { // Pour Fastify
+
+export const UpdateUserRouteSchema = {
     body: UpdateUserBodySchema,
     response: {
         200: z.object({
@@ -82,9 +95,11 @@ export const UpdateUserRouteSchema = { // Pour Fastify
 
 // GET USER BY ID (Params)
 export const UserIdParamsSchema = z.object({
-    userId: z.string().regex(/^\d+$/, "User ID doit être un nombre").transform(Number),
+    userId: z.string().regex(/^\d+$/, "User ID doit être un nombre"),
 });
-export const GetUserByIdRouteSchema = { // Pour Fastify
+export type UserIdParams = z.infer<typeof UserIdParamsSchema>;
+
+export const GetUserByIdRouteSchema = {
     params: UserIdParamsSchema,
     response: {
         200: UserBaseSchema,

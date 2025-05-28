@@ -1,5 +1,5 @@
 import Fastify, { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { ZodTypeProvider } from 'fastify-type-provider-zod';
+import { validatorCompiler, serializerCompiler, ZodTypeProvider } from 'fastify-type-provider-zod';
 //import dotenv from 'dotenv';
 import { config } from './shared/env.js';
 import { initializeDb } from './utils/dbConfig.js';
@@ -10,7 +10,11 @@ import userRoutes from './routes/users.js';
 import authRoutes from './routes/auth.js';
 
 
+// const fastify: FastifyInstance = Fastify({ logger: { level: config.LOG_LEVEL } });
 const fastify: FastifyInstance = Fastify({ logger: { level: config.LOG_LEVEL } }).withTypeProvider<ZodTypeProvider>();
+
+fastify.setValidatorCompiler(validatorCompiler);
+fastify.setSerializerCompiler(serializerCompiler);
 
 function setupHooks(): void {
 	fastify.addHook('onRequest', async (req: FastifyRequest, reply: FastifyReply) => {
