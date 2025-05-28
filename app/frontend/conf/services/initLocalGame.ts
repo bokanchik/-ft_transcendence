@@ -29,7 +29,6 @@ export async function initLocalGame(form: HTMLFormElement) {
             await createLocalMatch(alias1, alias2);
             break;
         case 'Tournament':
-        case 'Battle Royale':
         default:
             alert('Unknown game mode selected');
     }

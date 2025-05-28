@@ -2,6 +2,7 @@ import { UUID } from "crypto";
 import { navigateTo } from "./router.js";
 import socket from "./socket.js";
 import { removeWaitingToast, showToast, showWaitingToast } from "../components/toast.js";
+import { initCountdown } from "../components/countdown.js";
 
 // --- Main Fonction for online game: 
 export async function handleOnlineGame(display_name: string, userId: string, container: HTMLElement, button: HTMLButtonElement, title: HTMLHeadElement): Promise<void> {
@@ -11,7 +12,7 @@ export async function handleOnlineGame(display_name: string, userId: string, con
     } catch (err: unknown) {
         console.log(err);
         showToast('Error while creating a waiting room. Please, try again later', 'error');
-        navigateTo('/game'); // !! maybe redirect to error page instead of alert()
+        navigateTo('/game');
     } finally {
         button.disabled = false;
     }
@@ -27,31 +28,32 @@ export async function initOnlineGame(display_name: string, userId: string, butto
     
     socket.on('connect', () => {
         console.log('Connected to the server');
-        // TODO: peut-etre je dois aussi envoyer userId pour apres recuperer l'url de l'avatar avec /api/users/:userId
         socket.emit('authenticate', { display_name, userId });
     });
     
     socket.on('inQueue', () => {
         showWaitingToast(socket, controller);
-       // title.textContent = 'Looking for an opponent...';
-       // showWaitingMessage(buttonsContainer, socket, controller);
     });
 
     // --- Socket listener on matchFound event --> if opponenet is found
-    socket.on('matchFound', ({ matchId, displayName, side, opponent }: { matchId: UUID; displayName: string, side: 'left' | 'right'; opponent: string}) => {
+    socket.on('matchFound', async ({ matchId, displayName, side, opponent }: { matchId: UUID; displayName: string, side: 'left' | 'right'; opponent: string}) => {
 
-        // FOR DEBUGGING
-        // console.log(matchId);
-        // console.log(side);
-        // console.log(opponent);
-        // -------------------
-        
         sessionStorage.setItem('matchId', matchId);
         sessionStorage.setItem('displayName', displayName);
         sessionStorage.setItem('side', side);
         sessionStorage.setItem('opponent', opponent);
 
         removeWaitingToast();
+
+        const countdownContainer = document.createElement('div');
+        countdownContainer.className = `
+            fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50
+            text-lime-200 text-6xl font-extrabold tracking-widest jungle-font
+        `;        
+        document.body.appendChild(countdownContainer);
+
+        await initCountdown(countdownContainer);
+
         navigateTo(`/game-room?matchId=${matchId}`);
 
     });

@@ -6,8 +6,8 @@ import { LoginRequestBody, ApiResult } from '../shared/types.js';
 
 export function LoginPage(): HTMLElement {
 	const container = document.createElement('div');
-	container.className = 'bg-gradient-to-r from-blue-500 to-purple-600 flex justify-center items-center min-h-screen p-8';
-
+	container.className = 'bg-white flex justify-center items-center min-h-screen p-8';
+	
 	const formContainer = document.createElement('div');
 	formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';
 

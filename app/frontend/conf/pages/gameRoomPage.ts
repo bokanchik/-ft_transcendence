@@ -9,63 +9,77 @@ import { get } from "http";
 
 export function GameRoomPage(mode: GameMode): HTMLElement {
 	const container = document.createElement('div');
-	container.className = 'w-full h-screen flex flex-col items-center justify-center bg-gray-900';
-
+	container.className = 'w-full h-screen flex flex-col items-center justify-center bg-gradient-to-b from-green-900 via-green-700 to-green-600 jungle-font text-white';
+	
 	// Game box
 	const gameBox = document.createElement('div');
-	gameBox.className = 'relative bg-white w-[800px] h-[500px] border-4 border-black overflow-hidden';
+	gameBox.className = `
+			relative w-[800px] h-[500px] border-[10px] border-green-950 rounded-xl overflow-hidden
+			bg-gradient-to-br from-emerald-800 via-lime-700 to-green-600 shadow-xl
+		`;	
 	gameBox.id = 'game-box';
 
 	// Left paddle
 	const leftPaddle: HTMLDivElement = document.createElement('div');
-	leftPaddle.className = 'absolute left-0 top-[200px] w-[10px] h-[100px] bg-black';
+	leftPaddle.className = `
+		absolute left-0 top-[200px] w-[14px] h-[100px] bg-yellow-900 rounded-sm shadow-inner
+	`;
 	leftPaddle.id = 'left-paddle';
 
 	// Right paddle
 	const rightPaddle = document.createElement('div');
-	rightPaddle.className = 'absolute right-0 top-[200px] w-[10px] h-[100px] bg-black';
+	rightPaddle.className = `
+		absolute right-0 top-[200px] w-[14px] h-[100px] bg-yellow-900 rounded-sm shadow-inner
+	`;
 	rightPaddle.id = 'right-paddle';
 
 	// Ball
 	const ball = document.createElement('div');
-	ball.className = 'absolute w-[15px] h-[15px] bg-red-600 rounded-full';
+	ball.className = `
+		absolute w-[20px] h-[20px] rounded-full border-[2px] border-[#3e2f1c] 
+		bg-[#5b3c1d] shadow-inner jungle-coconut
+	`;
 	ball.id = 'ball';
-
-	ball.style.left = 'calc(50% - 7.5px)';
-	ball.style.top = 'calc(50% - 7.5px)';
-
-	// Countdown overlay
-	const countdown = document.createElement('div');
-	countdown.className = 'absolute inset-0 flex items-center justify-center text-6xl font-bold text-white bg-black bg-opacity-70 z-50';
-	countdown.id = 'countdown';
-	countdown.textContent = 'Start in 3...';
+	ball.style.left = 'calc(50% - 10px)';
+	ball.style.top = 'calc(50% - 10px)';
 
 	// Left username
 	const leftUsername = document.createElement('div');
-	leftUsername.className = 'absolute left-[20px] top-[20px] px-3 py-1 bg-white border border-black rounded text-black font-semibold text-xl shadow';
+	leftUsername.className = `
+		absolute left-[20px] top-[20px] px-3 py-1 bg-lime-200 text-green-900 border border-green-800
+		rounded font-bold text-xl shadow jungle-font
+	`;
 	leftUsername.id = 'left-username';
 
 	// Right username
 	const rightUsername = document.createElement('div');
-	rightUsername.className = 'absolute right-[20px] top-[20px] px-3 py-1 bg-white border border-black rounded text-black font-semibold text-xl shadow text-right';
+	rightUsername.className = `
+		absolute right-[20px] top-[20px] px-3 py-1 bg-lime-200 text-green-900 border border-green-800
+		rounded font-bold text-xl shadow text-right jungle-font
+	`;
 	rightUsername.id = 'right-username';
 
 	// Score display
 	const scoreDisplay = document.createElement('div');
-	scoreDisplay.className = 'absolute top-[20px] left-1/2 transform -translate-x-1/2 text-2xl font-bold text-black';
+	scoreDisplay.className = `
+		absolute top-[20px] left-1/2 transform -translate-x-1/2 
+		text-3xl font-extrabold text-yellow-300 jungle-font drop-shadow
+	`;
 	scoreDisplay.id = 'score-display';
-	scoreDisplay.textContent = '0 - 0';// TODO: should be apdated
+	scoreDisplay.textContent = '0 - 0'; // TODO: should be apdated
 
 	// Quit button
 	const quitButton = document.createElement('button');
-	quitButton.className = 'mt-6 px-4 py-2 bg-red-600 text-white font-bold rounded hover:bg-red-700';
+	quitButton.className = `
+		mt-6 px-5 py-2 bg-red-700 text-white font-bold rounded-lg 
+		hover:bg-red-800 shadow-lg transition duration-300 jungle-font
+	`;
 	quitButton.textContent = 'Quit';
 
 	// Append all to game box
 	gameBox.appendChild(leftPaddle);
 	gameBox.appendChild(rightPaddle);
 	gameBox.appendChild(ball);
-	gameBox.appendChild(countdown);
 	gameBox.appendChild(leftUsername);
 	gameBox.appendChild(rightUsername);
 	gameBox.appendChild(scoreDisplay);
@@ -81,7 +95,7 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 	}
 
 	// --- Countdown function
-	initCountdown(countdown);
+	// initCountdown(countdown);
 
 	// --- Main game function for socket handling and game logic
 	gameRoutine(quitButton, gameMode);

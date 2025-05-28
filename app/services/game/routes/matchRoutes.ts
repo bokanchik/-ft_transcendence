@@ -6,7 +6,7 @@ import { ZodTypeProvider } from "fastify-type-provider-zod"
 
 function matchRoutes(fastify: FastifyInstance, _options: unknown) {
 
-   fastify.withTypeProvider<ZodTypeProvider>().post('/match', {  
+   fastify.withTypeProvider<ZodTypeProvider>().post('/match/', {  
       preHandler: async (req, reply) => {
          // validate incoming data with zod (--> middleware)
          const reqValidation = createMatchSchema.safeParse(req.body);

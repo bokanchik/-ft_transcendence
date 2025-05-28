@@ -5,7 +5,7 @@ export function promptAliasForm(): HTMLDivElement {
 
     // --- Main Container ---
     const container: HTMLDivElement = document.createElement('div');
-    container.className = 'bg-gradient-to-r from-blue-500 to-purple-600 flex justify-center items-center min-h-screen p-8';
+	container.className = 'bg-white flex justify-center items-center min-h-screen p-8';
 
     const formContainer: HTMLDivElement = document.createElement('div');
     formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';
@@ -19,7 +19,7 @@ export function promptAliasForm(): HTMLDivElement {
     const form: HTMLFormElement = document.createElement('form');
     form.className = 'space-y-6';
 
-    const gameModeField = createSelectField('gameMode', 'Game Mode', ['1v1', 'Tournament', 'Battle Royale']);
+    const gameModeField = createSelectField('gameMode', 'Game Mode', ['1v1', 'Tournament']);
     const dynamicInputs = document.createElement('div');
 
     // --- Buttons ---
