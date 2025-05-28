@@ -22,6 +22,10 @@ function matchRoutes(fastify: FastifyInstance, _options: unknown) {
       handler: createMatchHandler,
    
    });
+   // ---- TODO ----
+   // POST /match/:matchId/move
+   // GET /match/:matchId/status
+
    fastify.get('/match/:matchId', { onRequest: [fastify.authenticate] }, getMatchIdHandler);
    fastify.get('/history/:userId', { onRequest: [fastify.authenticate] }, getMatchByUserHandler);
    

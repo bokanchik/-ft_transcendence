@@ -64,6 +64,7 @@ async function createLocalMatch(alias1: string, alias2: string) {
         sessionStorage.setItem('player1', data.player1);
         sessionStorage.setItem('player2', data.player2);
         sessionStorage.setItem('gameMode', 'local');
+        sessionStorage.setItem('localMatchId', matchId);
 
         navigateTo(`/game-room?matchId=${matchId}`);
 

@@ -64,7 +64,7 @@ export async function waitingRoom() {
             // notify players that they are matched
             fastify.io.to(player1.socketId).emit('matchFound', player1Data);
             fastify.io.to(player2.socketId).emit('matchFound', player2Data);
-
+            
             removePlayerFromWaitingList(player1.socketId);
             removePlayerFromWaitingList(player2.socketId);
             return;

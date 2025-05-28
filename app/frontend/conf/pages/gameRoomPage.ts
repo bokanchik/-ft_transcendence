@@ -148,7 +148,8 @@ function clientSocketHandler(gameMode: string | null) {
 	socket.on('connect', () => {
 		console.log('emit startLocal');
 		if (gameMode === 'local') {
-			socket.emit('startLocalGame');
+			const matchId = sessionStorage.getItem('localMatchId');
+			socket.emit('startLocalGame', matchId); // maybe need to send sides
 		}
 	});
 	

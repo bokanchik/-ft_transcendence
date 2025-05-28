@@ -8,7 +8,6 @@ import { setupPlugins } from './shared/auth-plugin/tokens.js'
 import matchRoutes from './routes/matchRoutes.ts'
 import { matchSocketHandler } from './sockets/matchSocketHandler.ts';
 
-// import { gameShemas } from './schemas/matchSchemas.ts'; TODO
 // import settingsRoutes from './routes/settings.ts' TODO
 
 

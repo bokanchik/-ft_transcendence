@@ -1,12 +1,14 @@
 import { fastify } from "../server.ts";
 import type { Socket } from "socket.io";
-import { waitingRoom, removePlayerFromWaitingList, addPlayerToWaitingList, getWaitingListSize } from "../utils/waitingRoom.ts";
 import db from '../database/connectDB.ts';
-
-import { fetchFirst, getRowByMatchId, setGameResult, updateStatus } from "../database/dbModels.ts";
+import { waitingRoom, removePlayerFromWaitingList, addPlayerToWaitingList, getWaitingListSize } from "../utils/waitingRoom.ts";
+import { fetchFirst, setGameResult } from "../database/dbModels.ts";
+import { handlePlayerMove } from "./pongGame.ts";
+import { PongGame } from "../sockets/pongGame.ts";
 
 const TIMEOUT_MS = 60000; // 1 minute
 const timeouts: Map<string, NodeJS.Timeout> = new Map();
+export let gameList: Map<string, PongGame> = new Map(); // string pour matchId
 
 // --- Socket.io handler for local and remote games ---
 export async function matchSocketHandler(socket: Socket): Promise<void> {
@@ -52,11 +54,15 @@ async function waitingRoomHandler(socket: Socket) {
 
 // --- Main function for game routine handling 
 async function gameRoutine(socket: Socket) {
-    socket.on('playerMove', (movement) => {
-        fastify.log.info(movement);
-        // handlePlayerMove(); // la logique du jeu est ici (ca update le state du jeu)
+    socket.on('playerMove', ({ leftPaddle, rightPaddle }) => {
+
+        fastify.log.info(leftPaddle);
+        fastify.log.info(rightPaddle);
+
+        handlePlayerMove(leftPaddle, rightPaddle); // la logique du jeu est ici (ca update le state du jeu)
     });
 }
+
 
 async function disconnectionHandler(socket: Socket)  {
     
@@ -115,9 +121,12 @@ async function getOpponentSocketId(socketId: string): Promise<string | null> {
 function localSocketEvents(socket: Socket) {
     
     // --- !!! TESTING FOR LOCAL ----
-    socket.on('startLocalGame', () => {
+    socket.on('startLocalGame', (matchId) => {
         fastify.log.info('Game started locally');
         socket.emit('gameStarted');
+        const player1 = { userId: 0, socketId: '', paddle: 200};
+        const player2 = { userId: 1, socketId: '', paddle: 200};
+        const pongGame = new PongGame(player1, player2, matchId);
     });
     // -------------------------------
 }
