@@ -1,4 +1,3 @@
-// app/services/users/types.ts (ou types/index.ts)
 export enum UserOnlineStatus {
 	ONLINE = 'online',
 	OFFLINE = 'offline',

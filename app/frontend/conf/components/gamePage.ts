@@ -1,5 +1,8 @@
 import { navigateTo } from '../services/router.js';
 import { handleOnlineGame } from '../services/initOnlineGame.js';
+import { HeaderComponent } from '../components/headerComponent.js';
+import { User } from '../shared/types.js';
+import { getUserDataFromStorage } from '../services/authService.js';
 import { showToast } from './toast.js';
 
 export type GameMode = 'local' | 'remote';
