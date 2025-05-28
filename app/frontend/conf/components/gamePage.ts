@@ -1,8 +1,6 @@
-import { getUserDataFromStorage } from '../services/authService.js';
 import { navigateTo } from '../services/router.js';
 import { handleOnlineGame } from '../services/initOnlineGame.js';
-import { User } from '../shared/types.js';
-import { HeaderComponent } from './headerComponent.js'; // ajout arthur pour le header
+import { showToast } from './toast.js';
 
 export type GameMode = 'local' | 'remote';
 
@@ -54,12 +52,13 @@ export function GamePage(): HTMLElement {
     buttonsContainer.className = 'flex flex-col items-center';
     
     const localGameButton: HTMLButtonElement = document.createElement('button');
-    localGameButton.id = 'local-butto| nulln';
+    localGameButton.id = 'local-button';
     localGameButton.className = 'bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mb-4 transition duration-300 ease-in-out';
     localGameButton.textContent = 'Local game';
     
     const onlineGameButton: HTMLButtonElement  = document.createElement('button');
-    onlineGameButton.id = 'online-button';
+    onlineGameButton.id = 'online-button';// fastify.get('/match/:matchId', { schema: matchSchemas.idOnly}, getMatchIdHandler);
+   
     onlineGameButton.className = 'bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mb-4 transition duration-300 ease-in-out';
     onlineGameButton.textContent = 'Online game';
     
@@ -93,26 +92,31 @@ export function GamePage(): HTMLElement {
     // formContainer.append(title, buttonsContainer, footer);
     // container.appendChild(formContainer); 
     
-    // --- Event: Local button clicked 
+    // --- Event: Local game button clicked 
     localGameButton.addEventListener('click', async () =>  {
         navigateTo('/local-game'); // la page avec un formulaire a remplir pour le jeu en local
     });
     
-    // --- Event: Online button clicked ---
+    // --- Event: Online game button clicked ---
     onlineGameButton.addEventListener('click', async () => { 
         
-        // TODO: fetch to /api/user/me to check if registred, ca me donne le type User
-        // const authData = getUserDataFromStorage();
-        // if (!authData) {
-        //     alert("You must be logged in to play online");
-        //     return;
-        // }
+        try {
+            const userRes = await fetch('/api/users/me');
+            if (!userRes.ok) {
+                showToast('You must be logged in to play online', 'error');
+                return;
+            }
+            const userData = await userRes.json();
+            const display_name: string = userData.display_name;
 
-        let display_name: string = authData.display_name;
+            sessionStorage.setItem('gameMode', 'online');
 
-        sessionStorage.setItem('gameMode', 'online');
-
-        await handleOnlineGame(display_name, buttonsContainer, onlineGameButton);
+            await handleOnlineGame(display_name, buttonsContainer, onlineGameButton);
+        } catch (err: unknown) {
+            console.log(`Failed to fetch from user`);
+            showToast('Something went wrong. Please try again later.', 'error');
+            throw err;
+        }
     });
 
         // return container;

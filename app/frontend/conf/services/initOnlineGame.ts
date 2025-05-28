@@ -1,17 +1,17 @@
 import { UUID } from "crypto";
 import { navigateTo } from "./router.js";
 import socket from "./socket.js";
+import { showToast } from "../components/toast.js";
+import { time } from "console";
 
 // --- Main Fonction for online game: 
-// post /api/game/match + socket initialisaztion + waiting room + 
-// matchmaking + then navigaTo(/game-room)
 export async function handleOnlineGame(display_name: string, container: HTMLElement, button: HTMLButtonElement): Promise<void> {
     button.disabled = true; // pour eviter les multiples click (data race)
     try {
         await initOnlineGame(display_name, container);
     } catch (err: unknown) {
         console.log(err);
-        alert('Error creating waiting room. Please try again.');
+        showToast('Error while creating a waiting room. Please, try again later', 'error');
         navigateTo('/game'); // !! maybe redirect to error page instead of alert()
     } finally {
         button.disabled = false;
@@ -28,17 +28,21 @@ export async function initOnlineGame(display_name: string, buttonsContainer: HTM
     
     socket.on('connect', () => {
         console.log('Connected to the server');
+        // TODO: peut-etre je dois aussi envoyer userId pour apres recuperer l'url de l'avatar avec /api/users/:userId
         socket.emit('authenticate', display_name);
-        showWaitingMessage(buttonsContainer, socket, controller);
     });
     
+    socket.on('inQueue', () => {
+        showWaitingMessage(buttonsContainer, socket, controller);
+    });
+
     // --- Socket listener on matchFound event --> if opponenet is found
     socket.on('matchFound', ({ matchId, displayName, side, opponent }: { matchId: UUID; displayName: string, side: 'left' | 'right'; opponent: string}) => {
 
         // FOR DEBUGGING
-        console.log(matchId);
-        console.log(side);
-        console.log(opponent);
+        // console.log(matchId);
+        // console.log(side);
+        // console.log(opponent);
         // -------------------
         
         sessionStorage.setItem('matchId', matchId);
@@ -46,7 +50,6 @@ export async function initOnlineGame(display_name: string, buttonsContainer: HTM
         sessionStorage.setItem('side', side);
         sessionStorage.setItem('opponent', opponent);
 
-        // socket.emit('startOnlineGame', matchId); je suis pas sure qu'on a besoin de cet emit: a voir ?
         navigateTo(`/game-room?matchId=${matchId}`);
 
     });
@@ -63,17 +66,16 @@ export async function initOnlineGame(display_name: string, buttonsContainer: HTM
 
     socket.on('connect_error', (err: Error) => {
         console.error(`Connection to the server is failed: ${err.message}`);
-        alert('Failed to connect to server.');
+        showToast('Failed to connect to server. Please try later.', 'error');
         cleanupSocket(socket);
       });
 
     // --- TODO: emit on server side ---
     socket.on('matchTimeout', () => {
-        alert('No opponent found. Please try again later.');
+        showToast('No opponent found. Please try later.', 'error');
         cleanupSocket(socket);
         navigateTo('/game');
     });
-
 }
 
 // --- Fonction pour afficher le message d'attente + Cancel button ---
@@ -88,15 +90,31 @@ export function showWaitingMessage(buttonsContainer: HTMLElement, socket: Socket
     cancelButton.textContent = 'Cancel';
     cancelButton.className = 'bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full transition duration-300 ease-in-out';
 
+    
+    const timerDisplay = document.createElement('div');
+    timerDisplay.className = 'text-gray-500 font-medium mt-2';
+    timerDisplay.textContent = 'Time remaining: 60s';
+
     cancelButton.addEventListener('click', () => {
         controller.abort(); // abort the fetch request
         socket.emit('cancelMatch'); // inform the server that client
                                     //  is going to leave a waiting room
+        clearInterval(timer);
         cleanupSocket(socket);
         navigateTo('/game');
     });
 
-    buttonsContainer.append(waitingMessage, cancelButton);
+    buttonsContainer.append(waitingMessage, timerDisplay, cancelButton);
+
+    let timeleft = 60;
+    const timer =  setInterval(() => {
+        timeleft--;
+        timerDisplay.textContent = `Time remaining: ${timeleft}s`;
+        
+        if (timeleft <= 0) {
+            clearInterval(timer);
+        }
+    }, 1000);
 }
 
 // // --- Fonction pour créer une salle d'attente ---

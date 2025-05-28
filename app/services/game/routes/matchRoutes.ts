@@ -1,11 +1,11 @@
 //import fastify from '../server.ts';
 import type { FastifyInstance } from 'fastify';
-import { createMatchHandler, getMatchStateHandler,
-   acceptMatchHandler, rejectMatchHandler, startMatchHandler, quitMatchHandler } from '../handlers/matchHandlers.ts'
+import { createMatchHandler, getMatchIdHandler } from '../handlers/matchHandlers.ts'
 import { createMatchSchema } from '../middleware/matchSchemas.ts';
 import { ZodTypeProvider } from "fastify-type-provider-zod"
 
 async function matchRoutes(fastify: FastifyInstance, _options: unknown) {
+
    fastify.withTypeProvider<ZodTypeProvider>().post('/', {  
       preHandler: async (req, reply) => {
          // validate incoming data with zod (--> middleware)
@@ -17,21 +17,14 @@ async function matchRoutes(fastify: FastifyInstance, _options: unknown) {
                errors: reqValidation.error.errors
             });
          }
-        // local --> no need for JWT verification, remote --> authenticate
-      //   const { isLocal } = reqValidation.data;
-      //   if (!isLocal) {
-      //    await fastify.authenticate(req, reply);
-      //   }
-
         req.validatedBody = reqValidation.data;
       },
       handler: createMatchHandler,
    
    });
+   fastify.get('/:matchId', { onRequest: [fastify.authenticate] }, getMatchIdHandler);
    
    // fastify.get('/match/:userId) -> qui donne tous les matchs pour cet user la
-   
-   // fastify.get('/match/:matchId', { schema: matchSchemas.idOnly}, getMatchIdHandler);
    
    // fastify.get('/match/:matchId/state', { schema: matchSchemas.idOnly }, getMatchStateHandler);
    // fastify.post('/match/:matchId/accept', { schema: matchSchemas.accept }, acceptMatchHandler);
