@@ -26,6 +26,8 @@ services:
     volumes:
       - frontdata:/app/dist
       - ./services/shared/types.ts:/app/shared/types.ts:ro
+      - ./services/shared/env.ts:/app/shared/env.ts:ro
+      - ./services/shared/schemas:/app/shared/schemas:ro
     networks:
       - tranet
 

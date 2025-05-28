@@ -61,7 +61,6 @@ export async function createUserAccount(userData: RegisterRequestBody): Promise<
 	}
 
 	const hashedPassword = await passwordUtils.hashPassword(password);
-
 	const payload: CreateUserPayload = {
 		username,
 		email,
@@ -69,7 +68,6 @@ export async function createUserAccount(userData: RegisterRequestBody): Promise<
 		display_name,
 		avatar_url: avatar_url && avatar_url.trim() !== "" ? avatar_url : generateDefaultAvatarUrl(display_name),
 	};
-
 	await userModel.createUser(payload);
 }
 
@@ -149,25 +147,32 @@ export async function updateUserProfile(userId: number, updates: UpdateUserPaylo
 		}
 	}
 
-	if (updates.avatar_url !== undefined) {
-		const potentialAvatar = updates.avatar_url;
-		if (potentialAvatar === null) {
-			processedUpdates.avatar_url = undefined;
-		} else if (potentialAvatar && isValidHttpUrl(potentialAvatar)) {
-			processedUpdates.avatar_url = potentialAvatar;
-		} else if (potentialAvatar && !isValidHttpUrl(potentialAvatar)) {
+	// if (updates.avatar_url !== undefined) {
+	// 	if (updates.avatar_url === 'string' && updates.avatar_url.trim() !== '') {
+	// 		if (isValidHttpUrl(updates.avatar_url)) {
+	// 			processedUpdates.avatar_url = updates.avatar_url.trim();
+	// 		} 
+	// 	} else {
+	// 			throw new ValidationError('Invalid avatar URL format provided.');
+	// 		}
+	// }
+	
+	if (updates.avatar_url !== undefined && updates.avatar_url !== null) {
+		if (isValidHttpUrl(updates.avatar_url)) {
+			processedUpdates.avatar_url = updates.avatar_url;
+		} else {
 			throw new ValidationError('Invalid avatar URL format provided.');
 		}
 	}
 
-	const changesToApply: Partial<UpdateUserPayload> = {};
+	const changesToApply: UpdateUserPayload = {};
 	for (const key in processedUpdates) {
-		const typedKey = key as keyof UpdateUserPayload;
-		if (processedUpdates[typedKey] !== currentUser[typedKey as keyof User]) {
-			changesToApply[typedKey] = processedUpdates[typedKey];
-		}
-	}
-
+    const typedKey = key as keyof UpdateUserPayload;
+    const value = processedUpdates[typedKey];
+    if (value !== null && value !== currentUser[typedKey]) {
+        changesToApply[typedKey] = value;
+    }
+}
 	if (Object.keys(changesToApply).length === 0) {
 		console.log(`No effective changes detected for user ${userId}. Profile remains unchanged.`);
 		return currentUser;

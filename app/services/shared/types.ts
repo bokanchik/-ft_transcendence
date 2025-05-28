@@ -1,58 +1,81 @@
-export enum UserOnlineStatus {
-	ONLINE = 'online',
-	OFFLINE = 'offline',
-	IN_GAME = 'in-game',
-}
+// export enum UserOnlineStatus {
+// 	ONLINE = 'online',
+// 	OFFLINE = 'offline',
+// 	IN_GAME = 'in-game',
+// }
+
+// export interface User {
+// 	id: number;
+// 	username: string;
+// 	email: string;
+// 	display_name: string;
+// 	avatar_url: string | null;
+// 	wins: number;
+// 	losses: number;
+// 	status: UserOnlineStatus;
+// 	created_at: string; // ou Date
+// 	updated_at: string; // ou Date
+// }
+
+// export interface UserWithPasswordHash extends User {
+// 	password_hash: string;
+// }
+
+// export interface CreateUserPayload {
+// 	username: string;
+// 	email: string;
+// 	password_hash: string;
+// 	display_name: string;
+// 	avatar_url?: string | null;
+// }
+
+// export interface RegisterRequestBody {
+// 	username: string;
+// 	email: string;
+// 	password: string;
+// 	display_name: string;
+// 	avatar_url?: string;
+// }
+
+// export interface LoginRequestBody {
+// 	identifier: string;
+// 	password: string;
+// }
+
+// export interface UpdateUserPayload {
+// 	email?: string;
+// 	display_name?: string;
+// 	avatar_url?: string;
+// }
+
+// export interface JWTPayload {
+// 	id: number;
+// 	username: string;
+// 	iat?: number; // Issued at
+// 	exp?: number; // Expiration time
+// }
+
+import type { User } from './schemas/usersSchemas.js'; // Importer le type
+import { UserOnlineStatus } from './schemas/usersSchemas.js'; // Importer l'enum
+
+// Ré-exporter les types et valeurs importés pour qu'ils soient disponibles à l'extérieur
+export type {
+    User, // Exporter sous le nom 'User'
+    UserWithPasswordHash,
+    RegisterRequestBody,
+    LoginRequestBody,
+    UpdateUserPayload,
+    CreateUserPayload,
+    JWTPayload
+} from './schemas/usersSchemas.js';
+
+export { UserOnlineStatus }; 
 
 export enum FriendshipStatus {
 	PENDING = 'pending',
 	ACCEPTED = 'accepted',
 	DECLINED = 'declined',
 	BLOCKED = 'blocked',
-}
-
-export interface User {
-	id: number;
-	username: string;
-	email: string;
-	display_name: string;
-	avatar_url: string | null;
-	wins: number;
-	losses: number;
-	status: UserOnlineStatus;
-	created_at: string; // ou Date
-	updated_at: string; // ou Date
-}
-
-export interface UserWithPasswordHash extends User {
-	password_hash: string;
-}
-
-export interface CreateUserPayload {
-	username: string;
-	email: string;
-	password_hash: string;
-	display_name: string;
-	avatar_url?: string | null;
-}
-
-export interface RegisterRequestBody {
-	username: string;
-	email: string;
-	password: string;
-	display_name: string;
-	avatar_url?: string;
-}
-
-export interface LoginRequestBody {
-	identifier: string;
-	password: string;
-}
-
-export interface UpdateUserPayload {
-	email?: string;
-	display_name?: string;
-	avatar_url?: string;
 }
 
 export interface Friendship {
@@ -77,12 +100,7 @@ export interface Match {
 	tournament_id: number | null;
 }
 
-export interface JWTPayload {
-	id: number;
-	username: string;
-	iat?: number; // Issued at
-	exp?: number; // Expiration time
-}
+
 
 export interface UpdatedUserResult {
 	changes?: number;
