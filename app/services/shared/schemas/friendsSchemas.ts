@@ -42,7 +42,7 @@ export const SendFriendRequestRouteSchema = {
 
 // Schéma pour les paramètres d'URL contenant friendshipId
 export const FriendshipIdParamsSchema = z.object({
-    friendshipId: z.string().regex(/^\d+$/, "Friendship ID doit être un nombre").transform(Number).pipe(z.number().int().min(1)),
+    friendshipId: z.string().regex(/^\d+$/, "Friendship ID doit être un nombre"),
 });
 export type FriendshipIdParams = z.infer<typeof FriendshipIdParamsSchema>;
 

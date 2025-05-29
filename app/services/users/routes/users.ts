@@ -13,7 +13,6 @@ import { UpdateUserRouteSchema, GetUserByIdRouteSchema } from '../shared/schemas
 
 
 export default async function userRoutes(fastify: FastifyInstance, options: FastifyPluginOptions) {
-
 	fastify.get(
 		config.URL_ALL_USERS,
 		getUsersHandler

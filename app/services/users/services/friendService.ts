@@ -75,7 +75,7 @@ export async function acceptFriendRequest(friendshipId: number, currentUserId: n
 	if (result.changes === 0) {
 		throw new Error('Failed to accept friend request, database reported no changes.');
 	}
-	return { message: 'Friend request accepted.' };
+	return { message: 'Friend request accepted.'};
 }
 
 /**
