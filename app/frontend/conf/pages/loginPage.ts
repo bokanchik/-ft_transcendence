@@ -2,6 +2,7 @@
 import { attemptLogin } from '../services/authService.js';
 import { navigateTo } from '../services/router.js';
 import { LoginForm } from '../components/loginForm.js';
+//@ts-ignore
 import { LoginRequestBody, ApiResult } from '../shared/types.js';
 
 export function LoginPage(): HTMLElement {

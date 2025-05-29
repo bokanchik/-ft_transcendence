@@ -1,3 +1,4 @@
+//@ts-ignore
 import { User as ApiUser, Friend, PendingFriendRequest, UserOnlineStatus } from '../shared/types.js';
 
 export interface UserListProps {

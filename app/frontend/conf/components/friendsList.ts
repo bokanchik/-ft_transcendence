@@ -1,4 +1,5 @@
 // /components/friendsList.ts
+//@ts-ignore
 import { Friend, UserOnlineStatus } from '../shared/types.js';
 import { navigateTo } from '../services/router.js';
 import { showCustomConfirm, showToast } from './toast.js';

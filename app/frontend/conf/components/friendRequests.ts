@@ -1,4 +1,5 @@
 // /components/friendRequests.ts
+//@ts-ignore
 import { PendingFriendRequest } from '../shared/types.js';
 
 interface FriendRequestsProps {

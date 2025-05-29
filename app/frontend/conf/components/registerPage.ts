@@ -1,4 +1,5 @@
 import { attemptRegister } from '../services/authService.js';
+//@ts-ignore
 import { RegisterRequestBody, ApiResult } from '../shared/types.js'
 import { fetchCsrfToken } from '../services/csrf.js';
 import { navigateTo } from '../services/router.js';

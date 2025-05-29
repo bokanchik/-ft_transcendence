@@ -3,70 +3,94 @@ import { cleanupSocket } from "../services/initOnlineGame.js";
 import { navigateTo } from "../services/router.js";
 import socket from '../services/socket.js';
 import { showGameResult } from "../components/gameResults.js";
-import { initCountdown } from "../components/countdown.js";
-import { get } from "http";
+import { showCustomConfirm } from "../components/toast.js";
+//@ts-ignore
+import { GameState } from '../shared/types.js';
+import { stat } from "fs";
 // import { showToast } from '../components/toast.js';
 
+const BG_COLOUR = " #ebffeb ";
+const BALL_COLOUR = " #ac6703 ";
+const PADDLE_COLOUR = " #ac6703 ";
+
+const gameState: GameState = {
+	leftPaddle: {
+		x: 20,
+		y: 200,
+		width: 20,
+		height: 120,
+		vy: 0
+	},
+	rightPaddle: {
+		x: 770,
+		y: 200,
+		width: 20,
+		height: 120,
+		vy: 0
+	},
+	ball: {
+		x: 400,
+		y: 250,
+		vx: 5,
+		vy: 3,
+		radius: 25
+	},
+	// score0: 0,
+	// score1: 0
+} 
+
+
 export function GameRoomPage(mode: GameMode): HTMLElement {
-	const container = document.createElement('div');
-	container.className = 'w-full h-screen flex flex-col items-center justify-center bg-gradient-to-b from-green-900 via-green-700 to-green-600 jungle-font text-white';
 	
-	// Game box
-	const gameBox = document.createElement('div');
-	gameBox.className = `
-			relative w-[800px] h-[500px] border-[10px] border-green-950 rounded-xl overflow-hidden
-			bg-gradient-to-br from-emerald-800 via-lime-700 to-green-600 shadow-xl
-		`;	
-	gameBox.id = 'game-box';
-
-	// Left paddle
-	const leftPaddle: HTMLDivElement = document.createElement('div');
-	leftPaddle.className = `
-		absolute left-0 top-[200px] w-[14px] h-[100px] bg-yellow-900 rounded-sm shadow-inner
+	// Conteneur principal
+	const container = document.createElement('div');
+	container.className = `
+		w-full h-screen flex flex-col items-center justify-center 
+		bg-gradient-to-b from-green-900 via-green-700 to-green-600 
+		jungle-font text-white
 	`;
-	leftPaddle.id = 'left-paddle';
 
-	// Right paddle
-	const rightPaddle = document.createElement('div');
-	rightPaddle.className = `
-		absolute right-0 top-[200px] w-[14px] h-[100px] bg-yellow-900 rounded-sm shadow-inner
-	`;
-	rightPaddle.id = 'right-paddle';
+	// Wrapper horizontal pour les usernames et canvas
+	const gameRow = document.createElement('div');
+	gameRow.className = 'flex items-center';
 
-	// Ball
-	const ball = document.createElement('div');
-	ball.className = `
-		absolute w-[20px] h-[20px] rounded-full border-[2px] border-[#3e2f1c] 
-		bg-[#5b3c1d] shadow-inner jungle-coconut
-	`;
-	ball.id = 'ball';
-	ball.style.left = 'calc(50% - 10px)';
-	ball.style.top = 'calc(50% - 10px)';
-
-	// Left username
+	// Nom du joueur gauche (à gauche du canvas)
 	const leftUsername = document.createElement('div');
 	leftUsername.className = `
-		absolute left-[20px] top-[20px] px-3 py-1 bg-lime-200 text-green-900 border border-green-800
-		rounded font-bold text-xl shadow jungle-font
+		mr-4 px-3 py-1 bg-lime-200 text-green-900 
+		border border-green-800 rounded font-bold text-xl 
+		shadow jungle-font text-center w-[120px]
 	`;
 	leftUsername.id = 'left-username';
 
-	// Right username
+	// Canvas de jeu
+	const canvas = document.createElement('canvas');
+	canvas.id = 'pong-canvas';
+	canvas.width = 800;
+	canvas.height = 500;
+	canvas.className = 'border-8 border-green-700 rounded-lg bg-neutral-900';
+
+	// Nom du joueur droit (à droite du canvas)
 	const rightUsername = document.createElement('div');
 	rightUsername.className = `
-		absolute right-[20px] top-[20px] px-3 py-1 bg-lime-200 text-green-900 border border-green-800
-		rounded font-bold text-xl shadow text-right jungle-font
+		ml-4 px-3 py-1 bg-lime-200 text-green-900 
+		border border-green-800 rounded font-bold text-xl 
+		shadow jungle-font text-center w-[120px]
 	`;
 	rightUsername.id = 'right-username';
 
 	// Score display
 	const scoreDisplay = document.createElement('div');
 	scoreDisplay.className = `
-		absolute top-[20px] left-1/2 transform -translate-x-1/2 
+		absolute top-25 left-1/2 transform -translate-x-1/2 
 		text-3xl font-extrabold text-yellow-300 jungle-font drop-shadow
 	`;
 	scoreDisplay.id = 'score-display';
-	scoreDisplay.textContent = '0 - 0'; // TODO: should be apdated
+	scoreDisplay.textContent = '0 - 0'; // TODO: need to be updated
+
+	// Composition de la ligne
+	gameRow.append(leftUsername, canvas, rightUsername, scoreDisplay);
+	container.appendChild(gameRow);
 
 	// Quit button
 	const quitButton = document.createElement('button');
@@ -76,15 +100,8 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 	`;
 	quitButton.textContent = 'Quit';
 
-	// Append all to game box
-	gameBox.appendChild(leftPaddle);
-	gameBox.appendChild(rightPaddle);
-	gameBox.appendChild(ball);
-	gameBox.appendChild(leftUsername);
-	gameBox.appendChild(rightUsername);
-	gameBox.appendChild(scoreDisplay);
-
-	container.append(gameBox, quitButton);
+	// Ajouter le bouton dans le container principal
+	container.appendChild(quitButton);
 	
 	const gameMode = sessionStorage.getItem('gameMode');
 	if (gameMode === 'local') {
@@ -94,15 +111,67 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 		setBoard(leftUsername, rightUsername);
 	}
 
-	// --- Countdown function
-	// initCountdown(countdown);
+	// Initialiser le canvas
+	const ctx = canvas.getContext('2d');
+	if (!ctx) throw new Error('Canvas context not supported');
+	ctx.fillStyle = BG_COLOUR;
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-	// --- Main game function for socket handling and game logic
-	gameRoutine(quitButton, gameMode);
+	// --- Event: quit button ---
+	quitButton.addEventListener('click', quitButtonHandler);
+	
+	drawGame(gameState, ctx);
+
+	clientSocketHandler(gameMode, ctx);
 
 	return container;
 }
 
+
+function drawGame(state: GameState, ctx: CanvasRenderingContext2D) {
+	
+	 // Efface tout le canvas
+	 ctx.fillStyle = BG_COLOUR;
+	 ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+	 
+	 // DRAW BALL
+	 const ball = state.ball;
+	 
+	 ctx.fillStyle = BALL_COLOUR;
+	ctx.beginPath();
+	ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+	ctx.fill();
+	
+	ctx.fillStyle = PADDLE_COLOUR;
+	
+	// DRAW LEFT PADDLE
+	const leftPaddle = state.leftPaddle;
+	
+	ctx.fillRect(leftPaddle.x, leftPaddle.y, leftPaddle.width, leftPaddle.height);
+	
+	// DRAW RIGHT PADDLE
+	const rightPaddle = state.rightPaddle;
+	
+	ctx.fillRect(rightPaddle.x, rightPaddle.y, rightPaddle.width, rightPaddle.height);
+	
+	
+}
+
+async function quitButtonHandler() {
+	const confirmed = await showCustomConfirm("Are you sure you want to quit this game?");
+	
+	if (confirmed) {
+		const matchId = sessionStorage.getItem('matchId');
+		const opponentId = sessionStorage.getItem('opponent');
+		
+		socket.emit('quit', matchId, opponentId);
+		cleanupSocket(socket);
+		sessionStorage.clear(); // clean storage --> users have to put there aliases again
+		navigateTo('/local-game');
+	}
+}
+
+// Function to set usernames if they're playing remotly
 function setBoard(leftUsername: HTMLDivElement, rightUsername: HTMLDivElement) {
 	const side = sessionStorage.getItem('side');
 	const displayName = sessionStorage.getItem('displayName');
@@ -117,73 +186,68 @@ function setBoard(leftUsername: HTMLDivElement, rightUsername: HTMLDivElement) {
 	}
 }
 
-function gameRoutine(container: HTMLButtonElement, gameMode: string | null) {
 
-	// --- Socket events handler ---
-	clientSocketHandler(gameMode);
-	
-	// --- Event: quit button ---
-	container.addEventListener('click', () => {
-		const matchId = sessionStorage.getItem('matchId');
-		const opponentId = sessionStorage.getItem('opponent');
-
-		socket.emit('quit', matchId, opponentId);
-		cleanupSocket(socket);
-		sessionStorage.clear(); // clean storage --> users have to put there aliases again
-		navigateTo('/game');
-	});
-}
-
-function clientSocketHandler(gameMode: string | null) {
+function clientSocketHandler(gameMode: string | null, ctx: CanvasRenderingContext2D) {
 	
 	if (!socket.connected) {
 		socket.connect();
 	}
 	
-	if (gameMode === 'remote') {
-		startOnlineGame(socket);
-	}
 	
+	socket.emit('start');
+	
+	document.addEventListener('keydown', keydown);
+	document.addEventListener('keyup', keyup);
+
 	// --- Local Socket events ---
-	socket.on('connect', () => {
-		console.log('emit startLocal');
-		if (gameMode === 'local') {
-			const matchId = sessionStorage.getItem('localMatchId');
-			socket.emit('startLocalGame', matchId); // maybe need to send sides
-		}
+	socket.on('gameStarted', (state: GameState) => {
+		console.log(JSON.stringify(state));
 	});
 	
-	socket.on('gameStarted', () => {
-		if (gameMode === 'local') {
-			startLocalGame(socket);
-		}
-	});
-
-	socket.on('gameFinished', async (matchId: string) => {
-		try {
-			const matchRes = await fetch(`/api/game/match/${matchId}`);
-			if (!matchRes.ok) throw new Error('Failed to fetch match info');
-			const matchData = await matchRes.json();
-			const data = matchData.data;
-			const player1: number = data.player1_id; // userid
-			const player2: number = data.player2_id;
-			const score1: number = data.player1_score;
-			const score2: number = data.player2_score;
-
-			const url1: string = await getUserAvatar(player1);
-			const url2: string = await getUserAvatar(player2);
-			const name1: string = await getDisplayName(player1);
-			const name2: string = await getDisplayName(player2);
-
-			setTimeout(() => {
-				showGameResult(name1, name2, score1, score2, url1, url2);
-			}, 2000);
-			
-		} catch (err: unknown) {
-			console.log(`Failed to fetch data from db: ${err}`);
-		}
+	socket.on('gameState', (state: GameState) => {
+		handleGameState(state, ctx);
 	});
 	
+	
+}
+// socket.on('gameFinished', async (matchId: string) => {
+	// 	try {
+		// 		const matchRes = await fetch(`/api/game/match/${matchId}`);
+		// 		if (!matchRes.ok) throw new Error('Failed to fetch match info');
+		// 		const matchData = await matchRes.json();
+		// 		const data = matchData.data;
+		// 		const player1: number = data.player1_id; // userid
+		// 		const player2: number = data.player2_id;
+		// 		const score1: number = data.player1_score;
+		// 		const score2: number = data.player2_score;
+		
+		// 		const url1: string = await getUserAvatar(player1);
+		// 		const url2: string = await getUserAvatar(player2);
+		// 		const name1: string = await getDisplayName(player1);
+// 		const name2: string = await getDisplayName(player2);
+
+// 		setTimeout(() => {
+	// 			showGameResult(name1, name2, score1, score2, url1, url2);
+	// 		}, 2000);
+	
+	// 	} catch (err: unknown) {
+		// 		console.log(`Failed to fetch data from db: ${err}`);
+		// 	}
+		// });
+
+function keydown(e: KeyboardEvent) {
+	console.log(e);
+	socket.emit('keydown', e.keyCode);
+}
+
+function keyup(e: KeyboardEvent) {
+	console.log(e);
+	socket.emit('keyup',  e.keyCode);
+}
+		
+function handleGameState(state: string, ctx: CanvasRenderingContext2D) {
+			state = JSON.parse(state);
+			requestAnimationFrame(() => drawGame(state, ctx));
 }
 
 async function getDisplayName(userId: number) : Promise<string> {
@@ -204,32 +268,32 @@ async function getUserAvatar(userId: number) : Promise<string> {
 	return url;
 }
 
-function startOnlineGame(socket: SocketIOClient.Socket) {
+// function startOnlineGame(socket: SocketIOClient.Socket) {
 
-	const side = sessionStorage.getItem('side');
-	let paddleMovement = 0;
+// 	const side = sessionStorage.getItem('side');
+// 	let paddleMovement = 0;
 
-	document.addEventListener('keydown', (event) => {
-		if (event.key === 'ArrowUp') {
-			paddleMovement = -1;
-		} else if (event.key === 'ArrowDown') {
-			paddleMovement = 1;
-		}
-		socket.emit('playerMove', {
-			side,
-			paddleMovement,
-		});
-	})
+// 	document.addEventListener('keydown', (event) => {
+// 		if (event.key === 'ArrowUp') {
+// 			paddleMovement = -1;
+// 		} else if (event.key === 'ArrowDown') {
+// 			paddleMovement = 1;
+// 		}
+// 		socket.emit('playerMove', {
+// 			side,
+// 			paddleMovement,
+// 		});
+// 	})
 
-	document.addEventListener('keyup', (event) => {
-		if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-			paddleMovement = 0;
-			socket.emit('playerMove', {
-				side,
-				paddleMovement,
-			});
-		}
-	});
+// 	document.addEventListener('keyup', (event) => {
+// 		if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+// 			paddleMovement = 0;
+// 			socket.emit('playerMove', {
+// 				side,
+// 				paddleMovement,
+// 			});
+// 		}
+// 	});
 
 	// socket.on('stateUpdate', (data: string) => {
 	// 	const { leftPaddleUpdated, rightPaddleUpdated, ballUpdated } = JSON.parse(data);
@@ -239,7 +303,7 @@ function startOnlineGame(socket: SocketIOClient.Socket) {
 	// 	document.getElementById('ball')!.style.top = `${ballUpdated.y}px`;
 	// });
 
-}
+//}
 
 function startLocalGame(socket: SocketIOClient.Socket) {
 	let leftPaddleMovement = 0;
@@ -284,6 +348,7 @@ function startLocalGame(socket: SocketIOClient.Socket) {
 	// 	}
 	// });
 
+//}
 }
 
 function sendPlayerMovement(socket: SocketIOClient.Socket, leftPaddle: number, rightPaddle: number) {

@@ -1,4 +1,5 @@
 // /components/profileForm.ts
+//@ts-ignore
 import { User, UpdateUserPayload, ApiResult } from '../shared/types.js'; // S'assurer que ApiResult est importé
 
 interface ProfileFormProps {

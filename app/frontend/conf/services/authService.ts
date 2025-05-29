@@ -1,5 +1,6 @@
 import { fetchWithCsrf, setCsrfToken } from './csrf.js';
 import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, ApiSuccessResponse, ApiResult } from '../shared/types.js';
+//@ts-ignore
 import { Match } from '../shared/types.js';
 import { handleApiResponse } from './apiUtils.js';
 

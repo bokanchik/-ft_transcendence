@@ -1,3 +1,4 @@
+//@ts-ignore
 import { User } from "../shared/types.js";
 
 export async function fetchUsers(): Promise<User[]> {

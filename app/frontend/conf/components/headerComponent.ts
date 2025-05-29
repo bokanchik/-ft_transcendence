@@ -1,4 +1,5 @@
 // src/components/headerComponent.ts
+//@ts-ignore
 import { User } from '../shared/types.js';
 import { navigateTo } from '../services/router.js'; // Assuming navigateTo handles data-link
 import { logout } from '../services/authService.js';

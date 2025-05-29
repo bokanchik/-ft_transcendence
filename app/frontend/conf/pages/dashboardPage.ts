@@ -1,6 +1,7 @@
 import { navigateTo } from '../services/router.js';
 import { getUserDataFromStorage, logout } from '../services/authService.js';
 import { fetchCsrfToken } from '../services/csrf.js';
+//@ts-ignore
 import { User as AuthUserType, User as ApiUserType } from '../shared/types.js';
 import {
 	getReceivedFriendRequests,

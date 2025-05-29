@@ -1,3 +1,4 @@
+//@ts-ignore
 import { ApiErrorResponse } from "../shared/types.js";
 
 /**

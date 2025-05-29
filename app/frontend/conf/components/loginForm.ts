@@ -1,4 +1,5 @@
 // /components/loginForm.ts
+//@ts-ignore
 import { LoginRequestBody, ApiResult } from '../shared/types.js';
 
 interface LoginFormProps {
