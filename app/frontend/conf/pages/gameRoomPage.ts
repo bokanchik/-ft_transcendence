@@ -39,6 +39,7 @@ const gameState: GameState = {
 	// score1: 0
 } 
 
+let isGameOver = false;
 
 export function GameRoomPage(mode: GameMode): HTMLElement {
 	
@@ -122,7 +123,7 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 	
 	drawGame(gameState, ctx);
 
-	clientSocketHandler(gameMode, ctx);
+	clientSocketHandler(scoreDisplay, gameMode, ctx);
 
 	return container;
 }
@@ -130,17 +131,18 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 
 function drawGame(state: GameState, ctx: CanvasRenderingContext2D) {
 	
-	 // Efface tout le canvas
-	 ctx.fillStyle = BG_COLOUR;
-	 ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+	// Efface tout le canvas
+	ctx.fillStyle = BG_COLOUR;
+	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 	 
-	 // DRAW BALL
-	 const ball = state.ball;
+	// DRAW BALL
+	const ball = state.ball;
 	 
-	 ctx.fillStyle = BALL_COLOUR;
+	ctx.fillStyle = BALL_COLOUR;
 	ctx.beginPath();
 	ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
 	ctx.fill();
+	ctx.closePath();
 	
 	ctx.fillStyle = PADDLE_COLOUR;
 	
@@ -171,7 +173,7 @@ async function quitButtonHandler() {
 	}
 }
 
-// Function to set usernames if they're playing remotly
+// Function to set usernames if they're playing in remote
 function setBoard(leftUsername: HTMLDivElement, rightUsername: HTMLDivElement) {
 	const side = sessionStorage.getItem('side');
 	const displayName = sessionStorage.getItem('displayName');
@@ -187,29 +189,103 @@ function setBoard(leftUsername: HTMLDivElement, rightUsername: HTMLDivElement) {
 }
 
 
-function clientSocketHandler(gameMode: string | null, ctx: CanvasRenderingContext2D) {
+function clientSocketHandler(scoreDisplay: HTMLDivElement, gameMode: string | null, ctx: CanvasRenderingContext2D) {
 	
 	if (!socket.connected) {
 		socket.connect();
 	}
 	
-	
 	socket.emit('start');
 	
 	document.addEventListener('keydown', keydown);
-	document.addEventListener('keyup', keyup);
-
-	// --- Local Socket events ---
-	socket.on('gameStarted', (state: GameState) => {
-		console.log(JSON.stringify(state));
-	});
 	
 	socket.on('gameState', (state: GameState) => {
 		handleGameState(state, ctx);
 	});
-	
+
+	socket.on('scoreUpdated', ({ score1, score2 }: {score1: number, score2: number})  => {
+		if (scoreDisplay) {
+			scoreDisplay.textContent = `${score1} - ${score2}`;
+		}
+	});
+
+	socket.on('gameOver', () => {
+		isGameOver = true;
+		// showToast ? You want to play again ? 
+		navigateTo('/local-game');
+	});
 	
 }
+
+function keydown(e: KeyboardEvent) {
+	console.log(e);
+	socket.emit('keydown', e.keyCode);
+}
+
+
+function handleGameState(state: string, ctx: CanvasRenderingContext2D) {
+	if (isGameOver) return;
+	state = JSON.parse(state);
+	requestAnimationFrame(() => drawGame(state, ctx));
+}
+
+
+async function getDisplayName(userId: number) : Promise<string> {
+	const userRes = await fetch(`api/users/${userId}`);
+	if (!userRes.ok) throw new Error('Failed to fetch user info');
+	const userData = await userRes.json();
+	const displayName = userData.display_name;
+	
+	return displayName;
+}
+
+async function getUserAvatar(userId: number) : Promise<string> {
+	const userRes = await fetch(`/api/users/${userId}`);
+	if (!userRes.ok) throw new Error('Failed to fetch user info');
+	const userData = await userRes.json();
+	const url: string = userData.avatar_url;
+	
+	return url;
+}
+
+// function startOnlineGame(socket: SocketIOClient.Socket) {
+	
+// 	const side = sessionStorage.getItem('side');
+// 	let paddleMovement = 0;
+
+// 	document.addEventListener('keydown', (event) => {
+	// 		if (event.key === 'ArrowUp') {
+		// 			paddleMovement = -1;
+		// 		} else if (event.key === 'ArrowDown') {
+			// 			paddleMovement = 1;
+			// 		}
+			// 		socket.emit('playerMove', {
+				// 			side,
+				// 			paddleMovement,
+				// 		});
+				// 	})
+				
+				// 	document.addEventListener('keyup', (event) => {
+					// 		if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+						// 			paddleMovement = 0;
+						// 			socket.emit('playerMove', {
+							// 				side,
+							// 				paddleMovement,
+							// 			});
+							// 		}
+							// 	});
+							
+							// socket.on('stateUpdate', (data: string) => {
+	// 	const { leftPaddleUpdated, rightPaddleUpdated, ballUpdated } = JSON.parse(data);
+	// 	document.getElementById('left-paddle')!.style.top = `${leftPaddleUpdated}px`;
+	// 	document.getElementById('right-paddle')!.style.top = `${rightPaddleUpdated}px`;
+	// 	document.getElementById('ball')!.style.left = `${ballUpdated.x}px`;
+	// 	document.getElementById('ball')!.style.top = `${ballUpdated.y}px`;
+	// });
+	
+	//}
+	
+
 // socket.on('gameFinished', async (matchId: string) => {
 	// 	try {
 		// 		const matchRes = await fetch(`/api/game/match/${matchId}`);
@@ -234,127 +310,3 @@ function clientSocketHandler(gameMode: string | null, ctx: CanvasRenderingContex
 		// 		console.log(`Failed to fetch data from db: ${err}`);
 		// 	}
 		// });
-
-function keydown(e: KeyboardEvent) {
-	console.log(e);
-	socket.emit('keydown', e.keyCode);
-}
-
-function keyup(e: KeyboardEvent) {
-	console.log(e);
-	socket.emit('keyup',  e.keyCode);
-}
-		
-function handleGameState(state: string, ctx: CanvasRenderingContext2D) {
-			state = JSON.parse(state);
-			requestAnimationFrame(() => drawGame(state, ctx));
-}
-
-async function getDisplayName(userId: number) : Promise<string> {
-	const userRes = await fetch(`api/users/${userId}`);
-	if (!userRes.ok) throw new Error('Failed to fetch user info');
-	const userData = await userRes.json();
-	const displayName = userData.display_name;
-
-	return displayName;
-}
-
-async function getUserAvatar(userId: number) : Promise<string> {
-	const userRes = await fetch(`/api/users/${userId}`);
-	if (!userRes.ok) throw new Error('Failed to fetch user info');
-	const userData = await userRes.json();
-	const url: string = userData.avatar_url;
-
-	return url;
-}
-
-// function startOnlineGame(socket: SocketIOClient.Socket) {
-
-// 	const side = sessionStorage.getItem('side');
-// 	let paddleMovement = 0;
-
-// 	document.addEventListener('keydown', (event) => {
-// 		if (event.key === 'ArrowUp') {
-// 			paddleMovement = -1;
-// 		} else if (event.key === 'ArrowDown') {
-// 			paddleMovement = 1;
-// 		}
-// 		socket.emit('playerMove', {
-// 			side,
-// 			paddleMovement,
-// 		});
-// 	})
-
-// 	document.addEventListener('keyup', (event) => {
-// 		if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-// 			paddleMovement = 0;
-// 			socket.emit('playerMove', {
-// 				side,
-// 				paddleMovement,
-// 			});
-// 		}
-// 	});
-
-	// socket.on('stateUpdate', (data: string) => {
-	// 	const { leftPaddleUpdated, rightPaddleUpdated, ballUpdated } = JSON.parse(data);
-	// 	document.getElementById('left-paddle')!.style.top = `${leftPaddleUpdated}px`;
-	// 	document.getElementById('right-paddle')!.style.top = `${rightPaddleUpdated}px`;
-	// 	document.getElementById('ball')!.style.left = `${ballUpdated.x}px`;
-	// 	document.getElementById('ball')!.style.top = `${ballUpdated.y}px`;
-	// });
-
-//}
-
-function startLocalGame(socket: SocketIOClient.Socket) {
-	let leftPaddleMovement = 0;
-	let rightPaddleMovement = 0;
-
-	document.addEventListener('keydown', (event) => {
-		if (event.key === 'w' || event.key === 'W') {
-			leftPaddleMovement = -1; // deplacer vers le haut
-		} else if (event.key === 's' || event.key === 'S') {
-			leftPaddleMovement = 1; // deplacer vers le bas
-		}
-
-		if (event.key === 'ArrowUp') {
-			rightPaddleMovement = -1;
-		} else if (event.key === 'ArrowDown') {
-			rightPaddleMovement = 1;
-		}
-		sendPlayerMovement(socket, leftPaddleMovement, rightPaddleMovement);
-
-	})
-
-	document.addEventListener('keyup', (event) => {
-		if (event.key === 'w' || event.key === 's' || event.key === 'W' || event.key == 'S') {
-			leftPaddleMovement = 0;
-		}
-		if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-			rightPaddleMovement = 0;
-		}
-
-		sendPlayerMovement(socket, leftPaddleMovement, rightPaddleMovement);
-	})
-
-	// TODO: serveur recois 
-	// socket.on('stateUpdate', (data: string) => {
-	// 	const { leftPaddleUpdated, rightPaddleUpdated } = JSON.parse(data);
-	// 	const leftPaddleElem = document.getElementById('left-paddle');
-	// 	const rightPaddleElem = document.getElementById('right-paddle');
-
-	// 	if (leftPaddleElem && rightPaddleElem) {
-	// 		leftPaddleElem.style.top = `${leftPaddleUpdated}px`;
-	// 		rightPaddleElem.style.top = `${rightPaddleUpdated}px`;
-	// 	}
-	// });
-
-//}
-}
-
-function sendPlayerMovement(socket: SocketIOClient.Socket, leftPaddle: number, rightPaddle: number) {
-	socket.emit('playerMove', ({
-		leftPaddle,
-		rightPaddle,
-	}));
-}
-

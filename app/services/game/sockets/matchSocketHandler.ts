@@ -9,7 +9,7 @@ import { createGameState } from "./pongGame.ts";
 // @ts-ignore
 import { GameState } from "./shared/types.js";
 import { FRAME_RATE, TIMEOUT_MS } from "../utils/constants.ts";
-import { gameLoop, handleKeydown, handleKeyup} from "./pongGame.ts";
+import { gameLoop, handleKeydown} from "./pongGame.ts";
 
 const timeouts: Map<string, NodeJS.Timeout> = new Map();
 //export let gameList: Map<string, PongGame> = new Map(); // string pour matchId
@@ -140,19 +140,7 @@ function localSocketEvents(socket: Socket) {
             }
         });
 
-        socket.on('keyup', (keyCode: string) => {
-            try {
-                const parsedKey = parseInt(keyCode);
-                handleKeyup(parsedKey, state);
-
-            } catch (err: unknown) {
-                throw err;
-            }
-        })
-
-        startGameInterval(state, socket);
-       // socket.emit('gameStarted', createGameState());
-        
+        startGameInterval(state, socket);        
     });
 
     // -------------------------------
@@ -160,12 +148,12 @@ function localSocketEvents(socket: Socket) {
 
 function startGameInterval(state: GameState, socket: Socket) {
     const intervalId = setInterval(() => {
-        const winner: number = gameLoop(state); // if == 0, game continue, == 1, player 1 win, == 2 player 2 won
+        const winner: number = gameLoop(state, socket); // if == 0, game continue, == 1, player 1 win, == 2 player 2 won
         
         if (!winner) {
            socket.emit('gameState', JSON.stringify(state));
         } else {
-            // client.emit('gameOver');
+            socket.emit('gameOver');
             clearInterval(intervalId);
         }
     }, 1000 / FRAME_RATE);
