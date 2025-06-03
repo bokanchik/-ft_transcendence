@@ -130,34 +130,39 @@ function localSocketEvents(socket: Socket) {
         fastify.log.info('Game started locally. Server is sending a game state.');
      
         const state = createGameState();
-     
+        
+        // handle key
         socket.on('keydown', (keyCode: string) => {
             try {
                 const parsedKey = parseInt(keyCode);
-                handleKeydown(parsedKey, state);
+                handleKeydown(socket, parsedKey, state);
             } catch (err: unknown) {
                 throw err;
             }
         });
 
-        startGameInterval(state, socket);        
+        socket.emit('gameState')
+
+        
+        // startGameInterval(state, socket);        
     });
 
     // -------------------------------
 }
 
-function startGameInterval(state: GameState, socket: Socket) {
-    const intervalId = setInterval(() => {
-        const winner: number = gameLoop(state, socket); // if == 0, game continue, == 1, player 1 win, == 2 player 2 won
-        
-        if (!winner) {
-           socket.emit('gameState', JSON.stringify(state));
-        } else {
-            socket.emit('gameOver');
-            clearInterval(intervalId);
-        }
-    }, 1000 / FRAME_RATE);
-}
+
+// function startGameInterval(state: GameState, socket: Socket) {
+//     const intervalId = setInterval(() => {
+
+//         const winner: number = gameLoop(state, socket); // if == 0, game continue, == 1, player 1 win, == 2 player 2 won
+//         if (!winner) {
+//            socket.emit('gameState', JSON.stringify(state));
+//         } else {
+//             socket.emit('gameOver');
+//             clearInterval(intervalId);
+//         }
+//     }, 1000 / FRAME_RATE); // en ms
+// }
 
 
 // --- Helper functions

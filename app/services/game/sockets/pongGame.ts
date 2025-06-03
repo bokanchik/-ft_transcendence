@@ -4,33 +4,26 @@ import { W, S, ARROW_UP, ARROW_DOWN, PADDLE_SPEED, GAME_HEIGHT, GAME_WIDTH, PADD
 import { fastify } from "../server.ts";
 import { Socket } from "socket.io";
 
-
-let score1: number = 0; // left player
-let score2: number = 0; // right player
-
 export function createGameState(): GameState {
     return {
-        leftPaddle: {
-            x: 20,
-            y: 200,
-            width: 20,
-            height: 120,
-            vy: 0
-        },
-        rightPaddle: {
-            x: 770,
-            y: 200,
-            width: 20,
-            height: 120,
-            vy: 0
-        },
+       leftPaddle: {
+            lowerEdgePos: 200,
+            velocity: 100
+	    },
+	    rightPaddle: {
+            lowerEdgePos: 200,
+            velocity: 100
+	    },
         ball: {
             x: 400,
             y: 250,
-            vx: 10,
-            vy: 5,
+            vectorX: 0,
+            vectorY: 0,
+            velocity: 0,
             radius: 25
         },
+        score1: 0, 
+        score2: 0
     }
 }
 
@@ -38,7 +31,7 @@ export function gameLoop(state: GameState, socket: Socket): number {
     const ball = state.ball;
     const leftPaddle = state.leftPaddle;
     const rightPaddle = state.rightPaddle;
-    
+
     // 1. move the ball
     ball.x += ball.vx;
     ball.y += ball.vy;
@@ -64,34 +57,40 @@ export function gameLoop(state: GameState, socket: Socket): number {
     
     // 4. check if a player scored (si la balle a touche le mur -> but !)
     if (ball.x - ball.radius <= 0) {
-        updateScore('right', socket);
+        updateScore(state, 'right', socket);
         resetBall(state);
     }
     if (ball.x + ball.radius >= GAME_WIDTH) {
-        updateScore('left', socket);
+        updateScore(state, 'left', socket);
         resetBall(state);
     }
     
     // 5. return 0 - continues, 1/2 if there is a winner
-    if (score1 == FINAL_SCORE) {
+    if (state.score1 == FINAL_SCORE) {
         return 1; // leftPlayer won
-    } else if (score2 == FINAL_SCORE) {
+    } else if (state.score2 == FINAL_SCORE) {
         return 2; // rightPlayer won
     }
 
-    fastify.log.info('Score Left: ' + score1 + 'Score right ' + score2);
+  //  fastify.log.info('Score Left: ' + score1 + 'Score right ' + score2);
     
     return 0;
 }
 
-function updateScore(side: string, socket: Socket) {
+function updateScore(state: GameState, side: string, socket: Socket) {
     if (side === 'left') {
-        score1++;
+        state.score1++;
     } else if (side === 'right') {
-        score2++;
+        state.score2++;
     }
-    socket.emit('scoreUpdated', ({ score1, score2 }));
-    fastify.log.info(`New score ${score1} : ${score2}`);
+    
+    const data = {
+        score1: state.score1,
+        score2: state.score2
+    }
+
+    socket.emit('scoreUpdated', (data));
+    fastify.log.info(`New state.score ${state.score1} : ${state.score2}`);
 }
 
 function resetBall(state: GameState) {
@@ -129,24 +128,30 @@ function isBallCollision(ball: any, paddle: any): boolean {
     
 }
 
-export function handleKeydown(key: number, state: GameState) {
+export function handleKeydown(socket: Socket, key: number, state: GameState) {
     
     switch (key) {
         case (S): // jouer a gauche
-        state.leftPaddle.y += PADDLE_SPEED;
-        break;
-        case (ARROW_DOWN): // jouer a droite
-        state.rightPaddle.y += PADDLE_SPEED;
-        break;
+            state.leftPaddle.lowerEdgePos += PADDLE_SPEED;
+            socket.emit('leftPaddle', state.leftPaddle.lowerEdgePos);
+            break;
+            case (ARROW_DOWN): // jouer a droite
+            state.rightPaddle.lowerEdgePos += PADDLE_SPEED;
+            const data = {
+                lowerEdgePos: state.rightPaddle.lowerEdgePos,
+                velocity: state.rightPaddle.velocity,
+            }
+            socket.emit('rightPaddle', (data));
+            break;
         case (W):
-            state.leftPaddle.y += -PADDLE_SPEED;
+            state.leftPaddle.lowerEdgePos += -PADDLE_SPEED;
+            socket.emit('leftPaddle', state.leftPaddle.lowerEdgePos);
             break;
         case (ARROW_UP):
-            state.rightPaddle.y += -PADDLE_SPEED;
+            state.rightPaddle.lowerEdgePos += -PADDLE_SPEED;
+            socket.emit('rightPaddle', state.rightPaddle.lowerEdgePos,  state.rightPaddle.velocity);
             break;
         default:
-            state.leftPaddle.vy = 0;
-            state.rightPaddle.vy = 0;
             break;
         }
 }

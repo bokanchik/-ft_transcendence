@@ -9,98 +9,112 @@ import { GameState } from '../shared/types.js';
 import { stat } from "fs";
 // import { showToast } from '../components/toast.js';
 
-const BG_COLOUR = " #ebffeb ";
-const BALL_COLOUR = " #ac6703 ";
-const PADDLE_COLOUR = " #ac6703 ";
+const BG_COLOUR = "rgb(0, 0, 0) ";
+const BALL_COLOUR = "rgb(255, 255, 255) ";
+const PADDLE_COLOUR = "rgb(255, 255, 255) ";
+const LEFT_PADDLE_X_POS = 20;
+const RIGHT_PADDLE_X_POS = 770;
+const FRAME_RATE = 60;
 
-const gameState: GameState = {
+const nextGameState: GameState = {
 	leftPaddle: {
-		x: 20,
-		y: 200,
-		width: 20,
-		height: 120,
-		vy: 0
+		lowerEdgePos: 200,
+		velocity: 100
 	},
 	rightPaddle: {
-		x: 770,
-		y: 200,
-		width: 20,
-		height: 120,
-		vy: 0
+		lowerEdgePos: 200,
+		velocity: 100
 	},
 	ball: {
 		x: 400,
 		y: 250,
-		vx: 5,
-		vy: 3,
+		vectorX: 0,
+		vectorY: 0,
+		velocity: 0,
 		radius: 25
 	},
 	// score0: 0,
 	// score1: 0
 } 
 
-let isGameOver = false;
+const currentGameState: GameState = {
+	leftPaddle: {
+		lowerEdgePos: 200,
+		width: 20,
+		height: 120,
+	},
+	rightPaddle: {
+		lowerEdgePos: 200,
+		width: 20,
+		height: 120,
+
+	},
+	ball: {
+		x: 400,
+		y: 250,
+	},
+};
 
 export function GameRoomPage(mode: GameMode): HTMLElement {
 	
 	// Conteneur principal
 	const container = document.createElement('div');
 	container.className = `
-		w-full h-screen flex flex-col items-center justify-center 
-		bg-gradient-to-b from-green-900 via-green-700 to-green-600 
-		jungle-font text-white
+	w-full h-screen flex flex-col items-center justify-center 
+	bg-gradient-to-b from-green-900 via-green-700 to-green-600 
+	jungle-font text-white
 	`;
-
+	
 	// Wrapper horizontal pour les usernames et canvas
 	const gameRow = document.createElement('div');
 	gameRow.className = 'flex items-center';
-
+	
 	// Nom du joueur gauche (à gauche du canvas)
 	const leftUsername = document.createElement('div');
 	leftUsername.className = `
-		mr-4 px-3 py-1 bg-lime-200 text-green-900 
-		border border-green-800 rounded font-bold text-xl 
-		shadow jungle-font text-center w-[120px]
+	mr-4 px-3 py-1 bg-lime-200 text-green-900 
+	border border-green-800 rounded font-bold text-xl 
+	shadow jungle-font text-center w-[120px]
 	`;
 	leftUsername.id = 'left-username';
-
+	
 	// Canvas de jeu
 	const canvas = document.createElement('canvas');
 	canvas.id = 'pong-canvas';
 	canvas.width = 800;
 	canvas.height = 500;
 	canvas.className = 'border-8 border-green-700 rounded-lg bg-neutral-900';
-
+	
 	// Nom du joueur droit (à droite du canvas)
 	const rightUsername = document.createElement('div');
 	rightUsername.className = `
-		ml-4 px-3 py-1 bg-lime-200 text-green-900 
-		border border-green-800 rounded font-bold text-xl 
-		shadow jungle-font text-center w-[120px]
+	ml-4 px-3 py-1 bg-lime-200 text-green-900 
+	border border-green-800 rounded font-bold text-xl 
+	shadow jungle-font text-center w-[120px]
 	`;
 	rightUsername.id = 'right-username';
-
+	
 	// Score display
 	const scoreDisplay = document.createElement('div');
 	scoreDisplay.className = `
-		absolute top-25 left-1/2 transform -translate-x-1/2 
-		text-3xl font-extrabold text-yellow-300 jungle-font drop-shadow
+	absolute top-25 left-1/2 transform -translate-x-1/2 
+	text-3xl font-extrabold text-yellow-300 jungle-font drop-shadow
 	`;
 	scoreDisplay.id = 'score-display';
 	scoreDisplay.textContent = '0 - 0'; // TODO: need to be updated
-
+	
 	// Composition de la ligne
 	gameRow.append(leftUsername, canvas, rightUsername, scoreDisplay);
 	container.appendChild(gameRow);
-
+	
 	// Quit button
 	const quitButton = document.createElement('button');
 	quitButton.className = `
-		mt-6 px-5 py-2 bg-red-700 text-white font-bold rounded-lg 
-		hover:bg-red-800 shadow-lg transition duration-300 jungle-font
+	mt-6 px-5 py-2 bg-red-700 text-white font-bold rounded-lg 
+	hover:bg-red-800 shadow-lg transition duration-300 jungle-font
 	`;
 	quitButton.textContent = 'Quit';
-
+	
 	// Ajouter le bouton dans le container principal
 	container.appendChild(quitButton);
 	
@@ -111,51 +125,73 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 	} else {
 		setBoard(leftUsername, rightUsername);
 	}
-
+	
 	// Initialiser le canvas
 	const ctx = canvas.getContext('2d');
 	if (!ctx) throw new Error('Canvas context not supported');
 	ctx.fillStyle = BG_COLOUR;
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+	
 	// --- Event: quit button ---
 	quitButton.addEventListener('click', quitButtonHandler);
 	
-	drawGame(gameState, ctx);
-
+	drawGame(currentGameState, nextGameState, ctx);
+	
 	clientSocketHandler(scoreDisplay, gameMode, ctx);
-
+	
 	return container;
 }
 
 
-function drawGame(state: GameState, ctx: CanvasRenderingContext2D) {
+function drawGame(currentGameState: GameState, nextGameState: GameState, ctx: CanvasRenderingContext2D) {
 	
 	// Efface tout le canvas
 	ctx.fillStyle = BG_COLOUR;
 	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-	 
-	// DRAW BALL
-	const ball = state.ball;
-	 
-	ctx.fillStyle = BALL_COLOUR;
-	ctx.beginPath();
-	ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-	ctx.fill();
-	ctx.closePath();
 	
+	drawBall(currentGameState, nextGameState, ctx);
+
+	drawLeftPaddle(currentGameState, nextGameState, ctx);
+
+	drawRightPaddle(currentGameState, nextGameState, ctx);
+}
+
+
+function drawRightPaddle(currentGameState: GameState, nextGameState: GameState, ctx: CanvasRenderingContext2D) {
 	ctx.fillStyle = PADDLE_COLOUR;
 	
-	// DRAW LEFT PADDLE
-	const leftPaddle = state.leftPaddle;
+	socket.on('rightPaddle', (data: any) => {
+		const newLowerEdgePos = (data.lowerEdgePos - currentGameState.rightPaddle.lowerEdgePos) *
+								1 / (FRAME_RATE * data.velocity) + currentGameState.rightPaddle.lowerEdgePos;
+		currentGameState.rightPaddle.lowerEdgePos = newLowerEdgePos;
+	});
+	console.log(`newLowerdgepos: ` + currentGameState.rightPaddle.lowerEdgePos);
 	
-	ctx.fillRect(leftPaddle.x, leftPaddle.y, leftPaddle.width, leftPaddle.height);
+	ctx.fillRect(RIGHT_PADDLE_X_POS, currentGameState.rightPaddle.lowerEdgePos, currentGameState.rightPaddle.width, currentGameState.rightPaddle.height);
 	
-	// DRAW RIGHT PADDLE
-	const rightPaddle = state.rightPaddle;
+}
+
+
+
+function drawLeftPaddle(currentGameState: GameState, nextGameState: GameState, ctx: CanvasRenderingContext2D) {
+	// ctx.fillStyle = PADDLE_COLOUR;
 	
-	ctx.fillRect(rightPaddle.x, rightPaddle.y, rightPaddle.width, rightPaddle.height);
+	// const leftPaddle = state.leftPaddle;
 	
+	// leftPaddle.lowerEdgePos = leftPaddle.lowerEdgePos
+	// ctx.fillRect(LEFT_PADDLE_X_POS, leftPaddle.lowerEdgePos, leftPaddle.width, leftPaddle.height);
+	
+}
+
+function drawBall(currentGameState: GameState, nextGameState: GameState, ctx: CanvasRenderingContext2D) {
+
+	// const ball = state.ball;
+	
+	// ctx.fillStyle = BALL_COLOUR;
+	// ctx.beginPath();
+	// ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+	// ctx.fill();
+	// ctx.closePath();
 	
 }
 
@@ -191,6 +227,8 @@ function setBoard(leftUsername: HTMLDivElement, rightUsername: HTMLDivElement) {
 
 function clientSocketHandler(scoreDisplay: HTMLDivElement, gameMode: string | null, ctx: CanvasRenderingContext2D) {
 	
+	let isGameOver = false;
+	
 	if (!socket.connected) {
 		socket.connect();
 	}
@@ -199,9 +237,9 @@ function clientSocketHandler(scoreDisplay: HTMLDivElement, gameMode: string | nu
 	
 	document.addEventListener('keydown', keydown);
 	
-	socket.on('gameState', (state: GameState) => {
-		handleGameState(state, ctx);
-	});
+	// socket.on('gameState', (state: GameState) => {
+		handleGameState(isGameOver, currentGameState, ctx);
+	// });
 
 	socket.on('scoreUpdated', ({ score1, score2 }: {score1: number, score2: number})  => {
 		if (scoreDisplay) {
@@ -211,6 +249,8 @@ function clientSocketHandler(scoreDisplay: HTMLDivElement, gameMode: string | nu
 
 	socket.on('gameOver', () => {
 		isGameOver = true;
+		// cleanupSocket(socket);
+		sessionStorage.clear();
 		// showToast ? You want to play again ? 
 		navigateTo('/local-game');
 	});
@@ -218,15 +258,14 @@ function clientSocketHandler(scoreDisplay: HTMLDivElement, gameMode: string | nu
 }
 
 function keydown(e: KeyboardEvent) {
-	console.log(e);
 	socket.emit('keydown', e.keyCode);
 }
 
 
-function handleGameState(state: string, ctx: CanvasRenderingContext2D) {
+function handleGameState(isGameOver: boolean, nextGameState: string, ctx: CanvasRenderingContext2D) {
 	if (isGameOver) return;
-	state = JSON.parse(state);
-	requestAnimationFrame(() => drawGame(state, ctx));
+	nextGameState = JSON.parse(nextGameState);
+	requestAnimationFrame(() => drawGame(currentGameState, nextGameState, ctx));
 }
 
 
