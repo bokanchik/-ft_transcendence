@@ -1,7 +1,7 @@
 import { navigateTo } from '../services/router.js';
-import { getUserDataFromStorage, logout } from '../services/authService.js';
+import { getUserDataFromStorage } from '../services/authService.js';
 import { fetchCsrfToken } from '../services/csrf.js';
-import { User as AuthUserType, User as ApiUserType } from '../shared/types.js';
+import { User } from '../shared/schemas/usersSchemas.js';
 import {
 	getReceivedFriendRequests,
 	getSentFriendRequests,
@@ -28,7 +28,7 @@ function MatchHistoryComponent(): HTMLElement {
 }
 
 export async function DashboardPage(): Promise<HTMLElement> {
-	const currentUser: AuthUserType | null = getUserDataFromStorage();
+	const currentUser: User | null = getUserDataFromStorage();
 
 	if (!currentUser) {
 		navigateTo('/login');
@@ -199,7 +199,7 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		]);
 
 		const userListProps: UserListProps = {
-			users: usersData as ApiUserType[],
+			users: usersData as User[],
 			friends: friendsData,
 			sentRequests: sentRequestsData,
 			receivedRequests: receivedRequestsData,

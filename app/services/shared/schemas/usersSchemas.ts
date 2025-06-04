@@ -19,8 +19,6 @@ export const UserBaseSchema = z.object({
     status: UserOnlineStatusSchema.default(UserOnlineStatus.OFFLINE),
     created_at: z.string(), // Ou z.date()
     updated_at: z.string(), // Ou z.date()
-    // created_at: z.string().datetime(), // Ou z.date()
-    // updated_at: z.string().datetime(), // Ou z.date()
 });
 export type User = z.infer<typeof UserBaseSchema>;
 

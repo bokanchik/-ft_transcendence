@@ -2,7 +2,8 @@
 import { attemptLogin } from '../services/authService.js';
 import { navigateTo } from '../services/router.js';
 import { LoginForm } from '../components/loginForm.js';
-import { LoginRequestBody, ApiResult } from '../shared/types.js';
+import { LoginRequestBody } from '../shared/schemas/usersSchemas.js';
+import { ApiResult } from '../shared/types.js';
 
 export function LoginPage(): HTMLElement {
 	const container = document.createElement('div');
