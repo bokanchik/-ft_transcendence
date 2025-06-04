@@ -11,10 +11,13 @@
 - [ ] changement mdp
 - [x] Affichage du status
 - [ ] tout matches
-- [ ] -> zod 
+- [x] -> zod/back 
+- [ ] -> zod/front 
 - [x] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde) -> cookie jwt_token
 - [x] httpOnly cookie for server-side ? -> yes
-- [ ] grafana
+- [x] grafana
+- [ ] grafana/dashboards
+- [ ] nettoyage
 
 ## 📌 Tâches initiales
 
