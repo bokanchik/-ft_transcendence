@@ -2,7 +2,7 @@
 import * as userModel from '../models/userModel.js';
 import * as passwordUtils from '../shared/auth-plugin/pswdUtils.js';
 import { ERROR_MESSAGES, ConflictError, ValidationError, NotFoundError } from '../shared/auth-plugin/appError.js';
-import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, CreateUserPayload, UserOnlineStatus } from '../shared/types.js';
+import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, CreateUserPayload, UserOnlineStatus } from '../shared/schemas/usersSchemas.js';
 import { isValidHttpUrl, isValidEmailFormat } from '../utils/apiUtils.js';
 
 /**
@@ -146,17 +146,6 @@ export async function updateUserProfile(userId: number, updates: UpdateUserPaylo
 			throw new ValidationError('Invalid email format provided.');
 		}
 	}
-
-	// if (updates.avatar_url !== undefined) {
-	// 	if (updates.avatar_url === 'string' && updates.avatar_url.trim() !== '') {
-	// 		if (isValidHttpUrl(updates.avatar_url)) {
-	// 			processedUpdates.avatar_url = updates.avatar_url.trim();
-	// 		} 
-	// 	} else {
-	// 			throw new ValidationError('Invalid avatar URL format provided.');
-	// 		}
-	// }
-	
 	if (updates.avatar_url !== undefined && updates.avatar_url !== null) {
 		if (isValidHttpUrl(updates.avatar_url)) {
 			processedUpdates.avatar_url = updates.avatar_url;
@@ -167,12 +156,12 @@ export async function updateUserProfile(userId: number, updates: UpdateUserPaylo
 
 	const changesToApply: UpdateUserPayload = {};
 	for (const key in processedUpdates) {
-    const typedKey = key as keyof UpdateUserPayload;
-    const value = processedUpdates[typedKey];
-    if (value !== null && value !== currentUser[typedKey]) {
-        changesToApply[typedKey] = value;
-    }
-}
+		const typedKey = key as keyof UpdateUserPayload;
+		const value = processedUpdates[typedKey];
+		if (value !== null && value !== currentUser[typedKey]) {
+			changesToApply[typedKey] = value;
+		}
+	}
 	if (Object.keys(changesToApply).length === 0) {
 		console.log(`No effective changes detected for user ${userId}. Profile remains unchanged.`);
 		return currentUser;

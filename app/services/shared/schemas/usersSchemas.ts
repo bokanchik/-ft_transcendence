@@ -77,7 +77,7 @@ export const UpdateUserBodySchema = z.object({
     display_name: UserBaseSchema.shape.display_name.optional(),
     avatar_url: UserBaseSchema.shape.avatar_url.optional(),
 }).refine(data => Object.keys(data).length > 0, {
-    message: "Au moins un champ doit être fourni pour la mise à jour."
+    message: "At least one change."
 });
 export type UpdateUserPayload = z.infer<typeof UpdateUserBodySchema>;
 
@@ -91,9 +91,14 @@ export const UpdateUserRouteSchema = {
     }
 };
 
-// GET USER BY ID (Params)
+export const UpdatedDbResultSchema = z.object({
+	changes: z.number().int().optional(),
+});
+export type UpdatedUserResult = z.infer<typeof UpdatedDbResultSchema>;
+
+// GET USER BY ID
 export const UserIdParamsSchema = z.object({
-    userId: z.string().regex(/^\d+$/, "User ID doit être un nombre"),
+    userId: z.string().regex(/^\d+$/, "User ID must be a positive integer."),
 });
 export type UserIdParams = z.infer<typeof UserIdParamsSchema>;
 
@@ -109,17 +114,16 @@ export const GetUserByIdRouteSchema = {
 export const CreateUserPayloadSchema = z.object({
     username: UserBaseSchema.shape.username,
     email: UserBaseSchema.shape.email,
-    password_hash: z.string(), // Hash, pas le mot de passe en clair
+    password_hash: z.string(),
     display_name: UserBaseSchema.shape.display_name,
     avatar_url: UserBaseSchema.shape.avatar_url.optional(),
 });
 export type CreateUserPayload = z.infer<typeof CreateUserPayloadSchema>;
 
-// --- Autres types utiles ---
 export const JWTPayloadSchema = z.object({
     id: z.number().int(),
     username: z.string(),
-    // iat: z.number().optional(), // JWT ajoute ces champs automatiquement
-    // exp: z.number().optional(),
+    iat: z.number().optional(), // JWT ajoute ces champs automatiquement
+    exp: z.number().optional(),
 });
 export type JWTPayload = z.infer<typeof JWTPayloadSchema>;

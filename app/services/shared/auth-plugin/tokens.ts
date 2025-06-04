@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { JWTPayload } from '../types.js';
+import { JWTPayload } from '../schemas/usersSchemas.js';
 import { config } from '../env.js';
 import fastifyJwt from '@fastify/jwt';
 import fastifyCookie, { CookieSerializeOptions } from '@fastify/cookie';

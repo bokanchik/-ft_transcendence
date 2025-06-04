@@ -1,6 +1,6 @@
 import { fetchWithCsrf, setCsrfToken } from './csrf.js';
-import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, ApiSuccessResponse, ApiResult } from '../shared/types.js';
-import { Match } from '../shared/types.js';
+import { ApiSuccessResponse, ApiResult, Match } from '../shared/types.js';
+import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload } from '../shared/schemas/usersSchemas.js';
 import { handleApiResponse } from './apiUtils.js';
 
 const USER_DATA_KEY = 'userDataKey';
@@ -32,6 +32,26 @@ export function getUserDataFromStorage(): User | null {
 		console.error("Error reading user data", e);
 		localStorage.removeItem(USER_DATA_KEY);
 		return null;
+	}
+}
+
+/**
+ * Fetches the list of all users from the API.
+ *
+ * @returns {Promise<User[]>} An array of User objects. Returns an empty array if the request fails.
+ */
+export async function fetchUsers(): Promise<User[]> {
+	try {
+		const response = await fetch('/api/users/');
+		if (!response.ok) {
+			console.error(`HTTP error! status: ${response.status}`);
+			return [];
+		}
+		const users = await response.json() as User[];
+		return users;
+	} catch (error) {
+		console.error("Failed to fetch users:", error);
+		return [];
 	}
 }
 

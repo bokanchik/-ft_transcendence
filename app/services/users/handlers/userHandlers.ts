@@ -1,9 +1,7 @@
 // Gère les requêtes Fastify (req, reply)
 import { FastifyRequest, FastifyReply } from 'fastify';
 import * as userService from '../services/userService.js';
-import { z } from 'zod';
-//import { JWTPayload, UpdateUserPayload, User } from '../shared/types.js';
-import { UserIdParams, UpdateUserPayload, User, JWTPayload, UserIdParamsSchema } from '../shared/schemas/usersSchemas.js';
+import { UserIdParams, UpdateUserPayload, JWTPayload } from '../shared/schemas/usersSchemas.js';
 
 type AuthenticatedRequest = FastifyRequest & { user: JWTPayload };
 

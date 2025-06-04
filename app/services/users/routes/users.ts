@@ -6,9 +6,7 @@ import {
 	getUserMeMatchHandler,
 	updateUserMeHandler,
 } from '../handlers/userHandlers.js';
-import { UpdateUserPayload } from '../shared/types.js';
 import { config } from '../shared/env.js';
-//import { updateUserSchema, userIdParamSchema, userResponseSchema } from '../schemas/userSchemas.js';
 import { UpdateUserRouteSchema, GetUserByIdRouteSchema } from '../shared/schemas/usersSchemas.js';
 
 
@@ -24,20 +22,6 @@ export default async function userRoutes(fastify: FastifyInstance, options: Fast
 		getUserMeHandler
 	);
 
-	// fastify.get<{ Params: { userId: string } }>(
-	// 	config.URL_USER,
-	// 	{
-	// 		onRequest: [fastify.authenticate],
-	// 		schema: {
-	// 			params: userIdParamSchema.params,
-	// 			response: {
-	// 				200: userResponseSchema
-	// 			}
-	// 		}
-	// 	},
-	// 	getUserInfoHandler
-	// );
-
 	fastify.get(
 		config.URL_USER,
 		{
@@ -47,7 +31,6 @@ export default async function userRoutes(fastify: FastifyInstance, options: Fast
 		getUserInfoHandler
 	);
 
-	// fastify.patch<{ Body: UpdateUserPayload }>(
 	fastify.patch(
 		config.URL_USER_ME,
 		{

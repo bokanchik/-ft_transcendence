@@ -1,6 +1,7 @@
 // app/services/users/models/friendModel.ts
 import { getDb } from '../utils/dbConfig.js';
-import { Friendship, User, Friend, FriendshipStatus } from '../shared/types.js'; // Importez vos types
+import { Friendship, Friend, FriendshipStatus } from '../shared/schemas/friendsSchemas.js';
+import { User } from '../shared/schemas/usersSchemas.js';
 
 /**
  * Creates a new friendship request in the database.
@@ -10,35 +11,35 @@ import { Friendship, User, Friend, FriendshipStatus } from '../shared/types.js';
  * @returns {Promise<Friendship>} The created friendship object with its ID.
  */
 export async function createFriendshipRequestInDb(user1Id: number, user2Id: number, initiatorId: number): Promise<Friendship> {
-    const db = getDb();
-    const [id1, id2] = user1Id < user2Id ? [user1Id, user2Id] : [user2Id, user1Id];
+	const db = getDb();
+	const [id1, id2] = user1Id < user2Id ? [user1Id, user2Id] : [user2Id, user1Id];
 
-//     const insertResult = await db.run(
-//         `INSERT INTO friendships (user1_id, user2_id, initiator_id, status) VALUES (?, ?, ?, ?)`,
-//         [id1, id2, initiatorId, FriendshipStatus.PENDING]
-//     );
+	//     const insertResult = await db.run(
+	//         `INSERT INTO friendships (user1_id, user2_id, initiator_id, status) VALUES (?, ?, ?, ?)`,
+	//         [id1, id2, initiatorId, FriendshipStatus.PENDING]
+	//     );
 
-//     if (insertResult.lastID === undefined) {
-//         throw new Error("Failed to create friendship, no lastID returned from insert operation.");
-//     }
+	//     if (insertResult.lastID === undefined) {
+	//         throw new Error("Failed to create friendship, no lastID returned from insert operation.");
+	//     }
 
-//     const newFriendship = await db.get<Friendship>(
-//         `SELECT * FROM friendships WHERE id = ?`,
-//         [insertResult.lastID]
-//     );
+	//     const newFriendship = await db.get<Friendship>(
+	//         `SELECT * FROM friendships WHERE id = ?`,
+	//         [insertResult.lastID]
+	//     );
 
-    const newFriendship = await db.get<Friendship>(
-        `INSERT INTO friendships (user1_id, user2_id, initiator_id, status)
+	const newFriendship = await db.get<Friendship>(
+		`INSERT INTO friendships (user1_id, user2_id, initiator_id, status)
          VALUES (?, ?, ?, ?)
          RETURNING *`,
-        [id1, id2, initiatorId, FriendshipStatus.PENDING]
-    );
+		[id1, id2, initiatorId, FriendshipStatus.PENDING]
+	);
 
-    
-    if (!newFriendship) {
-        throw new Error("Failed to create friendship or retrieve the created row using RETURNING.");
-    }
-    return newFriendship;
+
+	if (!newFriendship) {
+		throw new Error("Failed to create friendship or retrieve the created row using RETURNING.");
+	}
+	return newFriendship;
 }
 
 /**
@@ -48,12 +49,12 @@ export async function createFriendshipRequestInDb(user1Id: number, user2Id: numb
  * @returns {Promise<Friendship | undefined>} The friendship object or undefined if not found.
  */
 export async function getFriendshipByUsersInDb(user1Id: number, user2Id: number): Promise<Friendship | undefined> {
-    const db = getDb();
-    const [id1, id2] = user1Id < user2Id ? [user1Id, user2Id] : [user2Id, user1Id];
-    return db.get<Friendship>(
-        `SELECT * FROM friendships WHERE user1_id = ? AND user2_id = ?`,
-        [id1, id2]
-    );
+	const db = getDb();
+	const [id1, id2] = user1Id < user2Id ? [user1Id, user2Id] : [user2Id, user1Id];
+	return db.get<Friendship>(
+		`SELECT * FROM friendships WHERE user1_id = ? AND user2_id = ?`,
+		[id1, id2]
+	);
 }
 
 /**
@@ -62,12 +63,12 @@ export async function getFriendshipByUsersInDb(user1Id: number, user2Id: number)
  * @returns {Promise<Friendship | undefined>} The friendship object or undefined if not found.
  */
 export async function getFriendshipByIdInDb(friendshipId: number): Promise<Friendship | undefined> {
-    const db = getDb();
-    return db.get<Friendship>(`SELECT * FROM friendships WHERE id = ?`, [friendshipId]);
+	const db = getDb();
+	return db.get<Friendship>(`SELECT * FROM friendships WHERE id = ?`, [friendshipId]);
 }
 
 interface UpdateResult {
-    changes?: number;
+	changes?: number;
 }
 /**
  * Updates the status of a friendship.
@@ -76,12 +77,12 @@ interface UpdateResult {
  * @returns {Promise<UpdateResult>} The result of the database operation.
  */
 export async function updateFriendshipStatusInDb(friendshipId: number, status: FriendshipStatus): Promise<UpdateResult> {
-    const db = getDb();
-    const result = await db.run(
-        `UPDATE friendships SET status = ? WHERE id = ?`,
-        [status, friendshipId]
-    );
-    return { changes: result.changes };
+	const db = getDb();
+	const result = await db.run(
+		`UPDATE friendships SET status = ? WHERE id = ?`,
+		[status, friendshipId]
+	);
+	return { changes: result.changes };
 }
 
 /**
@@ -90,9 +91,9 @@ export async function updateFriendshipStatusInDb(friendshipId: number, status: F
  * @returns {Promise<UpdateResult>} The result of the database operation.
  */
 export async function deleteFriendshipInDb(friendshipId: number): Promise<UpdateResult> {
-    const db = getDb();
-    const result = await db.run(`DELETE FROM friendships WHERE id = ?`, [friendshipId]);
-    return { changes: result.changes };
+	const db = getDb();
+	const result = await db.run(`DELETE FROM friendships WHERE id = ?`, [friendshipId]);
+	return { changes: result.changes };
 }
 
 /**
@@ -102,9 +103,9 @@ export async function deleteFriendshipInDb(friendshipId: number): Promise<Update
  * @returns {Promise<DetailedFriend[]>} List of friends with their details.
  */
 export async function getAcceptedFriendsForUserInDb(userId: number): Promise<Friend[]> {
-    const db = getDb();
-    // Le query est long, on assume qu'il retourne les champs correspondants à DetailedFriend
-    const query = `
+	const db = getDb();
+	// Le query est long, on assume qu'il retourne les champs correspondants à DetailedFriend
+	const query = `
         SELECT
             f.id as friendship_id,
             f.status as friendship_status,
@@ -120,14 +121,14 @@ export async function getAcceptedFriendsForUserInDb(userId: number): Promise<Fri
         JOIN users u2 ON f.user2_id = u2.id
         WHERE (f.user1_id = ? OR f.user2_id = ?) AND f.status = 'accepted'
     `;
-    return db.all<Friend[]>(query, userId, userId, userId, userId, userId, userId, userId, userId, userId);
+	return db.all<Friend[]>(query, userId, userId, userId, userId, userId, userId, userId, userId, userId);
 }
 
 // Type pour les requêtes reçues
 export interface ReceivedFriendRequest {
-    friendship_id: number;
-    created_at: string; // ou Date
-    requester: Omit<User, 'wins' | 'losses' | 'status' | 'created_at' | 'updated_at' | 'password_hash'>; // Ajuster les Omit
+	friendship_id: number;
+	created_at: string; // ou Date
+	requester: Omit<User, 'wins' | 'losses' | 'status' | 'created_at' | 'updated_at' | 'password_hash'>; // Ajuster les Omit
 }
 /**
  * Retrieves all pending friend requests received by a user.
@@ -136,8 +137,8 @@ export interface ReceivedFriendRequest {
  * @returns {Promise<ReceivedFriendRequest[]>} List of received requests with requester details.
  */
 export async function getPendingReceivedFriendRequestsInDb(userId: number): Promise<ReceivedFriendRequest[]> {
-    const db = getDb();
-    const query = `
+	const db = getDb();
+	const query = `
         SELECT
             f.id as friendship_id, f.created_at,
             u_initiator.id, u_initiator.username, u_initiator.email,
@@ -147,23 +148,23 @@ export async function getPendingReceivedFriendRequestsInDb(userId: number): Prom
         WHERE (f.user1_id = ? OR f.user2_id = ?) AND f.status = 'pending' AND f.initiator_id != ?
         ORDER BY f.created_at DESC;
     `;
-    const rows = await db.all<any[]>(query, userId, userId, userId); // any[] pour l'instant
-    return rows.map(row => ({
-        friendship_id: row.friendship_id,
-        created_at: row.created_at,
-        requester: {
-            id: row.id, username: row.username, email: row.email,
-            display_name: row.display_name, avatar_url: row.avatar_url,
-        },
-    }));
+	const rows = await db.all<any[]>(query, userId, userId, userId); // any[] pour l'instant
+	return rows.map(row => ({
+		friendship_id: row.friendship_id,
+		created_at: row.created_at,
+		requester: {
+			id: row.id, username: row.username, email: row.email,
+			display_name: row.display_name, avatar_url: row.avatar_url,
+		},
+	}));
 }
 
 
 // Type pour les requêtes envoyées
 export interface SentFriendRequest {
-    friendship_id: number;
-    created_at: string; // ou Date
-    receiver: Omit<User, 'wins' | 'losses' | 'status' | 'created_at' | 'updated_at' | 'password_hash'>; // Ajuster
+	friendship_id: number;
+	created_at: string; // ou Date
+	receiver: Omit<User, 'wins' | 'losses' | 'status' | 'created_at' | 'updated_at' | 'password_hash'>; // Ajuster
 }
 /**
  * Retrieves all pending friend requests sent by a user.
@@ -172,8 +173,8 @@ export interface SentFriendRequest {
  * @returns {Promise<SentFriendRequest[]>} List of sent requests with receiver details.
  */
 export async function getPendingSentFriendRequestsInDb(userId: number): Promise<SentFriendRequest[]> {
-    const db = getDb();
-    const query = `
+	const db = getDb();
+	const query = `
         SELECT
             f.id as friendship_id, f.created_at,
             CASE WHEN f.user1_id = f.initiator_id THEN u2.id ELSE u1.id END as id,
@@ -187,30 +188,30 @@ export async function getPendingSentFriendRequestsInDb(userId: number): Promise<
         WHERE f.initiator_id = ? AND f.status = 'pending'
         ORDER BY f.created_at DESC;
     `;
-    const rows = await db.all<any[]>(query, userId); // any[] pour l'instant
-    return rows.map(row => ({
-        friendship_id: row.friendship_id,
-        created_at: row.created_at,
-        receiver: {
-            id: row.id, username: row.username, email: row.email,
-            display_name: row.display_name, avatar_url: row.avatar_url,
-        },
-    }));
+	const rows = await db.all<any[]>(query, userId); // any[] pour l'instant
+	return rows.map(row => ({
+		friendship_id: row.friendship_id,
+		created_at: row.created_at,
+		receiver: {
+			id: row.id, username: row.username, email: row.email,
+			display_name: row.display_name, avatar_url: row.avatar_url,
+		},
+	}));
 }
 
 
 export interface AdminFullFriendship extends Friendship {
-    user1_username: string;
-    user2_username: string;
-    initiator_username: string;
+	user1_username: string;
+	user2_username: string;
+	initiator_username: string;
 }
 /**
  * Retrieves all friendships, regardless of their status.
  * @returns {Promise<AdminFullFriendship[]>} List of all friendships.
  */
 export async function getAllFriendshipsInDb(): Promise<AdminFullFriendship[]> {
-    const db = getDb();
-    return db.all<AdminFullFriendship[]>(`
+	const db = getDb();
+	return db.all<AdminFullFriendship[]>(`
         SELECT
             f.*, u1.username as user1_username, u2.username as user2_username, ui.username as initiator_username
         FROM friendships f
@@ -228,11 +229,11 @@ export async function getAllFriendshipsInDb(): Promise<AdminFullFriendship[]> {
  * @returns {Promise<Friendship[]>} List of friends with their details.
  */
 export async function getFriends(userId: number, limit: number = 10, offset: number = 0): Promise<Friendship[]> {
-    const db = getDb();
-    const query = `
+	const db = getDb();
+	const query = `
         SELECT * FROM friendships
         WHERE (user1_id = ? OR user2_id = ?) AND status = 'accepted'
         LIMIT ? OFFSET ?
     `;
-    return db.all<Friendship[]>(query, userId, userId, limit, offset);
+	return db.all<Friendship[]>(query, userId, userId, limit, offset);
 }

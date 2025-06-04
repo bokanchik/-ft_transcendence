@@ -12,7 +12,7 @@ import {
 	sendFriendRequest,
 	removeFriend,
 } from '../services/friendService.js';
-import { fetchUsers } from '../services/api.js';
+import { fetchUsers } from '../services/authService.js';
 import { FriendsListComponent } from '../components/friendsList.js';
 import { FriendRequestsComponent } from '../components/friendRequests.js';
 import { UserList, UserListProps } from '../components/userList.js';

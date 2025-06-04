@@ -2,7 +2,7 @@
 import * as friendModel from '../models/friendModel.js';
 import * as userModel from '../models/userModel.js';
 import { ConflictError, NotFoundError, ValidationError, ForbiddenError } from '../shared/auth-plugin/appError.js';
-import { Friendship, FriendshipStatus } from '../shared/types.js';
+import { Friendship, FriendshipStatus } from '../shared/schemas/friendsSchemas.js';
 
 /**
  * Creates a friend request.
@@ -75,7 +75,7 @@ export async function acceptFriendRequest(friendshipId: number, currentUserId: n
 	if (result.changes === 0) {
 		throw new Error('Failed to accept friend request, database reported no changes.');
 	}
-	return { message: 'Friend request accepted.'};
+	return { message: 'Friend request accepted.' };
 }
 
 /**
@@ -158,25 +158,25 @@ export async function getSentFriendRequests(userId: number): Promise<any[]> {
 
 export async function removeFriendship(friendshipId: number, currentUserId: number): Promise<{ message: string }> {
 
-    const friendship = await friendModel.getFriendshipByIdInDb(friendshipId);
+	const friendship = await friendModel.getFriendshipByIdInDb(friendshipId);
 	console.log('[removeFriendship] Called with friendshipId:', friendshipId, 'currentUserId:', currentUserId);
-    console.log('[removeFriendship] DB result for friendship:', friendship);
+	console.log('[removeFriendship] DB result for friendship:', friendship);
 
-    if (!friendship) {
-        throw new NotFoundError('Friendship not found.');
-    }
-    if (friendship.user1_id !== currentUserId && friendship.user2_id !== currentUserId) {
-        throw new ForbiddenError("You are not part of this friendship.");
-    }
-    if (friendship.status !== 'accepted') {
-        throw new ConflictError('You can only remove an accepted friend.');
-    }
+	if (!friendship) {
+		throw new NotFoundError('Friendship not found.');
+	}
+	if (friendship.user1_id !== currentUserId && friendship.user2_id !== currentUserId) {
+		throw new ForbiddenError("You are not part of this friendship.");
+	}
+	if (friendship.status !== 'accepted') {
+		throw new ConflictError('You can only remove an accepted friend.');
+	}
 
-    const result = await friendModel.deleteFriendshipInDb(friendshipId);
-    if (result.changes === 0) {
-        throw new Error('Failed to remove friend, database reported no changes.');
-    }
-    return { message: 'Friend removed successfully.' };
+	const result = await friendModel.deleteFriendshipInDb(friendshipId);
+	if (result.changes === 0) {
+		throw new Error('Failed to remove friend, database reported no changes.');
+	}
+	return { message: 'Friend removed successfully.' };
 }
 
 /**

@@ -2,7 +2,7 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import { createUserAccount, loginUser, updateUserStatus } from '../services/userService.js';
 import { jwtToken, cookieOptions, csrfCookieName, csrfOptions } from '../shared/auth-plugin/tokens.js';
 import { ERROR_MESSAGES } from '../shared/auth-plugin/appError.js';
-import { JWTPayload, User, RegisterRequestBody, LoginRequestBody, UserOnlineStatus } from '../shared/types.js';
+import { JWTPayload, RegisterRequestBody, LoginRequestBody, UserOnlineStatus } from '../shared/schemas/usersSchemas.js';
 
 export async function registerHandler(req: FastifyRequest<{ Body: RegisterRequestBody }>, reply: FastifyReply) {
 	await createUserAccount(req.body);

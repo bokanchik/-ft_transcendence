@@ -1,5 +1,5 @@
 // /components/friendRequests.ts
-import { PendingFriendRequest } from '../shared/types.js';
+import { PendingFriendRequest } from '../shared/schemas/friendsSchemas.js';
 
 interface FriendRequestsProps {
 	receivedRequests: PendingFriendRequest[];
