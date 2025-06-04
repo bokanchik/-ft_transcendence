@@ -60,7 +60,7 @@ import { UserOnlineStatus } from './schemas/usersSchemas.js'; // Importer l'enum
 
 // Ré-exporter les types et valeurs importés pour qu'ils soient disponibles à l'extérieur
 export type {
-    User, // Exporter sous le nom 'User'
+    User,
     UserWithPasswordHash,
     RegisterRequestBody,
     LoginRequestBody,

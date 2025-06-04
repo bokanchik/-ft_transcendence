@@ -2,27 +2,43 @@
 import { getDb } from '../utils/dbConfig.js';
 import { Friendship, User, Friend, FriendshipStatus } from '../shared/types.js'; // Importez vos types
 
-export interface CreateFriendshipResult extends Omit<Friendship, 'created_at'> {} // `created_at` est géré par DB
-
 /**
  * Creates a new friendship request in the database.
  * @param {number} user1Id - ID of the first user.
  * @param {number} user2Id - ID of the second user.
  * @param {number} initiatorId - ID of the user initiating the request.
- * @returns {Promise<CreateFriendshipResult>} The created friendship object with its ID.
+ * @returns {Promise<Friendship>} The created friendship object with its ID.
  */
-export async function createFriendshipRequestInDb(user1Id: number, user2Id: number, initiatorId: number): Promise<CreateFriendshipResult> {
+export async function createFriendshipRequestInDb(user1Id: number, user2Id: number, initiatorId: number): Promise<Friendship> {
     const db = getDb();
     const [id1, id2] = user1Id < user2Id ? [user1Id, user2Id] : [user2Id, user1Id];
 
-    const result = await db.run(
-        `INSERT INTO friendships (user1_id, user2_id, initiator_id, status) VALUES (?, ?, ?, ?)`,
+//     const insertResult = await db.run(
+//         `INSERT INTO friendships (user1_id, user2_id, initiator_id, status) VALUES (?, ?, ?, ?)`,
+//         [id1, id2, initiatorId, FriendshipStatus.PENDING]
+//     );
+
+//     if (insertResult.lastID === undefined) {
+//         throw new Error("Failed to create friendship, no lastID returned from insert operation.");
+//     }
+
+//     const newFriendship = await db.get<Friendship>(
+//         `SELECT * FROM friendships WHERE id = ?`,
+//         [insertResult.lastID]
+//     );
+
+    const newFriendship = await db.get<Friendship>(
+        `INSERT INTO friendships (user1_id, user2_id, initiator_id, status)
+         VALUES (?, ?, ?, ?)
+         RETURNING *`,
         [id1, id2, initiatorId, FriendshipStatus.PENDING]
     );
-    if (result.lastID === undefined) {
-        throw new Error("Failed to create friendship, no lastID returned.");
+
+    
+    if (!newFriendship) {
+        throw new Error("Failed to create friendship or retrieve the created row using RETURNING.");
     }
-    return { id: result.lastID, user1_id: id1, user2_id: id2, initiator_id: initiatorId, status: FriendshipStatus.PENDING };
+    return newFriendship;
 }
 
 /**

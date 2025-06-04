@@ -1,30 +1,25 @@
 import { z } from 'zod';
 import { UserBaseSchema, UserOnlineStatusSchema, UserOnlineStatus } from './usersSchemas.js'; // Importer depuis vos schémas utilisateur
 
-// --- Enum pour FriendshipStatus ---
 export enum FriendshipStatus {
 	PENDING = 'pending',
 	ACCEPTED = 'accepted',
-	DECLINED = 'declined', // Note: 'declined' est souvent temporaire ou mène à la suppression de la ligne
+	DECLINED = 'declined', // Pertinent ?
 	BLOCKED = 'blocked',
 }
 export const FriendshipStatusSchema = z.nativeEnum(FriendshipStatus);
 
-// --- Schéma de Base pour Friendship ---
 export const FriendshipBaseSchema = z.object({
     id: z.number().int(),
     user1_id: z.number().int(),
     user2_id: z.number().int(),
     initiator_id: z.number().int(),
     status: FriendshipStatusSchema,
-    created_at: z.string(), // Ou z.string().datetime() si vous standardisez en ISO string
+    created_at: z.string(), // Ou z.string().date()
 });
 export type Friendship = z.infer<typeof FriendshipBaseSchema>;
 
-// --- Schémas pour les Requêtes/Réponses API spécifiques aux Amis ---
 
-// Schéma pour le corps de la requête d'envoi de demande d'ami
-// Le backend s'attend à 'friendId' (un ID numérique) et non 'receiverUsername'
 export const SendFriendRequestBodySchema = z.object({
     friendId: z.number().int().min(1, "L'ID de l'ami est requis et doit être positif."),
 });
@@ -35,7 +30,7 @@ export const SendFriendRequestRouteSchema = {
     response: {
         201: z.object({
             message: z.string(),
-            friendship: FriendshipBaseSchema // Ou un schéma plus spécifique si la réponse est différente
+            friendship: FriendshipBaseSchema
         })
     }
 };
@@ -53,11 +48,8 @@ export const FriendshipActionRouteSchema = {
         200: z.object({ message: z.string() })
     }
 };
-// Vous pouvez l'utiliser pour accept, decline, cancel, remove
-// Exemple : export const AcceptFriendRequestRouteSchema = FriendshipActionRouteSchema;
 
-
-// Schéma pour représenter un ami dans une liste (ce que votre frontend attend pour `Friend`)
+// Schéma pour représenter un ami dans une liste
 export const FriendSchema = z.object({
     friendship_id: z.number().int(),
     friendship_status: FriendshipStatusSchema, // Devrait toujours être 'accepted' pour une liste d'amis
@@ -67,61 +59,45 @@ export const FriendSchema = z.object({
     friend_avatar_url: z.string().url().nullable().optional(), // Correspond à UserBaseSchema.shape.avatar_url
     friend_wins: z.number().int().default(0),
     friend_losses: z.number().int().default(0),
-    friend_online_status: UserOnlineStatusSchema, // Utilise l'enum/schéma de usersSchemas
+    friend_online_status: UserOnlineStatusSchema,
 });
 export type Friend = z.infer<typeof FriendSchema>;
 
 export const FriendsListResponseSchema = z.array(FriendSchema);
-export const GetFriendsListRouteSchema = { // Pour la route GET /friends
+export const GetFriendsListRouteSchema = {
     response: {
         200: FriendsListResponseSchema
     }
 };
 
-// Schéma pour les informations utilisateur dans une demande d'ami (FriendRequestUserData)
-// C'est un sous-ensemble de UserBaseSchema
+
 export const FriendRequestUserSchema = UserBaseSchema.pick({
     id: true,
     username: true,
-    email: true, // Attention: exposer l'email ici ? Peut-être pas nécessaire pour le frontend.
+    email: true, // email ici ?
     display_name: true,
     avatar_url: true,
 });
 export type FriendRequestUserData = z.infer<typeof FriendRequestUserSchema>;
 
-// Schéma pour une demande d'ami en attente (PendingFriendRequest)
+
 export const PendingFriendRequestSchema = z.object({
     friendship_id: z.number().int(),
-    requester: FriendRequestUserSchema.optional(), // Optionnel car peut être une demande envoyée (receiver)
-    receiver: FriendRequestUserSchema.optional(),  // Optionnel car peut être une demande reçue (requester)
-    created_at: z.string(), // Ou z.string().datetime()
+    requester: FriendRequestUserSchema.optional(),
+    receiver: FriendRequestUserSchema.optional(),
+    created_at: z.string(),
 });
 export type PendingFriendRequest = z.infer<typeof PendingFriendRequestSchema>;
 
 export const PendingRequestsResponseSchema = z.array(PendingFriendRequestSchema);
-export const GetPendingRequestsRouteSchema = { // Pour GET /friends/requests/received et /sent
+export const GetPendingRequestsRouteSchema = {
     response: {
         200: PendingRequestsResponseSchema
     }
 };
 
 
-// --- Schémas pour d'autres types que vous aviez ---
-
-// Match Schema (si vous voulez le définir avec Zod)
-export const MatchSchema = z.object({
-    id: z.number().int(),
-    player1_id: z.number().int(),
-    player2_id: z.number().int(),
-    player1_score: z.number().int(),
-    player2_score: z.number().int(),
-    winner_id: z.number().int().nullable(),
-    win_type: z.string(), // Pourrait être un z.enum(['score', 'forfeit'])
-    match_date: z.string(), // Ou z.string().datetime()
-    game_type: z.string(), // Pourrait être un z.enum(['pong', 'autre_jeu'])
-    tournament_id: z.number().int().nullable(),
-});
-export type Match = z.infer<typeof MatchSchema>;
+// --- Schémas pour d'autres types ---
 
 
 // ApiResult, ApiSuccessResponse, ApiErrorResponse - Ces types sont plus génériques et
