@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { UserBaseSchema, UserOnlineStatusSchema, UserOnlineStatus } from './usersSchemas.js'; // Importer depuis vos schémas utilisateur
+import { UserBaseSchema, UserOnlineStatusSchema } from './usersSchemas.js'; // Importer depuis vos schémas utilisateur
 
 export enum FriendshipStatus {
 	PENDING = 'pending',
@@ -35,9 +35,8 @@ export const SendFriendRequestRouteSchema = {
     }
 };
 
-// Schéma pour les paramètres d'URL contenant friendshipId
 export const FriendshipIdParamsSchema = z.object({
-    friendshipId: z.string().regex(/^\d+$/, "Friendship ID doit être un nombre"),
+    friendshipId: z.string().regex(/^\d+$/, "Friendship ID must be a positive integer."),
 });
 export type FriendshipIdParams = z.infer<typeof FriendshipIdParamsSchema>;
 
@@ -56,7 +55,7 @@ export const FriendSchema = z.object({
     friend_id: z.number().int(),
     friend_username: z.string(),
     friend_display_name: z.string(),
-    friend_avatar_url: z.string().url().nullable().optional(), // Correspond à UserBaseSchema.shape.avatar_url
+    friend_avatar_url: z.string().url().nullable().optional(), // retester : UserBaseSchema.shape.avatar_url
     friend_wins: z.number().int().default(0),
     friend_losses: z.number().int().default(0),
     friend_online_status: UserOnlineStatusSchema,
@@ -96,53 +95,28 @@ export const GetPendingRequestsRouteSchema = {
     }
 };
 
-
 // --- Schémas pour d'autres types ---
 
-
-// ApiResult, ApiSuccessResponse, ApiErrorResponse - Ces types sont plus génériques et
-// pourraient rester des interfaces/types TypeScript standard, ou vous pouvez les construire
-// avec Zod si vous voulez valider la structure des réponses de succès/erreur elles-mêmes.
-// Pour l'instant, je les laisse comme types TypeScript car ils sont des wrappers.
-
-// Interface pour le retour d'une opération de base de données (comme updateUserInDb)
 export const UpdatedDbResultSchema = z.object({
-    changes: z.number().int().optional(), // SQLite retourne `changes`
-    // lastID n'est généralement pas pour les UPDATEs, mais pour les INSERTs
+    changes: z.number().int().optional(),
 });
-export type UpdatedDbResult = z.infer<typeof UpdatedDbResultSchema>;
+export type UpdatedUserResult = z.infer<typeof UpdatedDbResultSchema>;
 
-// --- Exemples de schémas de route Fastify que vous aviez en JSON ---
-// Ceux-ci sont déjà couverts ci-dessus par des noms plus spécifiques
-// comme `FriendshipActionRouteSchema` ou `SendFriendRequestRouteSchema`.
-
-// friendshipIdParamSchema (JSON) -> FriendshipIdParamsSchema (Zod)
-// export const friendshipIdParamSchema = { params: FriendshipIdParamsSchema };
-
-// sendFriendRequestSchema (JSON) -> SendFriendRequestRouteSchema (Zod)
-// export const sendFriendRequestSchema = SendFriendRequestRouteSchema;
-
-// friendResponseSchema (JSON) -> FriendSchema (Zod, pour un seul ami) ou FriendsListResponseSchema (pour un tableau)
-// export const friendResponseSchema = FriendSchema; // Pour la réponse d'un ami individuel si nécessaire
-
-// Dans usersSchemas.ts ou un fichier de schémas partagés
 export const ApiSuccessResponseSchema = z.object({
     message: z.string(),
-    user: UserBaseSchema, // Ou un autre schéma selon le contexte
+    user: UserBaseSchema, // Ou un autre schéma ??
 });
-
-// Puis dans types.ts
 export type ApiSuccessResponse = z.infer<typeof ApiSuccessResponseSchema>;
 
 export const ApiErrorResponseSchema = z.object({
     error: z.string(),
-    statusCode: z.number().optional(), // Si vous avez un code d'erreur applicatif
+    statusCode: z.number().optional(), // Si on fait les codes
     details: z.any().optional(),
 });
 export type ApiErrorResponse = z.infer<typeof ApiErrorResponseSchema>;
 
-// ApiResult devient plus complexe à typer génériquement avec Zod si le type de `data` varie.
-// Vous pourriez le garder comme type TypeScript :
-// export type ApiResult<TSuccessData = ApiSuccessResponse> =
-// 	| { success: true; data: TSuccessData }
-// 	| { success: false; error: string; details?: any; statusCode?: number };
+// typer génériquement avec Zod si le type de `data` !!!
+// en TypeScript :
+export type ApiResult<TSuccessData = ApiSuccessResponse> =
+	| { success: true; data: TSuccessData }
+	| { success: false; error: string; details?: any; statusCode?: number };
