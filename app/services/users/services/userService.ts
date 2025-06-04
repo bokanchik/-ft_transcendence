@@ -3,7 +3,6 @@ import * as userModel from '../models/userModel.js';
 import * as passwordUtils from '../shared/auth-plugin/pswdUtils.js';
 import { ERROR_MESSAGES, ConflictError, ValidationError, NotFoundError } from '../shared/auth-plugin/appError.js';
 import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, CreateUserPayload, UserOnlineStatus } from '../shared/schemas/usersSchemas.js';
-import { isValidHttpUrl, isValidEmailFormat } from '../utils/apiUtils.js';
 
 /**
  * Generates a default avatar URL using ui-avatars.com.
@@ -129,29 +128,15 @@ export async function updateUserProfile(userId: number, updates: UpdateUserPaylo
 	}
 
 	const processedUpdates: UpdateUserPayload = {};
-
 	if (updates.display_name !== undefined) {
-		if (typeof updates.display_name === 'string' && updates.display_name.trim().length > 0) {
-			processedUpdates.display_name = updates.display_name.trim();
-		} else {
-			throw new ValidationError('Display name cannot be empty');
-		}
+		processedUpdates.display_name = updates.display_name.trim();
 	}
-
 	if (updates.email !== undefined) {
-		const potentialEmail = updates.email;
-		if (potentialEmail && isValidEmailFormat(potentialEmail)) {
-			processedUpdates.email = potentialEmail.trim();
-		} else {
-			throw new ValidationError('Invalid email format provided.');
-		}
+		processedUpdates.email = updates.email;
 	}
-	if (updates.avatar_url !== undefined && updates.avatar_url !== null) {
-		if (isValidHttpUrl(updates.avatar_url)) {
-			processedUpdates.avatar_url = updates.avatar_url;
-		} else {
-			throw new ValidationError('Invalid avatar URL format provided.');
-		}
+	if (updates.avatar_url !== null) {
+		// if (updates.avatar_url !== undefined) {
+		processedUpdates.avatar_url = updates.avatar_url;
 	}
 
 	const changesToApply: UpdateUserPayload = {};
@@ -170,7 +155,6 @@ export async function updateUserProfile(userId: number, updates: UpdateUserPaylo
 	if (changesToApply.display_name && await userModel.isDisplayNameInDb(changesToApply.display_name, userId)) {
 		throw new ConflictError(`Display name '${changesToApply.display_name}' is already taken.`);
 	}
-
 	if (changesToApply.email && await userModel.isEmailInDb(changesToApply.email, userId)) {
 		throw new ConflictError(`Email '${changesToApply.email}' is already taken.`);
 	}
