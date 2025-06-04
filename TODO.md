@@ -1,39 +1,16 @@
 # ✅ TODO List
 
----
-
-## arthur
-
-- [x] display_name unique
-- [x] logout -> supprimer token
-- [x] login/logout maj du status
-- [ ] confirmation par mail
-- [ ] changement mdp
-- [x] Affichage du status
-- [ ] tout matches
-
-## 📌 Tâches initiales
-
-- [ ] jeu en local
-- [ ] redis pour les scores
-- [ ] Pages && components && services in frontend to clean !
 
 
 ## SASHA 
 
-## TO:DO 23 mai (finished):
-
-—> clean gameRoomPage.js
-—> create route /api/game/match/:userId 
 
 
-## TO:DO 26 mai
-—>  l’avatar URL (si possible)
-
-—> RedisCache pour socket ?
-
--> commencer le tournement ? 
-
+## TO:DO
+-> improve paddle's controls with keyup function
+-> rendre les mouvements de la balle plus fluides (framerate/taille)
+-> changer la vitesse de la balle ()
+-> incrementer la vitesse en fonction de nombre d'echanges
 
 ## taches secondaires
 

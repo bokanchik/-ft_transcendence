@@ -5,11 +5,11 @@ import { waitingRoom, removePlayerFromWaitingList, addPlayerToWaitingList, getWa
 import { fetchFirst, setGameResult } from "../database/dbModels.ts";
 // import { handlePlayerMove } from "./pongGame.ts";
 // import { PongGame } from "../sockets/pongGame.ts";
-import { createGameState } from "./pongGame.ts";
+import { createGameState, resetScore } from "./pongGame.ts";
 // @ts-ignore
 import { GameState } from "./shared/types.js";
 import { FRAME_RATE, TIMEOUT_MS } from "../utils/constants.ts";
-import { gameLoop, handleKeydown} from "./pongGame.ts";
+import { gameLoop, handleKeydown, handleKeyup} from "./pongGame.ts";
 
 const timeouts: Map<string, NodeJS.Timeout> = new Map();
 //export let gameList: Map<string, PongGame> = new Map(); // string pour matchId
@@ -54,6 +54,7 @@ async function waitingRoomHandler(socket: Socket) {
             throw err;
         }
     });
+
 }
 
 // --- Main function for game routine handling 
@@ -87,6 +88,7 @@ async function disconnectionHandler(socket: Socket)  {
             fastify.log.error(`Failed to find opponentSocketId: ${err}`);
             throw err;
         }
+        resetScore();
     });
     
     socket.on('disconnect', () => {
@@ -125,22 +127,21 @@ async function getOpponentSocketId(socketId: string): Promise<string | null> {
 function localSocketEvents(socket: Socket) {
     
     // --- !!! TESTING FOR LOCAL ----
+    const state = createGameState();
+
     socket.on('start',  () => {
      
-        fastify.log.info('Game started locally. Server is sending a game state.');
-     
-        const state = createGameState();
-     
-        socket.on('keydown', (keyCode: string) => {
-            try {
-                const parsedKey = parseInt(keyCode);
-                handleKeydown(parsedKey, state);
-            } catch (err: unknown) {
-                throw err;
-            }
-        });
-
+        fastify.log.info('Game started locally.');
+        
         startGameInterval(state, socket);        
+    });
+    
+    socket.on('keydown', (keyCode: string) => {
+        handleKeydown(parseInt(keyCode))
+    });
+
+    socket.on('keyup', (keyCode: string) => {
+        handleKeyup(parseInt(keyCode));
     });
 
     // -------------------------------
@@ -151,9 +152,10 @@ function startGameInterval(state: GameState, socket: Socket) {
         const winner: number = gameLoop(state, socket); // if == 0, game continue, == 1, player 1 win, == 2 player 2 won
         
         if (!winner) {
-           socket.emit('gameState', JSON.stringify(state));
+           socket.emit('gameState', state);
         } else {
             socket.emit('gameOver');
+            resetScore();
             clearInterval(intervalId);
         }
     }, 1000 / FRAME_RATE);

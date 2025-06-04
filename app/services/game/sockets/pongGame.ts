@@ -4,6 +4,12 @@ import { W, S, ARROW_UP, ARROW_DOWN, PADDLE_SPEED, GAME_HEIGHT, GAME_WIDTH, PADD
 import { fastify } from "../server.ts";
 import { Socket } from "socket.io";
 
+const keyState = {
+    W: false,
+    S: false, 
+    UP: false,
+    DOWN: false
+};
 
 let score1: number = 0; // left player
 let score2: number = 0; // right player
@@ -27,9 +33,9 @@ export function createGameState(): GameState {
         ball: {
             x: 400,
             y: 250,
-            vx: 10,
-            vy: 5,
-            radius: 25
+            vx: 3,
+            vy: 3,
+            radius: 15
         },
     }
 }
@@ -43,6 +49,11 @@ export function gameLoop(state: GameState, socket: Socket): number {
     ball.x += ball.vx;
     ball.y += ball.vy;
     
+    if (keyState.W) state.leftPaddle.y -= PADDLE_SPEED;
+    if (keyState.S) state.leftPaddle.y += PADDLE_SPEED;
+    if (keyState.UP) state.rightPaddle.y -= PADDLE_SPEED;
+    if (keyState.DOWN) state.rightPaddle.y += PADDLE_SPEED;
+
     // 2. move the paddles with bounds check
     leftPaddle.y = Math.min(leftPaddle.y, GAME_HEIGHT - PADDLE_HEIGHT);
     rightPaddle.y = Math.min(rightPaddle.y, GAME_HEIGHT - PADDLE_HEIGHT);
@@ -78,8 +89,6 @@ export function gameLoop(state: GameState, socket: Socket): number {
     } else if (score2 == FINAL_SCORE) {
         return 2; // rightPlayer won
     }
-
-    fastify.log.info('Score Left: ' + score1 + 'Score right ' + score2);
     
     return 0;
 }
@@ -129,25 +138,27 @@ function isBallCollision(ball: any, paddle: any): boolean {
     
 }
 
-export function handleKeydown(key: number, state: GameState) {
+export function resetScore() {
+    score1 = 0;
+    score2 = 0;
+}
+
+export function handleKeydown(key: number) {
     
     switch (key) {
-        case (S): // jouer a gauche
-        state.leftPaddle.y += PADDLE_SPEED;
-        break;
-        case (ARROW_DOWN): // jouer a droite
-        state.rightPaddle.y += PADDLE_SPEED;
-        break;
-        case (W):
-            state.leftPaddle.y += -PADDLE_SPEED;
-            break;
-        case (ARROW_UP):
-            state.rightPaddle.y += -PADDLE_SPEED;
-            break;
-        default:
-            state.leftPaddle.vy = 0;
-            state.rightPaddle.vy = 0;
-            break;
-        }
+        case W: keyState.W = true; break;
+        case S: keyState.S = true; break;
+        case ARROW_UP: keyState.UP = true; break;
+        case ARROW_DOWN: keyState.DOWN = true; break;
+    }
 }
             
+export function handleKeyup(key: number) {
+    switch (key) {
+        case W: keyState.W = false; break;
+        case S: keyState.S = false; break;
+        case ARROW_UP: keyState.UP = false; break;
+        case ARROW_DOWN: keyState.DOWN = false; break;
+    }
+}
+      

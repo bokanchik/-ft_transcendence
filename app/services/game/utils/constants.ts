@@ -1,11 +1,11 @@
 export const TIMEOUT_MS = 60000;
-export const FRAME_RATE = 30;
+export const FRAME_RATE = 60;
 export const W = 87;
 export const S = 83;
 export const ARROW_UP = 38;
 export const ARROW_DOWN = 40;
-export const PADDLE_SPEED = 20;
+export const PADDLE_SPEED = 10;
 export const GAME_HEIGHT = 500;
 export const GAME_WIDTH = 800;
 export const PADDLE_HEIGHT = 120;
-export const FINAL_SCORE = 10;
+export const FINAL_SCORE = 5;

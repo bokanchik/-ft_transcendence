@@ -19,21 +19,21 @@ const gameState: GameState = {
 		y: 200,
 		width: 20,
 		height: 120,
-		vy: 0
+		// vy: 0
 	},
 	rightPaddle: {
 		x: 770,
 		y: 200,
 		width: 20,
 		height: 120,
-		vy: 0
+		// vy: 0
 	},
 	ball: {
 		x: 400,
 		y: 250,
-		vx: 5,
-		vy: 3,
-		radius: 25
+		// vx: 3,
+		// vy: 3,
+		radius: 15
 	},
 	// score0: 0,
 	// score1: 0
@@ -83,7 +83,7 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 	// Score display
 	const scoreDisplay = document.createElement('div');
 	scoreDisplay.className = `
-		absolute top-25 left-1/2 transform -translate-x-1/2 
+		absolute top-8 left-1/2 transform -translate-x-1/2
 		text-3xl font-extrabold text-yellow-300 jungle-font drop-shadow
 	`;
 	scoreDisplay.id = 'score-display';
@@ -165,11 +165,12 @@ async function quitButtonHandler() {
 	if (confirmed) {
 		const matchId = sessionStorage.getItem('matchId');
 		const opponentId = sessionStorage.getItem('opponent');
-		
+		isGameOver = true;
 		socket.emit('quit', matchId, opponentId);
 		cleanupSocket(socket);
 		sessionStorage.clear(); // clean storage --> users have to put there aliases again
 		navigateTo('/local-game');
+		//isGameOver = false;
 	}
 }
 
@@ -198,7 +199,8 @@ function clientSocketHandler(scoreDisplay: HTMLDivElement, gameMode: string | nu
 	socket.emit('start');
 	
 	document.addEventListener('keydown', keydown);
-	
+	document.addEventListener('keyup', keyup);
+
 	socket.on('gameState', (state: GameState) => {
 		handleGameState(state, ctx);
 	});
@@ -212,20 +214,26 @@ function clientSocketHandler(scoreDisplay: HTMLDivElement, gameMode: string | nu
 	socket.on('gameOver', () => {
 		isGameOver = true;
 		// showToast ? You want to play again ? 
+		cleanupSocket(socket);
+		sessionStorage.clear();
 		navigateTo('/local-game');
+	//	isGameOver = false;
 	});
 	
 }
 
 function keydown(e: KeyboardEvent) {
-	console.log(e);
+//	console.log(e);
 	socket.emit('keydown', e.keyCode);
 }
 
+function keyup(e: KeyboardEvent) {
+	socket.emit('keyup', e.keyCode);
+}
 
-function handleGameState(state: string, ctx: CanvasRenderingContext2D) {
+
+function handleGameState(state: GameState, ctx: CanvasRenderingContext2D) {
 	if (isGameOver) return;
-	state = JSON.parse(state);
 	requestAnimationFrame(() => drawGame(state, ctx));
 }
 
