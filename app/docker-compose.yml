@@ -72,6 +72,18 @@ services:
     networks:
       - tranet
 
+  nginx_exporter:
+    image: nginx/nginx-prometheus-exporter:0.11
+    container_name: nginx_exporter
+    command:
+      - '-nginx.scrape-uri=http://gateaway:8081/stub_status'
+    networks:
+      - tranet
+      - monitoring
+    restart: unless-stopped
+    depends_on:
+      - gateaway
+
   cadvisor:
     build: ./services/cadvisor
     container_name: cadvisor
@@ -90,6 +102,9 @@ services:
     container_name: prometheus
     networks:
       - monitoring
+    depends_on:
+      - cadvisor
+      - nginx_exporter
     restart: always
   
   grafana:

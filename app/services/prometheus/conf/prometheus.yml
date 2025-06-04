@@ -6,6 +6,12 @@ scrape_configs:
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
+
   - job_name: 'cadvisor'
     static_configs:
       - targets: ['cadvisor:8080']
+
+
+  - job_name: 'nginx_gateaway'
+    static_configs:
+      - targets: ['nginx_exporter:9113']
