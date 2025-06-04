@@ -1,0 +1,62 @@
+# services/grafana/provisioning/notifiers/default-notifications.yml
+apiVersion: 1
+
+# Liste des points de contact (comment Grafana envoie les notifications)
+contactPoints:
+  - orgId: 1
+    name: email-admins # Nom unique du point de contact
+    receivers:
+      - uid: email_receiver_1 # UID unique pour ce type de récepteur dans ce point de contact
+        type: email
+        # Désactiver la résolution des messages (si vous ne voulez pas de notification "RESOLVED")
+        disableResolveMessage: false
+        settings:
+          addresses: admin1@example.com;admin2@example.com # Adresses e-mail séparées par des ; ou ,
+          singleEmail: false # Envoyer un e-mail par alerte (false) ou un e-mail groupé (true)
+        # secureSettings: # Pour les mots de passe, tokens API, etc. Utilisez des variables d'env Docker ou des secrets
+        #   smarthost_password: $SMTP_PASSWORD
+  # - name: slack-channel-alerts
+  #   receivers:
+  #     - uid: slack_receiver_1
+  #       type: slack
+  #       settings:
+  #         url: $SLACK_WEBHOOK_URL # Variable d'environnement pour le webhook URL
+  #         recipient: '#alerts-channel'
+  #         # ... autres options Slack
+
+# Politiques de notification (quand et comment utiliser les points de contact)
+policies:
+  - orgId: 1
+    receiver: email-admins # Point de contact par défaut pour la politique racine
+    # group_by définit comment grouper les alertes en une seule notification. '*' groupe par tous les labels.
+    group_by: ['grafana_folder', 'alertname']
+    # Temps d'attente avant d'envoyer la première notification pour un groupe d'alertes.
+    group_wait: 30s
+    # Temps d'attente avant d'envoyer une notification pour un groupe qui a déjà été notifié.
+    group_interval: 5m
+    # Temps d'attente avant de renvoyer une notification pour la même alerte (si elle est toujours active).
+    repeat_interval: 4h
+    # muteTimeIntervals: # Définir des périodes où les notifications sont silencieuses
+    #   - 'night-hours'
+    #   - 'weekend'
+    # Routes enfants pour des politiques plus spécifiques
+    routes:
+      - receiver: email-admins # Ou un autre point de contact
+        # Les alertes correspondant à ces labels utiliseront cette route
+        object_matchers:
+          - type: "=" # Peut être '=', '!=', '=~' (regex), '!~'
+            name: severity # Nom du label
+            value: critical # Valeur du label
+        # group_by, group_wait, etc. peuvent être surchargés ici
+        # continue: true # Si true, continue d'évaluer les routes sœurs même si celle-ci correspond
+
+# muteTimeIntervals: # Définition globale des intervalles de silence
+#   - name: 'night-hours'
+#     time_intervals:
+#       - times:
+#           - start_time: "00:00"
+#             end_time: "08:00"
+#         # days_of_month, months, years, location (timezone) sont aussi possibles
+#   - name: 'weekend'
+#     time_intervals:
+#       - weekdays: ["saturday", "sunday"]

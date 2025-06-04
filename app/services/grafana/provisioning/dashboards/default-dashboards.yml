@@ -1,0 +1,32 @@
+# services/grafana/provisioning/dashboards/default-dashboards.yml
+apiVersion: 1
+
+providers:
+  # <string> Nom unique pour ce provider de dashboards.
+  - name: 'default-prometheus-dashboards'
+    # <int> ID de l'organisation. Si omis, Grafana utilise l'ID de l'organisation par défaut (1).
+    orgId: 1
+    # <string> Nom du dossier dans lequel les dashboards seront placés dans l'UI de Grafana.
+    # Si le dossier n'existe pas, il sera créé.
+    folder: 'Monitoring Services'
+    # <string> UID du dossier. Si vous spécifiez un UID, Grafana utilisera cet UID.
+    # folderUid: 'monitoring-folder-uid'
+    # <string> Type de provider. 'file' est le plus courant pour les dashboards locaux.
+    type: file
+    # <bool> Désactiver la suppression des dashboards. Si true, Grafana ne supprimera pas
+    # les dashboards du dossier si le fichier est supprimé du disque.
+    disableDeletion: false
+    # <bool> Rendre les dashboards modifiables via l'UI.
+    # Si false, les dashboards seront en lecture seule et les modifications locales seront perdues au redémarrage.
+    editable: true
+    # <bool> Mettre à jour les dashboards automatiquement si le fichier JSON change sur le disque.
+    # (Nécessite un redémarrage de Grafana ou une API de rechargement pour les versions < 7.4)
+    # Pour les versions plus récentes, Grafana peut surveiller les changements de fichiers.
+    updateIntervalSeconds: 10 # Intervalle en secondes pour vérifier les mises à jour des dashboards (si supporté)
+    # <map> Options spécifiques au provider.
+    options:
+      # <string> Chemin vers le dossier contenant les dashboards à provisionner.
+      path: /etc/grafana/provisioning/dashboards/imported
+      # <bool> Si true, Grafana chargera les fichiers .json de manière récursive à partir du chemin.
+      # foldersFromFilesStructure: true # Utile si vous avez des sous-dossiers dans 'imported'
+                                       # que vous voulez refléter comme des dossiers dans Grafana.
