@@ -5,27 +5,23 @@ import socket from '../services/socket.js';
 import { showGameResult } from "../components/gameResults.js";
 import { showCustomConfirm } from "../components/toast.js";
 //@ts-ignore
-import { GameState } from '../shared/types.js';
-import { stat } from "fs";
+import { GameState } from '../shared/gameTypes.js';
 // import { showToast } from '../components/toast.js';
-
-const BG_COLOUR = " #ebffeb ";
-const BALL_COLOUR = " #ac6703 ";
-const PADDLE_COLOUR = " #ac6703 ";
+const PADDLE_HEIGHT = 120;
+const PADDLE_WIDTH = 20;
+const BG_COLOUR = "rgb(0, 0, 0) ";
+const BALL_COLOUR = "rgb(255, 255, 255) ";
+const PADDLE_COLOUR = "rgb(255, 255, 255) ";
 
 const gameState: GameState = {
 	leftPaddle: {
 		x: 20,
 		y: 200,
-		width: 20,
-		height: 120,
 		// vy: 0
 	},
 	rightPaddle: {
 		x: 770,
 		y: 200,
-		width: 20,
-		height: 120,
 		// vy: 0
 	},
 	ball: {
@@ -149,12 +145,12 @@ function drawGame(state: GameState, ctx: CanvasRenderingContext2D) {
 	// DRAW LEFT PADDLE
 	const leftPaddle = state.leftPaddle;
 	
-	ctx.fillRect(leftPaddle.x, leftPaddle.y, leftPaddle.width, leftPaddle.height);
+	ctx.fillRect(leftPaddle.x, leftPaddle.y, PADDLE_WIDTH, PADDLE_HEIGHT);
 	
 	// DRAW RIGHT PADDLE
 	const rightPaddle = state.rightPaddle;
 	
-	ctx.fillRect(rightPaddle.x, rightPaddle.y, rightPaddle.width, rightPaddle.height);
+	ctx.fillRect(rightPaddle.x, rightPaddle.y, PADDLE_WIDTH, PADDLE_HEIGHT);
 	
 	
 }
@@ -217,7 +213,7 @@ function clientSocketHandler(scoreDisplay: HTMLDivElement, gameMode: string | nu
 		cleanupSocket(socket);
 		sessionStorage.clear();
 		navigateTo('/local-game');
-	//	isGameOver = false;
+		isGameOver = false;
 	});
 	
 }

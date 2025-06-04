@@ -7,8 +7,7 @@ import { fetchFirst, setGameResult } from "../database/dbModels.ts";
 // import { PongGame } from "../sockets/pongGame.ts";
 import { createGameState, resetScore } from "./pongGame.ts";
 // @ts-ignore
-import { GameState } from "./shared/types.js";
-import { FRAME_RATE, TIMEOUT_MS } from "../utils/constants.ts";
+import { GameState, FRAME_RATE, TIMEOUT_MS } from "../shared/gameTypes.js";
 import { gameLoop, handleKeydown, handleKeyup} from "./pongGame.ts";
 
 const timeouts: Map<string, NodeJS.Timeout> = new Map();

@@ -1,8 +1,6 @@
 export interface Paddle {
     x: number,
     y: number,
-    width: number,
-    height: number,
     vy: number // vitesse y
 };
 
@@ -18,7 +16,18 @@ export interface GameState {
     leftPaddle: Paddle,
     rightPaddle: Paddle,
     ball: Ball,
-    // score0: number,
-    // score1: number
-    // peut-etre rajouter le score?
 }
+
+export const TIMEOUT_MS: number  = 60000;
+export const FRAME_RATE: number = 60;
+export const W: number = 87;
+export const S: number  = 83;
+export const ARROW_UP: number = 38;
+export const ARROW_DOWN: number  = 40;
+export const PADDLE_SPEED: number  = 10;
+export const GAME_HEIGHT: number  = 500;
+export const GAME_WIDTH: number  = 800;
+export const PADDLE_HEIGHT: number  = 120;
+export const PADDLE_WIDTH: number  = 20;
+export const FINAL_SCORE: number  = 5;
+export const MAX_SPEED: number  = 15;

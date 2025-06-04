@@ -12,7 +12,7 @@
 		"sourceMap": true,
 		"allowJs": true,
 	},
-	"include": ["./**/*.ts"],
+	//"include": ["./**/*.ts", "../shared/constants.ts"],
 	"exclude": [
 		"node_modules",
 		"dist",
