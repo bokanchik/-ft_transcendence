@@ -1,0 +1,7 @@
+- gestion des volumes
+
+- changement de mdp ? validation par mail ? (pas dans le sujet)
+
+- organisation .env (plusieurs fichiers .env ?)
+
+- images dans le docker-compose ? (doit la dl a chaque run)

@@ -72,26 +72,15 @@ services:
     networks:
       - tranet
 
-  nginx_exporter:
-    image: nginx/nginx-prometheus-exporter:0.11
-    container_name: nginx_exporter
-    command:
-      - '-nginx.scrape-uri=http://gateaway:8081/stub_status'
-    networks:
-      - tranet
-      - monitoring
-    restart: unless-stopped
-    depends_on:
-      - gateaway
-
   cadvisor:
-    build: ./services/cadvisor
+    image: gcr.io/cadvisor/cadvisor:v0.49.2
     container_name: cadvisor
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - monitoring
@@ -104,7 +93,7 @@ services:
       - monitoring
     depends_on:
       - cadvisor
-      - nginx_exporter
+      # - nginx_exporter
     restart: always
   
   grafana:
@@ -121,6 +110,18 @@ services:
     networks:
       - monitoring
     restart: always
+
+  # nginx_exporter:
+  #   image: nginx/nginx-prometheus-exporter:0.11
+  #   container_name: nginx_exporter
+  #   command:
+  #     - '-nginx.scrape-uri=http://gateaway:8081/stub_status'
+  #   networks:
+  #     - tranet
+  #     - monitoring
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - gateaway
 
 #openapi:
 #build: ./services/openapi
