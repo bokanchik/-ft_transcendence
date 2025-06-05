@@ -17,24 +17,19 @@ const gameState: GameState = {
 	leftPaddle: {
 		x: 20,
 		y: 200,
-		// vy: 0
 	},
 	rightPaddle: {
 		x: 770,
 		y: 200,
-		// vy: 0
 	},
 	ball: {
 		x: 400,
 		y: 250,
-		// vx: 3,
-		// vy: 3,
 		radius: 15
 	},
-	// score0: 0,
-	// score1: 0
 } 
 
+// boolean qui sert pour arreter dessiner le jeu
 let isGameOver = false;
 
 export function GameRoomPage(mode: GameMode): HTMLElement {
@@ -56,7 +51,7 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 	leftUsername.className = `
 		mr-4 px-3 py-1 bg-lime-200 text-green-900 
 		border border-green-800 rounded font-bold text-xl 
-		shadow jungle-font text-center w-[120px]
+		shadow jungle-font text-center inline-block
 	`;
 	leftUsername.id = 'left-username';
 
@@ -72,7 +67,7 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 	rightUsername.className = `
 		ml-4 px-3 py-1 bg-lime-200 text-green-900 
 		border border-green-800 rounded font-bold text-xl 
-		shadow jungle-font text-center w-[120px]
+		shadow jungle-font text-center inline-block
 	`;
 	rightUsername.id = 'right-username';
 
@@ -83,7 +78,7 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 		text-3xl font-extrabold text-yellow-300 jungle-font drop-shadow
 	`;
 	scoreDisplay.id = 'score-display';
-	scoreDisplay.textContent = '0 - 0'; // TODO: need to be updated
+	scoreDisplay.textContent = '0 - 0';
 
 	// Composition de la ligne
 	gameRow.append(leftUsername, canvas, rightUsername, scoreDisplay);
@@ -159,14 +154,14 @@ async function quitButtonHandler() {
 	const confirmed = await showCustomConfirm("Are you sure you want to quit this game?");
 	
 	if (confirmed) {
-		const matchId = sessionStorage.getItem('matchId');
-		const opponentId = sessionStorage.getItem('opponent');
+		// const matchId = sessionStorage.getItem('matchId');
+		// const opponentId = sessionStorage.getItem('opponent');
 		isGameOver = true;
-		socket.emit('quit', matchId, opponentId);
+		socket.emit('quitGame');
 		cleanupSocket(socket);
 		sessionStorage.clear(); // clean storage --> users have to put there aliases again
 		navigateTo('/local-game');
-		//isGameOver = false;
+		isGameOver = false;
 	}
 }
 

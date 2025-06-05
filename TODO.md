@@ -1,16 +1,8 @@
 # ✅ TODO List
 
 
-
-## SASHA 
-
-
-
 ## TO:DO
--> improve paddle's controls with keyup function
--> rendre les mouvements de la balle plus fluides (framerate/taille)
--> changer la vitesse de la balle ()
--> incrementer la vitesse en fonction de nombre d'echanges
+-> usernames cases doivent etre de la meme taille que les alises des jouers
 
 ## taches secondaires
 
@@ -18,3 +10,5 @@
 - [ ] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde)
 - [ ] La gestion d'erreurs (voir le fichier d'Arthur)
 
+## Custom settings
+-> blind mode ()

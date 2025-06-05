@@ -87,7 +87,7 @@ async function disconnectionHandler(socket: Socket)  {
             fastify.log.error(`Failed to find opponentSocketId: ${err}`);
             throw err;
         }
-        resetScore();
+   //     resetScore();
     });
     
     socket.on('disconnect', () => {
@@ -143,6 +143,8 @@ function localSocketEvents(socket: Socket) {
         handleKeyup(parseInt(keyCode));
     });
 
+    
+    
     // -------------------------------
 }
 
@@ -151,13 +153,19 @@ function startGameInterval(state: GameState, socket: Socket) {
         const winner: number = gameLoop(state, socket); // if == 0, game continue, == 1, player 1 win, == 2 player 2 won
         
         if (!winner) {
-           socket.emit('gameState', state);
+            socket.emit('gameState', state);
         } else {
             socket.emit('gameOver');
             resetScore();
             clearInterval(intervalId);
         }
     }, 1000 / FRAME_RATE);
+
+    socket.on('quitGame', () => {
+        resetScore();
+        clearInterval(intervalId);
+        return ;
+    })
 }
 
 

@@ -18,6 +18,7 @@ export interface GameState {
     ball: Ball,
 }
 
+// ! n'a pas fonctionne pour le frontends avec './shared/constants.js' !
 export const TIMEOUT_MS: number  = 60000;
 export const FRAME_RATE: number = 60;
 export const W: number = 87;
