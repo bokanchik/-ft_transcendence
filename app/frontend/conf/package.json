@@ -20,17 +20,23 @@
   "license": "ISC",
   "devDependencies": {
     "@tailwindcss/cli": "^4.1.4",
+    "@tailwindcss/postcss": "^4.1.8",
+    "@tailwindcss/vite": "^4.1.8",
     "@types/node": "^22.15.17",
     "@types/socket.io-client": "^1.4.36",
-    "concurrently": "^9.1.2"
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^9.1.2",
+    "postcss": "^8.5.4",
+    "tailwindcss": "^4.1.8"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.1.8",
     "commander": "^13.1.0",
-    "tailwindcss": "^4.1.4",
-    "typescript": "^5.8.3",
     "dotenv": "^16.5.0",
     "fastify-type-provider-zod": "^4.0.2",
-	  "zod": "^3.24.4",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "zod": "^3.24.4"
   }
 }
