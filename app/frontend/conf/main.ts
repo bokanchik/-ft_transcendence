@@ -11,7 +11,7 @@ import { ProfilePage } from './pages/profilePage.js';
 import { getUserDataFromStorage } from './services/authService.js';
 import { promptAliasForm } from './components/aliasFormPage.js';
 import { GameMode } from './components/gamePage.js'
-import './style/input.css';
+// import './style/input.css';
 
 // Conteneur où le contenu de la page sera injecté
 const appContainer = document.getElementById('main');
