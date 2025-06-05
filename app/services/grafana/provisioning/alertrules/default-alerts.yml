@@ -1,0 +1,57 @@
+# services/grafana/provisioning/alertrules/default-alerts.yml
+apiVersion: 1
+
+# Liste des groupes de règles d'alerte
+groups:
+  - name: ServiceAvailability   # Nom du groupe d'alerte
+    # UID optionnel pour le groupe. Si non fourni, un sera généré.
+    # uid: 'service-availability-alerts'
+    orgId: 1                   # ID de l'organisation
+    folder: 'Monitoring Services' # Nom du dossier où ces règles apparaîtront (doit correspondre à un dossier de dashboards)
+    # UID du dossier où les règles seront stockées.
+    # folderUid: 'monitoring-folder-uid'
+    # Intervalle auquel les règles de ce groupe seront évaluées.
+    interval: 60s
+    rules:
+      - # UID unique pour cette règle
+        uid: high_cpu_usage_alert
+        # Titre de la règle d'alerte
+        title: High CPU Usage
+        # Condition de l'alerte
+        condition: B # Référence à la query 'B' ci-dessous
+        # Données pour la règle (requêtes, expressions)
+        data:
+          - refId: A # Query pour obtenir la métrique brute
+            datasourceUid: 'prometheus-datasource' # UID de la datasource Prometheus
+            model:
+              expr: 'sum(rate(container_cpu_usage_seconds_total{container_label_com_docker_compose_service!=""}[1m])) by (container_label_com_docker_compose_service) / sum(container_spec_cpu_quota{container_label_com_docker_compose_service!=""}/100000) by (container_label_com_docker_compose_service) * 100 > 80'
+              # expr: 'avg_over_time(my_metric{job="my_job"}[5m]) > 90' # Exemple
+              intervalMs: 1000
+              maxDataPoints: 43200
+          - refId: B # Condition de seuil (Reduce, Math, etc.)
+            datasourceUid: '__expr__' # Datasource spéciale pour les expressions Grafana
+            model:
+              type: 'threshold'
+              # Conditions: is_above, is_below, is_outside_range, is_within_range
+              conditions:
+                - type: query
+                  params:
+                    - A # Référence à la query 'A'
+                    - GT # Greater Than
+                    - 80 # Seuil
+        # Durée pendant laquelle la condition doit être vraie avant que l'alerte ne se déclenche
+        for: 5m
+        # Annotations à ajouter à l'alerte (utiles pour les notifications)
+        annotations:
+          summary: 'High CPU usage on {{ $labels.container_label_com_docker_compose_service }}'
+          description: 'CPU usage is {{ $value }}% on service {{ $labels.container_label_com_docker_compose_service }}.'
+        # Labels à ajouter à l'alerte
+        labels:
+          severity: critical
+          service: '{{ $labels.container_label_com_docker_compose_service }}'
+        # Notification settings (optional, can be configured globally or per contact point)
+        # notification_settings:
+        #   receiver: 'default-email' # Nom du contact point
+        #   # ... autres options
+        # noDataState: NoData # Que faire si aucune donnée (NoData, Alerting, OK)
+        # execErrState: Error # Que faire en cas d'erreur d'exécution (Alerting, Error)

@@ -1,34 +1,33 @@
 import { navigateTo } from '../services/router.js';
 import { handleOnlineGame } from '../services/initOnlineGame.js';
-// @ts-ignore
-import { User } from '../shared/types.js';
-import { HeaderComponent } from './headerComponent.js'; // ajout arthur pour le header
-import { showToast } from './toast.js';
+import { HeaderComponent } from '../components/headerComponent.js';
+import { User } from '../shared/schemas/usersSchemas.js';
 import { getUserDataFromStorage } from '../services/authService.js';
+import { showToast } from './toast.js';
 
 export type GameMode = 'local' | 'remote';
 
 export function GamePage(): HTMLElement {
-    //ajout arthur -> on check tout de suite si l'utilisateur est connecté
-    const authData = getUserDataFromStorage();
+	//ajout arthur -> on check tout de suite si l'utilisateur est connecté
+	const authData = getUserDataFromStorage();
 
-    // Le HeaderComponent attend un currentUser.
-    // Si l'utilisateur n'est pas connecté, redirigez-le ou affichez un état alternatif.
-    if (!authData) {
-        console.warn("GamePage: User not authenticated, redirecting to login.");
-        navigateTo('/login');
-        // Retourner un élément vide pour éviter les erreurs de rendu pendant la redirection
-        return document.createElement('div');
-    }
-    const currentUser: User = authData as User;
+	// Le HeaderComponent attend un currentUser.
+	// Si l'utilisateur n'est pas connecté, redirigez-le ou affichez un état alternatif.
+	if (!authData) {
+		console.warn("GamePage: User not authenticated, redirecting to login.");
+		navigateTo('/login');
+		// Retourner un élément vide pour éviter les erreurs de rendu pendant la redirection
+		return document.createElement('div');
+	}
+	const currentUser: User = authData as User;
 
-    // --- Main Container ---
-    const pageWrapper = document.createElement('div');
-    pageWrapper.className = 'flex flex-col min-h-screen'; // Assure que la page prend toute la hauteur
+	// --- Main Container ---
+	const pageWrapper = document.createElement('div');
+	pageWrapper.className = 'flex flex-col min-h-screen'; // Assure que la page prend toute la hauteur
 
-    // --- Header ---
-    const headerElement = HeaderComponent({ currentUser});
-    pageWrapper.appendChild(headerElement);
+	// --- Header ---
+	const headerElement = HeaderComponent({ currentUser });
+	pageWrapper.appendChild(headerElement);
 
     // --- Game Page Content ---
     const gameContentContainer: HTMLDivElement = document.createElement('div');
@@ -109,4 +108,4 @@ export function GamePage(): HTMLElement {
         // return container;
         return pageWrapper; // ajout arthur
 }
-    
+

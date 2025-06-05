@@ -1,6 +1,5 @@
 import { fetchWithCsrf } from './csrf.js';
-//@ts-ignore
-import { Friend, PendingFriendRequest } from '../shared/types.js';
+import { Friend, PendingFriendRequest } from '../shared/schemas/friendsSchemas.js';
 import { handleApiResponse } from './apiUtils.js';
 
 /**

@@ -2,8 +2,7 @@
 import { navigateTo } from '../services/router.js';
 import { getUserDataFromStorage, fetchUserDetails, fetchMatchHistoryForUser } from '../services/authService.js';
 import { fetchCsrfToken } from '../services/csrf.js';
-//@ts-ignore
-import { User } from '../shared/types.js';
+import { User } from '../shared/schemas/usersSchemas.js';
 import { HeaderComponent } from '../components/headerComponent.js';
 import { showToast } from '../components/toast.js';
 

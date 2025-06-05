@@ -2,8 +2,7 @@
 import * as userModel from '../models/userModel.js';
 import * as passwordUtils from '../shared/auth-plugin/pswdUtils.js';
 import { ERROR_MESSAGES, ConflictError, ValidationError, NotFoundError } from '../shared/auth-plugin/appError.js';
-import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, CreateUserPayload, UserOnlineStatus } from '../shared/types.js';
-import { isValidHttpUrl, isValidEmailFormat } from '../utils/apiUtils.js';
+import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, CreateUserPayload, UserOnlineStatus } from '../shared/schemas/usersSchemas.js';
 
 /**
  * Generates a default avatar URL using ui-avatars.com.
@@ -61,7 +60,6 @@ export async function createUserAccount(userData: RegisterRequestBody): Promise<
 	}
 
 	const hashedPassword = await passwordUtils.hashPassword(password);
-
 	const payload: CreateUserPayload = {
 		username,
 		email,
@@ -69,7 +67,6 @@ export async function createUserAccount(userData: RegisterRequestBody): Promise<
 		display_name,
 		avatar_url: avatar_url && avatar_url.trim() !== "" ? avatar_url : generateDefaultAvatarUrl(display_name),
 	};
-
 	await userModel.createUser(payload);
 }
 
@@ -131,43 +128,25 @@ export async function updateUserProfile(userId: number, updates: UpdateUserPaylo
 	}
 
 	const processedUpdates: UpdateUserPayload = {};
-
 	if (updates.display_name !== undefined) {
-		if (typeof updates.display_name === 'string' && updates.display_name.trim().length > 0) {
-			processedUpdates.display_name = updates.display_name.trim();
-		} else {
-			throw new ValidationError('Display name cannot be empty');
-		}
+		processedUpdates.display_name = updates.display_name.trim();
 	}
-
 	if (updates.email !== undefined) {
-		const potentialEmail = updates.email;
-		if (potentialEmail && isValidEmailFormat(potentialEmail)) {
-			processedUpdates.email = potentialEmail.trim();
-		} else {
-			throw new ValidationError('Invalid email format provided.');
-		}
+		processedUpdates.email = updates.email;
+	}
+	if (updates.avatar_url !== null) {
+		// if (updates.avatar_url !== undefined) {
+		processedUpdates.avatar_url = updates.avatar_url;
 	}
 
-	if (updates.avatar_url !== undefined) {
-		const potentialAvatar = updates.avatar_url;
-		if (potentialAvatar === null) {
-			processedUpdates.avatar_url = undefined;
-		} else if (potentialAvatar && isValidHttpUrl(potentialAvatar)) {
-			processedUpdates.avatar_url = potentialAvatar;
-		} else if (potentialAvatar && !isValidHttpUrl(potentialAvatar)) {
-			throw new ValidationError('Invalid avatar URL format provided.');
-		}
-	}
-
-	const changesToApply: Partial<UpdateUserPayload> = {};
+	const changesToApply: UpdateUserPayload = {};
 	for (const key in processedUpdates) {
 		const typedKey = key as keyof UpdateUserPayload;
-		if (processedUpdates[typedKey] !== currentUser[typedKey as keyof User]) {
-			changesToApply[typedKey] = processedUpdates[typedKey];
+		const value = processedUpdates[typedKey];
+		if (value !== null && value !== currentUser[typedKey]) {
+			changesToApply[typedKey] = value;
 		}
 	}
-
 	if (Object.keys(changesToApply).length === 0) {
 		console.log(`No effective changes detected for user ${userId}. Profile remains unchanged.`);
 		return currentUser;
@@ -176,7 +155,6 @@ export async function updateUserProfile(userId: number, updates: UpdateUserPaylo
 	if (changesToApply.display_name && await userModel.isDisplayNameInDb(changesToApply.display_name, userId)) {
 		throw new ConflictError(`Display name '${changesToApply.display_name}' is already taken.`);
 	}
-
 	if (changesToApply.email && await userModel.isEmailInDb(changesToApply.email, userId)) {
 		throw new ConflictError(`Email '${changesToApply.email}' is already taken.`);
 	}
@@ -234,8 +212,6 @@ export async function getUserByEmail(email: string): Promise<User> {
  */
 export async function getUserByUsername(username: string): Promise<User> {
 	console.log('Fetching user by username from the database');
-	// Note: getUserByUsernameFromDb retourne UserWithPasswordHash, mais on ne veut pas exposer le hash.
-	// Il faudrait une version de getUserByUsernameFromDb qui omet le hash, ou le filtrer ici.
 	const userWithHash = await userModel.getUserByUsernameFromDb(username);
 	if (!userWithHash) {
 		throw new NotFoundError('User not found');

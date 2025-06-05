@@ -1,8 +1,8 @@
 // /pages/profilePage.ts
 import { getUserDataFromStorage, updateUserProfile } from '../services/authService.js';
 import { navigateTo } from '../services/router.js';
-//@ts-ignore
-import { User, UpdateUserPayload, ApiResult } from '../shared/types.js';
+import { User, UpdateUserPayload } from '../shared/schemas/usersSchemas.js';
+import { ApiResult } from '../shared/types.js';
 import { SettingsForm } from '../components/settingsForm.js'; // Importer le composant
 import { fetchCsrfToken } from '../services/csrf.js';
 

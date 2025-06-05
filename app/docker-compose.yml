@@ -1,10 +1,26 @@
+secrets:
+  gf_admin_pwd:
+    file: ../secrets/gf_admin_pwd.txt
+
+
+networks:
+  tranet:
+    name: tranet
+    driver: bridge
+  monitoring:
+    name: monitoring
+    driver: bridge
+
+volumes:
+  frontdata:
+    name: frontdata
+
 services:
   gateaway: # entrypoint for services
     container_name: gateaway
     build: ./gateaway
     ports:
       - "8443:8443"
-#      - "443:443"
     restart: always
     env_file: .env
     volumes:
@@ -15,6 +31,7 @@ services:
       - frontend
     networks:
       - tranet
+      - monitoring
 
   frontend:
     container_name: frontend
@@ -26,6 +43,8 @@ services:
     volumes:
       - frontdata:/app/dist
       - ./services/shared/types.ts:/app/shared/types.ts:ro
+      - ./services/shared/env.ts:/app/shared/env.ts:ro
+      - ./services/shared/schemas:/app/shared/schemas:ro
     networks:
       - tranet
 
@@ -52,19 +71,61 @@ services:
       - ./services/shared:/app/shared:ro
     networks:
       - tranet
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.2
+    container_name: cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - monitoring
+    restart: always
   
-  #openapi:
-    #build: ./services/openapi
-    #ports:
-   #   - "8080:8080" # for internal use
-  #  networks:
-    #  - tranet
+  prometheus:
+    build: ./services/prometheus
+    container_name: prometheus
+    networks:
+      - monitoring
+    depends_on:
+      - cadvisor
+      # - nginx_exporter
+    restart: always
+  
+  grafana:
+    build: ./services/grafana
+    container_name: grafana
+    secrets:
+      - gf_admin_pwd
+    depends_on:
+      - users
+      - prometheus
+    env_file: .env
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD__FILE=/run/secrets/gf_admin_pwd
+    networks:
+      - monitoring
+    restart: always
 
-networks:
-  tranet:
-    name: tranet
-    driver: bridge
+  # nginx_exporter:
+  #   image: nginx/nginx-prometheus-exporter:0.11
+  #   container_name: nginx_exporter
+  #   command:
+  #     - '-nginx.scrape-uri=http://gateaway:8081/stub_status'
+  #   networks:
+  #     - tranet
+  #     - monitoring
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - gateaway
 
-volumes:
-  frontdata:
-    name: frontdata
+#openapi:
+#build: ./services/openapi
+#ports:
+#   - "8080:8080" # for internal use
+#  networks:
+#  - tranet

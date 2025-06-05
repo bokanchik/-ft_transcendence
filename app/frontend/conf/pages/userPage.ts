@@ -1,48 +1,48 @@
-import { fetchUsers } from '../services/api.js';
+import { fetchUsers } from '../services/authService.js';
 import { UserList } from '../components/userList.js';
 
 export async function UsersPage(): Promise<HTMLElement> {
-    const container = document.createElement('div');
-    container.className = 'container mx-auto p-8';
+	const container = document.createElement('div');
+	container.className = 'container mx-auto p-8';
 
-    const title = document.createElement('h1');
-    title.className = 'text-3xl font-bold mb-6 text-center text-blue-700';
-    title.textContent = '🏓 King-Pong User List 🏓';
+	const title = document.createElement('h1');
+	title.className = 'text-3xl font-bold mb-6 text-center text-blue-700';
+	title.textContent = '🏓 King-Pong User List 🏓';
 
-    const userListElement = document.createElement('div');
-    userListElement.id = 'user-list';
-    userListElement.className = 'mt-6 bg-white p-6 rounded-lg shadow-md';
-    userListElement.innerHTML = '<p class="text-center text-gray-500">Loading users...</p>';
+	const userListElement = document.createElement('div');
+	userListElement.id = 'user-list';
+	userListElement.className = 'mt-6 bg-white p-6 rounded-lg shadow-md';
+	userListElement.innerHTML = '<p class="text-center text-gray-500">Loading users...</p>';
 
-    container.appendChild(title);
-    container.appendChild(userListElement);
+	container.appendChild(title);
+	container.appendChild(userListElement);
 
-    try {
-        const users = await fetchUsers();
-        userListElement.innerHTML = '';
+	try {
+		const users = await fetchUsers();
+		userListElement.innerHTML = '';
 
-        // Fournir des valeurs par défaut pour les props requises
-        const userListProps = {
-            users,
-            friends: [],
-            sentRequests: [],
-            receivedRequests: [],
-            currentUserId: -1, // ou null/undefined si tu adaptes UserList
-            onSendRequest: async () => {},
-            onCancelRequest: async () => {},
-            onAcceptRequest: async () => {},
-            onDeclineRequest: async () => {},
-        };
-        userListElement.appendChild(UserList(userListProps));
-    } catch (error) {
-        console.error("Failed to load users for UsersPage:", error);
-        userListElement.innerHTML = '<p class="text-center text-red-500">Error loading users.</p>';
-    }
+		// Fournir des valeurs par défaut pour les props requises
+		const userListProps = {
+			users,
+			friends: [],
+			sentRequests: [],
+			receivedRequests: [],
+			currentUserId: -1, // ou null/undefined si tu adaptes UserList
+			onSendRequest: async () => { },
+			onCancelRequest: async () => { },
+			onAcceptRequest: async () => { },
+			onDeclineRequest: async () => { },
+		};
+		userListElement.appendChild(UserList(userListProps));
+	} catch (error) {
+		console.error("Failed to load users for UsersPage:", error);
+		userListElement.innerHTML = '<p class="text-center text-red-500">Error loading users.</p>';
+	}
 
-    return container;
+	return container;
 }
 // app/frontend/conf/pages/userPage.ts
-// import { fetchUsers } from '../services/api.js';
+// import { fetchUsers } from '../services/authService.js';
 // import { UserList, UserListProps } from '../components/userList.js';
 // import { HeaderComponent } from '../components/headerComponent.js';
 // import { getUserDataFromStorage } from '../services/authService.js';
@@ -56,10 +56,11 @@ export async function UsersPage(): Promise<HTMLElement> {
 //     declineFriendRequest
 // } from '../services/friendService.js';
 // import { showToast } from '../components/toast.js';
-// import { User as ApiUserType, Friend, PendingFriendRequest } from '../shared/types.js'; // Import Friend and PendingFriendRequest
+// import { User as ApiUserType, Friend, PendingFriendRequest } from '../shared/schemas/usersSchemas.js'; // Import Friend and PendingFriendRequest
+// import { User as ApiUserType, Friend, PendingFriendRequest } from '../shared/schemas/friendsSchemas.js'; // Import Friend and PendingFriendRequest
 // import { createElement } from '../utils/domUtils.js';
-// import { navigateTo } from '../services/router.js'; // <--- ADD THIS IMPORT
-// import { router } from '../main.js'; // <--- ADD THIS IMPORT
+// import { navigateTo } from '../services/router.js';
+// import { router } from '../main.js';
 
 // export async function UsersPage(): Promise<HTMLElement> {
 //     const currentUser = getUserDataFromStorage();
@@ -70,9 +71,9 @@ export async function UsersPage(): Promise<HTMLElement> {
 //         const headerElement = HeaderComponent({ currentUser });
 //         pageContainer.appendChild(headerElement);
 //     }
-    
+
 //     const contentContainer = createElement('div', { className: 'container mx-auto p-4 md:p-8' });
-    
+
 //     const title = createElement('h1', {
 //         className: 'text-3xl font-bold mb-6 text-center text-blue-700',
 //         textContent: '🏓 All King-Pong Users 🏓'
@@ -106,7 +107,7 @@ export async function UsersPage(): Promise<HTMLElement> {
 //             sentRequestsPromise,
 //             receivedRequestsPromise
 //         ]);
-        
+
 //         userListElement.innerHTML = '';
 
 //         const createHandler = (action: Function, successMsg?: string) => async (id: number) => {
@@ -123,7 +124,7 @@ export async function UsersPage(): Promise<HTMLElement> {
 //                 showToast(e.message || 'An error occurred.', 'error');
 //             }
 //         };
-        
+
 //         const userListProps: UserListProps = {
 //             users: users as ApiUserType[],
 //             friends: friends,

@@ -1,6 +1,6 @@
 // /components/loginForm.ts
-//@ts-ignore
-import { LoginRequestBody, ApiResult } from '../shared/types.js';
+import { LoginRequestBody } from '../shared/schemas/usersSchemas.js';
+import { ApiResult } from '../shared/types.js';
 
 interface LoginFormProps {
 	onLoginAttempt: (credentials: LoginRequestBody) => Promise<ApiResult>;
@@ -78,7 +78,8 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 	return formWrapper;
 }
 // app/frontend/conf/components/loginForm.ts
-// import { LoginRequestBody, ApiResult, User } from '../shared/types.js'; // Added User
+// import { ApiResult } from '../shared/types.js';
+// import { LoginRequestBody, User } from '../shared/schemas/usersSchemas.js';
 // import { createElement, createInputField, createActionButton } from '../utils/domUtils.js';
 
 // interface LoginFormProps {
@@ -122,7 +123,7 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 //             loginButton
 //         ])
 //     ]);
-    
+
 //     const formWrapper = createElement('div', {}, [form, messageDiv]);
 
 

@@ -1,130 +1,129 @@
 // src/components/headerComponent.ts
-//@ts-ignore
-import { User } from '../shared/types.js';
+import { User } from '../shared/schemas/usersSchemas.js';
 import { navigateTo } from '../services/router.js'; // Assuming navigateTo handles data-link
 import { logout } from '../services/authService.js';
 import { showToast } from './toast.js';
 
 interface HeaderProps {
-    currentUser: User;
-    // onLanguageChange?: () => void;
+	currentUser: User;
+	// onLanguageChange?: () => void;
 }
 
 interface NavLink {
-    href: string;
-    text: string;
+	href: string;
+	text: string;
 }
 
 export function HeaderComponent(props: HeaderProps): HTMLElement {
-    const { currentUser } = props;
+	const { currentUser } = props;
 
-    const headerContainer = document.createElement('div');
-    headerContainer.className = 'flex justify-between items-center p-4 border-b border-gray-200 bg-white';
+	const headerContainer = document.createElement('div');
+	headerContainer.className = 'flex justify-between items-center p-4 border-b border-gray-200 bg-white';
 
-    // --- Left side: Language Button ---
-    const leftSection = document.createElement('div');
-    const langButton = document.createElement('button');
-    langButton.className = 'bg-blue-500 text-white font-bold py-2 px-4 rounded-lg text-sm hover:bg-blue-600 transition-colors';
-    langButton.textContent = 'ENG';
-    // langButton.addEventListener('click', () => { /* ... */ });
-    leftSection.appendChild(langButton);
+	// --- Left side: Language Button ---
+	const leftSection = document.createElement('div');
+	const langButton = document.createElement('button');
+	langButton.className = 'bg-blue-500 text-white font-bold py-2 px-4 rounded-lg text-sm hover:bg-blue-600 transition-colors';
+	langButton.textContent = 'ENG';
+	// langButton.addEventListener('click', () => { /* ... */ });
+	leftSection.appendChild(langButton);
 
-    // --- Center: Navigation Links ---
-    const centerSection = document.createElement('div');
-    centerSection.className = 'flex-grow flex justify-center space-x-4 sm:space-x-6'; // flex-grow to push others, justify-center
+	// --- Center: Navigation Links ---
+	const centerSection = document.createElement('div');
+	centerSection.className = 'flex-grow flex justify-center space-x-4 sm:space-x-6'; // flex-grow to push others, justify-center
 
-    const navLinks: NavLink[] = [
-        { href: '/', text: 'Home' },
-        { href: '/game', text: 'Game' },
-        { href: '/dashboard', text: 'Dashboard' },
-    ];
+	const navLinks: NavLink[] = [
+		{ href: '/', text: 'Home' },
+		{ href: '/game', text: 'Game' },
+		{ href: '/dashboard', text: 'Dashboard' },
+	];
 
-    navLinks.forEach(linkInfo => {
-        const linkElement = document.createElement('a');
-        linkElement.href = linkInfo.href;
-        linkElement.textContent = linkInfo.text;
-        linkElement.className = 'text-gray-600 hover:text-blue-600 font-medium transition-colors px-2 py-1 text-sm sm:text-base';
-        linkElement.setAttribute('data-link', '');
-        centerSection.appendChild(linkElement);
-    });
+	navLinks.forEach(linkInfo => {
+		const linkElement = document.createElement('a');
+		linkElement.href = linkInfo.href;
+		linkElement.textContent = linkInfo.text;
+		linkElement.className = 'text-gray-600 hover:text-blue-600 font-medium transition-colors px-2 py-1 text-sm sm:text-base';
+		linkElement.setAttribute('data-link', '');
+		centerSection.appendChild(linkElement);
+	});
 
-    // --- Right side: User Header (Avatar & Menu) ---
-    const rightSection = document.createElement('div');
-    const userHeader = document.createElement('div');
-    userHeader.className = 'flex items-center space-x-4 relative';
+	// --- Right side: User Header (Avatar & Menu) ---
+	const rightSection = document.createElement('div');
+	const userHeader = document.createElement('div');
+	userHeader.className = 'flex items-center space-x-4 relative';
 
-    const avatarDisplayWrapper = document.createElement('div');
-    avatarDisplayWrapper.className = 'bg-orange-400 p-2 rounded-lg flex items-center space-x-3 cursor-pointer select-none';
-    
-    const displayNameHeader = document.createElement('span');
-    displayNameHeader.className = 'text-white font-semibold text-sm';
-    displayNameHeader.textContent = currentUser.display_name || currentUser.username;
-    
-    const avatarHeader = document.createElement('img');
-    avatarHeader.className = 'w-10 h-10 rounded-full object-cover border-2 border-white';
-    const avatarFallbackName = currentUser.display_name || currentUser.username;
-    avatarHeader.src = currentUser.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(avatarFallbackName)}&background=0D8ABC&color=fff&size=128`;
-    avatarHeader.alt = 'User Avatar';
+	const avatarDisplayWrapper = document.createElement('div');
+	avatarDisplayWrapper.className = 'bg-orange-400 p-2 rounded-lg flex items-center space-x-3 cursor-pointer select-none';
 
-    avatarDisplayWrapper.appendChild(displayNameHeader);
-    avatarDisplayWrapper.appendChild(avatarHeader);
+	const displayNameHeader = document.createElement('span');
+	displayNameHeader.className = 'text-white font-semibold text-sm';
+	displayNameHeader.textContent = currentUser.display_name || currentUser.username;
 
-    const miniMenu = document.createElement('div');
-    miniMenu.className = 'absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-50 hidden flex-col';
-    miniMenu.style.top = '110%'; 
+	const avatarHeader = document.createElement('img');
+	avatarHeader.className = 'w-10 h-10 rounded-full object-cover border-2 border-white';
+	const avatarFallbackName = currentUser.display_name || currentUser.username;
+	avatarHeader.src = currentUser.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(avatarFallbackName)}&background=0D8ABC&color=fff&size=128`;
+	avatarHeader.alt = 'User Avatar';
 
-    const settingsButton = document.createElement('a');
-    settingsButton.href = '/profile';
-    settingsButton.setAttribute('data-link', '');
-    settingsButton.className = 'block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-lg';
-    settingsButton.textContent = 'Settings';
+	avatarDisplayWrapper.appendChild(displayNameHeader);
+	avatarDisplayWrapper.appendChild(avatarHeader);
 
-    const logoutButtonEl = document.createElement('button');
-    logoutButtonEl.className = 'block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-b-lg';
-    logoutButtonEl.textContent = 'Logout';
-    logoutButtonEl.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        try {
-            await logout();
-            showToast('You have been logged out.', 'success');
-        } catch (error) {
-            showToast('Error logging out.', 'error');
-        } finally {
-            navigateTo('/login');
-        }
-    });
+	const miniMenu = document.createElement('div');
+	miniMenu.className = 'absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-50 hidden flex-col';
+	miniMenu.style.top = '110%';
 
-    miniMenu.appendChild(settingsButton);
-    miniMenu.appendChild(logoutButtonEl);
-    userHeader.appendChild(avatarDisplayWrapper);
-    userHeader.appendChild(miniMenu);
-    rightSection.appendChild(userHeader);
+	const settingsButton = document.createElement('a');
+	settingsButton.href = '/profile';
+	settingsButton.setAttribute('data-link', '');
+	settingsButton.className = 'block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-lg';
+	settingsButton.textContent = 'Settings';
+
+	const logoutButtonEl = document.createElement('button');
+	logoutButtonEl.className = 'block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-b-lg';
+	logoutButtonEl.textContent = 'Logout';
+	logoutButtonEl.addEventListener('click', async (e) => {
+		e.stopPropagation();
+		try {
+			await logout();
+			showToast('You have been logged out.', 'success');
+		} catch (error) {
+			showToast('Error logging out.', 'error');
+		} finally {
+			navigateTo('/login');
+		}
+	});
+
+	miniMenu.appendChild(settingsButton);
+	miniMenu.appendChild(logoutButtonEl);
+	userHeader.appendChild(avatarDisplayWrapper);
+	userHeader.appendChild(miniMenu);
+	rightSection.appendChild(userHeader);
 
 
-    // Menu open/close logic
-    let menuOpen = false;
-    const toggleMenu = (show: boolean) => {
-        menuOpen = show;
-        miniMenu.classList.toggle('hidden', !menuOpen);
-    };
+	// Menu open/close logic
+	let menuOpen = false;
+	const toggleMenu = (show: boolean) => {
+		menuOpen = show;
+		miniMenu.classList.toggle('hidden', !menuOpen);
+	};
 
-    avatarDisplayWrapper.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggleMenu(!menuOpen);
-    });
+	avatarDisplayWrapper.addEventListener('click', (e) => {
+		e.stopPropagation();
+		toggleMenu(!menuOpen);
+	});
 
-    const globalClickListener = (event: MouseEvent) => {
-        if (menuOpen && !userHeader.contains(event.target as Node)) {
-            toggleMenu(false);
-        }
-    };
-    document.addEventListener('click', globalClickListener);
-    // Consider cleanup only if this component could be frequently removed/re-added or if multiple such components exist on one page.
+	const globalClickListener = (event: MouseEvent) => {
+		if (menuOpen && !userHeader.contains(event.target as Node)) {
+			toggleMenu(false);
+		}
+	};
+	document.addEventListener('click', globalClickListener);
+	// Consider cleanup only if this component could be frequently removed/re-added or if multiple such components exist on one page.
 
-    // Assemble the header sections
-    headerContainer.appendChild(leftSection);
-    headerContainer.appendChild(centerSection);
-    headerContainer.appendChild(rightSection);
+	// Assemble the header sections
+	headerContainer.appendChild(leftSection);
+	headerContainer.appendChild(centerSection);
+	headerContainer.appendChild(rightSection);
 
-    return headerContainer;
+	return headerContainer;
 }
