@@ -13,21 +13,6 @@ import { User } from '../shared/schemas/usersSchemas.js';
 export async function createFriendshipRequestInDb(user1Id: number, user2Id: number, initiatorId: number): Promise<Friendship> {
 	const db = getDb();
 	const [id1, id2] = user1Id < user2Id ? [user1Id, user2Id] : [user2Id, user1Id];
-
-	//     const insertResult = await db.run(
-	//         `INSERT INTO friendships (user1_id, user2_id, initiator_id, status) VALUES (?, ?, ?, ?)`,
-	//         [id1, id2, initiatorId, FriendshipStatus.PENDING]
-	//     );
-
-	//     if (insertResult.lastID === undefined) {
-	//         throw new Error("Failed to create friendship, no lastID returned from insert operation.");
-	//     }
-
-	//     const newFriendship = await db.get<Friendship>(
-	//         `SELECT * FROM friendships WHERE id = ?`,
-	//         [insertResult.lastID]
-	//     );
-
 	const newFriendship = await db.get<Friendship>(
 		`INSERT INTO friendships (user1_id, user2_id, initiator_id, status)
          VALUES (?, ?, ?, ?)

@@ -212,8 +212,6 @@ export async function getUserByEmail(email: string): Promise<User> {
  */
 export async function getUserByUsername(username: string): Promise<User> {
 	console.log('Fetching user by username from the database');
-	// Note: getUserByUsernameFromDb retourne UserWithPasswordHash, mais on ne veut pas exposer le hash.
-	// Il faudrait une version de getUserByUsernameFromDb qui omet le hash, ou le filtrer ici.
 	const userWithHash = await userModel.getUserByUsernameFromDb(username);
 	if (!userWithHash) {
 		throw new NotFoundError('User not found');

@@ -9,3 +9,5 @@
 - scripts pour inject des variables .env dans les json ?
 
 - images dans le docker-compose ? (doit la dl a chaque run)
+
+- uniformiser les module et mduleResolution dans tsconfig.json

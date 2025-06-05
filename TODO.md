@@ -10,7 +10,7 @@
 - [ ] confirmation par mail
 - [ ] changement mdp
 - [x] Affichage du status
-- [ ] tout matches
+- [ ] tout matches -> sasha ?
 - [x] -> zod/back 
 - [ ] -> zod/front 
 - [x] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde) -> cookie jwt_token
@@ -18,6 +18,8 @@
 - [x] grafana
 - [ ] grafana/dashboards
 - [ ] nettoyage
+
+- [ ] encore des interfaces dans friendModel et voir tous type de retour plus schemas routes
 
 ## 📌 Tâches initiales
 
@@ -30,6 +32,7 @@ at the end of a match -> call to database if need matchhistory)
 - [ ] La gestion d'erreurs 
 - [ ] Implementer les models pour les appels a la base de donnee
 - [ ] POST a Artur avec les donnees du match
+- [ ] Uniformiser les module et mduleResolution dans tsconfig.json
 
 
 ---
