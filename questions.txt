@@ -1,7 +1,11 @@
-- gestion des volumes
+- gestion des volumes docker
+
+- dossier shared ?
 
 - changement de mdp ? validation par mail ? (pas dans le sujet)
 
 - organisation .env (plusieurs fichiers .env ?)
+
+- scripts pour inject des variables .env dans les json ?
 
 - images dans le docker-compose ? (doit la dl a chaque run)
