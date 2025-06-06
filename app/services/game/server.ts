@@ -7,11 +7,13 @@ import db from './database/connectDB.ts'
 import { setupPlugins } from './shared/auth-plugin/tokens.js'
 import matchRoutes from './routes/matchRoutes.ts'
 import { matchSocketHandler } from './sockets/matchSocketHandler.ts';
+import { ZodTypeProvider } from "fastify-type-provider-zod"
+
 
 // import settingsRoutes from './routes/settings.ts' TODO
 
 
-const fastify: FastifyInstance = Fastify({ logger: true });
+const fastify: FastifyInstance = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
 
 // Initilize socket.io
 const io: Server = new Server(fastify.server, {

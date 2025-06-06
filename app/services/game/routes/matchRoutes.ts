@@ -1,15 +1,13 @@
 //import fastify from '../server.ts';
 import type { FastifyInstance } from 'fastify';
 import { createMatchHandler, getMatchIdHandler, getMatchByUserHandler } from '../handlers/matchHandlers.ts'
-import { createMatchSchema } from '../middleware/matchSchemas.ts';
-import { ZodTypeProvider } from "fastify-type-provider-zod"
+import { createLocalMatchBody, GetMatchIdRouteSchema, GetMatchByUserIdRouteSchema } from '../middleware/matchesSchemas.ts';
 
 function matchRoutes(fastify: FastifyInstance, _options: unknown) {
 
-   fastify.withTypeProvider<ZodTypeProvider>().post('/match/', {  
+   fastify.post('/match/', {  
       preHandler: async (req, reply) => {
-         // validate incoming data with zod (--> middleware)
-         const reqValidation = createMatchSchema.safeParse(req.body);
+         const reqValidation = createLocalMatchBody.safeParse(req.body);
          if (!reqValidation.success) {
             req.log.error('Validation failed:', reqValidation.error.errors); // for debugging
             return reply.code(400).send({
@@ -22,21 +20,28 @@ function matchRoutes(fastify: FastifyInstance, _options: unknown) {
       handler: createMatchHandler,
    
    });
-   // ---- TODO ----
-   // POST /match/:matchId/move
-   // GET /match/:matchId/status
 
-   fastify.get('/match/:matchId', { onRequest: [fastify.authenticate] }, getMatchIdHandler);
-   fastify.get('/history/:userId', { onRequest: [fastify.authenticate] }, getMatchByUserHandler);
+   fastify.get('/match/:matchId', {
+      onRequest: [fastify.authenticate],
+      schema: GetMatchIdRouteSchema,
+      handler: getMatchIdHandler,
+   });
+
+   fastify.get('/history/:userId', {
+      onRequest: [fastify.authenticate],
+      schema: GetMatchByUserIdRouteSchema,
+      handler: getMatchByUserHandler
+   });
    
-   // fastify.get('/match/:matchId/state', { schema: matchSchemas.idOnly }, getMatchStateHandler);
-   // fastify.post('/match/:matchId/accept', { schema: matchSchemas.accept }, acceptMatchHandler);
-   // fastify.post('/match/:matchId/reject', { schema: matchSchemas.reject }, rejectMatchHandler);
-   // fastify.post('/match/:matchId/start', { schema: matchSchemas.start }, startMatchHandler);
-   // fastify.post('/match/:matchId/quit', { schema: matchSchemas.quit }, quitMatchHandler);
-
-   fastify.log.info('Remote Match routes registered');
-
+   
+   fastify.log.info('Match routes registered');
+   
 }
+
+// fastify.get('/match/:matchId/state', { schema: matchSchemas.idOnly }, getMatchStateHandler);
+// fastify.post('/match/:matchId/accept', { schema: matchSchemas.accept }, acceptMatchHandler);
+// fastify.post('/match/:matchId/reject', { schema: matchSchemas.reject }, rejectMatchHandler);
+// fastify.post('/match/:matchId/start', { schema: matchSchemas.start }, startMatchHandler);
+// fastify.post('/match/:matchId/quit', { schema: matchSchemas.quit }, quitMatchHandler);
 
 export default matchRoutes;

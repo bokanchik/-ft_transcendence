@@ -17,14 +17,19 @@ const gameState: GameState = {
 	leftPaddle: {
 		x: 20,
 		y: 200,
+		vy: 0, // need to remove
+
 	},
 	rightPaddle: {
 		x: 770,
 		y: 200,
+		vy: 0,
 	},
 	ball: {
 		x: 400,
 		y: 250,
+		vx: 0,
+		vy: 0, // need to remove
 		radius: 15
 	},
 } 
