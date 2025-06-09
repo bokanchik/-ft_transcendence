@@ -227,25 +227,55 @@
 	}
 }
 
-.branch-image {
-  animation: rotateSlightly 4s infinite ease-in-out;
-  transition: transform 0.3s ease;
+@keyframes subtleRotate {
+  0%   { transform: rotate(0deg); }
+  50%  { transform: rotate(5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.rotate-parent {
+  display: inline-block;
+  animation: subtleRotate 4s ease-in-out infinite;
   transform-origin: right;
+  position: absolute;     /* or fixed, depending on behavior you want */
+  top: 0;                 /* start at the top */
+  right: 0;
+  height: 100vh;          /* optional: full height of viewport */
+  display: flex;
+  align-items: center;    /* vertical centering, optional */
+  justify-content: flex-end; /* push content to the edge */
+  pointer-events: none;   /* optional: let clicks pass through if it's decorative */
 }
 
-.branch-image:hover {
-  animation: rotateMore 4s ease-in;
-  /* transition: transform 0.3s ease; */
-  transform-origin: right bottom;
-}
-@keyframes rotateSlightly {
-  0% { transform: rotate(0deg); }
-  50% { transform: rotate(5deg); }
-  100% { transform: rotate(0deg); }
+.rotate-hover {
+  display: inline-block;
+  transition: transform 2s ease;
+  transform-origin: right;
+  pointer-events: auto;
 }
 
-@keyframes rotateMore {
-  0% { transform: rotate(0deg); }
-  50% { transform: rotate(20deg); }
-  100% { transform: rotate(0deg); }
+.rotate-parent:hover .rotate-hover {
+  transform: rotate(20deg);
+}
+
+.king_pong{
+	fill-opacity: 0;
+	stroke: #000;
+	stroke-width: 2px;
+	stroke-dasharray: 330;
+	stroke-dashoffset: 330;
+	animation: titleAnimation 2s ease-in-out 1 forwards;
+}
+
+@keyframes titleAnimation {
+	0%{
+		stroke-dashoffset: 330;
+	}
+	80%{
+		fill-opacity: 0;
+	}
+	100%{
+		fill-opacity: 100;
+		stroke-dashoffset: 0;
+	}
 }
