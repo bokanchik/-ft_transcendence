@@ -18,8 +18,6 @@ const gameState: GameState = {
 		x: 20,
 		y: 200,
 		vy: 0, // need to remove
-
-		vy: 0,
 	},
 	rightPaddle: {
 		x: 770,
