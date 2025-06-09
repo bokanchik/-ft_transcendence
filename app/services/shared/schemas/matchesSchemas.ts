@@ -66,7 +66,7 @@ export const GetMatchIdRouteSchema = {
 
 // GET MATCH HISTORY by USER_ID
 export const MatchUserIdParamsSchema = z.object({
-    userId: z.number().int(), // check avec arthur ? pourquoi il utilise regex -> parce que fastify t'envoie une string
+    userId: z.number().int(), // check avec arthur ? pourquoi il utilise regex
 });
 
 export type MatchUserIdParams = z.infer<typeof MatchUserIdParamsSchema>;

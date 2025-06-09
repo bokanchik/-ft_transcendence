@@ -40,7 +40,6 @@ export const SendFriendRequestBodySchema = z.object({
 });
 export type SendFriendRequestBody = z.infer<typeof SendFriendRequestBodySchema>;
 
-
 export const FriendshipIdParamsSchema = z.object({
     friendshipId: z.string().regex(/^\d+$/, "Friendship ID must be a positive integer."),
 });

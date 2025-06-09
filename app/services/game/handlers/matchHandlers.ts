@@ -58,7 +58,13 @@ export async function getMatchIdHandler(req: FastifyRequest<{ Params: MatchIdPar
     }
 }
 
+// si tu utilises des schemas zod pour tes routes, tu peux faire comme ca
+// type AuthenticatedRequest = FastifyRequest & { user: JWTPayload };
+// export async function getMatchByUserHandler(req: AuthenticatedRequest, reply: FastifyReply) {
 export async function getMatchByUserHandler(req: FastifyRequest<{ Params: MatchUserIdParams}>, reply: FastifyReply) {
+    // tu recois forcement une sting ici dans req.params.userId donc
+    // const userId = parseInt(req.params.userId, 10); // si pas de schemas zod pour tes routes
+    // const userId = parseInt((req.params as UserIdParams).userId, 10); // si tu utilises des schemas zod pour tes routes
     const { userId } = req.params;
 
     if (!userId) {
