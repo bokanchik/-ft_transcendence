@@ -44,10 +44,6 @@ export async function acceptFriendRequestHandler(req: FastifyRequest, reply: Fas
 	const currentUserId = (req.user as JWTPayload).id;
 	const friendshipId = parseInt((req.params as any).friendshipId, 10);
 
-	if (isNaN(friendshipId)) {
-		throw new AppError(ERROR_MESSAGES.INVALID_FRIENDSHIP_ID, 400);
-	}
-
 	req.log.info({ currentUserId, friendshipId }, 'Attempting to accept friend request');
 	const result = await friendService.acceptFriendRequest(friendshipId, currentUserId);
 	return reply.send(result);

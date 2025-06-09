@@ -2,7 +2,7 @@
 import * as friendModel from '../models/friendModel.js';
 import * as userModel from '../models/userModel.js';
 import { ConflictError, NotFoundError, ValidationError, ForbiddenError } from '../shared/auth-plugin/appError.js';
-import { Friendship, FriendshipStatus } from '../shared/schemas/friendsSchemas.js';
+import { Friend, PendingFriendRequest, Friendship, FriendshipStatus } from '../shared/schemas/friendsSchemas.js';
 
 /**
  * Creates a friend request.
@@ -11,7 +11,7 @@ import { Friendship, FriendshipStatus } from '../shared/schemas/friendsSchemas.j
  * @throws {ValidationError} If required parameters are missing or invalid.
  * @throws {NotFoundError} If the receiver does not exist.
  * @throws {ConflictError} If a friendship or request already exists.
- * @returns {Promise<Object>} The created friendship request.
+ * @returns {Promise<Friendship>} The created friendship request.
  */
 export async function sendFriendRequest(requesterId: number, receiverId: number): Promise<Friendship> {
 	if (requesterId === undefined || receiverId === undefined) {
@@ -53,7 +53,7 @@ export async function sendFriendRequest(requesterId: number, receiverId: number)
  * @throws {NotFoundError} If the friendship request does not exist.
  * @throws {ConflictError} If the request is not pending.
  * @throws {ForbiddenError} If the user is not authorized to accept the request.
- * @returns {Promise<Object>} A success message.
+ * @returns {Promise<{ message: string }>} A success message.
  */
 export async function acceptFriendRequest(friendshipId: number, currentUserId: number): Promise<{ message: string }> {
 	const friendship = await friendModel.getFriendshipByIdInDb(friendshipId);
@@ -118,9 +118,9 @@ export async function declineOrCancelFriendRequest(friendshipId: number, current
  * Retrieves the list of accepted friends for a user.
  * @param {number} userId - ID of the user.
  * @throws {NotFoundError} If the user does not exist.
- * @returns {Promise<Array>} List of friends.
+ * @returns {Promise<Friend[]>} List of friends.
  */
-export async function getFriends(userId: number): Promise<any[]> {
+export async function getFriends(userId: number): Promise<Friend[]> {
 	const user = await userModel.getUserByIdFromDb(userId);
 	if (!user) {
 		throw new NotFoundError('User not found.');
@@ -132,9 +132,9 @@ export async function getFriends(userId: number): Promise<any[]> {
  * Retrieves pending friend requests received by a user.
  * @param {number} userId - ID of the user.
  * @throws {NotFoundError} If the user does not exist.
- * @returns {Promise<Array>} List of received friend requests.
+ * @returns {Promise<PendingFriendRequest[]>} List of received friend requests.
  */
-export async function getReceivedFriendRequests(userId: number): Promise<any[]> {
+export async function getReceivedFriendRequests(userId: number): Promise<PendingFriendRequest[]> {
 	const user = await userModel.getUserByIdFromDb(userId);
 	if (!user) {
 		throw new NotFoundError('User not found.');
@@ -146,9 +146,9 @@ export async function getReceivedFriendRequests(userId: number): Promise<any[]> 
  * Retrieves pending friend requests sent by a user.
  * @param {number} userId - ID of the user.
  * @throws {NotFoundError} If the user does not exist.
- * @returns {Promise<Array>} List of sent friend requests.
+ * @returns {Promise<PendingFriendRequest[]>} List of sent friend requests.
  */
-export async function getSentFriendRequests(userId: number): Promise<any[]> {
+export async function getSentFriendRequests(userId: number): Promise<PendingFriendRequest[]> {
 	const user = await userModel.getUserByIdFromDb(userId);
 	if (!user) {
 		throw new NotFoundError('User not found.');
@@ -181,9 +181,9 @@ export async function removeFriendship(friendshipId: number, currentUserId: numb
 
 /**
  * Retrieves all friendships (admin only).
- * @returns {Promise<Array>} List of all friendships.
+ * @returns {Promise<Friendship[]>} List of all friendships.
  */
-export async function getAllFriendships(): Promise<any[]> {
+export async function getAllFriendships(): Promise<Friendship[]> {
 	return friendModel.getAllFriendshipsInDb();
 }
 
