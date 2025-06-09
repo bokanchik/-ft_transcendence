@@ -48,7 +48,7 @@ export type FriendshipIdParams = z.infer<typeof FriendshipIdParamsSchema>;
 export const FriendRequestUserSchema = UserBaseSchema.pick({
     id: true,
     username: true,
-    email: true, // email ici ?
+    // email: true, // email ici ?
     display_name: true,
     avatar_url: true,
 });

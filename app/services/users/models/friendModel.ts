@@ -1,6 +1,6 @@
 // app/services/users/models/friendModel.ts
 import { getDb } from '../utils/dbConfig.js';
-import { Friendship, Friend, FriendshipStatus } from '../shared/schemas/friendsSchemas.js';
+import { Friendship, Friend, FriendshipStatus, PendingFriendRequest } from '../shared/schemas/friendsSchemas.js';
 import { User } from '../shared/schemas/usersSchemas.js';
 
 /**
@@ -85,7 +85,7 @@ export async function deleteFriendshipInDb(friendshipId: number): Promise<Update
  * Retrieves all accepted friendships for a specific user.
  * Includes details about the friend (display_name, wins, losses, status, avatar_url).
  * @param {number} userId - ID of the user.
- * @returns {Promise<DetailedFriend[]>} List of friends with their details.
+ * @returns {Promise<Friend[]>} List of friends with their details.
  */
 export async function getAcceptedFriendsForUserInDb(userId: number): Promise<Friend[]> {
 	const db = getDb();
@@ -109,19 +109,19 @@ export async function getAcceptedFriendsForUserInDb(userId: number): Promise<Fri
 	return db.all<Friend[]>(query, userId, userId, userId, userId, userId, userId, userId, userId, userId);
 }
 
-// Type pour les requêtes reçues
-export interface ReceivedFriendRequest {
-	friendship_id: number;
-	created_at: string; // ou Date
-	requester: Omit<User, 'wins' | 'losses' | 'status' | 'created_at' | 'updated_at' | 'password_hash'>; // Ajuster les Omit
-}
+// // Type pour les requêtes reçues
+// export interface ReceivedFriendRequest {
+// 	friendship_id: number;
+// 	created_at: string; // ou Date
+// 	requester: Omit<User, 'wins' | 'losses' | 'status' | 'created_at' | 'updated_at' | 'password_hash'>; // Ajuster les Omit
+// }
 /**
  * Retrieves all pending friend requests received by a user.
  * Includes details about the requester.
  * @param {number} userId - ID of the user who received the requests.
- * @returns {Promise<ReceivedFriendRequest[]>} List of received requests with requester details.
+ * @returns {Promise<PendingFriendRequest[]>} List of received requests with requester details.
  */
-export async function getPendingReceivedFriendRequestsInDb(userId: number): Promise<ReceivedFriendRequest[]> {
+export async function getPendingReceivedFriendRequestsInDb(userId: number): Promise<PendingFriendRequest[]> {
 	const db = getDb();
 	const query = `
         SELECT
@@ -138,26 +138,28 @@ export async function getPendingReceivedFriendRequestsInDb(userId: number): Prom
 		friendship_id: row.friendship_id,
 		created_at: row.created_at,
 		requester: {
-			id: row.id, username: row.username, email: row.email,
-			display_name: row.display_name, avatar_url: row.avatar_url,
+			id: row.id, 
+			username: row.username,
+			display_name: row.display_name,
+			avatar_url: row.avatar_url,
 		},
 	}));
 }
 
 
-// Type pour les requêtes envoyées
-export interface SentFriendRequest {
-	friendship_id: number;
-	created_at: string; // ou Date
-	receiver: Omit<User, 'wins' | 'losses' | 'status' | 'created_at' | 'updated_at' | 'password_hash'>; // Ajuster
-}
+// // Type pour les requêtes envoyées
+// export interface SentFriendRequest {
+// 	friendship_id: number;
+// 	created_at: string; // ou Date
+// 	receiver: Omit<User, 'wins' | 'losses' | 'status' | 'created_at' | 'updated_at' | 'password_hash'>; // Ajuster
+// }
 /**
  * Retrieves all pending friend requests sent by a user.
  * Includes details about the receiver.
  * @param {number} userId - ID of the user who sent the requests.
- * @returns {Promise<SentFriendRequest[]>} List of sent requests with receiver details.
+ * @returns {Promise<PendingFriendRequest[]>} List of sent requests with receiver details.
  */
-export async function getPendingSentFriendRequestsInDb(userId: number): Promise<SentFriendRequest[]> {
+export async function getPendingSentFriendRequestsInDb(userId: number): Promise<PendingFriendRequest[]> {
 	const db = getDb();
 	const query = `
         SELECT
@@ -178,8 +180,10 @@ export async function getPendingSentFriendRequestsInDb(userId: number): Promise<
 		friendship_id: row.friendship_id,
 		created_at: row.created_at,
 		receiver: {
-			id: row.id, username: row.username, email: row.email,
-			display_name: row.display_name, avatar_url: row.avatar_url,
+			id: row.id,
+			username: row.username,
+			display_name: row.display_name,
+			avatar_url: row.avatar_url,
 		},
 	}));
 }

@@ -1,0 +1,1544 @@
+// app/services/users/utils/dbConfig.ts
+// app/services/users/utils/dbConfig.ts
+import sqlite3, { Database as SQLite3Database } from 'sqlite3';
+import { open, Database } from 'sqlite';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+let db: Database | undefined;
+
+export function getDb(): Database {
+	if (!db) throw new Error('DB not initialized');
+	return db;
+}
+
+export async function initializeDb(): Promise<Database> {
+	if (db) return db;
+
+	const dbDir = path.join(__dirname, '..', 'db');
+	const dbPath = path.join(dbDir, 'database.sqlite');
+
+	if (!fs.existsSync(dbDir)) {
+		fs.mkdirSync(dbDir, { recursive: true });
+	}
+
+	if (fs.existsSync(dbPath)) {
+		fs.unlinkSync(dbPath);
+		console.log('Old database.sqlite removed.');
+	}
+
+	try {
+		db = await open({
+			filename: dbPath,
+			driver: sqlite3.Database
+		});
+		console.log('Database connected!');
+
+		let initSQLPath = path.join(__dirname, '..', 'db', 'init.sql');
+		if (!fs.existsSync(initSQLPath)) {
+			initSQLPath = path.join(__dirname, '..', '..', 'db', 'init.sql');
+		}
+		if (fs.existsSync(initSQLPath)) {
+			const sql = fs.readFileSync(initSQLPath, 'utf-8');
+			await db.exec(sql);
+			console.log('Database initialized from init.sql.');
+		} else {
+			console.warn('init.sql not found. Database not initialized.');
+		}
+		if (!db) throw new Error("DB failed to initialize after setup.");
+		return db;
+	} catch (err: any) {
+		console.error('Error while connecting to the database:', err.message);
+		throw new Error(err.message || 'Database initialization failed');
+	}
+}
+// app/services/users/Dockerfile
+FROM node:22-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+#RUN npm run build
+
+#EXPOSE 4000
+
+CMD ["npm", "run", "dev"]
+// app/services/users/services/userService.ts
+// app/services/users/services/userService.ts
+import * as userModel from '../models/userModel.js';
+import * as passwordUtils from '../shared/auth-plugin/pswdUtils.js';
+import { ERROR_MESSAGES, ConflictError, ValidationError, NotFoundError } from '../shared/auth-plugin/appError.js';
+import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, CreateUserPayload, UserOnlineStatus } from '../shared/schemas/usersSchemas.js';
+
+/**
+ * Generates a default avatar URL using ui-avatars.com.
+ * @param {string} name - The name to use for generating the avatar.
+ * @returns {string} The generated avatar URL.
+ */
+function generateDefaultAvatarUrl(name: string): string {
+	const encodedName = encodeURIComponent(name);
+	return `https://ui-avatars.com/api/?name=${encodedName}&background=random&color=fff&size=128`;
+}
+
+/**
+ * Logs in a user by verifying their credentials.
+ * @param {string} params.identifier - The username or email of the user.
+ * @param {string} params.password - The user's password.
+ * @throws {ValidationError} If the credentials are invalid.
+ * @returns {Promise<User>} The user object without the password hash.
+ */
+export async function loginUser({ identifier, password }: LoginRequestBody): Promise<User> {
+	console.log(`Attempting to log user with identifier: ${identifier}`);
+	let userEntity;
+	const isEmail = identifier.includes('@');
+	if (isEmail) {
+		userEntity = await userModel.getUserByEmailFromDb(identifier);
+	} else {
+		userEntity = await userModel.getUserByUsernameFromDb(identifier);
+	}
+
+	if (!userEntity || !(await passwordUtils.comparePassword(password, userEntity.password_hash))) {
+		throw new ValidationError('Invalid username/email or password.');
+	}
+
+	const { password_hash, ...userPassLess } = userEntity;
+	return userPassLess;
+}
+
+/**
+ * Creates a new user account.
+ * @param {RegisterRequestBody} userData - The user data for account creation.
+ * @throws {ConflictError} If the username or email already exists.
+ * @returns {Promise<void>}
+ */
+export async function createUserAccount(userData: RegisterRequestBody): Promise<void> {
+	console.log('Creating a new user account');
+	const { username, email, password, display_name, avatar_url } = userData;
+
+	if (await userModel.isUsernameInDb(username)) {
+		throw new ConflictError(ERROR_MESSAGES.USERNAME_ALREADY_EXISTS);
+	}
+	if (await userModel.isDisplayNameInDb(display_name)) {
+		throw new ConflictError(ERROR_MESSAGES.DISPLAY_NAME_ALREADY_EXISTS);
+	}
+	if (await userModel.isEmailInDb(email)) {
+		throw new ConflictError(ERROR_MESSAGES.EMAIL_ALREADY_EXISTS);
+	}
+
+	const hashedPassword = await passwordUtils.hashPassword(password);
+	const payload: CreateUserPayload = {
+		username,
+		email,
+		password_hash: hashedPassword,
+		display_name,
+		avatar_url: avatar_url && avatar_url.trim() !== "" ? avatar_url : generateDefaultAvatarUrl(display_name),
+	};
+	await userModel.createUser(payload);
+}
+
+/**
+ * Retrieves all users from the database.
+ * @returns {Promise<Array>} A list of all users.
+ */
+export async function getAllUsers(): Promise<User[]> {
+	console.log('Fetching all users from the database');
+	return userModel.getAllUsersFromDb();
+}
+
+/**
+ * Retrieves a user by their ID.
+ * @param {number} userId - The ID of the user to retrieve.
+ * @throws {NotFoundError} If the user does not exist.
+ * @returns {Promise<Object>} The user object.
+ */
+export async function getUserById(userId: number): Promise<User> {
+	console.log('Fetching user by ID from the database');
+	const user = await userModel.getUserByIdFromDb(userId);
+	if (!user) {
+		throw new NotFoundError('User not found');
+	}
+	return user;
+}
+
+
+/**
+ * Retrieves the matches of a user by their ID.
+ * @param {number} userId - The ID of the user whose matches to retrieve.
+ * @throws {NotFoundError} If no matches are found for the user.
+ * @returns {Promise<Array>} A list of matches for the user.
+ */
+export async function getUserMatches(userId: number): Promise<any[]> { // TODO: Use Match[] type
+	console.log('Fetching user matches from the database');
+	const matches = await userModel.getUserMatchesFromDb(userId);
+	if (!matches) {
+		throw new NotFoundError('No matches found for this user'); // TODO: virer le if car matches deja undefined si vide
+	}
+	return matches;
+}
+
+/**
+ * Updates the profile of a user.
+ * @param {number} userId - The ID of the user to update.
+ * @param {Object} updates - The updates to apply to the user's profile.
+ * @throws {NotFoundError} If the user does not exist.
+ * @throws {ValidationError} If the updates are invalid.
+ * @throws {ConflictError} If the updated email or display name is already taken.
+ * @returns {Promise<Object>} The updated user object without the password hash.
+ */
+export async function updateUserProfile(userId: number, updates: UpdateUserPayload): Promise<User> {
+	console.log(`Attempting to update profile for user ID: ${userId}`);
+
+	const currentUser = await userModel.getUserByIdFromDb(userId);
+	if (!currentUser) {
+		throw new NotFoundError(`User with ID ${userId} not found`);
+	}
+
+	const processedUpdates: UpdateUserPayload = {};
+	if (updates.display_name !== undefined) {
+		processedUpdates.display_name = updates.display_name.trim();
+	}
+	if (updates.email !== undefined) {
+		processedUpdates.email = updates.email;
+	}
+	if (updates.avatar_url !== null) {
+		// if (updates.avatar_url !== undefined) {
+		processedUpdates.avatar_url = updates.avatar_url;
+	}
+
+	const changesToApply: UpdateUserPayload = {};
+	for (const key in processedUpdates) {
+		const typedKey = key as keyof UpdateUserPayload;
+		const value = processedUpdates[typedKey];
+		if (value !== null && value !== currentUser[typedKey]) {
+			changesToApply[typedKey] = value;
+		}
+	}
+	if (Object.keys(changesToApply).length === 0) {
+		console.log(`No effective changes detected for user ${userId}. Profile remains unchanged.`);
+		return currentUser;
+	}
+
+	if (changesToApply.display_name && await userModel.isDisplayNameInDb(changesToApply.display_name, userId)) {
+		throw new ConflictError(`Display name '${changesToApply.display_name}' is already taken.`);
+	}
+	if (changesToApply.email && await userModel.isEmailInDb(changesToApply.email, userId)) {
+		throw new ConflictError(`Email '${changesToApply.email}' is already taken.`);
+	}
+
+	try {
+		const result = await userModel.updateUserInDb(userId, changesToApply);
+		if (!result.changes || result.changes === 0) {
+			const finalUserCheck = await userModel.getUserByIdFromDb(userId);
+			if (!finalUserCheck) throw new NotFoundError(`User ${userId} disappeared after update attempt or no changes made.`);
+			return finalUserCheck;
+		}
+	} catch (dbError: any) {
+		console.error(`Database error during profile update for user ${userId}:`, dbError);
+		throw new Error(`Failed to update profile for user ${userId} due to a database issue.`);
+	}
+
+	const updatedUser = await userModel.getUserByIdFromDb(userId);
+	if (!updatedUser) {
+		throw new Error(`Failed to retrieve user ${userId} immediately after successful update.`);
+	}
+	return updatedUser;
+}
+
+/**
+ * Updates the status of a user.
+ * @param {number} userId - The ID of the user whose status to update.
+ * @param {UserOnlineStatus} status - The new online status of the user.
+ * @returns {Promise<void>}
+ */
+export async function updateUserStatus(userId: number, status: UserOnlineStatus): Promise<void> {
+	await userModel.updateStatusInDb(userId, status);
+}
+
+/**
+ * Retrieves a user by their email.
+ * @param {string} email - The email of the user to retrieve.
+ * @throws {NotFoundError} If the user does not exist.
+ * @returns {Promise<Object>} The user object.
+ */
+export async function getUserByEmail(email: string): Promise<User> {
+	console.log('Fetching user by email from the database');
+	const userWithHash = await userModel.getUserByEmailFromDb(email);
+	if (!userWithHash) {
+		throw new NotFoundError('User not found');
+	}
+	const { password_hash, ...user } = userWithHash;
+	return user as User;
+}
+
+/**
+ * Retrieves a user by their username.
+ * @param {string} username - The username of the user to retrieve.
+ * @throws {NotFoundError} If the user does not exist.
+ * @returns {Promise<Object>} The user object.
+ */
+export async function getUserByUsername(username: string): Promise<User> {
+	console.log('Fetching user by username from the database');
+	const userWithHash = await userModel.getUserByUsernameFromDb(username);
+	if (!userWithHash) {
+		throw new NotFoundError('User not found');
+	}
+	const { password_hash, ...user } = userWithHash;
+	return user as User;
+}
+// app/services/users/services/friendService.ts
+// services/friendService.js
+import * as friendModel from '../models/friendModel.js';
+import * as userModel from '../models/userModel.js';
+import { ConflictError, NotFoundError, ValidationError, ForbiddenError } from '../shared/auth-plugin/appError.js';
+import { Friendship, FriendshipStatus } from '../shared/schemas/friendsSchemas.js';
+
+/**
+ * Creates a friend request.
+ * @param {number} requesterId - ID of the user sending the request.
+ * @param {string} receiverUsername - Username of the user receiving the request.
+ * @throws {ValidationError} If required parameters are missing or invalid.
+ * @throws {NotFoundError} If the receiver does not exist.
+ * @throws {ConflictError} If a friendship or request already exists.
+ * @returns {Promise<Object>} The created friendship request.
+ */
+export async function sendFriendRequest(requesterId: number, receiverId: number): Promise<Friendship> {
+	if (requesterId === undefined || receiverId === undefined) {
+		throw new ValidationError('Requester ID and receiver username are required.');
+	}
+
+	const receiver = await userModel.getUserByIdFromDb(receiverId);
+	if (!receiver) {
+		throw new NotFoundError(`User with username '${receiverId}' not found.`);
+	}
+
+	if (requesterId === receiverId) {
+		throw new ValidationError("You cannot send a friend request to yourself.");
+	}
+
+	const [id1, id2] = requesterId < receiverId ? [requesterId, receiverId] : [receiverId, requesterId];
+	const existingFriendship = await friendModel.getFriendshipByUsersInDb(id1, id2);
+
+	if (existingFriendship) {
+		if (existingFriendship.status === 'accepted') {
+			throw new ConflictError('You are already friends with this user.');
+		} else if (existingFriendship.status === 'pending') {
+			if (existingFriendship.initiator_id === requesterId) {
+				throw new ConflictError('A friend request to this user is already pending from you.');
+			} else {
+				throw new ConflictError('This user has already sent you a friend request. Please respond to it.');
+			}
+		} else if (existingFriendship.status === 'declined' || existingFriendship.status === 'blocked') {
+			throw new ConflictError(`A previous interaction (${existingFriendship.status}) exists with this user.`);
+		}
+	}
+	return friendModel.createFriendshipRequestInDb(id1, id2, requesterId);
+}
+
+/**
+ * Accepts a friend request.
+ * @param {number} friendshipId - ID of the friendship request.
+ * @param {number} currentUserId - ID of the user accepting the request.
+ * @throws {NotFoundError} If the friendship request does not exist.
+ * @throws {ConflictError} If the request is not pending.
+ * @throws {ForbiddenError} If the user is not authorized to accept the request.
+ * @returns {Promise<Object>} A success message.
+ */
+export async function acceptFriendRequest(friendshipId: number, currentUserId: number): Promise<{ message: string }> {
+	const friendship = await friendModel.getFriendshipByIdInDb(friendshipId);
+
+	if (!friendship) {
+		throw new NotFoundError('Friend request not found.');
+	}
+	if (friendship.status !== FriendshipStatus.PENDING) {
+		throw new ConflictError(`This friend request is already '${friendship.status}'.`);
+	}
+	if (friendship.initiator_id === currentUserId) {
+		throw new ForbiddenError("You cannot accept a friend request you initiated.");
+	}
+	if (friendship.user1_id !== currentUserId && friendship.user2_id !== currentUserId) {
+		throw new ForbiddenError("You are not part of this friendship request.");
+	}
+
+	const result = await friendModel.updateFriendshipStatusInDb(friendshipId, FriendshipStatus.ACCEPTED);
+	if (result.changes === 0) {
+		throw new Error('Failed to accept friend request, database reported no changes.');
+	}
+	return { message: 'Friend request accepted.' };
+}
+
+/**
+ * Declines or cancels a friend request, or removes an existing friendship.
+ * @param {number} friendshipId - ID of the friendship.
+ * @param {number} currentUserId - ID of the user performing the action.
+ * @throws {NotFoundError} If the friendship does not exist.
+ * @throws {ForbiddenError} If the user is not part of the friendship.
+ * @returns {Promise<Object>} A success message.
+ */
+export async function declineOrCancelFriendRequest(friendshipId: number, currentUserId: number): Promise<{ message: string }> {
+	const friendship = await friendModel.getFriendshipByIdInDb(friendshipId);
+
+	if (!friendship) {
+		throw new NotFoundError('Friendship or request not found.');
+	}
+	if (friendship.user1_id !== currentUserId && friendship.user2_id !== currentUserId) {
+		throw new ForbiddenError("You are not part of this friendship.");
+	}
+
+	let actionMessage = '';
+	if (friendship.status === 'pending') {
+		if (friendship.initiator_id === currentUserId) {
+			actionMessage = 'Friend request cancelled.';
+		} else {
+			actionMessage = 'Friend request declined.';
+		}
+		await friendModel.deleteFriendshipInDb(friendshipId);
+	} else if (friendship.status === 'accepted') {
+		await friendModel.deleteFriendshipInDb(friendshipId);
+		actionMessage = 'Friend removed successfully.';
+	} else {
+		await friendModel.deleteFriendshipInDb(friendshipId);
+		actionMessage = `Friendship with status '${friendship.status}' removed.`;
+	}
+	return { message: actionMessage };
+}
+
+/**
+ * Retrieves the list of accepted friends for a user.
+ * @param {number} userId - ID of the user.
+ * @throws {NotFoundError} If the user does not exist.
+ * @returns {Promise<Array>} List of friends.
+ */
+export async function getFriends(userId: number): Promise<any[]> {
+	const user = await userModel.getUserByIdFromDb(userId);
+	if (!user) {
+		throw new NotFoundError('User not found.');
+	}
+	return friendModel.getAcceptedFriendsForUserInDb(userId);
+}
+
+/**
+ * Retrieves pending friend requests received by a user.
+ * @param {number} userId - ID of the user.
+ * @throws {NotFoundError} If the user does not exist.
+ * @returns {Promise<Array>} List of received friend requests.
+ */
+export async function getReceivedFriendRequests(userId: number): Promise<any[]> {
+	const user = await userModel.getUserByIdFromDb(userId);
+	if (!user) {
+		throw new NotFoundError('User not found.');
+	}
+	return friendModel.getPendingReceivedFriendRequestsInDb(userId);
+}
+
+/**
+ * Retrieves pending friend requests sent by a user.
+ * @param {number} userId - ID of the user.
+ * @throws {NotFoundError} If the user does not exist.
+ * @returns {Promise<Array>} List of sent friend requests.
+ */
+export async function getSentFriendRequests(userId: number): Promise<any[]> {
+	const user = await userModel.getUserByIdFromDb(userId);
+	if (!user) {
+		throw new NotFoundError('User not found.');
+	}
+	return friendModel.getPendingSentFriendRequestsInDb(userId);
+}
+
+export async function removeFriendship(friendshipId: number, currentUserId: number): Promise<{ message: string }> {
+
+	const friendship = await friendModel.getFriendshipByIdInDb(friendshipId);
+	console.log('[removeFriendship] Called with friendshipId:', friendshipId, 'currentUserId:', currentUserId);
+	console.log('[removeFriendship] DB result for friendship:', friendship);
+
+	if (!friendship) {
+		throw new NotFoundError('Friendship not found.');
+	}
+	if (friendship.user1_id !== currentUserId && friendship.user2_id !== currentUserId) {
+		throw new ForbiddenError("You are not part of this friendship.");
+	}
+	if (friendship.status !== 'accepted') {
+		throw new ConflictError('You can only remove an accepted friend.');
+	}
+
+	const result = await friendModel.deleteFriendshipInDb(friendshipId);
+	if (result.changes === 0) {
+		throw new Error('Failed to remove friend, database reported no changes.');
+	}
+	return { message: 'Friend removed successfully.' };
+}
+
+/**
+ * Retrieves all friendships (admin only).
+ * @returns {Promise<Array>} List of all friendships.
+ */
+export async function getAllFriendships(): Promise<any[]> {
+	return friendModel.getAllFriendshipsInDb();
+}
+
+/**
+ * Blocks a user.
+ * @param {number} blockerId - ID of the user blocking.
+ * @param {number} blockedUserId - ID of the user to block.
+ * @throws {ValidationError} If the blocker tries to block themselves.
+ * @throws {NotFoundError} If the user to block does not exist.
+ * @returns {Promise<{ message: string }>} A success message.
+ */
+export async function blockUser(
+	blockerId: number,
+	blockedUserId: number
+): Promise<{ message: string }> {
+	if (blockerId === blockedUserId) {
+		throw new ValidationError("You cannot block yourself.");
+	}
+	const userToBlock = await userModel.getUserByIdFromDb(blockedUserId);
+	if (!userToBlock) {
+		throw new NotFoundError("User to block not found.");
+	}
+
+	const [id1, id2] = blockerId < blockedUserId ? [blockerId, blockedUserId] : [blockedUserId, blockerId];
+	let friendship = await friendModel.getFriendshipByUsersInDb(id1, id2);
+
+	if (friendship) {
+		await friendModel.updateFriendshipStatusInDb(friendship.id, FriendshipStatus.BLOCKED);
+	} else {
+		friendship = await friendModel.createFriendshipRequestInDb(id1, id2, blockerId);
+		await friendModel.updateFriendshipStatusInDb(friendship.id, FriendshipStatus.BLOCKED);
+	}
+	return { message: `User ${userToBlock.username} has been blocked.` };
+}
+
+/**
+ * Unblocks a user.
+ * @param {number} unblockerId - ID of the user unblocking.
+ * @param {number} unblockedUserId - ID of the user to unblock.
+ * @throws {NotFoundError} If no active block exists.
+ * @returns {Promise<{ message: string }>} A success message.
+ */
+export async function unblockUser(
+	unblockerId: number,
+	unblockedUserId: number
+): Promise<{ message: string }> {
+	const [id1, id2] = unblockerId < unblockedUserId ? [unblockerId, unblockedUserId] : [unblockedUserId, unblockerId];
+	const friendship = await friendModel.getFriendshipByUsersInDb(id1, id2);
+
+	if (!friendship || friendship.status !== 'blocked') {
+		throw new NotFoundError("No active block found for this user or you cannot unblock.");
+	}
+	await friendModel.deleteFriendshipInDb(friendship.id);
+	return { message: "User has been unblocked. They can send/receive friend requests again." };
+}
+// app/services/users/models/friendModel.ts
+// app/services/users/models/friendModel.ts
+import { getDb } from '../utils/dbConfig.js';
+import { Friendship, Friend, FriendshipStatus } from '../shared/schemas/friendsSchemas.js';
+import { User } from '../shared/schemas/usersSchemas.js';
+
+/**
+ * Creates a new friendship request in the database.
+ * @param {number} user1Id - ID of the first user.
+ * @param {number} user2Id - ID of the second user.
+ * @param {number} initiatorId - ID of the user initiating the request.
+ * @returns {Promise<Friendship>} The created friendship object with its ID.
+ */
+export async function createFriendshipRequestInDb(user1Id: number, user2Id: number, initiatorId: number): Promise<Friendship> {
+	const db = getDb();
+	const [id1, id2] = user1Id < user2Id ? [user1Id, user2Id] : [user2Id, user1Id];
+	const newFriendship = await db.get<Friendship>(
+		`INSERT INTO friendships (user1_id, user2_id, initiator_id, status)
+         VALUES (?, ?, ?, ?)
+         RETURNING *`,
+		[id1, id2, initiatorId, FriendshipStatus.PENDING]
+	);
+
+
+	if (!newFriendship) {
+		throw new Error("Failed to create friendship or retrieve the created row using RETURNING.");
+	}
+	return newFriendship;
+}
+
+/**
+ * Retrieves a specific friendship by the IDs of the two users.
+ * @param {number} user1Id - ID of the first user.
+ * @param {number} user2Id - ID of the second user.
+ * @returns {Promise<Friendship | undefined>} The friendship object or undefined if not found.
+ */
+export async function getFriendshipByUsersInDb(user1Id: number, user2Id: number): Promise<Friendship | undefined> {
+	const db = getDb();
+	const [id1, id2] = user1Id < user2Id ? [user1Id, user2Id] : [user2Id, user1Id];
+	return db.get<Friendship>(
+		`SELECT * FROM friendships WHERE user1_id = ? AND user2_id = ?`,
+		[id1, id2]
+	);
+}
+
+/**
+ * Retrieves a friendship by its ID.
+ * @param {number} friendshipId - ID of the friendship.
+ * @returns {Promise<Friendship | undefined>} The friendship object or undefined if not found.
+ */
+export async function getFriendshipByIdInDb(friendshipId: number): Promise<Friendship | undefined> {
+	const db = getDb();
+	return db.get<Friendship>(`SELECT * FROM friendships WHERE id = ?`, [friendshipId]);
+}
+
+interface UpdateResult {
+	changes?: number;
+}
+/**
+ * Updates the status of a friendship.
+ * @param {number} friendshipId - ID of the friendship to update.
+ * @param {string} status - New status ('accepted', 'declined', 'blocked').
+ * @returns {Promise<UpdateResult>} The result of the database operation.
+ */
+export async function updateFriendshipStatusInDb(friendshipId: number, status: FriendshipStatus): Promise<UpdateResult> {
+	const db = getDb();
+	const result = await db.run(
+		`UPDATE friendships SET status = ? WHERE id = ?`,
+		[status, friendshipId]
+	);
+	return { changes: result.changes };
+}
+
+/**
+ * Deletes a friendship from the database.
+ * @param {number} friendshipId - ID of the friendship to delete.
+ * @returns {Promise<UpdateResult>} The result of the database operation.
+ */
+export async function deleteFriendshipInDb(friendshipId: number): Promise<UpdateResult> {
+	const db = getDb();
+	const result = await db.run(`DELETE FROM friendships WHERE id = ?`, [friendshipId]);
+	return { changes: result.changes };
+}
+
+/**
+ * Retrieves all accepted friendships for a specific user.
+ * Includes details about the friend (display_name, wins, losses, status, avatar_url).
+ * @param {number} userId - ID of the user.
+ * @returns {Promise<DetailedFriend[]>} List of friends with their details.
+ */
+export async function getAcceptedFriendsForUserInDb(userId: number): Promise<Friend[]> {
+	const db = getDb();
+	// Le query est long, on assume qu'il retourne les champs correspondants à DetailedFriend
+	const query = `
+        SELECT
+            f.id as friendship_id,
+            f.status as friendship_status,
+            CASE WHEN f.user1_id = ? THEN u2.id ELSE u1.id END as friend_id,
+            CASE WHEN f.user1_id = ? THEN u2.display_name ELSE u1.display_name END as friend_display_name,
+            CASE WHEN f.user1_id = ? THEN u2.username ELSE u1.username END as friend_username,
+            CASE WHEN f.user1_id = ? THEN u2.wins ELSE u1.wins END as friend_wins,
+            CASE WHEN f.user1_id = ? THEN u2.losses ELSE u1.losses END as friend_losses,
+            CASE WHEN f.user1_id = ? THEN u2.status ELSE u1.status END as friend_online_status,
+            CASE WHEN f.user1_id = ? THEN u2.avatar_url ELSE u1.avatar_url END as friend_avatar_url
+        FROM friendships f
+        JOIN users u1 ON f.user1_id = u1.id
+        JOIN users u2 ON f.user2_id = u2.id
+        WHERE (f.user1_id = ? OR f.user2_id = ?) AND f.status = 'accepted'
+    `;
+	return db.all<Friend[]>(query, userId, userId, userId, userId, userId, userId, userId, userId, userId);
+}
+
+// Type pour les requêtes reçues
+export interface ReceivedFriendRequest {
+	friendship_id: number;
+	created_at: string; // ou Date
+	requester: Omit<User, 'wins' | 'losses' | 'status' | 'created_at' | 'updated_at' | 'password_hash'>; // Ajuster les Omit
+}
+/**
+ * Retrieves all pending friend requests received by a user.
+ * Includes details about the requester.
+ * @param {number} userId - ID of the user who received the requests.
+ * @returns {Promise<ReceivedFriendRequest[]>} List of received requests with requester details.
+ */
+export async function getPendingReceivedFriendRequestsInDb(userId: number): Promise<ReceivedFriendRequest[]> {
+	const db = getDb();
+	const query = `
+        SELECT
+            f.id as friendship_id, f.created_at,
+            u_initiator.id, u_initiator.username, u_initiator.email,
+            u_initiator.display_name, u_initiator.avatar_url
+        FROM friendships f
+        JOIN users u_initiator ON f.initiator_id = u_initiator.id
+        WHERE (f.user1_id = ? OR f.user2_id = ?) AND f.status = 'pending' AND f.initiator_id != ?
+        ORDER BY f.created_at DESC;
+    `;
+	const rows = await db.all<any[]>(query, userId, userId, userId); // any[] pour l'instant
+	return rows.map(row => ({
+		friendship_id: row.friendship_id,
+		created_at: row.created_at,
+		requester: {
+			id: row.id, username: row.username, email: row.email,
+			display_name: row.display_name, avatar_url: row.avatar_url,
+		},
+	}));
+}
+
+
+// Type pour les requêtes envoyées
+export interface SentFriendRequest {
+	friendship_id: number;
+	created_at: string; // ou Date
+	receiver: Omit<User, 'wins' | 'losses' | 'status' | 'created_at' | 'updated_at' | 'password_hash'>; // Ajuster
+}
+/**
+ * Retrieves all pending friend requests sent by a user.
+ * Includes details about the receiver.
+ * @param {number} userId - ID of the user who sent the requests.
+ * @returns {Promise<SentFriendRequest[]>} List of sent requests with receiver details.
+ */
+export async function getPendingSentFriendRequestsInDb(userId: number): Promise<SentFriendRequest[]> {
+	const db = getDb();
+	const query = `
+        SELECT
+            f.id as friendship_id, f.created_at,
+            CASE WHEN f.user1_id = f.initiator_id THEN u2.id ELSE u1.id END as id,
+            CASE WHEN f.user1_id = f.initiator_id THEN u2.username ELSE u1.username END as username,
+            CASE WHEN f.user1_id = f.initiator_id THEN u2.email ELSE u1.email END as email,
+            CASE WHEN f.user1_id = f.initiator_id THEN u2.display_name ELSE u1.display_name END as display_name,
+            CASE WHEN f.user1_id = f.initiator_id THEN u2.avatar_url ELSE u1.avatar_url END as avatar_url
+        FROM friendships f
+        JOIN users u1 ON f.user1_id = u1.id
+        JOIN users u2 ON f.user2_id = u2.id
+        WHERE f.initiator_id = ? AND f.status = 'pending'
+        ORDER BY f.created_at DESC;
+    `;
+	const rows = await db.all<any[]>(query, userId); // any[] pour l'instant
+	return rows.map(row => ({
+		friendship_id: row.friendship_id,
+		created_at: row.created_at,
+		receiver: {
+			id: row.id, username: row.username, email: row.email,
+			display_name: row.display_name, avatar_url: row.avatar_url,
+		},
+	}));
+}
+
+
+export interface AdminFullFriendship extends Friendship {
+	user1_username: string;
+	user2_username: string;
+	initiator_username: string;
+}
+/**
+ * Retrieves all friendships, regardless of their status.
+ * @returns {Promise<AdminFullFriendship[]>} List of all friendships.
+ */
+export async function getAllFriendshipsInDb(): Promise<AdminFullFriendship[]> {
+	const db = getDb();
+	return db.all<AdminFullFriendship[]>(`
+        SELECT
+            f.*, u1.username as user1_username, u2.username as user2_username, ui.username as initiator_username
+        FROM friendships f
+        JOIN users u1 ON f.user1_id = u1.id
+        JOIN users u2 ON f.user2_id = u2.id
+        JOIN users ui ON f.initiator_id = ui.id
+    `);
+}
+
+/**
+ * Retrieves a paginated list of friends for a specific user.
+ * @param {number} userId - ID of the user.
+ * @param {number} limit - Maximum number of friends to retrieve.
+ * @param {number} offset - Number of records to skip.
+ * @returns {Promise<Friendship[]>} List of friends with their details.
+ */
+export async function getFriends(userId: number, limit: number = 10, offset: number = 0): Promise<Friendship[]> {
+	const db = getDb();
+	const query = `
+        SELECT * FROM friendships
+        WHERE (user1_id = ? OR user2_id = ?) AND status = 'accepted'
+        LIMIT ? OFFSET ?
+    `;
+	return db.all<Friendship[]>(query, userId, userId, limit, offset);
+}
+// app/services/users/models/userModel.ts
+// app/services/users/models/userModel.ts
+import { getDb } from '../utils/dbConfig.js';
+import { ERROR_MESSAGES } from '../shared/auth-plugin/appError.js';
+import { User, UserWithPasswordHash, CreateUserPayload, UpdatedUserResult, UpdateUserPayload, UserOnlineStatus } from '../shared/schemas/usersSchemas.js'; // Importez vos types
+
+/**
+ * Retrieves all users from the database.
+ * @returns {Promise<User[]>} A list of all users.
+ */
+export async function getAllUsersFromDb(): Promise<User[]> {
+	const db = getDb();
+	return db.all<User[]>('SELECT id, username, email, display_name, avatar_url, wins, losses, status, created_at, updated_at FROM users');
+}
+
+/**
+ * Retrieves a user by their display name.
+ * @param {string} displayName - The display name of the user.
+ * @returns {Promise<UserWithPasswordHash | undefined>} The user object or undefined if not found.
+ */
+export async function getUserByDisplayNameFromDb(displayName: string): Promise<UserWithPasswordHash | undefined> {
+	const db = getDb();
+	return db.get<UserWithPasswordHash>('SELECT * FROM users WHERE display_name = ?', [displayName]);
+}
+
+/**
+ * Retrieves a user by their username.
+ * @param {string} username - The username of the user.
+ * @returns {Promise<UserWithPasswordHash | undefined>} The user object or undefined if not found.
+ */
+export async function getUserByUsernameFromDb(username: string): Promise<UserWithPasswordHash | undefined> {
+	const db = getDb();
+	return db.get<UserWithPasswordHash>('SELECT * FROM users WHERE username = ?', [username]);
+}
+
+/**
+ * Retrieves a user by their email.
+ * @param {string} email - The email of the user.
+ * @returns {Promise<UserWithPasswordHash | undefined>} The user object or undefined if not found.
+ */
+export async function getUserByEmailFromDb(email: string): Promise<UserWithPasswordHash | undefined> {
+	const db = getDb();
+	return db.get<UserWithPasswordHash>('SELECT * FROM users WHERE email = ?', [email]);
+}
+
+/**
+ * Retrieves a user by their ID.
+ * @param {number} userId - The ID of the user.
+ * @returns {Promise<User | undefined>} The user object or undefined if not found.
+ */
+export async function getUserByIdFromDb(userId: number): Promise<User | undefined> {
+	const db = getDb();
+	return db.get<User>('SELECT id, username, email, display_name, avatar_url, wins, losses, status, created_at, updated_at FROM users WHERE id = ?', [userId]);
+}
+
+/**
+ * Retrieves all matches for a specific user.
+ * @param {number} userId - The ID of the user.
+ * @returns {Promise<any[]>} A list of matches for the user. // TODO: Définir un type Match et l'utiliser
+ */
+export async function getUserMatchesFromDb(userId: number): Promise<any[]> { // Remplacez any[] par Match[]
+	const db = getDb();
+	// TODO: Implémentez la requête SQL correcte pour récupérer les matchs
+	// Exemple: return db.all('SELECT * FROM matches WHERE player1_id = ? OR player2_id = ?', [userId, userId]);
+	console.warn("getUserMatchesFromDb query needs to be implemented correctly for user ID:", userId);
+	return db.all('SELECT * FROM matches WHERE player1_id = ? OR player2_id = ?', [userId, userId]); // Placeholder, ajustez
+}
+
+/**
+ * Creates a new user in the database.
+ * @param {CreateUserPayload} user - The user data to insert.
+ * @returns {Promise<void>} 
+ */
+export async function createUser(
+	{ username, email, password_hash, display_name, avatar_url = null }: CreateUserPayload
+): Promise<void> {
+	const db = getDb();
+	const result = await db.run(
+		`INSERT INTO users (username, email, password_hash, display_name, avatar_url) VALUES (?, ?, ?, ?, ?)`,
+		[username, email, password_hash, display_name, avatar_url]
+	);
+	if (result.lastID === undefined) {
+		throw new Error("Failed to create user, no lastID returned.");
+	}
+}
+
+/**
+ * Updates a user's details in the database.
+ * @param {number} userId - The ID of the user to update.
+ * @param {UpdateUserPayload} updates - The fields to update and their new values.
+ * @returns {Promise<UpdatedUserResult>} The result of the database operation.
+ * @throws {Error} If an error occurs during the update.
+ */
+export async function updateUserInDb(userId: number, updates: UpdateUserPayload): Promise<UpdatedUserResult> {
+	const db = getDb();
+	const fields = Object.keys(updates).filter(k => typeof k === 'string') as Array<keyof UpdateUserPayload>; // Clés typées
+	if (fields.length === 0) {
+		return { changes: 0 };
+	}
+	const setClause = fields.map((field) => `${String(field)} = ?`).join(', ');
+	const values: (string | number)[] = fields.map((field) => updates[field] as string | number);
+
+	const sql = `UPDATE users SET ${setClause}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
+	values.push(userId);
+
+	try {
+		const result = await db.run(sql, values);
+		return { changes: result.changes };
+	} catch (error: any) {
+		console.error('Error updating user:', error);
+		throw new Error(ERROR_MESSAGES.DATABASE_ERROR);
+	}
+}
+
+export async function updateStatusInDb(userId: number, status: UserOnlineStatus): Promise<void> {
+	const db = getDb();
+	const sql = `UPDATE users SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
+	const result = await db.run(sql, [status, userId]);
+	if (result.changes === 0) {
+		throw new Error(`User ${userId} not found or status unchanged.`);
+	}
+}
+
+export async function deleteUserFromDb(userId: number): Promise<void> {
+	const db = getDb();
+	const result = await db.run('DELETE FROM users WHERE id = ?', [userId]);
+	if (result.changes === 0) {
+		throw new Error(ERROR_MESSAGES.USER_NOT_FOUND);
+	}
+}
+
+export async function isUsernameInDb(username: string, id?: number): Promise<boolean> {
+	const db = getDb();
+	let query = 'SELECT EXISTS(SELECT 1 FROM users WHERE username = ?';
+	const params: (string | number)[] = [username];
+	if (id !== undefined) {
+		query += ' AND id != ?';
+		params.push(id);
+	}
+	query += ') AS "exists"';
+	const row = await db.get<{ exists: number }>(query, params);
+	return row?.exists === 1;
+}
+
+export async function isEmailInDb(email: string, id?: number): Promise<boolean> {
+	const db = getDb();
+	let query = 'SELECT EXISTS(SELECT 1 FROM users WHERE email = ?';
+	const params: (string | number)[] = [email];
+	if (id !== undefined) {
+		query += ' AND id != ?';
+		params.push(id);
+	}
+	query += ') AS "exists"';
+	const row = await db.get<{ exists: number }>(query, params);
+	return row?.exists === 1;
+}
+
+export async function isDisplayNameInDb(display_name: string, id?: number): Promise<boolean> {
+	const db = getDb();
+	let query = 'SELECT EXISTS(SELECT 1 FROM users WHERE display_name = ?';
+	const params: (string | number)[] = [display_name];
+	if (id !== undefined) {
+		query += ' AND id != ?';
+		params.push(id);
+	}
+	query += ') AS "exists"';
+	const row = await db.get<{ exists: number }>(query, params);
+	return row?.exists === 1;
+}
+// app/services/users/db/init.sql
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    display_name TEXT UNIQUE NOT NULL,
+    avatar_url TEXT,
+    wins INTEGER DEFAULT 0,
+    losses INTEGER DEFAULT 0,
+    status TEXT NOT NULL DEFAULT 'offline',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS friendships (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user1_id INTEGER NOT NULL,
+    user2_id INTEGER NOT NULL,
+    initiator_id INTEGER NOT NULL,
+    status TEXT NOT NULL DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(user1_id) REFERENCES users(id),
+    FOREIGN KEY(user2_id) REFERENCES users(id),
+    FOREIGN KEY(initiator_id) REFERENCES users(id),
+    CONSTRAINT user_order CHECK (user1_id < user2_id),
+    CONSTRAINT unique_pair UNIQUE (user1_id, user2_id)
+);
+
+CREATE TABLE IF NOT EXISTS matches (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    player1_id INTEGER NOT NULL,
+    player2_id INTEGER NOT NULL,
+    player1_score INTEGER NOT NULL,
+    player2_score INTEGER NOT NULL,
+    winner_id INTEGER NOT NULL,
+    win_type TEXT NOT NULL DEFAULT 'score',
+    match_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    game_type TEXT DEFAULT 'pong',
+    tournament_id INTEGER,
+    FOREIGN KEY(player1_id) REFERENCES users(id),
+    FOREIGN KEY(player2_id) REFERENCES users(id),
+    FOREIGN KEY(winner_id) REFERENCES users(id)
+);
+
+INSERT OR IGNORE INTO users (username, email, password_hash, display_name, avatar_url)
+VALUES
+	('Serge', 'serge@student.42.fr', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Serge P', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSq2Q26rH3nI4ossmbYm8jpCyYwuytbyk6iYXJ4_C4tO8FFgv4Wk488h9CB24G5jB46Qjk&usqp=CAU'),
+	('Xavier', 'xavier@student.42.fr', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Xavier N', 'https://www.lemediaplus.com/wp-content/uploads/2023/02/Xavier-niel-fortune.png'),
+	('Donkey_Kong', 'donkeyKong@nitendo.com', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Donkey Kong', 'https://m1.quebecormedia.com/emp/emp/dk1b93f6bb-34a1-498c-8234-fb9c7c6f794a_ORIGINAL.jpg?impolicy=crop-resize&x=0&y=0&w=1200&h=675&width=925'),
+	('jane_doe', 'jane@example.com', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Jane Doe', 'https://ui-avatars.com/api/?name=Jane+Doe&background=random&color=fff&size=128'),
+	('alice_smith', 'alice@example.com', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Alice Smith', 'https://gravatar.com/avatar/3bd177d6fdf72eecc626c6cc19dfbdc6?s=400&d=identicon&r=g'),
+	('Alexis B', 'alexb@example.com', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Alexis le Brun', 'https://media.ouest-france.fr/v1/pictures/MjAyMzA5NjIyNGQ3MmNlNzkyNTdjYzgwY2IyNDllOWQ2MmQzYzM?width=1260&height=708&focuspoint=50%2C36&cropresize=1&client_id=bpeditorial&sign=06fccb8b939b1ef4f9042a38edab621665dc6428590f6fa79a643ed33535af5f');
+
+
+
+INSERT OR IGNORE INTO friendships (user1_id, user2_id, initiator_id, status)
+VALUES
+    (1, 5, 1, 'accepted'),-- Serge et alice sont amis (Serge a initié)
+    (1, 4, 4, 'accepted'),-- Serge et jane sont amis (jane a initié)
+    (1, 3, 3, 'pending'),-- Donkey_kong a envoyé une demande d'ami à Serge (en attente)
+    (1, 2, 2, 'pending'),-- Xavier a envoyé une demande d'ami à Serge (en attente)
+    (2, 5, 5, 'blocked');-- Alice a bloqué Xavier
+// app/services/users/server.ts
+import Fastify, { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { validatorCompiler, serializerCompiler, ZodTypeProvider } from 'fastify-type-provider-zod';
+import { config } from './shared/env.js';
+import { initializeDb } from './utils/dbConfig.js';
+import { setupPlugins } from './shared/auth-plugin/tokens.js';
+import { setupErrorHandler } from './shared/auth-plugin/appError.js';
+import friendRoutes from './routes/friends.js';
+import userRoutes from './routes/users.js';
+import authRoutes from './routes/auth.js';
+
+
+// const fastify: FastifyInstance = Fastify({ logger: { level: config.LOG_LEVEL } });
+const fastify: FastifyInstance = Fastify({ logger: { level: config.LOG_LEVEL } }).withTypeProvider<ZodTypeProvider>();
+
+fastify.setValidatorCompiler(validatorCompiler);
+fastify.setSerializerCompiler(serializerCompiler);
+
+function setupHooks(): void {
+	fastify.addHook('onRequest', async (req: FastifyRequest, reply: FastifyReply) => {
+		if (fastify.log.level === 'trace') {
+			req.log.trace({ path: req.raw.url, cookies: req.cookies, headers: req.headers }, '[Logging Hook]');
+		} else {
+			req.log.debug({ path: req.raw.url, method: req.method }, '[Request Received]');
+		}
+	});
+	fastify.log.info('Logging onRequest hook registered');
+}
+
+function setupRoutes(): void {
+	fastify.get('/api/users/csrf-token', async (request: FastifyRequest, reply: FastifyReply) => {
+		const token: string = await reply.generateCsrf();
+		request.log.debug(`[CSRF Endpoint] Token CSRF fourni au client: ${token}`);
+		return { csrfToken: token };
+	});
+	fastify.log.info('CSRF token endpoint /api/users/csrf-token registered');
+
+	fastify.register(userRoutes);
+	fastify.register(authRoutes);
+	fastify.register(friendRoutes);
+	fastify.log.info('Routes registered');
+}
+
+async function buildApp(): Promise<FastifyInstance> {
+	try {
+		await initializeDb();
+		fastify.log.info('Database initialized');
+		await setupPlugins(fastify);
+		setupHooks();
+		setupRoutes();
+		setupErrorHandler(fastify);
+		return fastify;
+	} catch (err: any) {
+		fastify.log.error({ err: err.message, stack: err.stack }, 'Error initializing app');
+		process.exit(1);
+	}
+}
+
+async function start() {
+	let app: FastifyInstance | undefined;
+	try {
+		app = await buildApp();
+		await app.listen({ port: config.API_USER_PORT, host: '0.0.0.0' });
+		const address = app.server.address();
+		const port = typeof address === 'string' ? address : (address?.port);
+		app.log.info(`Server listening on ${port || 'unknown port'}`);
+	} catch (err: any) {
+		const logger = app?.log || console;
+		logger.error({ err: err.message, stack: err.stack }, 'Failed to start server:');
+		process.exit(1);
+	}
+}
+
+start();
+// app/services/users/handlers/friendsHandlers.ts
+import { FastifyRequest, FastifyReply } from 'fastify';
+import * as friendService from '../services/friendService.js';
+import { ERROR_MESSAGES, AppError } from '../shared/auth-plugin/appError.js';
+import { JWTPayload } from '../shared/schemas/usersSchemas.js';
+
+// Types pour les requêtes avec params
+interface FriendshipIdRequest extends FastifyRequest<{ Params: { friendshipId: string } }> {
+	user: JWTPayload;
+}
+interface BlockUserRequest extends FastifyRequest<{ Params: { userIdToBlock: string } }> {
+	user: JWTPayload;
+}
+interface UnblockUserRequest extends FastifyRequest<{ Params: { userIdToUnblock: string } }> {
+	user: JWTPayload;
+}
+
+export async function sendFriendRequestHandler(req: FastifyRequest, reply: FastifyReply) {
+	const requesterId = (req.user as JWTPayload).id;
+	const { friendId } = req.body as { friendId: number };
+
+	req.log.info({ requesterId, friendId }, 'Attempting to send friend request');
+	const newFriendship = await friendService.sendFriendRequest(requesterId, friendId);
+	return reply.code(201).send({
+		message: 'Friend request sent successfully.',
+		friendship: newFriendship
+	});
+}
+
+export async function getReceivedRequestsHandler(req: FastifyRequest, reply: FastifyReply) {
+	const userId = (req.user as JWTPayload).id;
+	req.log.info({ userId }, 'Fetching received friend requests');
+	const requests = await friendService.getReceivedFriendRequests(userId);
+	return reply.send(requests);
+}
+
+export async function getSentRequestsHandler(req: FastifyRequest, reply: FastifyReply) {
+	const userId = (req.user as JWTPayload).id;
+	req.log.info({ userId }, 'Fetching sent friend requests');
+	const requests = await friendService.getSentFriendRequests(userId);
+	return reply.send(requests);
+}
+
+export async function acceptFriendRequestHandler(req: FastifyRequest, reply: FastifyReply) {
+	const currentUserId = (req.user as JWTPayload).id;
+	const friendshipId = parseInt((req.params as any).friendshipId, 10);
+
+	if (isNaN(friendshipId)) {
+		throw new AppError(ERROR_MESSAGES.INVALID_FRIENDSHIP_ID, 400);
+	}
+
+	req.log.info({ currentUserId, friendshipId }, 'Attempting to accept friend request');
+	const result = await friendService.acceptFriendRequest(friendshipId, currentUserId);
+	return reply.send(result);
+}
+
+export async function declineFriendRequestHandler(req: FastifyRequest, reply: FastifyReply) {
+	const currentUserId = (req.user as JWTPayload).id;
+	const friendshipId = parseInt((req.params as any).friendshipId, 10);
+
+	if (isNaN(friendshipId)) {
+		throw new AppError(ERROR_MESSAGES.INVALID_FRIENDSHIP_ID, 400);
+	}
+
+	req.log.info({ currentUserId, friendshipId }, 'Attempting to decline friend request');
+	const result = await friendService.declineOrCancelFriendRequest(friendshipId, currentUserId);
+	return reply.send(result);
+}
+
+export async function cancelFriendRequestHandler(req: FastifyRequest, reply: FastifyReply) {
+	const currentUserId = (req.user as JWTPayload).id;
+	const friendshipId = parseInt((req.params as any).friendshipId, 10);
+
+	if (isNaN(friendshipId)) {
+		throw new AppError(ERROR_MESSAGES.INVALID_FRIENDSHIP_ID, 400);
+	}
+
+	req.log.info({ currentUserId, friendshipId }, 'Attempting to cancel friend request');
+	const result = await friendService.declineOrCancelFriendRequest(friendshipId, currentUserId);
+	return reply.send(result);
+}
+
+export async function getMyFriendsHandler(req: FastifyRequest, reply: FastifyReply) {
+	const userId = (req.user as JWTPayload).id;
+	req.log.info({ userId }, 'Fetching user friends list');
+	const friends = await friendService.getFriends(userId);
+	return reply.send(friends);
+}
+
+export async function removeFriendshipHandler(
+	//    req: FastifyRequest<{ Params: { friendshipId: string } }>,
+	req: FastifyRequest,
+	reply: FastifyReply
+) {
+	const currentUserId = (req.user as JWTPayload).id;
+	const friendshipId = parseInt((req.params as any).friendshipId, 10);
+
+	if (isNaN(friendshipId)) {
+		return reply.code(400).send({ error: "Invalid friendship ID." });
+	}
+
+	req.log.info({ currentUserId, friendshipId }, 'Attempting to remove friendship');
+	const result = await friendService.removeFriendship(friendshipId, currentUserId);
+	return reply.send(result);
+}
+
+export async function blockUserHandler(req: BlockUserRequest, reply: FastifyReply) {
+	const blockerId = req.user.id;
+	const userIdToBlock = parseInt(req.params.userIdToBlock, 10);
+
+	if (isNaN(userIdToBlock)) {
+		throw new AppError('Invalid user ID to block.', 400);
+	}
+	req.log.info({ blockerId, userIdToBlock }, 'Attempting to block user');
+	const result = await friendService.blockUser(blockerId, userIdToBlock);
+	return reply.send(result);
+}
+
+export async function unblockUserHandler(req: UnblockUserRequest, reply: FastifyReply) {
+	const unblockerId = req.user.id;
+	const userIdToUnblock = parseInt(req.params.userIdToUnblock, 10);
+
+	if (isNaN(userIdToUnblock)) {
+		throw new AppError('Invalid user ID to unblock.', 400);
+	}
+	req.log.info({ unblockerId, userIdToUnblock }, 'Attempting to unblock user');
+	const result = await friendService.unblockUser(unblockerId, userIdToUnblock);
+	return reply.send(result);
+}
+
+export async function getAllFriendshipsHandler(req: FastifyRequest, reply: FastifyReply) {
+	req.log.info('Admin fetching all friendships');
+	const friendships = await friendService.getAllFriendships();
+	return reply.send(friendships);
+}
+// app/services/users/handlers/userHandlers.ts
+// Gère les requêtes Fastify (req, reply)
+import { FastifyRequest, FastifyReply } from 'fastify';
+import * as userService from '../services/userService.js';
+import { UserIdParams, UpdateUserPayload, JWTPayload } from '../shared/schemas/usersSchemas.js';
+
+type AuthenticatedRequest = FastifyRequest & { user: JWTPayload };
+
+export async function getUsersHandler(req: FastifyRequest, reply: FastifyReply) {
+	const users = await userService.getAllUsers();
+	return reply.code(200).send(users);
+}
+
+export async function getUserMeHandler(req: AuthenticatedRequest, reply: FastifyReply) {
+	const user = await userService.getUserById(req.user.id);
+	return reply.code(200).send(user);
+}
+
+export async function getUserMeMatchHandler(req: AuthenticatedRequest, reply: FastifyReply) {
+	const matches = await userService.getUserMatches(req.user.id);
+	return reply.code(200).send(matches);
+}
+
+export async function updateUserMeHandler(req: AuthenticatedRequest, reply: FastifyReply) {
+	const userId = req.user.id;
+	const updates = req.body as UpdateUserPayload;
+
+	req.log.info({ userId, updates }, 'Attempting to update user profile');
+	const updatedUser = await userService.updateUserProfile(userId, updates);
+
+	return reply.code(200).send({
+		message: 'User updated successfully',
+		user: updatedUser
+	});
+}
+
+export async function getUserInfoHandler(req: AuthenticatedRequest, reply: FastifyReply) {
+	const userId = parseInt((req.params as UserIdParams).userId, 10);
+
+	if (isNaN(userId)) {
+		return reply.code(400).send({ error: 'Invalid user ID.' });
+	}
+
+	const user = await userService.getUserById(userId);
+	if (!user) {
+		return reply.code(404).send({ error: 'User not found.' });
+	}
+
+	return reply.code(200).send(user);
+}
+// export async function getUserInfoHandler(req: AuthenticatedRequest, reply: FastifyReply) {
+
+// const parseResult = UserIdParamsSchema.safeParse(req.params);
+
+// 	if (!parseResult.success) {
+// 		return reply.code(400).send({ error: 'Invalid user ID format' });
+// 	}
+
+// 	const { userId } = parseResult.data;
+// 	const userIdNum = parseInt(userId, 10);
+
+// 	const user = await userService.getUserById(userIdNum);
+// 	if (!user) {
+// 		return reply.code(404).send({ error: 'User not found.' });
+// 	}
+// 	return reply.code(200).send(user);
+// }
+// app/services/users/handlers/authHandlers.ts
+import { FastifyRequest, FastifyReply } from 'fastify';
+import { createUserAccount, loginUser, updateUserStatus } from '../services/userService.js';
+import { jwtToken, cookieOptions, csrfCookieName, csrfOptions } from '../shared/auth-plugin/tokens.js';
+import { ERROR_MESSAGES } from '../shared/auth-plugin/appError.js';
+import { JWTPayload, RegisterRequestBody, LoginRequestBody, UserOnlineStatus } from '../shared/schemas/usersSchemas.js';
+
+export async function registerHandler(req: FastifyRequest<{ Body: RegisterRequestBody }>, reply: FastifyReply) {
+	await createUserAccount(req.body);
+
+	return reply.code(201).send({
+		message: 'Registration successful. Please log in.'
+	});
+}
+
+export async function loginHandler(req: FastifyRequest<{ Body: LoginRequestBody }>, reply: FastifyReply) {
+	const user = await loginUser(req.body);
+	const tokenPayload: JWTPayload = { id: user.id, username: user.username };
+	const token = reply.server.jwt.sign(tokenPayload);
+	const decodedToken = reply.server.jwt.decode(token) as { exp: number };
+	await updateUserStatus(user.id, UserOnlineStatus.ONLINE);
+
+	reply.setCookie(jwtToken, token, {
+		...cookieOptions,
+		expires: new Date(decodedToken.exp * 1000),
+	});
+
+	return reply.send({
+		message: 'Login accepted',
+		user,
+	});
+}
+
+export async function logoutHandler(req: FastifyRequest, reply: FastifyReply) {
+	const id = (req.user as JWTPayload).id;
+	await updateUserStatus(id, UserOnlineStatus.OFFLINE);
+	reply.clearCookie(jwtToken, cookieOptions);
+	reply.clearCookie(csrfCookieName, csrfOptions);
+	return reply.send({ message: 'Logout successful' });
+}
+
+export async function refreshTokenHandler(req: FastifyRequest, reply: FastifyReply) {
+	const refreshToken = (req.cookies as any).refreshToken;
+	if (!refreshToken) {
+		return reply.code(401).send({ error: ERROR_MESSAGES.REFRESH_TOKEN_MISSING });
+	}
+
+	try {
+		const decoded = reply.server.jwt.verify(refreshToken, { ignoreExpiration: false }) as JWTPayload & { exp: number };
+		const newToken = reply.server.jwt.sign({ id: decoded.id, username: decoded.username });
+		reply.setCookie(jwtToken, newToken, {
+			...cookieOptions,
+			expires: new Date(decoded.exp * 1000),
+		});
+		return reply.send({ message: 'Token refreshed successfully' });
+	} catch (err) {
+		return reply.code(401).send({ error: ERROR_MESSAGES.INVALID_REFRESH_TOKEN });
+	}
+}
+// app/services/users/.dockerignore
+# Node modules (can be installed with npm install)
+node_modules/
+# ignore git history
+.git
+# ignore cache directory
+.DS_Store// app/services/users/package.json
+{
+  "name": "users",
+  "version": "1.0.0",
+  "main": "dist/server.js",
+  "type": "module",
+  "description": "Fastify app with SQLite",
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "npm run clean && tsc",
+    "start": "node dist/server.js",
+    "dev": "npm run build && concurrently \"tsc -w\" \"nodemon dist/server.js\" | pino-pretty",
+    "start:dev": "node --inspect dist/server.js"
+},
+  "dependencies": {
+    "@fastify/static": "^6.0.1",
+    "@fastify/jwt": "^9.1.0",
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/csrf-protection": "^7.1.0",
+    "fastify": "^5.3.2",
+    "concurrently": "^9.1.2",
+    "dotenv": "^16.5.0",
+    "bcrypt": "^5.1.1",
+    "sqlite3": "^5.1.7",
+    "sqlite": "^5.1.1",
+    "fastify-type-provider-zod": "^4.0.2",
+	"zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^22.15.18",
+    "@types/bcrypt": "^5.0.2",
+    "@types/sqlite3": "^5.1.0",
+	"pino": "^9.6.0",
+	"pino-pretty": "^13.0.0",
+    "nodemon": "^3.1.10",
+    "dotenv-cli": "^8.0.0"
+  }
+}
+// app/services/users/routes/users.ts
+import { FastifyInstance, FastifyPluginOptions } from 'fastify';
+import {
+	getUsersHandler,
+	getUserMeHandler,
+	getUserInfoHandler,
+	getUserMeMatchHandler,
+	updateUserMeHandler,
+} from '../handlers/userHandlers.js';
+import { config } from '../shared/env.js';
+import { UpdateUserRouteSchema, GetUserByIdRouteSchema } from '../shared/schemas/usersSchemas.js';
+
+
+export default async function userRoutes(fastify: FastifyInstance, options: FastifyPluginOptions) {
+	fastify.get(
+		config.URL_ALL_USERS,
+		getUsersHandler
+	);
+
+	fastify.get(
+		config.URL_USER_ME,
+		{ onRequest: [fastify.authenticate] },
+		getUserMeHandler
+	);
+
+	fastify.get(
+		config.URL_USER,
+		{
+			onRequest: [fastify.authenticate],
+			schema: GetUserByIdRouteSchema
+		},
+		getUserInfoHandler
+	);
+
+	fastify.patch(
+		config.URL_USER_ME,
+		{
+			onRequest: [fastify.authenticate, fastify.csrfProtection],
+			schema: UpdateUserRouteSchema
+		},
+		updateUserMeHandler
+	);
+
+	fastify.get(
+		config.URL_USER_MATCH,
+		{ onRequest: [fastify.authenticate] },
+		getUserMeMatchHandler
+	);
+}
+// app/services/users/routes/auth.ts
+import { FastifyInstance, FastifyPluginOptions } from 'fastify';
+import { config } from '../shared/env.js'
+import { loginHandler, logoutHandler, registerHandler } from '../handlers/authHandlers.js';
+import { RegisterRouteSchema, LoginRouteSchema, LogoutRouteSchema } from '../shared/schemas/usersSchemas.js';
+
+export default async function authRoute(fastify: FastifyInstance, options: FastifyPluginOptions) {
+	fastify.post(
+		config.URL_LOGIN,
+		{ schema: LoginRouteSchema },
+		loginHandler
+	);
+	fastify.post(
+		config.URL_REGISTER,
+		{ schema: RegisterRouteSchema },
+		registerHandler
+	);
+	fastify.post(
+		config.URL_LOGOUT,
+		{
+			schema: LogoutRouteSchema,
+			onRequest: [fastify.authenticate, fastify.csrfProtection],
+		},
+		logoutHandler
+	);
+}
+// app/services/users/routes/friends.ts
+import { FastifyInstance, FastifyPluginOptions } from 'fastify';
+import { SendFriendRequestRouteSchema, FriendshipActionRouteSchema } from "../shared/schemas/friendsSchemas.js";
+import { config } from "../shared/env.js";
+import {
+	acceptFriendRequestHandler,
+	declineFriendRequestHandler,
+	getReceivedRequestsHandler,
+	getSentRequestsHandler,
+	sendFriendRequestHandler,
+	cancelFriendRequestHandler,
+	getMyFriendsHandler,
+	removeFriendshipHandler,
+} from "../handlers/friendsHandlers.js";
+
+export default async function friendRoutes(fastify: FastifyInstance, options: FastifyPluginOptions) {
+	fastify.post(
+		config.URL_FRIEND_REQUEST,
+		{
+			onRequest: [fastify.authenticate, fastify.csrfProtection],
+			schema: SendFriendRequestRouteSchema
+		},
+		sendFriendRequestHandler
+	);
+	fastify.get(
+		config.URL_FRIEND_RECEIVED,
+		{ onRequest: [fastify.authenticate] },
+		getReceivedRequestsHandler
+	);
+	fastify.get(
+		config.URL_FRIEND_SENT,
+		{ onRequest: [fastify.authenticate] },
+		getSentRequestsHandler
+	);
+	fastify.post(
+		config.URL_FRIEND_ACCEPT,
+		{
+			onRequest: [fastify.authenticate, fastify.csrfProtection],
+			schema: FriendshipActionRouteSchema
+		},
+		acceptFriendRequestHandler
+	);
+	fastify.post(
+		config.URL_FRIEND_DECLINE,
+		{
+			onRequest: [fastify.authenticate, fastify.csrfProtection],
+			schema: FriendshipActionRouteSchema
+		},
+		declineFriendRequestHandler
+	);
+	fastify.post(
+		config.URL_FRIEND_CANCEL,
+		{
+			onRequest: [fastify.authenticate, fastify.csrfProtection],
+			schema: FriendshipActionRouteSchema
+		},
+		cancelFriendRequestHandler
+	);
+	fastify.get(
+		config.URL_FRIEND_LIST,
+		{ onRequest: [fastify.authenticate] },
+		getMyFriendsHandler
+	);
+	fastify.post(
+		config.URL_FRIEND_REMOVE,
+		{
+			onRequest: [fastify.authenticate, fastify.csrfProtection],
+			schema: FriendshipActionRouteSchema
+		},
+		removeFriendshipHandler
+	);
+};
+// app/services/users/tsconfig.json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": "./", // Tous les fichiers .ts sont à la racine ou dans des sous-dossiers
+    "outDir": "./dist", // Où les fichiers .js compilés iront
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true, // Impose la casse correcte des noms de fichiers
+    "strict": true,
+    "skipLibCheck": true, // Accélère la compilation en ne vérifiant pas les .d.ts des libs
+    "resolveJsonModule": true, // Permet d'importer des fichiers .json
+    "sourceMap": true, // Génère les sourcemaps pour le débogage
+    "allowJs": true,
+  },
+  "include": ["**/*.ts", "../../frontend/conf/utils/config.ts"],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
