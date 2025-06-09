@@ -109,12 +109,6 @@ export async function getAcceptedFriendsForUserInDb(userId: number): Promise<Fri
 	return db.all<Friend[]>(query, userId, userId, userId, userId, userId, userId, userId, userId, userId);
 }
 
-// // Type pour les requêtes reçues
-// export interface ReceivedFriendRequest {
-// 	friendship_id: number;
-// 	created_at: string; // ou Date
-// 	requester: Omit<User, 'wins' | 'losses' | 'status' | 'created_at' | 'updated_at' | 'password_hash'>; // Ajuster les Omit
-// }
 /**
  * Retrieves all pending friend requests received by a user.
  * Includes details about the requester.
@@ -146,13 +140,6 @@ export async function getPendingReceivedFriendRequestsInDb(userId: number): Prom
 	}));
 }
 
-
-// // Type pour les requêtes envoyées
-// export interface SentFriendRequest {
-// 	friendship_id: number;
-// 	created_at: string; // ou Date
-// 	receiver: Omit<User, 'wins' | 'losses' | 'status' | 'created_at' | 'updated_at' | 'password_hash'>; // Ajuster
-// }
 /**
  * Retrieves all pending friend requests sent by a user.
  * Includes details about the receiver.
