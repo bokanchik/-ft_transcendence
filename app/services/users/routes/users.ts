@@ -7,18 +7,25 @@ import {
 	updateUserMeHandler,
 } from '../handlers/userHandlers.js';
 import { config } from '../shared/env.js';
-import { UpdateUserRouteSchema, GetUserByIdRouteSchema } from '../shared/schemas/usersSchemas.js';
+import { UpdateUserRouteSchema, GetUserByIdRouteSchema, GetUsersListRouteSchema, GetMeRouteSchema } from '../shared/schemas/usersSchemas.js';
 
 
 export default async function userRoutes(fastify: FastifyInstance, options: FastifyPluginOptions) {
 	fastify.get(
 		config.URL_ALL_USERS,
+		{
+			onRequest: [fastify.authenticate],
+			schema: GetUsersListRouteSchema
+		},
 		getUsersHandler
 	);
 
 	fastify.get(
 		config.URL_USER_ME,
-		{ onRequest: [fastify.authenticate] },
+		{
+			onRequest: [fastify.authenticate],
+			schema: GetMeRouteSchema
+		},
 		getUserMeHandler
 	);
 

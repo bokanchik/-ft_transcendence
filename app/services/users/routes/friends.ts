@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
-import { SendFriendRequestRouteSchema, FriendshipActionRouteSchema } from "../shared/schemas/friendsSchemas.js";
+import { SendFriendRequestRouteSchema, FriendshipActionRouteSchema, GetFriendsListRouteSchema, GetPendingRequestsRouteSchema } from "../shared/schemas/friendsSchemas.js";
 import { config } from "../shared/env.js";
 import {
 	acceptFriendRequestHandler,
@@ -23,12 +23,18 @@ export default async function friendRoutes(fastify: FastifyInstance, options: Fa
 	);
 	fastify.get(
 		config.URL_FRIEND_RECEIVED,
-		{ onRequest: [fastify.authenticate] },
+		{
+			onRequest: [fastify.authenticate],
+			schema: GetPendingRequestsRouteSchema
+		},
 		getReceivedRequestsHandler
 	);
 	fastify.get(
 		config.URL_FRIEND_SENT,
-		{ onRequest: [fastify.authenticate] },
+		{
+			onRequest: [fastify.authenticate],
+			schema: GetPendingRequestsRouteSchema
+		},
 		getSentRequestsHandler
 	);
 	fastify.post(
@@ -57,7 +63,10 @@ export default async function friendRoutes(fastify: FastifyInstance, options: Fa
 	);
 	fastify.get(
 		config.URL_FRIEND_LIST,
-		{ onRequest: [fastify.authenticate] },
+		{
+			onRequest: [fastify.authenticate],
+			schema: GetFriendsListRouteSchema
+		},
 		getMyFriendsHandler
 	);
 	fastify.post(

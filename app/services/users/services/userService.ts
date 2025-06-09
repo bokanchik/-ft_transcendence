@@ -104,9 +104,6 @@ export async function getUserById(userId: number): Promise<User> {
 export async function getUserMatches(userId: number): Promise<any[]> { // TODO: Use Match[] type
 	console.log('Fetching user matches from the database');
 	const matches = await userModel.getUserMatchesFromDb(userId);
-	if (!matches) {
-		throw new NotFoundError('No matches found for this user'); // TODO: virer le if car matches deja undefined si vide
-	}
 	return matches;
 }
 

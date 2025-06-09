@@ -26,7 +26,8 @@ export const FriendSchema = z.object({
     friend_id: z.number().int(),
     friend_username: z.string(),
     friend_display_name: z.string(),
-    friend_avatar_url: z.string().url().nullable().optional(), // re-tester : UserBaseSchema.shape.avatar_url
+    // friend_avatar_url: z.string().url().nullable().optional(), // re-tester : UserBaseSchema.shape.avatar_url
+    friend_avatar_url: UserBaseSchema.shape.avatar_url.optional(),
     friend_wins: z.number().int().default(0),
     friend_losses: z.number().int().default(0),
     friend_online_status: UserOnlineStatusSchema,

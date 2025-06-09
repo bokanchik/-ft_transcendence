@@ -71,6 +71,20 @@ export const LogoutRouteSchema = {
     }
 };
 
+// GET ALL USERS
+export const GetUsersListRouteSchema = {
+    response: {
+        200: z.array(UserBaseSchema)
+    }
+};
+
+// GET /me
+export const GetMeRouteSchema = {
+    response: {
+        200: UserBaseSchema
+    }
+};
+
 // UPDATE USER
 export const UpdateUserBodySchema = z.object({
     email: UserBaseSchema.shape.email.optional(),
@@ -127,3 +141,4 @@ export const JWTPayloadSchema = z.object({
     exp: z.number().optional(),
 });
 export type JWTPayload = z.infer<typeof JWTPayloadSchema>;
+
