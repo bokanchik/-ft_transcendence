@@ -7,8 +7,6 @@
 - [x] display_name unique
 - [x] logout -> supprimer token
 - [x] login/logout maj du status
-- [ ] confirmation par mail
-- [ ] changement mdp
 - [x] Affichage du status
 - [ ] tout matches -> sasha ?
 - [x] -> zod/back 

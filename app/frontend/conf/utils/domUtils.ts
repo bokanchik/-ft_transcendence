@@ -1,4 +1,6 @@
 // app/frontend/conf/utils/domUtils.ts
+import { showToast } from "../components/toast.js";
+
 export function createElement<K extends keyof HTMLElementTagNameMap>(
     tagName: K,
     options?: {
@@ -73,7 +75,7 @@ export function createElement<K extends keyof HTMLElementTagNameMap>(
 }
 
 
-// Reusable Action Button (similar to what you had in UserList)
+// Reusable Action Button
 interface ActionButtonProps {
     text: string;
     baseClass?: string; // e.g., 'bg-blue-500'
@@ -87,7 +89,7 @@ interface ActionButtonProps {
 
 export function createActionButton(props: ActionButtonProps): HTMLButtonElement {
     const button = createElement('button', {
-        textContent: props.text, // Initial text
+        textContent: props.text,
         type: 'button'
     });
 
@@ -127,15 +129,14 @@ export function createActionButton(props: ActionButtonProps): HTMLButtonElement 
         } catch (error) {
             const actionText = props.dataAction || originalText || 'action';
             console.error(`Error performing action "${actionText}":`, error);
-            // showToast is good, or a more generic error display
-            alert(`Failed to ${actionText.toLowerCase()}.`); // Fallback alert
-            button.textContent = originalText; // Restore text on error
-            button.disabled = false; // Re-enable on error
+            showToast(`Failed to ${actionText.toLowerCase()}.`, 'error');
+            button.textContent = originalText;
+            button.disabled = false;
         }
         // Note: Re-enabling the button and restoring text on success should be handled
         // by the parent component logic (e.g., after a list re-renders or state updates)
         // unless the action is purely local and doesn't trigger a re-render.
-        // For now, let's assume parent handles UI update post-success. If not, uncomment below:
+        // If not :
         // if (button.disabled) { // If not re-enabled by parent logic
         //     button.textContent = originalText;
         //     button.disabled = false;
@@ -145,7 +146,7 @@ export function createActionButton(props: ActionButtonProps): HTMLButtonElement 
 }
 
 
-// Helper for input fields (from aliasFormPage)
+// Helper for input fields
 interface InputFieldOptions {
     type?: string;
     placeholder?: string;

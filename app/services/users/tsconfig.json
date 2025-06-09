@@ -13,7 +13,7 @@
     "sourceMap": true, // Génère les sourcemaps pour le débogage
     "allowJs": true,
   },
-  "include": ["**/*.ts"],
+  "include": ["**/*.ts", "../../frontend/conf/utils/config.ts"],
   "exclude": [
     "node_modules",
     "dist"

@@ -1,5 +1,6 @@
 import { Friend, PendingFriendRequest } from '../shared/schemas/friendsSchemas.js';
 import { User as ApiUser, UserOnlineStatus } from '../shared/schemas/usersSchemas.js';
+import { createActionButton } from '../utils/domUtils.js';
 
 export interface UserListProps {
 	users: ApiUser[];
@@ -94,25 +95,40 @@ export function UserList(props: UserListProps): HTMLElement {
 		const receivedRequestFromThisUser = receivedRequests.find(r => r.requester?.id === user.id);
 
 		if (isFriend) {
-			friendshipStatus.textContent = 'Ami';
+			friendshipStatus.textContent = 'Friends';
 			friendshipStatus.className += ' text-green-600 font-semibold';
 		} else if (sentRequestToThisUser) {
-			friendshipStatus.textContent = 'Demande envoyée';
+			friendshipStatus.textContent = 'Friend request sent';
 			friendshipStatus.className += ' text-yellow-600';
-			actionButton = createActionButton('Annuler', 'bg-yellow-500 text-black', () => onCancelRequest(sentRequestToThisUser.friendship_id));
+			actionButton = createActionButton({
+				text: 'Cancel Request',
+				variant: 'warning', // 'bg-yellow-500 text-black',
+				onClick: () => onCancelRequest(sentRequestToThisUser.friendship_id)
+			});
 		} else if (receivedRequestFromThisUser) {
-			friendshipStatus.textContent = 'Demande reçue';
+			friendshipStatus.textContent = 'Request received';
 			friendshipStatus.className += ' text-indigo-600';
 
 			actionButtonsContainer = document.createElement('div');
 			actionButtonsContainer.className = 'flex space-x-1'; // Mettre les boutons côte à côte
-			const acceptBtn = createActionButton('Accepter', 'bg-green-500', () => onAcceptRequest(receivedRequestFromThisUser.friendship_id));
-			const declineBtn = createActionButton('Refuser', 'bg-red-500', () => onDeclineRequest(receivedRequestFromThisUser.friendship_id));
+			const acceptBtn = createActionButton({
+				text: 'Accept',
+				variant: 'success', // 'bg-green-500'
+				onClick: () => onAcceptRequest(receivedRequestFromThisUser.friendship_id)
+				});
+			const declineBtn = createActionButton({
+				text: 'Decline',
+				variant: 'danger', // 'bg-red-500'
+				onClick: () => onDeclineRequest(receivedRequestFromThisUser.friendship_id)
+				});
 			actionButtonsContainer.appendChild(acceptBtn);
 			actionButtonsContainer.appendChild(declineBtn);
 		} else {
-			friendshipStatus.textContent = 'Non ami'; // Statut par défaut si aucune des conditions
-			actionButton = createActionButton('Inviter', 'bg-blue-500', () => onSendRequest(user.id));
+			friendshipStatus.textContent = 'Not Friends'; // Statut par défaut si aucune des conditions
+			actionButton = createActionButton({
+				text: 'Inviter', // 'bg-blue-500'
+				onClick: () => onSendRequest(user.id)
+			});
 		}
 
 		actionContainer.prepend(friendshipStatus);
@@ -131,24 +147,24 @@ export function UserList(props: UserListProps): HTMLElement {
 	return ul;
 }
 
-function createActionButton(text: string, baseClass: string, onClick: () => Promise<void>): HTMLButtonElement {
-	const button = document.createElement('button');
-	button.textContent = text;
-	button.className = `${baseClass} text-white text-xs font-semibold py-1 px-2.5 rounded hover:opacity-80 transition-opacity disabled:opacity-50`;
-	button.addEventListener('click', async (e) => {
-		e.stopPropagation();
-		button.disabled = true;
-		const originalText = button.textContent;
-		button.textContent = '...';
-		try {
-			await onClick();
-		} catch (error) {
-			const actionText = originalText || 'action';
-			console.error(`Error performing action "${actionText}":`, error);
-			alert(`Failed to ${actionText.toLowerCase()}.`);
-			button.textContent = originalText;
-			button.disabled = false;
-		}
-	});
-	return button;
-}
+// function createActionButton(text: string, baseClass: string, onClick: () => Promise<void>): HTMLButtonElement {
+// 	const button = document.createElement('button');
+// 	button.textContent = text;
+// 	button.className = `${baseClass} text-white text-xs font-semibold py-1 px-2.5 rounded hover:opacity-80 transition-opacity disabled:opacity-50`;
+// 	button.addEventListener('click', async (e) => {
+// 		e.stopPropagation();
+// 		button.disabled = true;
+// 		const originalText = button.textContent;
+// 		button.textContent = '...';
+// 		try {
+// 			await onClick();
+// 		} catch (error) {
+// 			const actionText = originalText || 'action';
+// 			console.error(`Error performing action "${actionText}":`, error);
+// 			alert(`Failed to ${actionText.toLowerCase()}.`);
+// 			button.textContent = originalText;
+// 			button.disabled = false;
+// 		}
+// 	});
+// 	return button;
+// }

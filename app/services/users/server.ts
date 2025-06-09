@@ -1,6 +1,5 @@
 import Fastify, { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { validatorCompiler, serializerCompiler, ZodTypeProvider } from 'fastify-type-provider-zod';
-//import dotenv from 'dotenv';
 import { config } from './shared/env.js';
 import { initializeDb } from './utils/dbConfig.js';
 import { setupPlugins } from './shared/auth-plugin/tokens.js';
