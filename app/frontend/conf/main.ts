@@ -1,16 +1,17 @@
-import { HomePage } from './components/homePage.js';
-import { LoginPage } from './pages/loginPage.js'
-import { RegisterPage } from './components/registerPage.js'
-import { UsersPage } from './pages/userPage.js';
-import { GamePage } from './components/gamePage.js';
-import { GameRoomPage } from './pages/gameRoomPage.js';
-import { navigateTo } from './services/router.js';
-import { DashboardPage } from './pages/dashboardPage.js'
-import { SettingsPage } from './pages/settingsPage.js';
-import { ProfilePage } from './pages/profilePage.js';
-import { getUserDataFromStorage } from './services/authService.js';
-import { promptAliasForm } from './components/aliasFormPage.js';
-import { GameMode } from './components/gamePage.js'
+import { HomePage } from './components/homePage.ts';
+import { LoginPage } from './pages/loginPage.ts'
+import { RegisterPage } from './components/registerPage.ts'
+import { UsersPage } from './pages/userPage.ts';
+import { GamePage } from './components/gamePage.ts';
+import { GameRoomPage } from './pages/gameRoomPage.ts';
+import { navigateTo } from './services/router.ts';
+import { DashboardPage } from './pages/dashboardPage.ts'
+import { SettingsPage } from './pages/settingsPage.ts';
+import { ProfilePage } from './pages/profilePage.ts';
+import { getUserDataFromStorage } from './services/authService.ts';
+import { promptAliasForm } from './components/aliasFormPage.ts';
+import { GameMode } from './components/gamePage.ts'
+import { showcase } from './components/showcase.ts';
 // import './style/input.css';
 
 // Conteneur où le contenu de la page sera injecté
@@ -34,7 +35,7 @@ function renderNotFoundPage(): HTMLElement {
 }
 
 const routes: { [key: string]: RouteConfig } = {
-    '/': { component: HomePage },
+    '/': { component: showcase },
     '/users': { component: UsersPage },
     '/login': { component: LoginPage },
     '/register': { component: RegisterPage },
@@ -111,6 +112,7 @@ export async function router() {
 
 // Se déclenche lorsque le HTML initial est chargé
 document.addEventListener('DOMContentLoaded', () => {
+	console.log("main.js chargé à " + new Date().toLocaleTimeString());
 	document.body.addEventListener('click', (event) => {
 		const target = event.target as HTMLElement;
 		const linkElement = target.closest('a[data-link]') as HTMLAnchorElement | null;

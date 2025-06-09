@@ -9,6 +9,15 @@
     "esModuleInterop": true,     // Meilleure interopérabilité avec les modules CommonJS
     "skipLibCheck": true,        // Accélère la compilation
     "forceConsistentCasingInFileNames": true,
+	"emitDeclarationOnly": true, // Émettre uniquement les déclarations
+	"declaration": true,         // Générer des fichiers de déclaration .d.ts
+	"declarationDir": "./dist/ts", // Répertoire pour les fichiers de déclaration
+	"sourceMap": true,           // Générer des fichiers source map
+	"composite": true,           // Nécessaire pour les projets composites
+	"incremental": true,         // Activer la compilation incrémentale
+	"resolveJsonModule": true,   // Permet l'importation de fichiers JSON
+	"isolatedModules": true,     // Assure que chaque fichier est un module isolé
+	"allowImportingTsExtensions": true, // Permet l'importation de fichiers .ts
     "lib": ["ES2016", "DOM"],     // Inclure les types pour le DOM du navigateur
     "allowJs": true
   },

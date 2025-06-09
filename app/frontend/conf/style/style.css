@@ -1,0 +1,245 @@
+@import "tailwindcss";
+*{
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+#leaf2{
+	animation: leaf2 1s ease-in-out infinite alternate;
+	transform-origin: top;
+	transform-box: fill-box;
+}
+@keyframes leaf2{
+	from{
+		transform: rotateZ(0deg);
+	}
+	to{
+		transform: rotateZ(5deg);
+	}
+}
+
+#leaf1{
+	animation: leaf1 1s ease-in-out infinite alternate;
+	transform-origin: bottom;
+	transform-box: fill-box;
+}
+@keyframes leaf1{
+	from{
+		transform: rotateZ(0deg);
+	}
+	to{
+		transform: rotateZ(-5deg);
+	}
+}
+#leaf3{
+	animation: leaf3 1s ease-in-out infinite alternate;
+	transform-origin: bottom;
+	transform-box: fill-box;
+}
+@keyframes leaf3{
+	from{
+		transform: rotateZ(0deg);
+	}
+	to{
+		transform: rotateZ(5deg);
+	}
+}
+#leaf4{
+	animation: leaf4 1s ease-in-out infinite alternate;
+	transform-origin: top;
+	transform-box: fill-box;
+}
+@keyframes leaf4{
+	from{
+		transform: rotateZ(0deg);
+	}
+	to{
+		transform: rotateZ(-5deg);
+	}
+}
+#leaf5{
+	animation: leaf5 1s ease-in-out infinite alternate;
+	transform-origin: bottom;
+	transform-box: fill-box;
+}
+@keyframes leaf5{
+	from{
+		transform: rotateZ(0deg);
+	}
+	to{
+		transform: rotateZ(5deg);
+	}
+}
+#leaf6{
+	animation: leaf6 1s ease-in-out infinite alternate;
+	transform-origin: top;
+	transform-box: fill-box;
+}
+@keyframes leaf6{
+	from{
+		transform: rotateZ(0deg);
+	}
+	to{
+		transform: rotateZ(-5deg);
+	}
+}
+#leaf7{
+	animation: leaf7 1s ease-in-out infinite alternate;
+	transform-origin: bottom;
+	transform-box: fill-box;
+}
+@keyframes leaf7{
+	from{
+		transform: rotateZ(0deg);
+	}
+	to{
+		transform: rotateZ(5deg);
+	}
+}
+#leaf8{
+	animation: leaf8 1s ease-in-out infinite alternate;
+	transform-origin: top;
+	transform-box: fill-box;
+}
+@keyframes leaf8{
+	from{
+		transform: rotateZ(0deg);
+	}
+	to{
+		transform: rotateZ(-5deg);
+	}
+}
+#leaf9{
+	animation: leaf9 1s ease-in-out infinite alternate;
+	transform-origin: bottom;
+	transform-box: fill-box;
+}
+@keyframes leaf9{
+	from{
+		transform: rotateZ(0deg);
+	}
+	to{
+		transform: rotateZ(5deg);
+	}
+}
+#leaf10{
+	animation: leaf10 1s ease-in-out infinite alternate;
+	transform-origin: top;
+	transform-box: fill-box;
+}
+@keyframes leaf10{
+	from{
+		transform: rotateZ(0deg);
+	}
+	to{
+		transform: rotateZ(-5deg);
+	}
+}
+#leaf11{
+	animation: leaf11 1s ease-in-out infinite alternate;
+	transform-origin: bottom;
+	transform-box: fill-box;
+}
+@keyframes leaf11{
+	from{
+		transform: rotateZ(0deg);
+	}
+	to{
+		transform: rotateZ(5deg);
+	}
+}
+#leaf12{
+	animation: leaf12 1s ease-in-out infinite alternate;
+	transform-origin: top;
+	transform-box: fill-box;
+}
+@keyframes leaf12{
+	from{
+		transform: rotateZ(0deg);
+	}
+	to{
+		transform: rotateZ(-2deg);
+	}
+}
+#leaf13{
+	animation: leaf13 1s ease-in-out infinite alternate;
+	transform-origin: bottom;
+	transform-box: fill-box;
+}
+@keyframes leaf13{
+	from{
+		transform: rotateZ(0deg);
+	}
+	to{
+		transform: rotateZ(5deg);
+	}
+}
+#leaf14{
+	animation: leaf14 1s ease-in-out infinite alternate;
+	transform-origin: top;
+	transform-box: fill-box;
+}
+@keyframes leaf14{
+	from{
+		transform: rotateZ(0deg);
+	}
+	to{
+		transform: rotateZ(2deg);
+	}
+}
+#leaf15{
+	animation: leaf15 1s ease-in-out infinite alternate;
+	transform-origin: bottom;
+	transform-box: fill-box;
+}
+@keyframes leaf15{
+	from{
+		transform: rotateZ(0deg);
+	}
+	to{
+		transform: rotateZ(5deg);
+	}
+}
+#leaf16{
+	animation: leaf16 1s ease-in-out infinite alternate;
+	transform-origin: right;
+	transform-box: fill-box;
+}
+@keyframes leaf16{
+	from{
+		transform: rotateZ(0deg);
+	}
+	to{
+		transform: rotateZ(-5deg);
+	}
+}
+#leaf17{
+	animation: leaf17 1s ease-in-out infinite alternate;
+	transform-origin: top;
+	transform-box: fill-box;
+}
+@keyframes leaf17{
+	from{
+		transform: rotateZ(0deg);
+	}
+	to{
+		transform: rotateZ(5deg);
+	}
+}
+
+@keyframes rotateSlightly {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+svg.rotate-plant {
+  animation: rotateSlightly 4s infinite ease-in-out;
+  transition: transform 0.3s ease;
+  transform-origin: center;
+}
+
+svg.rotate-plant:hover {
+  animation: none; /* stop the subtle animation */
+  transform: rotate(20deg);
+}

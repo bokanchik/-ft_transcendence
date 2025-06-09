@@ -32,6 +32,7 @@
   "dependencies": {
     "@fastify/cookie": "^11.0.2",
     "@fastify/csrf-protection": "^7.1.0",
+    "@fastify/jwt": "^9.1.0",
     "@tailwindcss/vite": "^4.1.8",
     "@types/bcrypt": "^5.0.2",
     "bcrypt": "^6.0.0",
