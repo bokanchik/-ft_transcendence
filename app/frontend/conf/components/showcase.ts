@@ -6,7 +6,8 @@ export function showcase(): HTMLElement {
 	const outerDiv = document.createElement('div');
 	outerDiv.className = 'bg-white flex flex-col justify-center items-center min-h-screen text-black p-8';
 	outerDiv.innerHTML = `
-		<svg class="animate-[fill-rotateSlightly_4s_ease-in-out_infinite] none w-100 h-80 static " width="405" height="352" viewBox="0 0 405 352" fill="none" xmlns="http://www.w3.org/2000/svg">
+	<div class="branch-image">
+		<svg class="none w-100 h-80 static " width="405" height="352" viewBox="0 0 405 352" fill="none" xmlns="http://www.w3.org/2000/svg">
 				<g id="Group 2">
 					<path id="branch" d="M368.535 206.71C368.234 207.318 367.71 207.848 366.977 208.302C357.01 209.056 328.707 208.314 282.573 201.239C173.195 180.655 13.0573 135.558 138.297 169.734C197.576 185.91 245.753 195.591 282.573 201.239C324.38 209.106 358.772 213.393 366.977 208.302C371.788 207.938 372.326 207.226 368.535 206.71Z" fill="#197B13" stroke="#0E3C05" stroke-width="2"/>
 					<path id="leaf2" d="M342.946 211.23C330.392 253.91 296.969 303.929 281.826 323.603C307.903 260.73 308.333 250.777 342.946 211.23Z" fill="#067042" stroke="#067042"/>
@@ -27,7 +28,9 @@ export function showcase(): HTMLElement {
 					<path id="leaf15" d="M107.543 160.668C87.3878 134.177 57.4035 122.022 54.4986 122.207C73.8701 140.325 97.9329 155.397 107.543 160.668Z" fill="#067042" stroke="#067042"/>
 					<path id="leaf16" d="M94.8138 157.632C68.5314 165.518 42.0868 153.871 32.1498 147.062C35.6103 145.838 52.9878 146.239 94.8138 157.632Z" fill="#067042" stroke="#067042"/>
 				</g>
-			</svg>`;
+			</svg>
+		</div>`;
+		
 
 	const innerDiv = document.createElement('div');
 	innerDiv.className = 'text-center bg-grey-300 bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 container mx-auto';

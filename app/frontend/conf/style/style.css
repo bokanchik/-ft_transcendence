@@ -6,7 +6,7 @@
 }
 #leaf2{
 	animation: leaf2 1s ease-in-out infinite alternate;
-	transform-origin: top;
+	transform-origin: top right;
 	transform-box: fill-box;
 }
 @keyframes leaf2{
@@ -46,7 +46,7 @@
 }
 #leaf4{
 	animation: leaf4 1s ease-in-out infinite alternate;
-	transform-origin: top;
+	transform-origin: top right;
 	transform-box: fill-box;
 }
 @keyframes leaf4{
@@ -72,7 +72,7 @@
 }
 #leaf6{
 	animation: leaf6 1s ease-in-out infinite alternate;
-	transform-origin: top;
+	transform-origin: top right;
 	transform-box: fill-box;
 }
 @keyframes leaf6{
@@ -98,7 +98,7 @@
 }
 #leaf8{
 	animation: leaf8 1s ease-in-out infinite alternate;
-	transform-origin: top;
+	transform-origin: top right;
 	transform-box: fill-box;
 }
 @keyframes leaf8{
@@ -124,7 +124,7 @@
 }
 #leaf10{
 	animation: leaf10 1s ease-in-out infinite alternate;
-	transform-origin: top;
+	transform-origin: top right;
 	transform-box: fill-box;
 }
 @keyframes leaf10{
@@ -215,7 +215,7 @@
 }
 #leaf17{
 	animation: leaf17 1s ease-in-out infinite alternate;
-	transform-origin: top;
+	transform-origin: top right;
 	transform-box: fill-box;
 }
 @keyframes leaf17{
@@ -223,23 +223,29 @@
 		transform: rotateZ(0deg);
 	}
 	to{
-		transform: rotateZ(5deg);
+		transform: rotateZ(2deg);
 	}
 }
 
+.branch-image {
+  animation: rotateSlightly 4s infinite ease-in-out;
+  transition: transform 0.3s ease;
+  transform-origin: right;
+}
+
+.branch-image:hover {
+  animation: rotateMore 4s ease-in;
+  /* transition: transform 0.3s ease; */
+  transform-origin: right bottom;
+}
 @keyframes rotateSlightly {
   0% { transform: rotate(0deg); }
   50% { transform: rotate(5deg); }
   100% { transform: rotate(0deg); }
 }
 
-svg.rotate-plant {
-  animation: rotateSlightly 4s infinite ease-in-out;
-  transition: transform 0.3s ease;
-  transform-origin: center;
-}
-
-svg.rotate-plant:hover {
-  animation: none; /* stop the subtle animation */
-  transform: rotate(20deg);
+@keyframes rotateMore {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(20deg); }
+  100% { transform: rotate(0deg); }
 }
