@@ -1,13 +1,1 @@
-- gestion des volumes docker
-
-- dossier shared ?
-
-- changement de mdp ? validation par mail ? (pas dans le sujet)
-
-- organisation .env (plusieurs fichiers .env ?)
-
-- scripts pour inject des variables .env dans les json ?
-
-- images dans le docker-compose ? (doit la dl a chaque run)
-
-- uniformiser les module et mduleResolution dans tsconfig.json
+- quels sont les wins types et a quoi ils peuvent nous servir ? 

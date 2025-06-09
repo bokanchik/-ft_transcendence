@@ -1,5 +1,6 @@
 import { type FastifyReply, type FastifyRequest } from 'fastify';
 import { getRowByMatchId, getMatchesByUserId } from '../database/dbModels.ts';
+import { MatchIdParams, MatchUserIdParams } from '../middleware/matchesSchemas.ts';
 
 // http post /api/game/match
 export async function createMatchHandler(req: FastifyRequest, reply: FastifyReply) {
@@ -18,8 +19,8 @@ export async function createMatchHandler(req: FastifyRequest, reply: FastifyRepl
 }
 
 // Handler to get match details by matchId
-export async function getMatchIdHandler(req: FastifyRequest, reply: FastifyReply) {
-    const matchId = (req.params as { matchId: string}).matchId;
+export async function getMatchIdHandler(req: FastifyRequest<{ Params: MatchIdParams }>, reply: FastifyReply) {
+    const { matchId } = req.params;
 
     if (!matchId) {
         return reply.code(400).send({ error: 'Match ID is required' });
@@ -29,17 +30,25 @@ export async function getMatchIdHandler(req: FastifyRequest, reply: FastifyReply
     try {
         const match = await getRowByMatchId(matchId);
         if (match) {
-            let data = {
-                id: match.id,
-                player1_id: match.player1_id,
-                player2_id: match.player2_id,
-                player1_score: match.player1_score,
-                player2_score: match.player2_score,
-                winner_id: match.winner_id,
-                win_type: match.win_type,
-            };
-            return reply.code(200).send({ data });
-        }   
+            return reply.code(200).send({
+                data: {
+                    id: match.id,
+                    matchId: match.matchId,
+                    player1_id: match.player1_id,
+                    player2_id: match.player2_id,
+                    player1_socket: match.player1_socket,
+                    player2_socket: match.player2_socket,
+                    player1_score: match.player1_score,
+                    player2_score: match.player2_score,
+                    winner_id: match.winner_id,
+                    win_type: match.win_type,
+                    created_at: match.created_at,
+                    status: match.status
+                }
+            });
+        }  else {
+            return reply.code(404).send({ error: 'Match not found' });
+        }
 
     } catch (err: unknown) { 
         if (err instanceof Error) {
@@ -49,8 +58,8 @@ export async function getMatchIdHandler(req: FastifyRequest, reply: FastifyReply
     }
 }
 
-export async function getMatchByUserHandler(req: FastifyRequest, reply: FastifyReply) {
-    const userId = (req.params as { userId: number }).userId;
+export async function getMatchByUserHandler(req: FastifyRequest<{ Params: MatchUserIdParams}>, reply: FastifyReply) {
+    const { userId } = req.params;
 
     if (!userId) {
         return reply.code(400).send({ error: 'UserId is required'});
@@ -60,7 +69,7 @@ export async function getMatchByUserHandler(req: FastifyRequest, reply: FastifyR
     try {
         const matches = await getMatchesByUserId(userId);
         // console.log(matches);
-        return matches;
+        return reply.code(200).send(matches);
 
     } catch (err: unknown) {
         if (err instanceof Error) {

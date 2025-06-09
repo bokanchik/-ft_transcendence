@@ -12,9 +12,9 @@ const matchTable: string = `
         player2_socket TEXT NOT NULL,
         player1_score INTEGER,
         player2_score INTEGER,
-        winner_id TEXT,
+        winner_id INTEGER,
         win_type TEXT DEFAULT 'score',
-        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         status TEXT NOT NULL CHECK (status IN ('pending', 'in_progress', 'finished'))
     )`;
 

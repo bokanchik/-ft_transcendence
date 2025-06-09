@@ -10,7 +10,7 @@
     "skipLibCheck": true,        // Accélère la compilation
     "forceConsistentCasingInFileNames": true,
     "lib": ["ES2016", "DOM"],     // Inclure les types pour le DOM du navigateur
-    "allowJs": true
+  //  "allowJs": true
   },
   "include": ["**/*.ts"],
   "exclude": ["node_modules", "dist"]
