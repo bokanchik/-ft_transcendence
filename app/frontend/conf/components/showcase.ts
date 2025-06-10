@@ -1,10 +1,10 @@
 export function showcase(): HTMLElement {
 	
 	const container = document.createElement('div');
-	container.className = 'bg-white flex flex-col items-center min-h-screen text-black p-8';
+	container.className = 'bg-white flex items-center justify-center min-h-screen text-black p-8';
 
 	const innerDiv = document.createElement('div');
-	innerDiv.className = 'text-center bg-grey-300 bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 container mx-auto ';
+	innerDiv.className = 'flex flex-col items-center gap-12';
 
 	innerDiv.innerHTML = `
         <svg class="king_pong" width="440" height="88" viewBox="0 0 440 88" fill="none" xmlns="http://www.w3.org/2000/svg">

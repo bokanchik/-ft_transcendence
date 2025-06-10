@@ -279,3 +279,7 @@
 		stroke-dashoffset: 0;
 	}
 }
+
+.plant2{
+	transform:scaleX(-1);
+}
