@@ -12,7 +12,7 @@ export const MatchStatusSchema = z.nativeEnum(MatchStatus);
 // --- Base Schemas ---
 export const MatchBaseSchema = z.object({
     id: z.number().int(),
-    matchid: z.string(),
+    matchId: z.string(), // ou i min
     player1_id: z.number().int(),
     player2_id: z.number().int(),
     player1_socket: z.string(),
@@ -66,13 +66,14 @@ export const GetMatchIdRouteSchema = {
 
 // GET MATCH HISTORY by USER_ID
 export const MatchUserIdParamsSchema = z.object({
-    userId: z.number().int(), // check avec arthur ? pourquoi il utilise regex -> parce que fastify t'envoie une string
+    userId: z.string().regex(/^\d+$/, "User ID must be a positive integer."),
+    // userId: z.number().int(), // check avec arthur ? pourquoi il utilise regex -> parce que fastify t'envoie une string
 });
 
 export type MatchUserIdParams = z.infer<typeof MatchUserIdParamsSchema>;
 
 export const GetMatchByUserIdRouteSchema = {
-    params: MatchIdParamsSchema,
+    params: MatchUserIdParamsSchema,
     response: {
         200: z.array(MatchBaseSchema),
         400: z.object({ error: z.string() }),

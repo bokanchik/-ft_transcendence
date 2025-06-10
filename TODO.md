@@ -8,7 +8,8 @@
 - [x] logout -> supprimer token
 - [x] login/logout maj du status
 - [x] Affichage du status
-- [ ] tout matches -> sasha ?
+- [x] tout matches -> sasha ?
+- [ ] verifier matches avec sasha
 - [x] -> zod/back 
 - [ ] -> zod/front 
 - [x] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde) -> cookie jwt_token
@@ -16,6 +17,8 @@
 - [x] grafana
 - [ ] grafana/dashboards
 - [ ] nettoyage
+- [ ] env
+- [ ] fichiers partagés
 
 - [ ] encore des interfaces dans friendModel et voir tous type de retour plus schemas routes
 

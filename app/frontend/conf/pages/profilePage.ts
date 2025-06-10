@@ -81,11 +81,11 @@ async function MatchHistoryComponent(props: MatchHistoryComponentProps): Promise
                 <div class="text-sm text-gray-600">
                     Score : ${profiledUserScore} - ${opponentScore}
                     <span class="mx-1">|</span>
-                    Type : ${match.game_type}
+                    Type : ${match.win_type}
                     <span class="mx-1">|</span>
-                    Date : ${new Date(match.match_date).toLocaleDateString()}
+                    Date : ${new Date(match.created_at).toLocaleDateString()}
                 </div>
-            `;
+            `; // TODO : changer win_type
 			list.appendChild(item);
 		}
 		el.appendChild(list);

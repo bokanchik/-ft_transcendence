@@ -1,6 +1,7 @@
 import { fetchWithCsrf, setCsrfToken } from './csrf.js';
-import { ApiSuccessResponse, ApiResult, Match } from '../shared/types.js';
+import { ApiSuccessResponse, ApiResult } from '../shared/types.js';
 import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload } from '../shared/schemas/usersSchemas.js';
+import { Match } from '../shared/schemas/matchesSchemas.js';
 import { handleApiResponse } from './apiUtils.js';
 
 const USER_DATA_KEY = 'userDataKey';

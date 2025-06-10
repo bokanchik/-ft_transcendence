@@ -1,6 +1,6 @@
 import { type FastifyReply, type FastifyRequest } from 'fastify';
 import { getRowByMatchId, getMatchesByUserId } from '../database/dbModels.ts';
-import { MatchIdParams, MatchUserIdParams } from '../middleware/matchesSchemas.ts';
+import { MatchIdParams, MatchUserIdParams } from '../shared/schemas/matchesSchemas.ts';
 
 // http post /api/game/match
 export async function createMatchHandler(req: FastifyRequest, reply: FastifyReply) {
