@@ -6,7 +6,7 @@
 #    By: aduvilla <aduvilla@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/23 22:29:59 by aduvilla          #+#    #+#              #
-#    Updated: 2025/05/15 23:48:57 by aduvilla         ###   ########.fr        #
+#    Updated: 2025/06/11 01:10:46 by aduvilla         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,8 @@ DC_FILE		= app/docker-compose.yml
 
 SHARED_FILE	= app/services/shared/schemas
 
-TARGET_FRONT	= app/frontend/conf/shared/schemas
+TARGET_FRONT	= app/frontend/src/shared/schemas
+# TARGET_FRONT	= app/frontend/conf/shared/schemas
 
 CREDENTIALS	= secrets/credentials.txt
 
