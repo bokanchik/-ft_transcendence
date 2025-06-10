@@ -14,6 +14,10 @@ ENV_FILE	= app/.env
 
 DC_FILE		= app/docker-compose.yml
 
+SHARED_FILE	= app/services/shared/schemas
+
+TARGET_FRONT	= app/frontend/conf/shared/schemas
+
 CREDENTIALS	= secrets/credentials.txt
 
 all			: up
@@ -24,6 +28,8 @@ up			:
 #	@cat $(CREDENTIALS) >> $(ENV_FILE).tmp
 #	@mv $(ENV_FILE).tmp $(ENV_FILE)
 #	@mkdir -p ~/data/mariadb ~/data/wordpress
+	rm -rf $(TARGET_FRONT)
+	cp -r $(SHARED_FILE) $(TARGET_FRONT)
 	docker compose -f $(DC_FILE) up -d
 #	@grep -Fvx -f $(CREDENTIALS) $(ENV_FILE) > $(ENV_FILE).tmp || true
 #	@mv $(ENV_FILE).tmp $(ENV_FILE)
@@ -38,6 +44,7 @@ re			: down up
 
 fdown		:
 #	@sudo rm -rf ~/data
+	rm -rf $(TARGET_FRONT)
 	docker compose -f $(DC_FILE) down --rmi all -v --remove-orphans
 
 prune		: fdown
