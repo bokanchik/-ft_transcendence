@@ -1,4 +1,4 @@
-import { HomePage } from './components/homePage.js';
+import { HomePage } from './pages/homePage.js';
 import { LoginPage } from './pages/loginPage.js'
 import { RegisterPage } from './components/registerPage.js'
 import { UsersPage } from './pages/userPage.js';
@@ -35,7 +35,7 @@ function renderNotFoundPage(): HTMLElement {
 
 const routes: { [key: string]: RouteConfig } = {
     '/': { component: HomePage },
-    '/users': { component: UsersPage },
+    // '/users': { component: UsersPage },
     '/login': { component: LoginPage },
     '/register': { component: RegisterPage },
     '/dashboard': { component: DashboardPage, requiredAuth: true },

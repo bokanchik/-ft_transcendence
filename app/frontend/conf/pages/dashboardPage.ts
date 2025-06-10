@@ -18,14 +18,7 @@ import { FriendRequestsComponent } from '../components/friendRequests.js';
 import { UserList, UserListProps } from '../components/userList.js';
 import { HeaderComponent } from '../components/headerComponent.js';
 import { showToast } from '../components/toast.js';
-
-// Placeholder pour l'historique des matchs
-function MatchHistoryComponent(): HTMLElement {
-	const el = document.createElement('div');
-	el.className = 'p-4 text-center';
-	el.innerHTML = '<p class="text-gray-500">L\'historique des matchs sera affiché ici.</p>';
-	return el;
-}
+import { MatchHistoryComponent } from '../components/matchHistoryComponent.js';
 
 export async function DashboardPage(): Promise<HTMLElement> {
 	const currentUser: User | null = getUserDataFromStorage();
@@ -239,7 +232,14 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	}
 
 	async function loadMatchHistoryContent(): Promise<HTMLElement> {
-		return MatchHistoryComponent();
+		if (currentUser) {
+			return await MatchHistoryComponent({ userId: currentUser.id });
+		} else {
+			const errorMsg = document.createElement('div');
+			errorMsg.className = 'min-h-screen flex items-center justify-center text-xl text-red-500';
+			errorMsg.textContent = 'User not found. Please log in.';
+			return errorMsg;
+		}
 	}
 
 	// Charger le contenu de l'onglet initial

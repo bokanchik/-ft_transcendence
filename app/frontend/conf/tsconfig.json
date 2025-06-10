@@ -1,17 +1,18 @@
 {
   "compilerOptions": {
-    "target": "ES2020",          // Cible JavaScript moderne mais compatible
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "outDir": "./dist/js",
     "rootDir": "./",
-    "strict": true,              // Activer toutes les vérifications strictes
+    "strict": true,
     "esModuleInterop": true,     // Meilleure interopérabilité avec les modules CommonJS
-    "skipLibCheck": true,        // Accélère la compilation
+    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "lib": ["ES2016", "DOM"],     // Inclure les types pour le DOM du navigateur
+    "lib": ["ESNext", "DOM"],
+    // "noEmit": true
   //  "allowJs": true
   },
-  "include": ["**/*.ts"],
+  "include": ["**/*.ts", "**/*.d.ts"],
   "exclude": ["node_modules", "dist"]
 }
