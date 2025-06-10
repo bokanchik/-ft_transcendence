@@ -18,7 +18,6 @@
 - [ ] grafana/dashboards
 - [x] env
 - [x] fichiers partagés
-- [ ] encore des interfaces dans friendModel et voir tous type de retour plus schemas routes
 - [ ] nettoyage
 
 ## 📌 Tâches initiales

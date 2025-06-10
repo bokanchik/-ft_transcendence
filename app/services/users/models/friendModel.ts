@@ -1,6 +1,6 @@
 // app/services/users/models/friendModel.ts
 import { getDb } from '../utils/dbConfig.js';
-import { Friendship, Friend, FriendshipStatus, PendingFriendRequest } from '../shared/schemas/friendsSchemas.js';
+import { Friendship, Friend, FriendshipStatus, PendingFriendRequest, AdminFullFriendship } from '../shared/schemas/friendsSchemas.js';
 
 /**
  * Creates a new friendship request in the database.
@@ -174,12 +174,6 @@ export async function getPendingSentFriendRequestsInDb(userId: number): Promise<
 	}));
 }
 
-
-export interface AdminFullFriendship extends Friendship {
-	user1_username: string;
-	user2_username: string;
-	initiator_username: string;
-}
 /**
  * Retrieves all friendships, regardless of their status.
  * @returns {Promise<AdminFullFriendship[]>} List of all friendships.

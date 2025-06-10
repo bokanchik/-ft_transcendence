@@ -20,6 +20,13 @@ export const FriendshipBaseSchema = z.object({
 });
 export type Friendship = z.infer<typeof FriendshipBaseSchema>;
 
+export const AdminFullFriendshipSchema = FriendshipBaseSchema.extend({
+	user1_username: z.string(),
+	user2_username: z.string(),
+	initiator_username: z.string(),
+});
+export type AdminFullFriendship = z.infer<typeof AdminFullFriendshipSchema>;
+
 export const FriendSchema = z.object({
 	friendship_id: z.number().int(),
 	friendship_status: FriendshipStatusSchema,
