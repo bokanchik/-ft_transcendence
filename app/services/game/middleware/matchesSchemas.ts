@@ -12,15 +12,15 @@ export const MatchStatusSchema = z.nativeEnum(MatchStatus);
 // --- Base Schemas ---
 export const MatchBaseSchema = z.object({
     id: z.number().int(),
-    matchid: z.string(),
-    player1_id: z.number().int(),
-    player2_id: z.number().int(),
+    matchId: z.string().uuid(),
+    player1_id: z.number(),
+    player2_id: z.number(),
     player1_socket: z.string(),
     player2_socket: z.string(),
-    player1_score: z.number().int().min(0).max(10),
-    player2_score: z.number().int().min(0).max(10),
-    winner_id: z.number().int(),
-    win_type: z.string(),
+    player1_score: z.number().int(),
+    player2_score: z.number().int(),
+    winner_id: z.number().nullable(),
+    win_type: z.string().nullable(),
     created_at: z.string(), // Ou z.date()
     status: MatchStatusSchema.default(MatchStatus.PENDING)
 
@@ -34,7 +34,6 @@ export type Match = z.infer<typeof MatchBaseSchema>;
 export const createLocalMatchBody = z.object({
     player1: z.string().min(1),
     player2: z.string().min(1),
-    isLocal: z.boolean(),
 }).strict();
 
 export type createLocalMatchRequestBody = z.infer<typeof createLocalMatchBody>;

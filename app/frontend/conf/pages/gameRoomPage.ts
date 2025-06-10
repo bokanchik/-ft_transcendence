@@ -155,21 +155,6 @@ function drawGame(state: GameState, ctx: CanvasRenderingContext2D) {
 	
 }
 
-async function quitButtonHandler() {
-	const confirmed = await showCustomConfirm("Are you sure you want to quit this game?");
-	
-	if (confirmed) {
-		// const matchId = sessionStorage.getItem('matchId');
-		// const opponentId = sessionStorage.getItem('opponent');
-		isGameOver = true;
-		socket.emit('quitGame');
-		cleanupSocket(socket);
-		sessionStorage.clear(); // clean storage --> users have to put there aliases again
-		navigateTo('/local-game');
-		isGameOver = false;
-	}
-}
-
 // Function to set usernames if they're playing in remote
 function setBoard(leftUsername: HTMLDivElement, rightUsername: HTMLDivElement) {
 	const side = sessionStorage.getItem('side');
@@ -185,22 +170,30 @@ function setBoard(leftUsername: HTMLDivElement, rightUsername: HTMLDivElement) {
 	}
 }
 
-
 function clientSocketHandler(scoreDisplay: HTMLDivElement, gameMode: string | null, ctx: CanvasRenderingContext2D) {
 	
 	if (!socket.connected) {
 		socket.connect();
 	}
 	
-	socket.emit('start');
+	if (gameMode === 'local') {
+		handleLocalEvents(ctx, scoreDisplay);
+	} else if (gameMode === 'remote') {
+		handleRemoteEvents(ctx, scoreDisplay);
+	}
 	
+}
+
+function handleRemoteEvents(ctx: CanvasRenderingContext2D, scoreDisplay: HTMLDivElement) {
+	socket.emit('startRemote');
+
 	document.addEventListener('keydown', keydown);
 	document.addEventListener('keyup', keyup);
-
+	
 	socket.on('gameState', (state: GameState) => {
 		handleGameState(state, ctx);
 	});
-
+	
 	socket.on('scoreUpdated', ({ score1, score2 }: {score1: number, score2: number})  => {
 		if (scoreDisplay) {
 			scoreDisplay.textContent = `${score1} - ${score2}`;
@@ -209,7 +202,31 @@ function clientSocketHandler(scoreDisplay: HTMLDivElement, gameMode: string | nu
 
 	socket.on('gameOver', () => {
 		isGameOver = true;
-		// showToast ? You want to play again ? 
+		cleanupSocket(socket);
+		sessionStorage.clear();
+		navigateTo('/local-game');
+		isGameOver = false;
+	});
+}
+
+function handleLocalEvents(ctx: CanvasRenderingContext2D, scoreDisplay: HTMLDivElement) {
+	socket.emit('startLocal');
+	
+	document.addEventListener('keydown', keydown);
+	document.addEventListener('keyup', keyup);
+	
+	socket.on('gameState', (state: GameState) => {
+		handleGameState(state, ctx);
+	});
+	
+	socket.on('scoreUpdated', ({ score1, score2 }: {score1: number, score2: number})  => {
+		if (scoreDisplay) {
+			scoreDisplay.textContent = `${score1} - ${score2}`;
+		}
+	});
+	
+	socket.on('gameOver', () => {
+		isGameOver = true;
 		cleanupSocket(socket);
 		sessionStorage.clear();
 		navigateTo('/local-game');
@@ -219,7 +236,7 @@ function clientSocketHandler(scoreDisplay: HTMLDivElement, gameMode: string | nu
 }
 
 function keydown(e: KeyboardEvent) {
-//	console.log(e);
+	//	console.log(e);
 	socket.emit('keydown', e.keyCode);
 }
 
@@ -234,61 +251,23 @@ function handleGameState(state: GameState, ctx: CanvasRenderingContext2D) {
 }
 
 
-async function getDisplayName(userId: number) : Promise<string> {
-	const userRes = await fetch(`api/users/${userId}`);
-	if (!userRes.ok) throw new Error('Failed to fetch user info');
-	const userData = await userRes.json();
-	const displayName = userData.display_name;
+
+
+async function quitButtonHandler() {
+	const confirmed = await showCustomConfirm("Are you sure you want to quit this game?");
 	
-	return displayName;
+	if (confirmed) {
+		// const matchId = sessionStorage.getItem('matchId');
+		// const opponentId = sessionStorage.getItem('opponent');
+		isGameOver = true;
+		socket.emit('quitGame');
+		cleanupSocket(socket);
+		sessionStorage.clear(); // clean storage --> users have to put there aliases again
+		navigateTo('/local-game');
+		isGameOver = false;
+	}
 }
 
-async function getUserAvatar(userId: number) : Promise<string> {
-	const userRes = await fetch(`/api/users/${userId}`);
-	if (!userRes.ok) throw new Error('Failed to fetch user info');
-	const userData = await userRes.json();
-	const url: string = userData.avatar_url;
-	
-	return url;
-}
-
-// function startOnlineGame(socket: SocketIOClient.Socket) {
-	
-// 	const side = sessionStorage.getItem('side');
-// 	let paddleMovement = 0;
-
-// 	document.addEventListener('keydown', (event) => {
-	// 		if (event.key === 'ArrowUp') {
-		// 			paddleMovement = -1;
-		// 		} else if (event.key === 'ArrowDown') {
-			// 			paddleMovement = 1;
-			// 		}
-			// 		socket.emit('playerMove', {
-				// 			side,
-				// 			paddleMovement,
-				// 		});
-				// 	})
-				
-				// 	document.addEventListener('keyup', (event) => {
-					// 		if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-						// 			paddleMovement = 0;
-						// 			socket.emit('playerMove', {
-							// 				side,
-							// 				paddleMovement,
-							// 			});
-							// 		}
-							// 	});
-							
-							// socket.on('stateUpdate', (data: string) => {
-	// 	const { leftPaddleUpdated, rightPaddleUpdated, ballUpdated } = JSON.parse(data);
-	// 	document.getElementById('left-paddle')!.style.top = `${leftPaddleUpdated}px`;
-	// 	document.getElementById('right-paddle')!.style.top = `${rightPaddleUpdated}px`;
-	// 	document.getElementById('ball')!.style.left = `${ballUpdated.x}px`;
-	// 	document.getElementById('ball')!.style.top = `${ballUpdated.y}px`;
-	// });
-	
-	//}
-	
 
 // socket.on('gameFinished', async (matchId: string) => {
 	// 	try {
@@ -304,13 +283,31 @@ async function getUserAvatar(userId: number) : Promise<string> {
 		// 		const url1: string = await getUserAvatar(player1);
 		// 		const url2: string = await getUserAvatar(player2);
 		// 		const name1: string = await getDisplayName(player1);
-// 		const name2: string = await getDisplayName(player2);
+		// 		const name2: string = await getDisplayName(player2);
+		
+		// 		setTimeout(() => {
+			// 			showGameResult(name1, name2, score1, score2, url1, url2);
+			// 		}, 2000);
+			
+			// 	} catch (err: unknown) {
+				// 		console.log(`Failed to fetch data from db: ${err}`);
+				// 	}
+				// });
 
-// 		setTimeout(() => {
-	// 			showGameResult(name1, name2, score1, score2, url1, url2);
-	// 		}, 2000);
-	
-	// 	} catch (err: unknown) {
-		// 		console.log(`Failed to fetch data from db: ${err}`);
-		// 	}
-		// });
+async function getDisplayName(userId: number) : Promise<string> {
+	const userRes = await fetch(`api/users/${userId}`);
+	if (!userRes.ok) throw new Error('Failed to fetch user info');
+	const userData = await userRes.json();
+	const displayName = userData.display_name;
+					
+	return displayName;
+}
+				
+async function getUserAvatar(userId: number) : Promise<string> {
+	const userRes = await fetch(`/api/users/${userId}`);
+	if (!userRes.ok) throw new Error('Failed to fetch user info');
+	const userData = await userRes.json();
+	const url: string = userData.avatar_url;
+					
+	return url;
+}

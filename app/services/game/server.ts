@@ -17,13 +17,7 @@ const fastify: FastifyInstance = Fastify({ logger: true }).withTypeProvider<ZodT
 
 // Initilize socket.io
 const io: Server = new Server(fastify.server, {
-  // cors -> dit au server depuis quels domaine/ports il peut charger les resources 
-    cors: {
-      origin: "http://localhost:5000", // l'url du frontend
-      methods: ["GET", "POST"],
-      allowedHeaders: ["Content-Type, Authorization"],
-      credentials: true,
-    },
+    path: "/socket-client/"
 });
 
 // Attach io to fastify instance

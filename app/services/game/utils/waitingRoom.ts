@@ -47,9 +47,7 @@ export async function waitingRoom() {
             opponent: player1.display_name,
         }
         
-        if (player1 && player2) { // si les jouers sont toujours dans le waiting room
-            
-            // put to db with game state ?
+        if (player1 && player2) {
 
             insertMatchToDB({
                 matchId,

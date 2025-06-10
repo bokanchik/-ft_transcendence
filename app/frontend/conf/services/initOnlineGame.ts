@@ -5,7 +5,7 @@ import { removeWaitingToast, showToast, showWaitingToast } from "../components/t
 import { initCountdown } from "../components/countdown.js";
 
 // --- Main Fonction for online game: 
-export async function handleOnlineGame(display_name: string, userId: string, container: HTMLElement, button: HTMLButtonElement, title: HTMLHeadElement): Promise<void> {
+export async function handleOnlineGame(display_name: string, userId: number, container: HTMLElement, button: HTMLButtonElement, title: HTMLHeadElement): Promise<void> {
     button.disabled = true; // pour eviter les multiples click (data race)
     try {
         await initOnlineGame(display_name, userId, container, title);
@@ -18,8 +18,15 @@ export async function handleOnlineGame(display_name: string, userId: string, con
     }
 }
 
+// for debugging
+interface SocketError extends Error {
+  code?: string;
+  description?: string;
+  context?: string;
+}
+
 // --- Fonction pour initialiser le client socket et le mettre dans le waiting room ---
-export async function initOnlineGame(display_name: string, userId: string, buttonsContainer: HTMLElement, title: HTMLHeadElement) {
+export async function initOnlineGame(display_name: string, userId: number, buttonsContainer: HTMLElement, title: HTMLHeadElement) {
     const controller: AbortController = new AbortController();
 
     if (!socket.connected) {
@@ -27,11 +34,12 @@ export async function initOnlineGame(display_name: string, userId: string, butto
     }
     
     socket.on('connect', () => {
-        console.log('Connected to the server');
+        console.log('Connecte au serveur');
         socket.emit('authenticate', { display_name, userId });
     });
     
     socket.on('inQueue', () => {
+        console.log('Dans la queue...');
         showWaitingToast(socket, controller);
     });
 
@@ -70,13 +78,17 @@ export async function initOnlineGame(display_name: string, userId: string, butto
         console.error('Socket error:', err);
     });
 
-    socket.on('connect_error', (err: Error) => {
+    socket.on('connect_error', (err: SocketError) => {
+       
         console.error(`Connection to the server is failed: ${err.message}`);
+        console.log(err.description);
+        console.log(err.context);
+       
         showToast('Failed to connect to server. Please try later.', 'error');
         cleanupSocket(socket);
       });
 
-    // --- TODO: emit on server side ---
+    // --- Match timeout (60s) event ---
     socket.on('matchTimeout', () => {
         showToast('No opponent found. Please try later.', 'error');
         cleanupSocket(socket);

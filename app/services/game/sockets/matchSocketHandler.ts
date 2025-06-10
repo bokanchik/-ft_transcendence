@@ -18,14 +18,13 @@ export async function matchSocketHandler(socket: Socket): Promise<void> {
    
     fastify.log.info(`Player connected: ${socket.id}`); 
 
-    localSocketEvents(socket);
-   // onlineSocketEvents(socket);
+    onlineGameInit(socket);
+    serverSocketEvents(socket);
 }
 
 // --- Main function for remote game socket handling
-async function onlineSocketEvents(socket: Socket) {
+async function onlineGameInit(socket: Socket) {
     waitingRoomHandler(socket);
-  //  gameRoutine(socket);
     disconnectionHandler(socket);
 }
 
@@ -34,7 +33,7 @@ async function waitingRoomHandler(socket: Socket) {
     socket.on('authenticate', async ({ display_name, userId }) => {
         try {
             // store display_name and socket.id in waiting list if not already in        
-            const newPlayer = await addPlayerToWaitingList(display_name,userId, socket.id);
+            const newPlayer = await addPlayerToWaitingList(display_name, userId, socket.id);
             
             if (newPlayer) {
                 socket.emit('inQueue');
@@ -56,16 +55,99 @@ async function waitingRoomHandler(socket: Socket) {
 
 }
 
-// --- Main function for game routine handling 
-// async function gameRoutine(socket: Socket) {
-//     socket.on('playerMove', ({ leftPaddle, rightPaddle }) => {
+const clientRooms = {};
+const state = {};
+const gameModes = {};
 
-//         fastify.log.info(leftPaddle);
-//         fastify.log.info(rightPaddle);
+function serverSocketEvents(socket: Socket) {
+    
+    socket.on('startRemote', () => {
+        fastify.log.info('Game started in remote mode');
+        gameModes[socket.id] = 'remote';
+        startRemoteGame(socket);
+    })
+    
 
-//         handlePlayerMove(leftPaddle, rightPaddle); // la logique du jeu est ici (ca update le state du jeu)
-//     });
-// }
+    socket.on('startLocal',  () => {    
+        fastify.log.info('Game started locally'); 
+        gameModes[socket.id] = 'local';
+        const state: GameState = createGameState();
+        startLocalGameInterval(state, socket);      
+    });
+    
+    socket.on('keydown', (keyCode: string) => {
+        if (gameModes[socket.id] === 'remote') {
+            if (keyCode !== '38' && keyCode !== '40') return;
+        }
+        handleKeydown(parseInt(keyCode))
+    });
+    
+    socket.on('keyup', (keyCode: string) => {
+        if (gameModes[socket.id] === 'remote') {
+            if (keyCode !== '38' && keyCode !== '40') return;
+        }
+        handleKeyup(parseInt(keyCode));
+    });
+    
+}
+
+
+function startRemoteGame(client: Socket) {
+    fastify.log.info(`Client socket: ` + client.id);
+    
+    let roomName = makeid(5);
+    clientRooms[client.id] = roomName;
+    // emit roomName ?
+    state[roomName] = createGameState();
+    client.join(roomName);
+    
+    fastify.log.info(state[roomName]);
+    // start game for this room
+    startRemoteGameInterval(state[roomName], client, roomName);
+    
+}
+
+function startRemoteGameInterval(state: GameState, socket: Socket, roomName: string) {
+    const intervalId = setInterval(() => {
+        const winner: number = gameLoop(state, socket); // if == 0, game continue, == 1, player 1 win, == 2 player 2 won
+        
+        if (!winner) {
+            socket.to(roomName).emit('gameState', state);
+            socket.emit('gameState', state);
+        } else {
+            socket.emit('gameOver');
+            resetScore();
+            clearInterval(intervalId);
+        }
+    }, 1000 / FRAME_RATE);
+    
+    socket.on('quitGame', () => {
+        resetScore();
+        clearInterval(intervalId);
+        return ;
+    })
+}
+
+
+function startLocalGameInterval(state: GameState, socket: Socket) {
+    const intervalId = setInterval(() => {
+        const winner: number = gameLoop(state, socket); // if == 0, game continue, == 1, player 1 win, == 2 player 2 won
+        
+        if (!winner) {
+            socket.emit('gameState', state);
+        } else {
+            socket.emit('gameOver');
+            resetScore();
+            clearInterval(intervalId);
+        }
+    }, 1000 / FRAME_RATE);
+    
+    socket.on('quitGame', () => {
+        resetScore();
+        clearInterval(intervalId);
+        return ;
+    })
+}
 
 
 async function disconnectionHandler(socket: Socket)  {
@@ -123,52 +205,6 @@ async function getOpponentSocketId(socketId: string): Promise<string | null> {
     }
 }
 
-function localSocketEvents(socket: Socket) {
-    
-    // --- !!! TESTING FOR LOCAL ----
-    const state = createGameState();
-
-    socket.on('start',  () => {
-     
-        fastify.log.info('Game started locally.');
-        
-        startGameInterval(state, socket);        
-    });
-    
-    socket.on('keydown', (keyCode: string) => {
-        handleKeydown(parseInt(keyCode))
-    });
-
-    socket.on('keyup', (keyCode: string) => {
-        handleKeyup(parseInt(keyCode));
-    });
-
-    
-    
-    // -------------------------------
-}
-
-function startGameInterval(state: GameState, socket: Socket) {
-    const intervalId = setInterval(() => {
-        const winner: number = gameLoop(state, socket); // if == 0, game continue, == 1, player 1 win, == 2 player 2 won
-        
-        if (!winner) {
-            socket.emit('gameState', state);
-        } else {
-            socket.emit('gameOver');
-            resetScore();
-            clearInterval(intervalId);
-        }
-    }, 1000 / FRAME_RATE);
-
-    socket.on('quitGame', () => {
-        resetScore();
-        clearInterval(intervalId);
-        return ;
-    })
-}
-
-
 // --- Helper functions
 let matchmakingLock = false;
 
@@ -194,4 +230,15 @@ export function clearMatchTimeout(socketId: string) {
         clearTimeout(timeout);
         timeouts.delete(socketId);
     }
+}
+
+function makeid(length: number) {
+    let res = '';
+    let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let charLen = characters.length;
+    for (let i = 0; i < length; i++) {
+        res += characters.charAt(Math.floor(Math.random() * charLen));
+    }
+    
+    return res;
 }

@@ -1,7 +1,8 @@
 import { type FastifyReply, type FastifyRequest } from 'fastify';
 import { getRowByMatchId, getMatchesByUserId } from '../database/dbModels.ts';
 import { MatchIdParams, MatchUserIdParams } from '../middleware/matchesSchemas.ts';
-
+import { MatchBaseSchema } from '../middleware/matchesSchemas.ts';
+import { z } from 'zod';
 // http post /api/game/match
 export async function createMatchHandler(req: FastifyRequest, reply: FastifyReply) {
     req.log.info(`Client envoie: ${JSON.stringify(req.validatedBody)}`);
@@ -30,8 +31,8 @@ export async function getMatchIdHandler(req: FastifyRequest<{ Params: MatchIdPar
     try {
         const match = await getRowByMatchId(matchId);
         if (match) {
-            return reply.code(200).send({
-                data: {
+
+            const res = {
                     id: match.id,
                     matchId: match.matchId,
                     player1_id: match.player1_id,
@@ -44,8 +45,9 @@ export async function getMatchIdHandler(req: FastifyRequest<{ Params: MatchIdPar
                     win_type: match.win_type,
                     created_at: match.created_at,
                     status: match.status
-                }
-            });
+            };
+            const validatedRes = MatchBaseSchema.parse(res);
+            return reply.code(200).send(validatedRes);
         }  else {
             return reply.code(404).send({ error: 'Match not found' });
         }

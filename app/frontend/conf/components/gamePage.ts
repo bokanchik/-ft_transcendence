@@ -7,11 +7,25 @@ import { showToast } from './toast.js';
 
 export type GameMode = 'local' | 'remote';
 
+/**
+ * @brief Renders the Game Page UI and sets up game mode interaction.
+ *
+ * @returns A DOM element (`HTMLElement`) representing the entire game page layout.
+ *
+ * @details
+ * - Checks if the user is authenticated; redirects to `/login` if not.
+ * - Constructs the full page layout including:
+ *   - Header with user info
+ *   - A main section with buttons to select game modes
+ *   - A footer with a link to return home
+ * - Provides an "Online game" button that:
+ *   - Verifies the user's session via `/api/users/me`
+ *   - Stores the selected game mode in `sessionStorage`
+ *   - Calls `handleOnlineGame` to start an online session
+ */
 export function GamePage(): HTMLElement {
-	//ajout arthur -> on check tout de suite si l'utilisateur est connecté
 	const authData = getUserDataFromStorage();
 
-	// Le HeaderComponent attend un currentUser.
 	// Si l'utilisateur n'est pas connecté, redirigez-le ou affichez un état alternatif.
 	if (!authData) {
 		console.warn("GamePage: User not authenticated, redirecting to login.");
@@ -46,13 +60,8 @@ export function GamePage(): HTMLElement {
     buttonsContainer.id = 'buttons-container';
     buttonsContainer.className = 'flex flex-col items-center';
     
-    // const localGameButton: HTMLButtonElement = document.createElement('button');
-    // localGameButton.id = 'local-button';
-    // localGameButton.className = 'bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mb-4 transition duration-300 ease-in-out';
-    // localGameButton.textContent = 'Local game';
-    
     const onlineGameButton: HTMLButtonElement  = document.createElement('button');
-    onlineGameButton.id = 'online-button';// fastify.get('/match/:matchId', { schema: matchSchemas.idOnly}, getMatchIdHandler);
+    onlineGameButton.id = 'online-button';
    
     onlineGameButton.className = 'bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mb-4 transition duration-300 ease-in-out';
     onlineGameButton.textContent = 'Online game';
@@ -86,14 +95,14 @@ export function GamePage(): HTMLElement {
     onlineGameButton.addEventListener('click', async () => { 
         
         try {
-            const userRes = await fetch('/api/users/me');
+            const userRes: Response = await fetch('/api/users/me');
             if (!userRes.ok) {
                 showToast('You must be logged in to play online', 'error');
                 return;
             }
             const userData = await userRes.json();
             const display_name: string = userData.display_name;
-            const userId: string = userData.id;
+            const userId: number = userData.id;
 
             sessionStorage.setItem('gameMode', 'remote');
 
@@ -105,7 +114,6 @@ export function GamePage(): HTMLElement {
             throw err;
         }
     });
-        // return container;
-        return pageWrapper; // ajout arthur
+        return pageWrapper;
 }
 
