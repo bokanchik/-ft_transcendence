@@ -86,7 +86,8 @@ export async function fetchUserDetails(userId: number): Promise<User> {
  */
 export async function fetchMatchHistoryForUser(userId: number): Promise<Match[]> {
 	try {
-		const response = await fetch(`/api/users/${userId}/matches`, {
+		// const response = await fetch(`/api/users/${userId}/matches`, {
+		const response = await fetch(`/api/game/history/${userId}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',

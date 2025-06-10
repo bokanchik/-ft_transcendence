@@ -70,7 +70,7 @@ export async function getMatchByUserHandler(req: FastifyRequest<{ Params: MatchU
     if (!userId) {
         return reply.code(400).send({ error: 'UserId is required'});
     }
-    req.log.info(`Fetching matche history for user: ${userId}`);
+    req.log.info(`Fetching matches history for user: ${userId}`);
     
     try {
         const matches = await getMatchesByUserId(userId);
