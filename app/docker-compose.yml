@@ -1,6 +1,10 @@
 secrets:
   gf_admin_pwd:
     file: ../secrets/gf_admin_pwd.txt
+  jwt_secret:
+    file: ../secrets/jwt_secret.txt
+  cookie_secret:
+    file: ../secrets/cookie_secret.txt
 
 
 networks:
@@ -22,7 +26,7 @@ services:
     ports:
       - "8443:8443"
     restart: always
-    env_file: .env
+    env_file: ./env/gateaway.env
     volumes:
       - frontdata:/usr/share/nginx/html:ro
     depends_on:
@@ -54,6 +58,12 @@ services:
     ports:
       - "4000:4000"
     env_file: .env
+    environment:
+      - JWT_SECRET__FILE=/run/secrets/jwt_secret
+      - COOKIE_SECRET__FILE=/run/secrets/cookie_secret
+    secrets:
+      - jwt_secret
+      - cookie_secret
     restart: always
     volumes:
       - ./services/shared:/app/shared:ro
@@ -66,6 +76,12 @@ services:
     ports:
       - "3001:3001"
     env_file: .env
+    environment:
+      - JWT_SECRET__FILE=/run/secrets/jwt_secret
+      - COOKIE_SECRET__FILE=/run/secrets/cookie_secret
+    secrets:
+      - jwt_secret
+      - cookie_secret
     restart: always
     volumes:
       - ./services/shared:/app/shared:ro
@@ -104,7 +120,7 @@ services:
     depends_on:
       - users
       - prometheus
-    env_file: .env
+    env_file: ./env/grafana.env
     environment:
       - GF_SECURITY_ADMIN_PASSWORD__FILE=/run/secrets/gf_admin_pwd
     networks:
