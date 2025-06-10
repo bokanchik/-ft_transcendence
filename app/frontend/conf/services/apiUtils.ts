@@ -1,5 +1,5 @@
 //@ts-ignore
-import { ApiErrorResponse } from "../shared/types.js";
+import { ApiErrorResponse } from "../utils/types.js";
 
 /**
  * Handles an API response, parsing JSON and throwing errors if the response is not OK.

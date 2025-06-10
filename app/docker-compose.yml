@@ -41,13 +41,10 @@ services:
     container_name: frontend
     build: ./frontend
     restart: always
-    env_file: .env
     ports:
       - "5000:5000" # for development (live-server)
     volumes:
       - frontdata:/app/dist
-      - ./services/shared/types.ts:/app/shared/types.ts:ro
-      - ./services/shared/env.ts:/app/shared/env.ts:ro
       - ./services/shared/schemas:/app/shared/schemas:ro
     networks:
       - tranet
@@ -57,7 +54,9 @@ services:
     container_name: users
     ports:
       - "4000:4000"
-    env_file: .env
+    env_file:
+      - ./env/common.env
+      - ./env/routes.env
     environment:
       - JWT_SECRET__FILE=/run/secrets/jwt_secret
       - COOKIE_SECRET__FILE=/run/secrets/cookie_secret
@@ -75,7 +74,9 @@ services:
     container_name: game
     ports:
       - "3001:3001"
-    env_file: .env
+    env_file:
+      - ./env/common.env
+      - ./env/routes.env
     environment:
       - JWT_SECRET__FILE=/run/secrets/jwt_secret
       - COOKIE_SECRET__FILE=/run/secrets/cookie_secret

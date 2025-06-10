@@ -1,6 +1,6 @@
 // /components/loginForm.ts
 import { LoginRequestBody } from '../shared/schemas/usersSchemas.js';
-import { ApiResult } from '../shared/types.js';
+import { ApiResult } from '../utils/types.js';
 
 interface LoginFormProps {
 	onLoginAttempt: (credentials: LoginRequestBody) => Promise<ApiResult>;

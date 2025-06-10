@@ -17,7 +17,6 @@ function getSecret(variableName: string): string | undefined {
   return process.env[variableName];
 }
 
-
 const envSchema = z.object({
 	NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 	LOG_LEVEL: z.string().min(1, " is required"),

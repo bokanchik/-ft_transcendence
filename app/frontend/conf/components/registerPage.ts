@@ -1,6 +1,6 @@
 import { attemptRegister } from '../services/authService.js';
 import { RegisterRequestBody } from '../shared/schemas/usersSchemas.js'
-import { ApiResult } from '../shared/types.js'
+import { ApiResult } from '../utils/types.js'
 import { navigateTo } from '../services/router.js';
 
 export async function RegisterPage(): Promise<HTMLElement> {
