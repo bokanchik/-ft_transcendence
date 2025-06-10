@@ -58,8 +58,7 @@ export const LoginRouteSchema = {
     response: {
         200: z.object({
             message: z.string(),
-            user: UserBaseSchema,
-            // csrfToken: z.string().optional(),
+            user: UserBaseSchema
         })
     }
 };

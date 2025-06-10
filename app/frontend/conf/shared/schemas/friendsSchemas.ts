@@ -73,11 +73,10 @@ export const SendFriendRequestRouteSchema = {
 	}
 };
 
-export const MessageResponseSchema = z.object({ message: z.string() });
 export const FriendshipActionRouteSchema = {
 	params: FriendshipIdParamsSchema,
 	response: {
-		200: MessageResponseSchema
+		200: z.object({ message: z.string() })
 	}
 };
 
@@ -95,3 +94,4 @@ export const GetPendingRequestsRouteSchema = {
 	}
 };
 
+export const MessageResponseSchema = z.object({ message: z.string() });

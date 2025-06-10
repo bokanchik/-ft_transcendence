@@ -1,14 +1,8 @@
 import { fetchWithCsrf } from './csrf.js';
-import {
-	Friend,
-	PendingFriendRequest,
-	PendingRequestsResponseSchema,
-	FriendsListResponseSchema,
-	MessageResponseSchema,
-} from '../shared/schemas/friendsSchemas.js';
-// import { handleApiResponse } from './apiUtils.js';
+import { Friend, PendingFriendRequest, PendingRequestsResponseSchema } from '../shared/schemas/friendsSchemas.js';
+import { handleApiResponse } from './apiUtils.js';
 import { config } from '../utils/config.js';
-import { handleApiResponse } from './error.js';
+// import { handleApiResponse } from './error.js';
 
 /**
  * Retrieves the friend requests received by the logged-in user.
@@ -21,8 +15,8 @@ export async function getReceivedFriendRequests(): Promise<PendingFriendRequest[
 		headers: { 'Content-Type': 'application/json' },
 		credentials: 'include',
 	});
-	return handleApiResponse(response, PendingRequestsResponseSchema);
-	// return handleApiResponse(response);
+	// return handleApiResponse(response, PendingRequestsResponseSchema);
+	return handleApiResponse(response);
 }
 
 /**
@@ -36,7 +30,7 @@ export async function getFriendsList(): Promise<Friend[]> {
 		headers: { 'Content-Type': 'application/json' },
 		credentials: 'include',
 	});
-	return handleApiResponse(response, FriendsListResponseSchema);
+	return handleApiResponse(response);
 }
 
 /**
@@ -50,7 +44,7 @@ export async function getSentFriendRequests(): Promise<PendingFriendRequest[]> {
 		headers: { 'Content-Type': 'application/json' },
 		credentials: 'include',
 	});
-	return handleApiResponse(response, PendingRequestsResponseSchema);
+	return handleApiResponse(response);
 }
 
 /**
@@ -63,7 +57,7 @@ export async function acceptFriendRequest(friendshipId: number): Promise<{ messa
 	const response = await fetchWithCsrf(url, {
 		method: 'POST',
 	});
-	return handleApiResponse(response, MessageResponseSchema);
+	return handleApiResponse(response);
 }
 
 /**
@@ -76,7 +70,7 @@ export async function declineFriendRequest(friendshipId: number): Promise<{ mess
 	const response = await fetchWithCsrf(url, {
 		method: 'POST',
 	});
-	return handleApiResponse(response, MessageResponseSchema);
+	return handleApiResponse(response);
 }
 
 /**
@@ -89,7 +83,7 @@ export async function cancelFriendRequest(friendshipId: number): Promise<{ messa
 	const response = await fetchWithCsrf(url, {
 		method: 'POST',
 	});
-	return handleApiResponse(response, MessageResponseSchema);
+	return handleApiResponse(response);
 }
 
 /**
@@ -104,7 +98,7 @@ export async function sendFriendRequest(friendId: number): Promise<{ message: st
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ friendId }),
 	});
-	return handleApiResponse(response, MessageResponseSchema);
+	return handleApiResponse(response);
 }
 
 /**
@@ -117,5 +111,5 @@ export async function removeFriend(friendshipId: number): Promise<{ message: str
 	const response = await fetchWithCsrf(url, {
 		method: 'POST',
 	});
-	return handleApiResponse(response, MessageResponseSchema);
+	return handleApiResponse(response);
 }
