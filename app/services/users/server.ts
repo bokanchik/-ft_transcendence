@@ -3,7 +3,7 @@ import { validatorCompiler, serializerCompiler, ZodTypeProvider } from 'fastify-
 import { config } from './shared/env.js';
 import { initializeDb } from './utils/dbConfig.js';
 import { setupPlugins } from './shared/auth-plugin/tokens.js';
-import { setupErrorHandler } from './shared/auth-plugin/appError.js';
+import { setupErrorHandler } from './utils/appError.js';
 import friendRoutes from './routes/friends.js';
 import userRoutes from './routes/users.js';
 import authRoutes from './routes/auth.js';

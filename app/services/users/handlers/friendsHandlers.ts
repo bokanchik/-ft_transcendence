@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import * as friendService from '../services/friendService.js';
-import { ERROR_MESSAGES, AppError } from '../shared/auth-plugin/appError.js';
+import { ERROR_MESSAGES, AppError } from '../utils/appError.js';
 import { JWTPayload } from '../shared/schemas/usersSchemas.js';
 
 // Types pour les requêtes avec params

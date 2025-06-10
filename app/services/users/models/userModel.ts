@@ -1,6 +1,6 @@
 // app/services/users/models/userModel.ts
 import { getDb } from '../utils/dbConfig.js';
-import { ERROR_MESSAGES } from '../shared/auth-plugin/appError.js';
+import { ERROR_MESSAGES } from '../utils/appError.js';
 import { User, UserWithPasswordHash, CreateUserPayload, UpdatedUserResult, UpdateUserPayload, UserOnlineStatus } from '../shared/schemas/usersSchemas.js'; // Importez vos types
 
 /**

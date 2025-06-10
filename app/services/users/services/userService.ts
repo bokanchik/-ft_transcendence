@@ -1,7 +1,7 @@
 // app/services/users/services/userService.ts
 import * as userModel from '../models/userModel.js';
-import * as passwordUtils from '../shared/auth-plugin/pswdUtils.js';
-import { ERROR_MESSAGES, ConflictError, ValidationError, NotFoundError } from '../shared/auth-plugin/appError.js';
+import * as passwordUtils from '../utils/pswdUtils.js';
+import { ERROR_MESSAGES, ConflictError, ValidationError, NotFoundError } from '../utils/appError.js';
 import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, CreateUserPayload, UserOnlineStatus } from '../shared/schemas/usersSchemas.js';
 
 /**

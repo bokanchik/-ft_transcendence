@@ -1,7 +1,7 @@
 // services/friendService.js
 import * as friendModel from '../models/friendModel.js';
 import * as userModel from '../models/userModel.js';
-import { ConflictError, NotFoundError, ValidationError, ForbiddenError } from '../shared/auth-plugin/appError.js';
+import { ConflictError, NotFoundError, ValidationError, ForbiddenError } from '../utils/appError.js';
 import { Friend, PendingFriendRequest, Friendship, FriendshipStatus } from '../shared/schemas/friendsSchemas.js';
 
 /**
