@@ -3,7 +3,6 @@ import {
 	getUsersHandler,
 	getUserMeHandler,
 	getUserInfoHandler,
-	getUserMeMatchHandler,
 	updateUserMeHandler,
 } from '../handlers/userHandlers.js';
 import { config } from '../shared/env.js';
@@ -45,11 +44,5 @@ export default async function userRoutes(fastify: FastifyInstance, options: Fast
 			schema: UpdateUserRouteSchema
 		},
 		updateUserMeHandler
-	);
-
-	fastify.get(
-		config.URL_USER_MATCH,
-		{ onRequest: [fastify.authenticate] },
-		getUserMeMatchHandler
 	);
 }

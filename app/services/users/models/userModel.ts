@@ -53,19 +53,6 @@ export async function getUserByIdFromDb(userId: number): Promise<User | undefine
 }
 
 /**
- * Retrieves all matches for a specific user.
- * @param {number} userId - The ID of the user.
- * @returns {Promise<any[]>} A list of matches for the user. // TODO: Définir un type Match et l'utiliser
- */
-export async function getUserMatchesFromDb(userId: number): Promise<any[]> { // Remplacez any[] par Match[]
-	const db = getDb();
-	// TODO: Implémentez la requête SQL correcte pour récupérer les matchs
-	// Exemple: return db.all('SELECT * FROM matches WHERE player1_id = ? OR player2_id = ?', [userId, userId]);
-	console.warn("getUserMatchesFromDb query needs to be implemented correctly for user ID:", userId);
-	return db.all('SELECT * FROM matches WHERE player1_id = ? OR player2_id = ?', [userId, userId]); // Placeholder, ajustez
-}
-
-/**
  * Creates a new user in the database.
  * @param {CreateUserPayload} user - The user data to insert.
  * @returns {Promise<void>} 

@@ -1,7 +1,6 @@
 // app/services/users/models/friendModel.ts
 import { getDb } from '../utils/dbConfig.js';
 import { Friendship, Friend, FriendshipStatus, PendingFriendRequest } from '../shared/schemas/friendsSchemas.js';
-import { User } from '../shared/schemas/usersSchemas.js';
 
 /**
  * Creates a new friendship request in the database.

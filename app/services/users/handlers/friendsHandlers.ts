@@ -82,18 +82,13 @@ export async function getMyFriendsHandler(req: FastifyRequest, reply: FastifyRep
 	return reply.send(friends);
 }
 
-export async function removeFriendshipHandler(
-	//    req: FastifyRequest<{ Params: { friendshipId: string } }>,
-	req: FastifyRequest,
-	reply: FastifyReply
-) {
+export async function removeFriendshipHandler( req: FastifyRequest, reply: FastifyReply ) {
 	const currentUserId = (req.user as JWTPayload).id;
 	const friendshipId = parseInt((req.params as any).friendshipId, 10);
 
 	if (isNaN(friendshipId)) {
 		return reply.code(400).send({ error: "Invalid friendship ID." });
 	}
-
 	req.log.info({ currentUserId, friendshipId }, 'Attempting to remove friendship');
 	const result = await friendService.removeFriendship(friendshipId, currentUserId);
 	return reply.send(result);

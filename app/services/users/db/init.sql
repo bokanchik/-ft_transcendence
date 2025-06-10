@@ -26,22 +26,6 @@ CREATE TABLE IF NOT EXISTS friendships (
     CONSTRAINT unique_pair UNIQUE (user1_id, user2_id)
 );
 
-CREATE TABLE IF NOT EXISTS matches (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    player1_id INTEGER NOT NULL,
-    player2_id INTEGER NOT NULL,
-    player1_score INTEGER NOT NULL,
-    player2_score INTEGER NOT NULL,
-    winner_id INTEGER NOT NULL,
-    win_type TEXT NOT NULL DEFAULT 'score',
-    match_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    game_type TEXT DEFAULT 'pong',
-    tournament_id INTEGER,
-    FOREIGN KEY(player1_id) REFERENCES users(id),
-    FOREIGN KEY(player2_id) REFERENCES users(id),
-    FOREIGN KEY(winner_id) REFERENCES users(id)
-);
-
 INSERT OR IGNORE INTO users (username, email, password_hash, display_name, avatar_url)
 VALUES
 	('Serge', 'serge@student.42.fr', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Serge P', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSq2Q26rH3nI4ossmbYm8jpCyYwuytbyk6iYXJ4_C4tO8FFgv4Wk488h9CB24G5jB46Qjk&usqp=CAU'),

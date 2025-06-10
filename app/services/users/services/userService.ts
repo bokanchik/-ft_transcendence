@@ -94,19 +94,6 @@ export async function getUserById(userId: number): Promise<User> {
 	return user;
 }
 
-
-/**
- * Retrieves the matches of a user by their ID.
- * @param {number} userId - The ID of the user whose matches to retrieve.
- * @throws {NotFoundError} If no matches are found for the user.
- * @returns {Promise<Array>} A list of matches for the user.
- */
-export async function getUserMatches(userId: number): Promise<any[]> { // TODO: Use Match[] type
-	console.log('Fetching user matches from the database');
-	const matches = await userModel.getUserMatchesFromDb(userId);
-	return matches;
-}
-
 /**
  * Updates the profile of a user.
  * @param {number} userId - The ID of the user to update.
