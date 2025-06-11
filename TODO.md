@@ -8,20 +8,28 @@
 - [x] logout -> supprimer token
 - [x] login/logout maj du status
 - [x] Affichage du status
+- [x] Affichage de l'avatar sur dashboard
 - [x] tout matches -> sasha ?
 - [x] verifier matches avec sasha
 - [x] -> zod/back 
 - [x] -> zod/front 
+- [ ] Réponse schemas
 - [x] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde) -> cookie jwt_token
 - [x] httpOnly cookie for server-side ? -> yes
+- [ ] 2FA
 - [x] grafana
 - [ ] grafana/dashboards
 - [x] env
 - [x] fichiers partagés
+- [ ] tout traduire
+- [ ] La gestion d'erreurs 
 - [ ] nettoyage
+- [ ] Boutons pour amis pour lancer un match
+- [ ] Route pour update win loses / Permissions pour faire ca ?
 
 ## 📌 Tâches initiales
 
+- [ ] update db user a chaque fin de match (score, win, lose, etc.)
 - [ ] jeu en local
 - [ ] redis pour les scores
 - [ ] Pages && components && services in frontend to clean !
@@ -32,7 +40,6 @@ at the end of a match -> call to database if need matchhistory)
 - [ ] Implementer les models pour les appels a la base de donnee
 - [ ] POST a Artur avec les donnees du match
 - [ ] Uniformiser les module et mduleResolution dans tsconfig.json
-
 
 ---
 

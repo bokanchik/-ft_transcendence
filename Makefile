@@ -6,7 +6,7 @@
 #    By: aduvilla <aduvilla@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/23 22:29:59 by aduvilla          #+#    #+#              #
-#    Updated: 2025/06/11 15:02:53 by aduvilla         ###   ########.fr        #
+#    Updated: 2025/06/11 17:17:54 by aduvilla         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,18 +17,15 @@ DC_FILE		= app/docker-compose.yml
 SHARED_FILE	= app/services/shared/schemas
 
 TARGET_FRONT	= app/frontend/src/shared/schemas
-# TARGET_FRONT	= app/frontend/conf/shared/schemas
 
 CREDENTIALS	= secrets/credentials.txt
 
 all			: up
 
-
 up			:
 #	@grep -Fvx -f $(CREDENTIALS) $(ENV_FILE) > $(ENV_FILE).tmp || true
 #	@cat $(CREDENTIALS) >> $(ENV_FILE).tmp
 #	@mv $(ENV_FILE).tmp $(ENV_FILE)
-#	@mkdir -p ~/data/mariadb ~/data/wordpress
 	@mkdir -p $(dir $(TARGET_FRONT))
 	@rm -rf $(TARGET_FRONT)
 	@cp -r $(SHARED_FILE) $(TARGET_FRONT)
@@ -45,7 +42,6 @@ down		:
 re			: down up
 
 fdown		:
-#	@sudo rm -rf ~/data
 	rm -rf $(TARGET_FRONT)
 	docker compose -f $(DC_FILE) down --rmi all -v --remove-orphans
 
