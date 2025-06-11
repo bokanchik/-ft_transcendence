@@ -2,11 +2,11 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-COPY package*.json .
+COPY conf/package*.json .
 
 RUN npm install
 
-COPY . .
+COPY conf/ .
 
-CMD ["npm", "run", "build"]
-# CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "dev"]
+
