@@ -6,7 +6,6 @@ secrets:
   cookie_secret:
     file: ../secrets/cookie_secret.txt
 
-
 networks:
   tranet:
     name: tranet
@@ -25,7 +24,6 @@ services:
     build: ./gateaway
     ports:
       - "8443:8443"
-      - "5173:5173" # for development (live-server)
     restart: always
     env_file: ./env/gateaway.env
     volumes:

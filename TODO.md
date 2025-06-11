@@ -9,7 +9,7 @@
 - [x] login/logout maj du status
 - [x] Affichage du status
 - [x] tout matches -> sasha ?
-- [ ] verifier matches avec sasha
+- [x] verifier matches avec sasha
 - [x] -> zod/back 
 - [x] -> zod/front 
 - [x] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde) -> cookie jwt_token
