@@ -28,7 +28,7 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		navigateTo('/login');
 		const redirectMsg = document.createElement('div');
 		redirectMsg.className = 'min-h-screen flex items-center justify-center text-xl';
-		redirectMsg.textContent = 'Redirecting to login...';
+		redirectMsg.textContent = t('msg.redirect.login');
 		return redirectMsg;
 	}
 
@@ -38,7 +38,7 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		console.error("Failed to fetch CSRF token:", error);
 		const errorMsg = document.createElement('div');
 		errorMsg.className = 'min-h-screen flex items-center justify-center text-xl text-red-500';
-		errorMsg.textContent = 'Error initializing page. Please try refreshing.';
+		errorMsg.textContent = t('msg.error.initializing');
 		return errorMsg;
 	}
 
@@ -238,12 +238,11 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		} else {
 			const errorMsg = document.createElement('div');
 			errorMsg.className = 'min-h-screen flex items-center justify-center text-xl text-red-500';
-			errorMsg.textContent = 'User not found. Please log in.';
+			errorMsg.textContent = t('msg.user.notFound');
 			return errorMsg;
 		}
 	}
 
-	// Charger le contenu de l'onglet initial
 	await loadActiveTabContent();
 
 	return pageContainer;
