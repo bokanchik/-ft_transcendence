@@ -16,8 +16,8 @@ DC_FILE		= app/docker-compose.yml
 
 SHARED_FILE	= app/services/shared/schemas
 
-TARGET_FRONT	= app/frontend/src/shared/schemas
-# TARGET_FRONT	= app/frontend/conf/shared/schemas
+# TARGET_FRONT	= app/frontend/src/shared/schemas
+TARGET_FRONT	= app/frontend/conf/shared/schemas
 
 CREDENTIALS	= secrets/credentials.txt
 
