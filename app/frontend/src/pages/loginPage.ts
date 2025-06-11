@@ -4,6 +4,7 @@ import { navigateTo } from '../services/router.js';
 import { LoginForm } from '../components/loginForm.js';
 import { LoginRequestBody } from '../shared/schemas/usersSchemas.js';
 import { ApiResult } from '../utils/types.js';
+import { t } from '../services/i18nService.js';
 
 export function LoginPage(): HTMLElement {
 	const container = document.createElement('div');
@@ -14,7 +15,7 @@ export function LoginPage(): HTMLElement {
 
 	const title = document.createElement('h2');
 	title.className = 'text-3xl font-bold mb-6 text-center text-gray-800';
-	title.textContent = 'Login';
+	title.textContent = t('login.title'); // Traduction
 
 	formContainer.appendChild(title);
 

@@ -1,0 +1,22 @@
+{
+  "app.title": "King-Pong",
+  "header.home": "Accueil",
+  "header.game": "Jeu",
+  "header.dashboard": "Tableau de Bord",
+  "header.settings": "Paramètres",
+  "header.logout": "Déconnexion",
+  "header.language": "ENG",
+  "login.title": "Connexion",
+  "login.identifierLabel": "Nom d'utilisateur ou Email",
+  "login.passwordLabel": "Mot de passe",
+  "login.button": "Se connecter",
+  "login.registerLink": "Pas de compte ? S'inscrire",
+  "dashboard.tabs.users": "Tous les utilisateurs",
+  "dashboard.tabs.friends": "Amis",
+  "dashboard.tabs.pending": "En attente",
+  "dashboard.tabs.history": "Historique des matchs",
+  "general.error": "Erreur",
+  "general.loading": "Chargement...",
+  "general.cancel": "Annuler",
+  "general.confirm": "Confirmer"
+}

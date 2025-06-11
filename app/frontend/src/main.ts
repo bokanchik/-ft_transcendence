@@ -11,9 +11,8 @@ import { ProfilePage } from './pages/profilePage.js';
 import { getUserDataFromStorage } from './services/authService.js';
 import { promptAliasForm } from './components/aliasFormPage.js';
 import { GameMode } from './components/gamePage.js'
-// import './style/input.css';
+import { initI18n, t } from './services/i18nService.js';
 
-// Conteneur où le contenu de la page sera injecté
 const appContainer = document.getElementById('main');
 
 interface RouteConfig {
@@ -110,7 +109,9 @@ export async function router() {
 }
 
 // Se déclenche lorsque le HTML initial est chargé
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    await initI18n(); // Initialise le service de traduction
+    document.title = t('app.title');
 	document.body.addEventListener('click', (event) => {
 		const target = event.target as HTMLElement;
 		const linkElement = target.closest('a[data-link]') as HTMLAnchorElement | null;
