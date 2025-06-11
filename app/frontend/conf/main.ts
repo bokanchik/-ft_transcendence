@@ -109,7 +109,7 @@ export async function router() {
 						<g class="plant1 fixed pointer-none">
 							<path id="branch" d="M368.535 206.71C368.234 207.318 367.71 207.848 366.977 208.302C357.01 209.056 328.707 208.314 282.573 201.239C173.195 180.655 13.0573 135.558 138.297 169.734C197.576 185.91 245.753 195.591 282.573 201.239C324.38 209.106 358.772 213.393 366.977 208.302C371.788 207.938 372.326 207.226 368.535 206.71Z" fill="#0E3C05" stroke="#0E3C05" stroke-width="2"/>
 							<g id="leaves">
-								<path class=" origin-top-right [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box]" d="M342.946 211.23C330.392 253.91 296.969 303.929 281.826 323.603C307.903 260.73 308.333 250.777 342.946 211.23Z" fill="#067042" stroke="#067042"/>
+								<path class="origin-top-right [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box]" d="M342.946 211.23C330.392 253.91 296.969 303.929 281.826 323.603C307.903 260.73 308.333 250.777 342.946 211.23Z" fill="#067042" stroke="#067042"/>
 								<path class="origin-bottom [animation:smallNegativeRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box]" d="M343.503 208.24C358.893 165.954 341.338 113.805 333.199 93.2834C335.109 133.353 339.476 188.896 343.503 208.24Z" fill="#067042" stroke="#067042"/>
 								<path class="origin-top-right [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box]" d="M310.952 207.035C282.949 254.734 249.054 301.565 235.607 319.019C249.386 287.497 283.745 220.97 310.952 207.035Z" fill="#067042" stroke="#067042"/>
 								<path class="origin-bottom [animation:smallNegativeRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box]" d="M310.867 204.343C324.596 147.618 299.536 98.0579 283.011 71.8242C288.568 107.723 301.919 184.485 310.867 204.343Z" fill="#067042" stroke="#067042"/>
@@ -265,6 +265,49 @@ export async function router() {
 							<path class="origin-bottom [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300" d="M265 250C252.5 212.167 242.9 113.4 304.5 21C298 76.1667 281 199.2 265 250Z" fill="#25885D" stroke="#25885D"/>
 							<path class="origin-bottom [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300" d="M304.5 200.5C301.167 153 315.6 49.1 400 13.5C378 54.3333 328.1 148.9 304.5 200.5Z" fill="#25885D" stroke="#25885D"/>
 							<path class="origin-bottom-left [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300" d="M345.5 162C372.333 134.667 438.9 75.6 490.5 58C462.5 95.5 394.3 168.8 345.5 162Z" fill="#25885D" stroke="#25885D"/>
+						</g>
+					</svg>
+				</div>
+			</div>
+		</div>
+		<div class="plant2 pointer-none absolute center top-0 right-0">
+			<div class="rotate-parent origin-top">
+				<div class="rotate-hover ">
+					<svg width="350" height="400" viewBox="0 0 86 211" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<g id="plant3">
+							<g id="leaves">
+								<g class="origin-right [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300">
+									<path d="M71.165 4.76527C71.1107 4.76049 71.0557 4.7534 71 4.7439C71.0561 4.75108 71.1111 4.75821 71.165 4.76527C72.5736 4.88934 73.5186 3.46296 74 2.50002C74.3163 1.86747 75.5 1 77.5 1C76 3 76.3908 3.80464 75 4.50002C73.6482 5.1759 73.0348 5.01025 71.165 4.76527Z" fill="#25885D"/>
+									<path d="M71 4.7439C72.5 5.00002 73.5 3.50008 74 2.50002C74.3163 1.86747 75.5 1 77.5 1C76 3 76.3908 3.80464 75 4.50002C73.6092 5.1954 73 5 71 4.7439Z"/>
+								</g>
+								<path class="origin-right [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300" d="M60.0014 8C61.5014 8.5 62.6833 9.66474 63.0012 10.5C62.8196 9.85034 64.1371 8.81085 61 5.5C59.4206 3.83313 59.1865 5.33435 55.5013 2C55.238 4.91762 56.576 6.07545 57.0014 6.5C57.5018 6.99942 58.5939 7.53084 60.0014 8Z" fill="#25885D" />
+								<path class="origin-right [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300" d="M71 7.76308C68.485 8.60121 67.5 9.57638 66 8.74304C70.5 11.243 71 11.2634 72.5 10.7634C74 10.2634 74.5 10.2631 77.5 9.76368C75.5 8.74321 73.9109 6.79301 71 7.76308Z" fill="#25885D" />
+								<path class="origin-right [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300" d="M51.3058 17.5C56.1807 16.2813 57.8664 17.6429 58.3057 18.2945C58.0547 17.7877 57.5229 14.326 53.8058 13.5C49.3058 12.5 48.8057 12.5 45.3057 10.5C44.8057 12 44.883 13.6546 45.8057 15.5C46.8057 17.5 49.3057 18 51.3058 17.5Z" fill="#25885D" />
+								<g class="origin-top-left [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300">
+									<path d="M59.1187 17.1886C59.0711 17.1904 59.0313 17.1851 59 17.1718C59.0399 17.1767 59.0795 17.1823 59.1187 17.1886C59.9702 17.1559 63.311 14.833 65.1176 14.833C67.4118 14.833 70.3235 17.1664 73 16.4998C71.0882 19.4998 68 20.9998 65.1176 20.9998C62.747 20.9998 61.7076 17.6033 59.1187 17.1886Z" fill="#25885D"/>
+									<path d="M59 17.1718C59.592 17.4227 63.21 14.833 65.1176 14.833C67.4118 14.833 70.3235 17.1664 73 16.4998C71.0882 19.4998 68 20.9998 65.1176 20.9998C62.7111 20.9998 61.6765 17.4997 59 17.1718Z"/>
+								</g>
+								<path class="origin-top [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300" d="M45.5 30.5C50.9412 29.2607 51.4402 31.5719 52 32.5C51.6801 31.7782 52.8885 28.4945 47.3652 24.8158C44.5844 22.9637 42.7306 26.2048 36.2423 22.5C35.7787 25.7418 37.1827 28.1479 39.5 30C41.8173 31.8521 42.2558 31.2389 45.5 30.5Z" fill="#25885D" />
+								<g class="origin-top-left [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300">
+								<path d="M52.167 35.5327C52.0995 35.537 52.0435 35.5293 52 35.5082C52.0563 35.5161 52.112 35.5243 52.167 35.5327C53.299 35.4601 57.6457 32 60 32C63 32 65.5 31 69 30C66.5 34.5 66 37.5 59.4839 37.5C56.3875 37.5 55.5275 36.0479 52.167 35.5327Z" fill="#25885D"/>
+								<path d="M52 35.5082C52.7742 35.8845 57.5054 32 60 32C63 32 65.5 31 69 30C66.5 34.5 66 37.5 59.4839 37.5C56.3369 37.5 55.5 36 52 35.5082Z" />
+								</g>
+								<path class="origin-top-right [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300" d="M32.5 53C36.5 51 44.3333 48.4224 46.5 48.589C45 47.5892 45.5 48.5887 35.5 41.3452C29.66 37.1151 23 40.3455 13 41.345C23.5 54.5 28.5 55 32.5 53Z"/>
+								<path class="origin-left [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300"" d="M58.5 48.5C53.6668 48.5 48.5 56.4229 47 55.5895C51.5 58.0895 54.2889 60 61.5 60C68 60 75.5 51.5006 78 44.5C70.5 48 65 48.5 58.5 48.5Z"/>
+								<path class="origin-bottom [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300" d="M31.9787 76.6765C38.5176 74.6765 43.4415 75.0712 44 76.016C43.6809 75.2811 40.8584 71.3023 28.2795 64.8913C21.8066 61.5923 15.3334 64.8909 1 67.2497C8.39789 76.2051 11.5 79.7684 19.4947 80.4476C25.0432 80.919 27.355 78.0907 31.9787 76.6765Z"/>
+								<path class="origin-top-right [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box]  stroke-emerald-300" d="M55.5 75C52.1678 77.0363 47 82 44 83.1798C49.5 82.5 55.5 85.4997 64 85.4997C71.1589 85.4997 83.5 82.5 85 63.5C63.5 76 64.5 69.5 55.5 75Z"/>
+								<path class="origin-right [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300" d="M34 104.744C37.257 102.224 40.8333 100.577 43 100.744C41.5 99.7443 37.5 100.744 27.5 93.5003C21.66 89.2701 14.5 93.5005 4.5 94.5C20 113.5 28.5 109 34 104.744Z"/>
+								<path class="origin-right [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300" d="M55 98.4994C51.4486 101.778 45.5 102.12 44 101.287C48.5 103.787 54.449 110.51 61.5 108.999C68.5 107.499 78 103.499 81.5 92.4988C62.5 89 61.5 92.4991 55 98.4994Z"/>
+								<path class="origin-right [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300" d="M35 123C38 120.5 42.3961 118.797 43 119.8C42.6549 119.02 40.3332 119.458 35.4941 117.128C29 114 16.9 115.791 12.5 119.8C13.0176 119.911 21 121.5 23.5 123C26.2116 124.627 30.9084 126.41 35 123Z"/>
+								<path class="origin-right [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300" d="M55 115.5C50.6 117.5 46.5 119.312 45 118.479C49.5 120.979 48.2698 120.411 55 123C61.5 125.501 73 122.501 75.5 115.5C67 115.501 60.5 113 55 115.5Z"/>
+								<path class="origin-right [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300" d="M34 139.743C36 136.143 40.8333 135.576 43 135.743C41.5 134.743 40 137.243 34 133.243C28 129.243 24 133.243 14 134.243C17 144.743 31.5 144.243 34 139.743Z"/>
+								<path class="origin-right [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300" d="M52.5 139.5C50 136.5 49.2248 135.836 46 135.836L51.4419 133.911C64.5023 129.29 73.0891 136.508 74.5 141C62 141.5 54.965 142.458 52.5 139.5Z"/>
+								<path class="origin-right [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300" d="M33.1455 159.75C36.2 158.075 39.1091 155.744 41 155.904C39.6909 154.943 37.7007 158.285 33.1455 153.501C28.3455 148.46 25.2909 147.498 17 149.421C19.6182 159.517 29.1238 161.957 33.1455 159.75Z"/>
+								<path class="origin-right [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300" d="M54 156.286C49.6 158.286 45.5 157.119 44 156.286C48.5 158.786 47.1733 156.731 51.5 162.5C54.5 166.5 64.5 164.5 68.5 158C60 156.714 59.5 153.786 54 156.286Z"/>
+								<path class="origin-right [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300" d="M48.5 174.5C44.1 176.5 40 175.333 38.5 174.5C43 177 38.3079 176.573 44 181C48.5 184.5 59 182.333 62.5 179C55.5 176 54 172 48.5 174.5Z"/>
+								<path class="origin-right [animation:smallPositiveRotation_1s_ease-in-out_infinite_alternate] [transform-box:fill-box] fill-emerald-300 stroke-emerald-300" d="M28.9765 179.102C35.858 176.478 36.3961 174.091 37 175.094C36.6549 174.314 34.153 175.094 29.4941 172.421C23.9035 169.214 19.4 171.085 15 175.094C15.5176 175.205 18 176.5 20.5 178C23.2116 179.627 24 181 28.9765 179.102Z"/>
+								</g>
+							<path id="branch" d="M45.5 128.5C48.5 165.5 27.5 197.5 23 209.5L21 206.5C29.0034 197.5 46.5 160.5 44 128.5C40.0927 78.4867 48 12.5 72 4.5C44 20 42.1113 86.7057 45.5 128.5Z" fill="#0E3C05" stroke="#0E3C05"/>
 						</g>
 					</svg>
 				</div>
