@@ -6,10 +6,16 @@ export default defineConfig({
     // Si votre frontend tourne sur un port (ex: 5173) et votre backend sur un autre (ex: 3000)
     proxy: {
       // Toute requête commençant par /api sera redirigée vers votre backend
-      '/api': {
-        target: 'http://localhost:3000', // <-- METTEZ ICI L'ADRESSE DE VOTRE BACKEND
+      '/api/users': {
+        target: 'http://localhost:4000', // <-- METTEZ ICI L'ADRESSE DE VOTRE BACKEND
         changeOrigin: true, // Nécessaire pour les hôtes virtuels
         secure: false,      // Si votre backend n'a pas de certificat SSL en dev
+        },
+        '/api/game': {
+        target: 'http://localhost:3001', // <-- METTEZ ICI L'ADRESSE DE VOTRE BACKEND
+        changeOrigin: true, // Nécessaire pour les hôtes virtuels
+        secure: false,      // Si votre backend n'a pas de certificat SSL en dev
+
       },
     },
     // Si vous utilisez HTTPS en dev, configurez-le ici

@@ -31,6 +31,7 @@ export async function createMatchTable() {
 	try {
 		await execute(db, matchTable);
 		console.log('Matches table created or already exists.');
+		// --- TEST ----
 		await execute(db, fillMatchTable);
 		console.log('Sample data inserted into matches table.');
 	} catch (err: unknown) {
