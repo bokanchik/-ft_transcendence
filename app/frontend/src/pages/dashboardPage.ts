@@ -226,9 +226,9 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		return FriendRequestsComponent({
 			receivedRequests: received,
 			sentRequests: sent,
-			onAcceptRequest: handleAcceptFriendRequest, // Réutilisation du handler global
-			onDeclineRequest: handleDeclineFriendRequest, // Réutilisation du handler global
-			onCancelRequest: handleCancelFriendRequest, // Réutilisation du handler global
+			onAcceptRequest: handleAcceptFriendRequest,
+			onDeclineRequest: handleDeclineFriendRequest,
+			onCancelRequest: handleCancelFriendRequest,
 		});
 	}
 
