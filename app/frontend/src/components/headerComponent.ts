@@ -3,15 +3,15 @@ import { User } from '../shared/schemas/usersSchemas.js';
 import { navigateTo } from '../services/router.js'; // Assuming navigateTo handles data-link
 import { logout } from '../services/authService.js';
 import { showToast } from './toast.js';
+import { t, getLanguage, setLanguage } from '../services/i18nService.js';
 
 interface HeaderProps {
 	currentUser: User;
-	// onLanguageChange?: () => void;
 }
 
 interface NavLink {
 	href: string;
-	text: string;
+	textKey: string; // On utilise une clé de traduction au lieu de texte en dur
 }
 
 export function HeaderComponent(props: HeaderProps): HTMLElement {
@@ -24,24 +24,30 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 	const leftSection = document.createElement('div');
 	const langButton = document.createElement('button');
 	langButton.className = 'bg-blue-500 text-white font-bold py-2 px-4 rounded-lg text-sm hover:bg-blue-600 transition-colors';
-	langButton.textContent = 'ENG';
-	// langButton.addEventListener('click', () => { /* ... */ });
+    
+    // Le bouton affiche la langue vers laquelle on veut basculer
+	langButton.textContent = getLanguage() === 'fr' ? 'EN' : 'FR';
+	
+    langButton.addEventListener('click', () => {
+        const newLang = getLanguage() === 'fr' ? 'en' : 'fr';
+        setLanguage(newLang); // Appelle la fonction qui change la langue et rafraîchit tout
+    });
 	leftSection.appendChild(langButton);
 
 	// --- Center: Navigation Links ---
 	const centerSection = document.createElement('div');
-	centerSection.className = 'flex-grow flex justify-center space-x-4 sm:space-x-6'; // flex-grow to push others, justify-center
+	centerSection.className = 'flex-grow flex justify-center space-x-4 sm:space-x-6';
 
 	const navLinks: NavLink[] = [
-		{ href: '/', text: 'Home' },
-		{ href: '/game', text: 'Game' },
-		{ href: '/dashboard', text: 'Dashboard' },
+		{ href: '/', textKey: 'header.home' },
+		{ href: '/game', textKey: 'header.game' },
+		{ href: '/dashboard', textKey: 'header.dashboard' },
 	];
 
 	navLinks.forEach(linkInfo => {
 		const linkElement = document.createElement('a');
 		linkElement.href = linkInfo.href;
-		linkElement.textContent = linkInfo.text;
+		linkElement.textContent = t(linkInfo.textKey); // traduit
 		linkElement.className = 'text-gray-600 hover:text-blue-600 font-medium transition-colors px-2 py-1 text-sm sm:text-base';
 		linkElement.setAttribute('data-link', '');
 		centerSection.appendChild(linkElement);
@@ -49,7 +55,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 
 	// --- Right side: User Header (Avatar & Menu) ---
 	const rightSection = document.createElement('div');
-	const userHeader = document.createElement('div');
+    const userHeader = document.createElement('div');
 	userHeader.className = 'flex items-center space-x-4 relative';
 
 	const avatarDisplayWrapper = document.createElement('div');
@@ -68,6 +74,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 	avatarDisplayWrapper.appendChild(displayNameHeader);
 	avatarDisplayWrapper.appendChild(avatarHeader);
 
+
 	const miniMenu = document.createElement('div');
 	miniMenu.className = 'absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-50 hidden flex-col';
 	miniMenu.style.top = '110%';
@@ -76,18 +83,18 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 	settingsButton.href = '/profile';
 	settingsButton.setAttribute('data-link', '');
 	settingsButton.className = 'block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-lg';
-	settingsButton.textContent = 'Settings';
+	settingsButton.textContent = t('header.settings'); // Traduction
 
 	const logoutButtonEl = document.createElement('button');
 	logoutButtonEl.className = 'block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-b-lg';
-	logoutButtonEl.textContent = 'Logout';
+	logoutButtonEl.textContent = t('header.logout'); // Traduction
 	logoutButtonEl.addEventListener('click', async (e) => {
 		e.stopPropagation();
 		try {
 			await logout();
-			showToast('You have been logged out.', 'success');
+			showToast('You have been logged out.', 'success'); // a traduire
 		} catch (error) {
-			showToast('Error logging out.', 'error');
+			showToast('Error logging out.', 'error'); // a traduire
 		} finally {
 			navigateTo('/login');
 		}
@@ -99,9 +106,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 	userHeader.appendChild(miniMenu);
 	rightSection.appendChild(userHeader);
 
-
-	// Menu open/close logic
-	let menuOpen = false;
+    let menuOpen = false;
 	const toggleMenu = (show: boolean) => {
 		menuOpen = show;
 		miniMenu.classList.toggle('hidden', !menuOpen);
@@ -118,7 +123,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		}
 	};
 	document.addEventListener('click', globalClickListener);
-	// Consider cleanup only if this component could be frequently removed/re-added or if multiple such components exist on one page.
+
 
 	// Assemble the header sections
 	headerContainer.appendChild(leftSection);
