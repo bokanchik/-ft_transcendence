@@ -19,6 +19,7 @@ import { UserList, UserListProps } from '../components/userList.js';
 import { HeaderComponent } from '../components/headerComponent.js';
 import { showToast } from '../components/toast.js';
 import { MatchHistoryComponent } from '../components/matchHistoryComponent.js';
+import { t } from '../services/i18nService.js';
 
 export async function DashboardPage(): Promise<HTMLElement> {
 	const currentUser: User | null = getUserDataFromStorage();
@@ -79,12 +80,12 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		return item;
 	}
 
-	sidebar.appendChild(createSidebarItem('Username', currentUser.username));
-	sidebar.appendChild(createSidebarItem('Display Name', currentUser.display_name));
-	sidebar.appendChild(createSidebarItem('Email', currentUser.email));
-	sidebar.appendChild(createSidebarItem('Creation Date', new Date(currentUser.created_at)));
-	sidebar.appendChild(createSidebarItem('Wins', currentUser.wins ?? 'N/A'));
-	sidebar.appendChild(createSidebarItem('Losses', currentUser.losses ?? 'N/A'));
+	sidebar.appendChild(createSidebarItem(t('sidebar.username'), currentUser.username));
+	sidebar.appendChild(createSidebarItem(t('sidebar.displayName'), currentUser.display_name));
+	sidebar.appendChild(createSidebarItem(t('sidebar.email'), currentUser.email));
+	sidebar.appendChild(createSidebarItem(t('sidebar.createdAt'), new Date(currentUser.created_at)));
+	sidebar.appendChild(createSidebarItem(t('sidebar.wins'), currentUser.wins ?? 'N/A'));
+	sidebar.appendChild(createSidebarItem(t('sidebar.losses'), currentUser.losses ?? 'N/A'));
 
 	// --- Contenu à onglets ---
 	const tabContentWrapper = document.createElement('div');
@@ -94,10 +95,10 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	tabNavigation.className = 'flex space-x-1 border-b border-gray-200 mb-6';
 
 	const TABS = [
-		{ id: 'users', label: 'All Users', componentLoader: loadUsersContent },
-		{ id: 'friends', label: 'Friends', componentLoader: loadFriendsContent },
-		{ id: 'pending', label: 'Pending', componentLoader: loadPendingRequestsContent },
-		{ id: 'history', label: 'History Match', componentLoader: loadMatchHistoryContent },
+		{ id: 'users', label: t('dashboard.tabs.users'), componentLoader: loadUsersContent },
+		{ id: 'friends', label: t('dashboard.tabs.friends'), componentLoader: loadFriendsContent },
+		{ id: 'pending', label: t('dashboard.tabs.pending'), componentLoader: loadPendingRequestsContent },
+		{ id: 'history', label: t('dashboard.tabs.history'), componentLoader: loadMatchHistoryContent },
 	];
 	let activeTabId = TABS[0].id;
 

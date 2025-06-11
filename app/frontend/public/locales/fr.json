@@ -18,5 +18,11 @@
   "general.error": "Erreur",
   "general.loading": "Chargement...",
   "general.cancel": "Annuler",
-  "general.confirm": "Confirmer"
+  "general.confirm": "Confirmer",
+  "sidebar.username": "Nom d'utilisateur",
+  "sidebar.displayName": "Nom d'affichage",
+  "sidebar.email": "Email",
+  "sidebar.createdAt": "Créé le",
+  "sidebar.wins": "Victoires",
+  "sidebar.losses": "Défaites"
 }
