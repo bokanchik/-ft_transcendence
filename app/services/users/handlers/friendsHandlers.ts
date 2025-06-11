@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import * as friendService from '../services/friendService.js';
-import { ERROR_MESSAGES, AppError } from '../shared/auth-plugin/appError.js';
+import { ERROR_MESSAGES, AppError } from '../utils/appError.js';
 import { JWTPayload } from '../shared/schemas/usersSchemas.js';
 
 // Types pour les requêtes avec params
@@ -44,10 +44,6 @@ export async function acceptFriendRequestHandler(req: FastifyRequest, reply: Fas
 	const currentUserId = (req.user as JWTPayload).id;
 	const friendshipId = parseInt((req.params as any).friendshipId, 10);
 
-	if (isNaN(friendshipId)) {
-		throw new AppError(ERROR_MESSAGES.INVALID_FRIENDSHIP_ID, 400);
-	}
-
 	req.log.info({ currentUserId, friendshipId }, 'Attempting to accept friend request');
 	const result = await friendService.acceptFriendRequest(friendshipId, currentUserId);
 	return reply.send(result);
@@ -86,18 +82,13 @@ export async function getMyFriendsHandler(req: FastifyRequest, reply: FastifyRep
 	return reply.send(friends);
 }
 
-export async function removeFriendshipHandler(
-	//    req: FastifyRequest<{ Params: { friendshipId: string } }>,
-	req: FastifyRequest,
-	reply: FastifyReply
-) {
+export async function removeFriendshipHandler( req: FastifyRequest, reply: FastifyReply ) {
 	const currentUserId = (req.user as JWTPayload).id;
 	const friendshipId = parseInt((req.params as any).friendshipId, 10);
 
 	if (isNaN(friendshipId)) {
 		return reply.code(400).send({ error: "Invalid friendship ID." });
 	}
-
 	req.log.info({ currentUserId, friendshipId }, 'Attempting to remove friendship');
 	const result = await friendService.removeFriendship(friendshipId, currentUserId);
 	return reply.send(result);

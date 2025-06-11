@@ -58,7 +58,8 @@ export const LoginRouteSchema = {
     response: {
         200: z.object({
             message: z.string(),
-            user: UserBaseSchema
+            user: UserBaseSchema,
+            // csrfToken: z.string().optional(),
         })
     }
 };
@@ -68,6 +69,20 @@ export const LogoutRouteSchema = {
         200: z.object({
             message: z.string()
         })
+    }
+};
+
+// GET ALL USERS
+export const GetUsersListRouteSchema = {
+    response: {
+        200: z.array(UserBaseSchema)
+    }
+};
+
+// GET /me
+export const GetMeRouteSchema = {
+    response: {
+        200: UserBaseSchema
     }
 };
 
@@ -127,3 +142,4 @@ export const JWTPayloadSchema = z.object({
     exp: z.number().optional(),
 });
 export type JWTPayload = z.infer<typeof JWTPayloadSchema>;
+

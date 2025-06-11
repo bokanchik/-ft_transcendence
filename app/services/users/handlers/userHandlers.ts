@@ -15,11 +15,6 @@ export async function getUserMeHandler(req: AuthenticatedRequest, reply: Fastify
 	return reply.code(200).send(user);
 }
 
-export async function getUserMeMatchHandler(req: AuthenticatedRequest, reply: FastifyReply) {
-	const matches = await userService.getUserMatches(req.user.id);
-	return reply.code(200).send(matches);
-}
-
 export async function updateUserMeHandler(req: AuthenticatedRequest, reply: FastifyReply) {
 	const userId = req.user.id;
 	const updates = req.body as UpdateUserPayload;
@@ -47,20 +42,3 @@ export async function getUserInfoHandler(req: AuthenticatedRequest, reply: Fasti
 
 	return reply.code(200).send(user);
 }
-// export async function getUserInfoHandler(req: AuthenticatedRequest, reply: FastifyReply) {
-
-// const parseResult = UserIdParamsSchema.safeParse(req.params);
-
-// 	if (!parseResult.success) {
-// 		return reply.code(400).send({ error: 'Invalid user ID format' });
-// 	}
-
-// 	const { userId } = parseResult.data;
-// 	const userIdNum = parseInt(userId, 10);
-
-// 	const user = await userService.getUserById(userIdNum);
-// 	if (!user) {
-// 		return reply.code(404).send({ error: 'User not found.' });
-// 	}
-// 	return reply.code(200).send(user);
-// }

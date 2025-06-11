@@ -6,7 +6,7 @@
 #    By: aduvilla <aduvilla@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/23 22:29:59 by aduvilla          #+#    #+#              #
-#    Updated: 2025/05/15 23:48:57 by aduvilla         ###   ########.fr        #
+#    Updated: 2025/06/11 17:17:54 by aduvilla         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,16 +14,21 @@ ENV_FILE	= app/.env
 
 DC_FILE		= app/docker-compose.yml
 
+SHARED_FILE	= app/services/shared/schemas
+
+TARGET_FRONT	= app/frontend/src/shared/schemas
+
 CREDENTIALS	= secrets/credentials.txt
 
 all			: up
-
 
 up			:
 #	@grep -Fvx -f $(CREDENTIALS) $(ENV_FILE) > $(ENV_FILE).tmp || true
 #	@cat $(CREDENTIALS) >> $(ENV_FILE).tmp
 #	@mv $(ENV_FILE).tmp $(ENV_FILE)
-#	@mkdir -p ~/data/mariadb ~/data/wordpress
+	@mkdir -p $(dir $(TARGET_FRONT))
+	@rm -rf $(TARGET_FRONT)
+	@cp -r $(SHARED_FILE) $(TARGET_FRONT)
 	docker compose -f $(DC_FILE) up -d
 #	@grep -Fvx -f $(CREDENTIALS) $(ENV_FILE) > $(ENV_FILE).tmp || true
 #	@mv $(ENV_FILE).tmp $(ENV_FILE)
@@ -37,7 +42,7 @@ down		:
 re			: down up
 
 fdown		:
-#	@sudo rm -rf ~/data
+	rm -rf $(TARGET_FRONT)
 	docker compose -f $(DC_FILE) down --rmi all -v --remove-orphans
 
 prune		: fdown

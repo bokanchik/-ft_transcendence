@@ -1,7 +1,7 @@
 // app/services/users/services/userService.ts
 import * as userModel from '../models/userModel.js';
-import * as passwordUtils from '../shared/auth-plugin/pswdUtils.js';
-import { ERROR_MESSAGES, ConflictError, ValidationError, NotFoundError } from '../shared/auth-plugin/appError.js';
+import * as passwordUtils from '../utils/pswdUtils.js';
+import { ERROR_MESSAGES, ConflictError, ValidationError, NotFoundError } from '../utils/appError.js';
 import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, CreateUserPayload, UserOnlineStatus } from '../shared/schemas/usersSchemas.js';
 
 /**
@@ -92,22 +92,6 @@ export async function getUserById(userId: number): Promise<User> {
 		throw new NotFoundError('User not found');
 	}
 	return user;
-}
-
-
-/**
- * Retrieves the matches of a user by their ID.
- * @param {number} userId - The ID of the user whose matches to retrieve.
- * @throws {NotFoundError} If no matches are found for the user.
- * @returns {Promise<Array>} A list of matches for the user.
- */
-export async function getUserMatches(userId: number): Promise<any[]> { // TODO: Use Match[] type
-	console.log('Fetching user matches from the database');
-	const matches = await userModel.getUserMatchesFromDb(userId);
-	if (!matches) {
-		throw new NotFoundError('No matches found for this user'); // TODO: virer le if car matches deja undefined si vide
-	}
-	return matches;
 }
 
 /**

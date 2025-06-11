@@ -1,0 +1,47 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "Frontend application for Ping-Pong",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+   "prepare:dist": "mkdir -p ./dist/css ./dist/js",
+    "build:clean": "rm -rf ./dist/*",
+    "build:html": "cp index.html ./dist/index.html",
+    "build:ts": "tsc",
+    "build:css": "./node_modules/.bin/tailwindcss -i ./src/style/input.css -o ./dist/css/style.css --minify",
+    "build:public": "cp -r public/* dist/",
+    "build": "npm run build:clean && npm run prepare:dist && npm run build:html && npm run build:ts && npm run build:css && npm run build:public",
+    "watch:ts": "tsc --watch > ./logs/tsc.log 2>&1",
+    "watch:css": "./node_modules/.bin/tailwindcss -i ./style/input.css -o ./dist/css/style.css --watch > ./logs/tailwind.log 2>&1",
+    "dev": "npm run build && mkdir -p ./logs && concurrently \"npm run watch:ts\" \"npm run watch:css\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.4",
+    "@tailwindcss/postcss": "^4.1.8",
+    "@tailwindcss/vite": "^4.1.8",
+    "@types/node": "^22.15.17",
+    "@types/socket.io-client": "^1.4.36",
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^9.1.2",
+    "http-server": "^14.1.1",
+    "postcss": "^8.5.4",
+    "tailwindcss": "^4.1.8"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/csrf-protection": "^7.1.0",
+    "@types/bcrypt": "^5.0.2",
+    "bcrypt": "^6.0.0",
+    "commander": "^13.1.0",
+    "dotenv": "^16.5.0",
+    "fastify-type-provider-zod": "^4.0.2",
+    "socket.io-client": "^4.8.1",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "zod": "^3.24.4"
+  }
+}

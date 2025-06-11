@@ -1,6 +1,6 @@
 // app/services/users/models/userModel.ts
 import { getDb } from '../utils/dbConfig.js';
-import { ERROR_MESSAGES } from '../shared/auth-plugin/appError.js';
+import { ERROR_MESSAGES } from '../utils/appError.js';
 import { User, UserWithPasswordHash, CreateUserPayload, UpdatedUserResult, UpdateUserPayload, UserOnlineStatus } from '../shared/schemas/usersSchemas.js'; // Importez vos types
 
 /**
@@ -50,19 +50,6 @@ export async function getUserByEmailFromDb(email: string): Promise<UserWithPassw
 export async function getUserByIdFromDb(userId: number): Promise<User | undefined> {
 	const db = getDb();
 	return db.get<User>('SELECT id, username, email, display_name, avatar_url, wins, losses, status, created_at, updated_at FROM users WHERE id = ?', [userId]);
-}
-
-/**
- * Retrieves all matches for a specific user.
- * @param {number} userId - The ID of the user.
- * @returns {Promise<any[]>} A list of matches for the user. // TODO: Définir un type Match et l'utiliser
- */
-export async function getUserMatchesFromDb(userId: number): Promise<any[]> { // Remplacez any[] par Match[]
-	const db = getDb();
-	// TODO: Implémentez la requête SQL correcte pour récupérer les matchs
-	// Exemple: return db.all('SELECT * FROM matches WHERE player1_id = ? OR player2_id = ?', [userId, userId]);
-	console.warn("getUserMatchesFromDb query needs to be implemented correctly for user ID:", userId);
-	return db.all('SELECT * FROM matches WHERE player1_id = ? OR player2_id = ?', [userId, userId]); // Placeholder, ajustez
 }
 
 /**

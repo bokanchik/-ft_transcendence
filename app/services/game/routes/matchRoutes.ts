@@ -1,7 +1,7 @@
 //import fastify from '../server.ts';
 import type { FastifyInstance } from 'fastify';
 import { createMatchHandler, getMatchIdHandler, getMatchByUserHandler } from '../handlers/matchHandlers.ts'
-import { createLocalMatchBody, GetMatchIdRouteSchema, GetMatchByUserIdRouteSchema } from '../middleware/matchesSchemas.ts';
+import { createLocalMatchBody, GetMatchIdRouteSchema, GetMatchByUserIdRouteSchema } from '../shared/schemas/matchesSchemas.ts';
 
 function matchRoutes(fastify: FastifyInstance, _options: unknown) {
 

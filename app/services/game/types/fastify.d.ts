@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { Server } from 'socket.io';
-import { createMatchSchema } from '../middleware/matchSchemas.ts';
+import { createMatchSchema } from '../shared/schemas/matchSchemas.ts';
 import z from "zod";
 
 declare module 'fastify' {
