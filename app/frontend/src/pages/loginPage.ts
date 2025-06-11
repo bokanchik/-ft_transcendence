@@ -24,7 +24,7 @@ export function LoginPage(): HTMLElement {
 	};
 
 	// Fonction de rappel pour le succès de la connexion
-	const handleLoginSuccess = (_userData: any) => {
+	const handleLoginSuccess = (userData: any) => {
 		setTimeout(() => { navigateTo('/dashboard'); }, 500);
 	};
 

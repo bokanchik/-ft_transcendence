@@ -36,6 +36,7 @@ export function FriendsListComponent(props: FriendsListProps): HTMLElement {
 			const wins = friend.friend_wins ?? 0;
 			const losses = friend.friend_losses ?? 0;
 
+			// const avatarFallbackName = displayName.charAt(0).toUpperCase();
 			const avatar = avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random&color=fff&size=40`;
 
 			let statusIndicatorClass = 'bg-gray-400';

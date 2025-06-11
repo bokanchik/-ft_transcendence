@@ -1,5 +1,3 @@
-import { Socket } from "socket.io-client";
-
 export function showToast(message: string, type: 'success' | 'error' = 'success') {
     const existingToast = document.querySelector('.custom-toast');
     if (existingToast) {
@@ -114,7 +112,7 @@ export function showCustomConfirm(message: string, title: string = "Confirmation
     });
 }
 
-export function showWaitingToast(socket: Socket, controller: AbortController) {
+export function showWaitingToast(socket: SocketIOClient.Socket, controller: AbortController) {
     const existingToast = document.querySelector('.custom-waiting-toast');
     if (existingToast) {
         existingToast.remove();

@@ -1,8 +1,6 @@
-import { io, Socket } from "socket.io-client";
+import { Socket } from "socket.io-client"
 
-const URL = 'http://localhost:3001';
-
-const socket: Socket = io(URL, {
+const socket: typeof Socket = io('http://localhost:3001', {
     transports: ['websocket'],
     autoConnect: false,
 });

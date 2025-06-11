@@ -6,7 +6,7 @@
 #    By: aduvilla <aduvilla@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/23 22:29:59 by aduvilla          #+#    #+#              #
-#    Updated: 2025/06/11 12:33:35 by aduvilla         ###   ########.fr        #
+#    Updated: 2025/06/11 15:02:53 by aduvilla         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -29,8 +29,9 @@ up			:
 #	@cat $(CREDENTIALS) >> $(ENV_FILE).tmp
 #	@mv $(ENV_FILE).tmp $(ENV_FILE)
 #	@mkdir -p ~/data/mariadb ~/data/wordpress
-	rm -rf $(TARGET_FRONT)
-	cp -r $(SHARED_FILE) $(TARGET_FRONT)
+	@mkdir -p $(dir $(TARGET_FRONT))
+	@rm -rf $(TARGET_FRONT)
+	@cp -r $(SHARED_FILE) $(TARGET_FRONT)
 	docker compose -f $(DC_FILE) up -d
 #	@grep -Fvx -f $(CREDENTIALS) $(ENV_FILE) > $(ENV_FILE).tmp || true
 #	@mv $(ENV_FILE).tmp $(ENV_FILE)

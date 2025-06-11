@@ -2,7 +2,7 @@ import { GameMode } from "../components/gamePage.js";
 import { cleanupSocket } from "../services/initOnlineGame.js";
 import { navigateTo } from "../services/router.js";
 import socket from '../services/socket.js';
-// import { showGameResult } from "../components/gameResults.js";
+import { showGameResult } from "../components/gameResults.js";
 import { showCustomConfirm } from "../components/toast.js";
 //@ts-ignore
 import { GameState } from '../shared/gameTypes.js';
@@ -36,7 +36,7 @@ const gameState: GameState = {
 // boolean qui sert pour arreter dessiner le jeu
 let isGameOver = false;
 
-export function GameRoomPage(_mode: GameMode): HTMLElement {
+export function GameRoomPage(mode: GameMode): HTMLElement {
 	
 	// Conteneur principal
 	const container = document.createElement('div');
@@ -185,7 +185,7 @@ function setBoard(leftUsername: HTMLDivElement, rightUsername: HTMLDivElement) {
 }
 
 
-function clientSocketHandler(scoreDisplay: HTMLDivElement, _gameMode: string | null, ctx: CanvasRenderingContext2D) {
+function clientSocketHandler(scoreDisplay: HTMLDivElement, gameMode: string | null, ctx: CanvasRenderingContext2D) {
 	
 	if (!socket.connected) {
 		socket.connect();
@@ -233,23 +233,23 @@ function handleGameState(state: GameState, ctx: CanvasRenderingContext2D) {
 }
 
 
-// async function getDisplayName(userId: number) : Promise<string> {
-// 	const userRes = await fetch(`api/users/${userId}`);
-// 	if (!userRes.ok) throw new Error('Failed to fetch user info');
-// 	const userData = await userRes.json();
-// 	const displayName = userData.display_name;
+async function getDisplayName(userId: number) : Promise<string> {
+	const userRes = await fetch(`api/users/${userId}`);
+	if (!userRes.ok) throw new Error('Failed to fetch user info');
+	const userData = await userRes.json();
+	const displayName = userData.display_name;
 	
-// 	return displayName;
-// }
+	return displayName;
+}
 
-// async function getUserAvatar(userId: number) : Promise<string> {
-// 	const userRes = await fetch(`/api/users/${userId}`);
-// 	if (!userRes.ok) throw new Error('Failed to fetch user info');
-// 	const userData = await userRes.json();
-// 	const url: string = userData.avatar_url;
+async function getUserAvatar(userId: number) : Promise<string> {
+	const userRes = await fetch(`/api/users/${userId}`);
+	if (!userRes.ok) throw new Error('Failed to fetch user info');
+	const userData = await userRes.json();
+	const url: string = userData.avatar_url;
 	
-// 	return url;
-// }
+	return url;
+}
 
 // function startOnlineGame(socket: SocketIOClient.Socket) {
 	

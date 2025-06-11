@@ -1,6 +1,5 @@
 import { UUID } from "crypto";
 import { navigateTo } from "./router.js";
-import { Socket } from "socket.io-client";
 import socket from "./socket.js";
 import { removeWaitingToast, showToast, showWaitingToast } from "../components/toast.js";
 import { initCountdown } from "../components/countdown.js";
@@ -20,7 +19,7 @@ export async function handleOnlineGame(display_name: string, userId: string, con
 }
 
 // --- Fonction pour initialiser le client socket et le mettre dans le waiting room ---
-export async function initOnlineGame(display_name: string, userId: string, _buttonsContainer: HTMLElement, _title: HTMLHeadElement) {
+export async function initOnlineGame(display_name: string, userId: string, buttonsContainer: HTMLElement, title: HTMLHeadElement) {
     const controller: AbortController = new AbortController();
 
     if (!socket.connected) {
@@ -132,7 +131,7 @@ export async function initOnlineGame(display_name: string, userId: string, _butt
 
 
 // --- Helper to cleanup Socket connexion ---
-export function cleanupSocket(socket: Socket) {
+export function cleanupSocket(socket: SocketIOClient.Socket) {
     socket.removeAllListeners();
     socket.disconnect();
 }

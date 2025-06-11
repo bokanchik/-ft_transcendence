@@ -127,7 +127,6 @@ export function UserList(props: UserListProps): HTMLElement {
 			friendshipStatus.textContent = 'Not Friends'; // Statut par défaut si aucune des conditions
 			actionButton = createActionButton({
 				text: 'Inviter', // 'bg-blue-500'
-				variant: 'primary',
 				onClick: () => onSendRequest(user.id)
 			});
 		}
