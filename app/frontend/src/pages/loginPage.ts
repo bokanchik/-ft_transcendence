@@ -41,11 +41,11 @@ export function LoginPage(): HTMLElement {
 	linksDiv.className = 'mt-6 text-center';
 	linksDiv.innerHTML = `
         <a href="/" data-link class="text-blue-600 hover:text-blue-800 text-sm">
-            Back to Home
+            ${t('login.backToHome')}
         </a>
         <span class="mx-2 text-gray-400">|</span>
         <a href="/register" data-link class="text-blue-600 hover:text-blue-800 text-sm">
-            Don't have an account? Register
+            ${t('login.registerLink')}
         </a>
     `;
 	formContainer.appendChild(linksDiv);

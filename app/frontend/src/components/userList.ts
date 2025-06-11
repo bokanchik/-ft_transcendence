@@ -1,6 +1,7 @@
 import { Friend, PendingFriendRequest } from '../shared/schemas/friendsSchemas.js';
 import { User as ApiUser, UserOnlineStatus } from '../shared/schemas/usersSchemas.js';
 import { createActionButton } from '../utils/domUtils.js';
+import { t } from '../services/i18nService.js';
 
 export interface UserListProps {
 	users: ApiUser[];
@@ -54,15 +55,15 @@ export function UserList(props: UserListProps): HTMLElement {
 
 		const avatarSrc = avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random&color=fff&size=40`;
 
-		let statusIndicatorClass = 'bg-gray-400'; // Offline par défaut
-		let statusText = 'Offline';
+		let statusIndicatorClass = 'bg-gray-400';
+		let statusText = t('status.offline');
 
 		if (status === UserOnlineStatus.ONLINE) {
 			statusIndicatorClass = 'bg-green-500';
-			statusText = 'Online';
+			statusText = t('status.online');
 		} else if (status === UserOnlineStatus.IN_GAME) {
 			statusIndicatorClass = 'bg-yellow-500';
-			statusText = 'In Game';
+			statusText = t('status.inGame');
 		}
 
 		userPrimaryInfoContainer.innerHTML = `
@@ -71,7 +72,6 @@ export function UserList(props: UserListProps): HTMLElement {
                 <div class="flex items-center mb-1">
                     <span class="inline-block w-3 h-3 ${statusIndicatorClass} rounded-full mr-2" title="${statusText}"></span>
                     <strong class="text-lg text-gray-700">${displayName}</strong>
-                    <!-- Le (@username) a été enlevé d'ici -->
                 </div>
                 <div class="text-xs text-gray-500">
                     <span>Wins: ${wins}</span> | <span>Losses: ${losses}</span>
@@ -95,38 +95,39 @@ export function UserList(props: UserListProps): HTMLElement {
 		const receivedRequestFromThisUser = receivedRequests.find(r => r.requester?.id === user.id);
 
 		if (isFriend) {
-			friendshipStatus.textContent = 'Friends';
+			friendshipStatus.textContent = t('friend.status.friend');
 			friendshipStatus.className += ' text-green-600 font-semibold';
 		} else if (sentRequestToThisUser) {
-			friendshipStatus.textContent = 'Friend request sent';
+			friendshipStatus.textContent = t('friend.notFriends');
 			friendshipStatus.className += ' text-yellow-600';
 			actionButton = createActionButton({
-				text: 'Cancel Request',
-				variant: 'warning', // 'bg-yellow-500 text-black',
+				text: t('friend.cancelRequest'),
+				variant: 'warning',
 				onClick: () => onCancelRequest(sentRequestToThisUser.friendship_id)
 			});
 		} else if (receivedRequestFromThisUser) {
-			friendshipStatus.textContent = 'Request received';
+			friendshipStatus.textContent = t('friend.requestReceived');
 			friendshipStatus.className += ' text-indigo-600';
 
 			actionButtonsContainer = document.createElement('div');
 			actionButtonsContainer.className = 'flex space-x-1'; // Mettre les boutons côte à côte
 			const acceptBtn = createActionButton({
-				text: 'Accept',
-				variant: 'success', // 'bg-green-500'
+				text: t('friend.accept'),
+				variant: 'success',
 				onClick: () => onAcceptRequest(receivedRequestFromThisUser.friendship_id)
 				});
 			const declineBtn = createActionButton({
-				text: 'Decline',
-				variant: 'danger', // 'bg-red-500'
+				text: t('friend.decline'),
+				variant: 'danger',
 				onClick: () => onDeclineRequest(receivedRequestFromThisUser.friendship_id)
 				});
 			actionButtonsContainer.appendChild(acceptBtn);
 			actionButtonsContainer.appendChild(declineBtn);
 		} else {
-			friendshipStatus.textContent = 'Not Friends'; // Statut par défaut si aucune des conditions
+			friendshipStatus.textContent = t('friend.status.notFriend'); // Statut par défaut si aucune des conditions
 			actionButton = createActionButton({
-				text: 'Inviter', // 'bg-blue-500'
+				text: t('friend.request'),
+				variant: 'primary',
 				onClick: () => onSendRequest(user.id)
 			});
 		}
@@ -146,25 +147,3 @@ export function UserList(props: UserListProps): HTMLElement {
 
 	return ul;
 }
-
-// function createActionButton(text: string, baseClass: string, onClick: () => Promise<void>): HTMLButtonElement {
-// 	const button = document.createElement('button');
-// 	button.textContent = text;
-// 	button.className = `${baseClass} text-white text-xs font-semibold py-1 px-2.5 rounded hover:opacity-80 transition-opacity disabled:opacity-50`;
-// 	button.addEventListener('click', async (e) => {
-// 		e.stopPropagation();
-// 		button.disabled = true;
-// 		const originalText = button.textContent;
-// 		button.textContent = '...';
-// 		try {
-// 			await onClick();
-// 		} catch (error) {
-// 			const actionText = originalText || 'action';
-// 			console.error(`Error performing action "${actionText}":`, error);
-// 			alert(`Failed to ${actionText.toLowerCase()}.`);
-// 			button.textContent = originalText;
-// 			button.disabled = false;
-// 		}
-// 	});
-// 	return button;
-// }
