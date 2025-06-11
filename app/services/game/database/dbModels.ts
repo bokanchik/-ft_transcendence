@@ -142,6 +142,28 @@ export async function getAllRows() {
 	}
 }
 
+export async function getOpponentSocketId(socketId: string): Promise<string | null> {
+	const sql = `
+		SELECT * FROM matches
+		WHERE player1_socket = ? OR player2_socket = ?
+		ORDER BY created_at DESC
+		LIMIT 1
+	`;
+	
+	try {
+		const match = await fetchFirst(db, sql, [socketId, socketId]);
+		if (!match) return null;       
+		if (match.player1_socket === socketId) {
+			return match.player2_socket;
+		} else {
+			return match.player1_socket;
+		}
+	} catch (err: unknown) {
+		console.log(`Failed to find the match: ${err}`);
+		return null;
+	}
+}
+
 export async function updateStatus(status: MatchStatus, matchId: string) {
 
 	let sql = `UPDATE matches SET status = ? WHERE matchId = ? `;

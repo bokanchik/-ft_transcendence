@@ -181,13 +181,13 @@ function clientSocketHandler(scoreDisplay: HTMLDivElement, gameMode: string | nu
 		handleRemoteEvents(ctx, scoreDisplay);
 	}
 	
+	document.addEventListener('keydown', keydown);
+	document.addEventListener('keyup', keyup);
 }
 
 function handleRemoteEvents(ctx: CanvasRenderingContext2D, scoreDisplay: HTMLDivElement) {
 	socket.emit('startRemote');
 
-	document.addEventListener('keydown', keydown);
-	document.addEventListener('keyup', keyup);
 	
 	socket.on('gameState', (state: GameState) => {
 		handleGameState(state, ctx);
@@ -203,16 +203,13 @@ function handleRemoteEvents(ctx: CanvasRenderingContext2D, scoreDisplay: HTMLDiv
 		isGameOver = true;
 		cleanupSocket(socket);
 		sessionStorage.clear();
-		navigateTo('/local-game');
+		navigateTo('/game');
 		isGameOver = false;
 	});
 }
 
 function handleLocalEvents(ctx: CanvasRenderingContext2D, scoreDisplay: HTMLDivElement) {
 	socket.emit('startLocal');
-	
-	document.addEventListener('keydown', keydown);
-	document.addEventListener('keyup', keyup);
 	
 	socket.on('gameState', (state: GameState) => {
 		handleGameState(state, ctx);

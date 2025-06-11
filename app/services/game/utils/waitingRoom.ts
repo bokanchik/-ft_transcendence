@@ -2,6 +2,10 @@ import { fastify } from "../server.ts";
 import { clearMatchTimeout } from "../sockets/matchSocketHandler.ts";
 import { insertMatchToDB } from "../database/dbModels.ts";
 import { updateStatus } from "../database/dbModels.ts";
+import type { Socket } from "socket.io";
+// @ts-ignore
+import { TIMEOUT_MS } from "../shared/gameTypes.ts";
+const timeouts: Map<string, NodeJS.Timeout> = new Map();
 
 // import Game from "../models/gameModel.js";
 
@@ -12,6 +16,33 @@ type PlayerInfo = {
 }
 
 let waitingList: Map<string, PlayerInfo> = new Map();
+
+export async function waitingRoomHandler(socket: Socket) {
+    
+    socket.on('authenticate', async ({ display_name, userId }) => {
+        try {
+            // store display_name and socket.id in waiting list if not already in        
+            const newPlayer = await addPlayerToWaitingList(display_name, userId, socket.id);
+            
+            if (newPlayer) {
+                socket.emit('inQueue');
+                // set timeout of 1 min for matchmaking process
+                const timeout = setTimeout(() => {
+                    fastify.log.info(`Timeout of matchmaking for player: ${display_name}`);
+                    socket.emit('matchTimeout');
+                    cleanOnDisconnection(socket.id);
+                }, TIMEOUT_MS);
+                timeouts.set(socket.id, timeout);
+            }
+            // call to waiting room
+            await tryMatchPlayers();
+        } catch (err: unknown) {
+            fastify.log.error(`Error during matchmaking process: ${err}`);
+            throw err;
+        }
+    });
+
+}
 
 // --- Waiting room system ---
 export async function waitingRoom() {
@@ -109,4 +140,23 @@ export function addPlayerToWaitingList(display_name: string, userId: number, soc
     waitingList.set(socketId, { display_name, userId, socketId } );
     fastify.log.info(`Player ${display_name} with socket: ${socketId} added to waiting list. List size: ${waitingList.size}`);
     return true;
+}
+
+// --- Helper functions
+let matchmakingLock = false;
+
+async function tryMatchPlayers() {
+    if (matchmakingLock || getWaitingListSize() < 2) return;
+    matchmakingLock = true;
+    try {
+        await waitingRoom();
+    } finally {
+        matchmakingLock = false;
+    }
+}
+
+export function cleanOnDisconnection(socketId: string) {
+    fastify.log.info(`Player disconnected: ${socketId}`);
+    removePlayerFromWaitingList(socketId);
+    clearMatchTimeout(socketId);
 }
