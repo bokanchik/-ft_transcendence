@@ -1,27 +1,34 @@
 //@ts-ignore
-import { GameState, W, S, ARROW_UP, ARROW_DOWN, PADDLE_SPEED, GAME_HEIGHT, GAME_WIDTH, PADDLE_HEIGHT, PADDLE_WIDTH, FINAL_SCORE, MAX_SPEED } from "../shared/gameTypes.js";
+import { GameState, W, S, ARROW_UP, ARROW_DOWN, PADDLE_SPEED, GAME_HEIGHT, GAME_WIDTH, PADDLE_HEIGHT, PADDLE_WIDTH, FINAL_SCORE, MAX_SPEED, PADDLE_X_LEFT, PADDLE_X_RIGHT } from "../shared/gameTypes.js";
 import { fastify } from "../server.ts";
 import { Socket } from "socket.io";
 
 const keyState = {
-    W: false,
-    S: false, 
-    UP: false,
-    DOWN: false
+    local: {
+        W: false,
+        S: false, 
+        UP: false,
+        DOWN: false
+    },
+    remote: {
+        left: {
+            UP: false,
+            DOWN: false,
+        },
+        right: {
+            UP: false,
+            DOWN: false,
+        }
+    }
 };
-
-let score1: number = 0; // left player
-let score2: number = 0; // right player
 
 export function createGameState(): GameState {
     return {
         leftPaddle: {
-            x: 20,
             y: 200,
             vy: 0,
         },
         rightPaddle: {
-            x: 770,
             y: 200,
             vy: 0,
         },
@@ -32,10 +39,12 @@ export function createGameState(): GameState {
             vy: 2,
             radius: 15
         },
+        score1: 0, // left
+        score2: 0, // right
     }
 }
 
-export function gameLoop(state: GameState, socket: Socket): number {    
+export function gameLoop(state: GameState, mode: string): number {    
     const ball = state.ball;
     const leftPaddle = state.leftPaddle;
     const rightPaddle = state.rightPaddle;
@@ -45,10 +54,17 @@ export function gameLoop(state: GameState, socket: Socket): number {
     ball.y += ball.vy;
     
     // 2. move the paddles with bounds check
-    if (keyState.W) state.leftPaddle.y -= PADDLE_SPEED;
-    if (keyState.S) state.leftPaddle.y += PADDLE_SPEED;
-    if (keyState.UP) state.rightPaddle.y -= PADDLE_SPEED;
-    if (keyState.DOWN) state.rightPaddle.y += PADDLE_SPEED;
+    if (mode === 'local') {
+        if (keyState.local.W) state.leftPaddle.y -= PADDLE_SPEED;
+        if (keyState.local.S) state.leftPaddle.y += PADDLE_SPEED;
+        if (keyState.local.UP) state.rightPaddle.y -= PADDLE_SPEED;
+        if (keyState.local.DOWN) state.rightPaddle.y += PADDLE_SPEED;
+    } else if (mode === 'remote') {
+        if (keyState.remote.left.UP) state.leftPaddle.y -= PADDLE_SPEED;
+        if (keyState.remote.left.DOWN) state.leftPaddle.y += PADDLE_SPEED;
+        if (keyState.remote.right.UP) state.rightPaddle.y -= PADDLE_SPEED;
+        if (keyState.remote.right.DOWN) state.rightPaddle.y += PADDLE_SPEED;
+    }
 
     leftPaddle.y = Math.min(leftPaddle.y, GAME_HEIGHT - PADDLE_HEIGHT);
     rightPaddle.y = Math.min(rightPaddle.y, GAME_HEIGHT - PADDLE_HEIGHT);
@@ -62,11 +78,11 @@ export function gameLoop(state: GameState, socket: Socket): number {
     }
     
     // 3. detect collision of a ball (with walls and paddles) et changer la vitesse de la balle + l'angle
-    if (isBallCollision(ball, leftPaddle) && ball.vx < 0) {
+    if (isBallCollision(ball, PADDLE_X_LEFT, leftPaddle.y) && ball.vx < 0) {
         const impactY = (ball.y - (leftPaddle.y + PADDLE_HEIGHT / 2)) / (PADDLE_HEIGHT / 2);
         ball.vx = Math.min(-ball.vx * 1.05, MAX_SPEED); // Inverser et accélérer horizontalement
         ball.vy = ball.vy + impactY * 2; // Modifier l’angle verticalement
-    } else if (isBallCollision(ball, rightPaddle) && ball.vx > 0) {
+    } else if (isBallCollision(ball, PADDLE_X_RIGHT, rightPaddle.y) && ball.vx > 0) {
         const impactY = (ball.y - (rightPaddle.y + PADDLE_HEIGHT / 2)) / (PADDLE_HEIGHT / 2);
         ball.vx = Math.max(-ball.vx * 1.05, -MAX_SPEED);
         ball.vy = ball.vy + impactY * 2;
@@ -75,32 +91,32 @@ export function gameLoop(state: GameState, socket: Socket): number {
     
     // 4. check if a player scored (si la balle a touche le mur -> but !)
     if (ball.x - ball.radius <= 0) {
-        updateScore('right', socket);
+        updateScore('right', state);
         resetBall(state);
     }
     if (ball.x + ball.radius >= GAME_WIDTH) {
-        updateScore('left', socket);
+        updateScore('left', state);
         resetBall(state);
     }
     
     // 5. return 0 - continues, 1/2 if there is a winner
-    if (score1 == FINAL_SCORE) {
+    if (state.score1 == FINAL_SCORE) {
         return 1; // leftPlayer won
-    } else if (score2 == FINAL_SCORE) {
+    } else if (state.score2 == FINAL_SCORE) {
         return 2; // rightPlayer won
     }
     
     return 0;
 }
 
-function updateScore(side: string, socket: Socket) {
+function updateScore(side: string, state: GameState) {
     if (side === 'left') {
-        score1++;
+        state.score1++;
     } else if (side === 'right') {
-        score2++;
+        state.score2++;
     }
-    socket.emit('scoreUpdated', ({ score1, score2 }));
-    fastify.log.info(`New score ${score1} : ${score2}`);
+   
+    fastify.log.info(`New score {${state.score1}} : {${state.score2}}`);
 }
 
 function resetBall(state: GameState) {
@@ -120,10 +136,10 @@ function resetBall(state: GameState) {
 }
 
 
-function isBallCollision(ball: any, paddle: any): boolean {
+function isBallCollision(ball: any, paddleX: any, paddleY): boolean {
     // 1. Calculate the center x and y of a paddle, using the left corner x and y
-    const paddleCenterX = paddle.x + PADDLE_WIDTH / 2;
-    const paddleCenterY = paddle.y + PADDLE_HEIGHT / 2;
+    const paddleCenterX = paddleX + PADDLE_WIDTH / 2;
+    const paddleCenterY = paddleY + PADDLE_HEIGHT / 2;
 
     // 2.   Calculate the absolute values of the x and y difference between
     //      the center of a ball and a paddle
@@ -148,27 +164,36 @@ function isBallCollision(ball: any, paddle: any): boolean {
     
 }
 
-export function resetScore() {
-    score1 = 0;
-    score2 = 0;
+export function handleKeydownRemote(key: number, side: string, state: GameState) {
+    switch (key) {
+        case ARROW_UP: keyState.remote[side].UP = true; break;
+        case ARROW_DOWN: keyState.remote[side].DOWN = true; break;
+    }
+}
+
+export function handleKeyupRemote(key: number, side: string, state: GameState) {
+    switch (key) {
+            case ARROW_UP: keyState.remote[side].UP = false; break;
+            case ARROW_DOWN: keyState.remote[side].DOWN = false; break;
+    }
 }
 
 export function handleKeydown(key: number) {
     
     switch (key) {
-        case W: keyState.W = true; break;
-        case S: keyState.S = true; break;
-        case ARROW_UP: keyState.UP = true; break;
-        case ARROW_DOWN: keyState.DOWN = true; break;
+        case W: keyState.local.W = true; break;
+        case S: keyState.local.S = true; break;
+        case ARROW_UP: keyState.local.UP = true; break;
+        case ARROW_DOWN: keyState.local.DOWN = true; break;
     }
 }
             
 export function handleKeyup(key: number) {
     switch (key) {
-        case W: keyState.W = false; break;
-        case S: keyState.S = false; break;
-        case ARROW_UP: keyState.UP = false; break;
-        case ARROW_DOWN: keyState.DOWN = false; break;
+        case W: keyState.local.W = false; break;
+        case S: keyState.local.S = false; break;
+        case ARROW_UP: keyState.local.UP = false; break;
+        case ARROW_DOWN: keyState.local.DOWN = false; break;
     }
 }
       

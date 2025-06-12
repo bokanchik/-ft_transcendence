@@ -5,7 +5,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-   "prepare:dist": "mkdir -p ./dist/css ./dist/js",
+    "prepare:dist": "mkdir -p ./dist/css ./dist/js",
     "build:clean": "rm -rf ./dist/*",
     "build:html": "cp index.html ./dist/index.html",
     "build:ts": "tsc",

@@ -1,11 +1,11 @@
 import { fastify } from "../server.ts";
 import type { Socket } from "socket.io";
 import { waitingRoomHandler, cleanOnDisconnection } from "../utils/waitingRoom.ts";
-import { getOpponentSocketId, setGameResult } from "../database/dbModels.ts";
-import { createGameState, resetScore } from "./pongGame.ts";
+import { getOpponentSocketId, getRowByMatchId, setGameResult } from "../database/dbModels.ts";
+import { createGameState } from "./pongGame.ts";
 // @ts-ignore
 import { GameState, FRAME_RATE } from "../shared/gameTypes.js";
-import { gameLoop, handleKeydown, handleKeyup} from "./pongGame.ts";
+import { gameLoop, handleKeydown, handleKeyup, handleKeydownRemote, handleKeyupRemote} from "./pongGame.ts";
 
 const timeouts: Map<string, NodeJS.Timeout> = new Map();
 
@@ -21,17 +21,12 @@ async function onlineGameInit(socket: Socket) {
     disconnectionHandler(socket);
 }
 
-const clientRooms = {};
+const gameRooms = {};
 const state = {};
 const players = {};
 
 function serverSocketEvents(socket: Socket) {
     
-    socket.on('startRemote', () => {
-        fastify.log.info('Game started in remote mode');
-        fastify.log.info('New client connected with id: ' + socket.id);
-        startRemoteGame(socket);
-    })
     
     socket.on('startLocal',  () => {    
         fastify.log.info('Game started locally'); 
@@ -40,6 +35,69 @@ function serverSocketEvents(socket: Socket) {
     });
     
     socket.on('keydown', (keyCode: string) => {
+        const roomName = gameRooms[socket.id];
+        const playerSide = players[socket.id];
+        if (roomName && playerSide){
+            handleKeydownRemote(parseInt(keyCode), playerSide, state);
+        }
+    });
+    
+    socket.on('keyup', (keyCode: string) => {
+        const roomName = gameRooms[socket.id];
+        const playerSide = players[socket.id];
+        if (roomName && playerSide) {
+            handleKeyupRemote(parseInt(keyCode), playerSide, state);
+        }
+    })
+    
+}
+
+
+export function startRemoteGame(client1: Socket, client2: Socket, matchId: string) {    
+    let roomName = makeid(5);
+
+    client1.join(roomName);
+    client2.join(roomName);
+
+    gameRooms[client1.id] = roomName;
+    gameRooms[client2.id] = roomName;
+
+    players[client1.id] = 'left';
+    players[client2.id] = 'right';
+
+    state[roomName] = createGameState();
+    
+    startRemoteGameInterval(state[roomName], roomName, matchId);
+    
+}
+
+async function startRemoteGameInterval(state: GameState, roomName: string, matchId: string) {
+
+    const intervalId = setInterval(async ()  => {
+        const winner: number = gameLoop(state, 'remote'); // if == 0, game continue, == 1, player 1 win, == 2 player 2 won
+        
+        if (!winner) {
+            fastify.io.to(roomName).emit('gameState', state);
+        } else {
+            fastify.io.to(roomName).emit('gameOver');
+            
+            const match = await getRowByMatchId(matchId);
+            if (winner == 1) {
+                setGameResult(matchId, state.score1, state.score2, match.player1_id, 'score');
+            } else if (winner == 2) {
+                setGameResult(matchId, state.score1, state.score2, match.player2_id, 'score');
+            }
+            clearInterval(intervalId);
+        }
+    }, 1000 / FRAME_RATE);
+    
+    timeouts.set(roomName, intervalId);
+}
+
+
+function startLocalGameInterval(state: GameState, socket: Socket) {
+
+    socket.on('keydown', (keyCode: string) => {
         handleKeydown(parseInt(keyCode))
     });
     
@@ -47,60 +105,19 @@ function serverSocketEvents(socket: Socket) {
         handleKeyup(parseInt(keyCode));
     });
     
-}
-
-
-function startRemoteGame(client: Socket) {    
-    let roomName = makeid(5);
-    clientRooms[client.id] = roomName;
-    // emit roomName ?
-    state[roomName] = createGameState();
-    client.join(roomName);
-    
-    fastify.log.info(state[roomName]);
-    // start game for this room
-    startRemoteGameInterval(state[roomName], client, roomName);
-    
-}
-
-function startRemoteGameInterval(state: GameState, socket: Socket, roomName: string) {
     const intervalId = setInterval(() => {
-        const winner: number = gameLoop(state, socket); // if == 0, game continue, == 1, player 1 win, == 2 player 2 won
-        
-        if (!winner) {
-            socket.to(roomName).emit('gameState', state);
-            socket.emit('gameState');
-        } else {
-            socket.to(roomName).emit('gameOver');
-            resetScore();
-            clearInterval(intervalId);
-        }
-    }, 1000 / FRAME_RATE);
-    
-    socket.on('quitGame', () => {
-        resetScore();
-        clearInterval(intervalId);
-        return ;
-    })
-}
-
-
-function startLocalGameInterval(state: GameState, socket: Socket) {
-    const intervalId = setInterval(() => {
-        const winner: number = gameLoop(state, socket); // if == 0, game continue, == 1, player 1 win, == 2 player 2 won
+        const winner: number = gameLoop(state, 'local'); // if == 0, game continue, == 1, player 1 win, == 2 player 2 won
         
         if (!winner) {
             socket.emit('gameState', state);
         } else {
             socket.emit('gameOver');
-            resetScore();
             clearInterval(intervalId);
             return;
         }
     }, 1000 / FRAME_RATE);
     
     socket.on('quitGame', () => {
-        resetScore();
         clearInterval(intervalId);
         return ;
     })

@@ -1,5 +1,4 @@
 export interface Paddle {
-    x: number,
     y: number,
     vy: number // vitesse y
 };
@@ -16,6 +15,8 @@ export interface GameState {
     leftPaddle: Paddle,
     rightPaddle: Paddle,
     ball: Ball,
+    score1: number,
+    score2: number,
 }
 
 // ! n'a pas fonctionne pour le frontends avec './shared/constants.js' !
@@ -32,3 +33,5 @@ export const PADDLE_HEIGHT: number  = 120;
 export const PADDLE_WIDTH: number  = 20;
 export const FINAL_SCORE: number  = 5;
 export const MAX_SPEED: number  = 15;
+export const PADDLE_X_LEFT = 20;
+export const PADDLE_X_RIGHT = 770;

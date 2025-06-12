@@ -1,5 +1,5 @@
 import { fastify } from "../server.ts";
-import { clearMatchTimeout } from "../sockets/matchSocketHandler.ts";
+import { clearMatchTimeout, startRemoteGame } from "../sockets/matchSocketHandler.ts";
 import { insertMatchToDB } from "../database/dbModels.ts";
 import { updateStatus } from "../database/dbModels.ts";
 import type { Socket } from "socket.io";
@@ -12,7 +12,7 @@ const timeouts: Map<string, NodeJS.Timeout> = new Map();
 type PlayerInfo = {
     display_name: string;
     userId: number;
-    socketId: string;
+    socket: Socket;
 }
 
 let waitingList: Map<string, PlayerInfo> = new Map();
@@ -22,7 +22,7 @@ export async function waitingRoomHandler(socket: Socket) {
     socket.on('authenticate', async ({ display_name, userId }) => {
         try {
             // store display_name and socket.id in waiting list if not already in        
-            const newPlayer = await addPlayerToWaitingList(display_name, userId, socket.id);
+            const newPlayer = await addPlayerToWaitingList(display_name, userId, socket);
             
             if (newPlayer) {
                 socket.emit('inQueue');
@@ -58,8 +58,8 @@ export async function waitingRoom() {
         }
         
         // --- clear match timeout for matchmaking
-        clearMatchTimeout(player1.socketId);
-        clearMatchTimeout(player2.socketId);
+        clearMatchTimeout(player1.socket.id);
+        clearMatchTimeout(player2.socket.id);
 
         const matchId = crypto.randomUUID();
         
@@ -84,18 +84,20 @@ export async function waitingRoom() {
                 matchId,
                 player1_id: player1.userId,
                 player2_id: player2.userId,
-                player1_socket: player1.socketId,
-                player2_socket: player2.socketId
+                player1_socket: player1.socket.id,
+                player2_socket: player2.socket.id
             });
             
             updateStatus('in_progress', matchId);
 
             // notify players that they are matched
-            fastify.io.to(player1.socketId).emit('matchFound', player1Data);
-            fastify.io.to(player2.socketId).emit('matchFound', player2Data);
+            fastify.io.to(player1.socket.id).emit('matchFound', player1Data);
+            fastify.io.to(player2.socket.id).emit('matchFound', player2Data);
             
-            removePlayerFromWaitingList(player1.socketId);
-            removePlayerFromWaitingList(player2.socketId);
+            removePlayerFromWaitingList(player1.socket.id);
+            removePlayerFromWaitingList(player2.socket.id);
+
+            startRemoteGame(player1.socket, player2.socket, matchId);
             return;
         } else {
             fastify.log.error('Matchmaking aborted: one or both players disconnected');
@@ -130,15 +132,15 @@ export async function removePlayerFromWaitingList(socketId: string) {
    // fastify.log.warn(`Player with socket ID ${socketId} not found in waiting list.`);
 }
 
-export function addPlayerToWaitingList(display_name: string, userId: number, socketId: string) {
+export function addPlayerToWaitingList(display_name: string, userId: number, socket: Socket) {
    // check if display_name is already in waiting list
-   if (waitingList.has(socketId)) {
-        fastify.log.info(`Player ${display_name} with socket: ${socketId} is already in waiting list. List size: ${waitingList.size}`);
+   if (waitingList.has(socket.id)) {
+        fastify.log.info(`Player ${display_name} with socket: ${socket.id} is already in waiting list. List size: ${waitingList.size}`);
         return false;
     }
-    // add display_name and socketId to waiting list
-    waitingList.set(socketId, { display_name, userId, socketId } );
-    fastify.log.info(`Player ${display_name} with socket: ${socketId} added to waiting list. List size: ${waitingList.size}`);
+    // add display_name and socket.id to waiting list
+    waitingList.set(socket.id, { display_name, userId, socket } );
+    fastify.log.info(`Player ${display_name} with socket: ${socket.id} added to waiting list. List size: ${waitingList.size}`);
     return true;
 }
 

@@ -41,13 +41,13 @@ export async function createMatchTable() {
 
 export async function setGameResult(matchId: string, player1_score: number, player2_score: number, winner_id: string, win_type: string) {
 	const sql = `
-UPDATE matches
-SET player1_score = ?,
-	player2_score = ?,
-	winner_id = ?,
-	win_type = ?,
-	status = 'finished'
-WHERE matchId = ? `;
+	UPDATE matches
+	SET player1_score = ?,
+		player2_score = ?,
+		winner_id = ?,
+		win_type = ?,
+		status = 'finished'
+	WHERE matchId = ? `;
 
 	const params = [
 		player1_score,
@@ -60,6 +60,7 @@ WHERE matchId = ? `;
 	try {
 		await execute(db, sql, params);
 		console.log(`Game result saved for match ${matchId}`);
+		getRowByMatchId(matchId);
 	} catch (err: unknown) {
 		console.log(`Failed to insert game result to DB: ${err} `);
 	}
