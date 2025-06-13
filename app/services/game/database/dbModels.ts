@@ -59,7 +59,7 @@ export async function setGameResult(matchId: string, player1_score: number, play
 
 	try {
 		await execute(db, sql, params);
-		console.log(`Game result saved for match ${matchId}`);
+		console.log(`\x1b[32m Game result saved for match ${matchId} \x1b[0m`);
 		getRowByMatchId(matchId);
 	} catch (err: unknown) {
 		console.log(`Failed to insert game result to DB: ${err} `);
@@ -86,13 +86,13 @@ INSERT INTO matches(
 		player2_id,
 		player1_socket,
 		player2_socket,
-		'pending' // or active ?
+		'in_progress'
 	];
 
 	try {
 		await execute(db, sql, params);
+		console.log(`\x1b[32m Match ${matchId} inserted to DB \x1b[0m`);
 		getRowByMatchId(matchId);
-		console.log(`Match ${matchId} inserted to DB`);
 
 	} catch (err: unknown) {
 		console.log(`Failed to insert match into DB ${err} `);
@@ -101,10 +101,10 @@ INSERT INTO matches(
 
 export async function getMatchesByUserId(userId: number) {
 	const sql = `
-SELECT * FROM matches
-WHERE player1_id = ? OR player2_id = ?
-	ORDER BY created_at DESC
-`;
+	SELECT * FROM matches
+	WHERE player1_id = ? OR player2_id = ?
+		ORDER BY created_at DESC
+	`;
 
 	try {
 		const matches = await fetchAll(db, sql, [userId, userId]);

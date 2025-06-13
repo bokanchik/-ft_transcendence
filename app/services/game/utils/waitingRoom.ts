@@ -1,21 +1,11 @@
 import { fastify } from "../server.ts";
-import { clearMatchTimeout, startRemoteGame } from "../sockets/matchSocketHandler.ts";
-import { insertMatchToDB } from "../database/dbModels.ts";
-import { updateStatus } from "../database/dbModels.ts";
+import { clearMatchTimeout, startRemoteGame, timeouts } from "../sockets/matchSocketHandler.ts";
+import { insertMatchToDB, updateStatus } from "../database/dbModels.ts";
 import type { Socket } from "socket.io";
+import { firstInFirstOut, addPlayerToWaitingList, removePlayerFromWaitingList, getWaitingListSize } from "./waitingListUtils.ts";
 // @ts-ignore
 import { TIMEOUT_MS } from "../shared/gameTypes.ts";
-const timeouts: Map<string, NodeJS.Timeout> = new Map();
 
-// import Game from "../models/gameModel.js";
-
-type PlayerInfo = {
-    display_name: string;
-    userId: number;
-    socket: Socket;
-}
-
-let waitingList: Map<string, PlayerInfo> = new Map();
 
 export async function waitingRoomHandler(socket: Socket) {
     
@@ -48,6 +38,7 @@ export async function waitingRoomHandler(socket: Socket) {
 export async function waitingRoom() {
 
     fastify.log.info('Matchmaking process activated');
+
     try {
         const player1 = firstInFirstOut();
         const player2 = firstInFirstOut();
@@ -63,7 +54,7 @@ export async function waitingRoom() {
 
         const matchId = crypto.randomUUID();
         
-        // assign sides random function ?
+        // assign sides: player1 --> left, player2 --> right
         const player1Data = {
             matchId,
             displayName: player1.display_name,
@@ -88,61 +79,26 @@ export async function waitingRoom() {
                 player2_socket: player2.socket.id
             });
             
-            updateStatus('in_progress', matchId);
-
             // notify players that they are matched
             fastify.io.to(player1.socket.id).emit('matchFound', player1Data);
             fastify.io.to(player2.socket.id).emit('matchFound', player2Data);
             
             removePlayerFromWaitingList(player1.socket.id);
             removePlayerFromWaitingList(player2.socket.id);
-
-            startRemoteGame(player1.socket, player2.socket, matchId);
+            
+            // timeout pour syncroniser le client et le serveur : est-ce que c'est la bonne solution ?
+            setTimeout(() => startRemoteGame(player1.socket, player2.socket, matchId), 3000);
+            
             return;
         } else {
             fastify.log.error('Matchmaking aborted: one or both players disconnected');
             return;
         }
-    } catch (error) {
+    } catch (error: unknown) {
         fastify.log.error('Error during matchmaking:', error);
     }
 }
 
-// --- Simple mathcmaking system : first in first out ---
-function firstInFirstOut() {
-    for (const [socketId, playerInfo] of waitingList.entries()){
-        waitingList.delete(socketId);
-        fastify.log.info(`Player ${playerInfo.display_name} with socket ${socketId} removed from waiting list. List size: ${waitingList.size}`);
-        return playerInfo;
-    }
-    return null;
-}
-
-// --- Waiting list management ---
-export function getWaitingListSize() {
-    return waitingList.size;
-}
-
-export async function removePlayerFromWaitingList(socketId: string) {
-    if (waitingList.has(socketId)) {
-        const player = waitingList.get(socketId);
-        waitingList.delete(socketId);
-        fastify.log.info(`Player ${player?.display_name} removed from waiting list. List size: ${waitingList.size}`);
-    }
-   // fastify.log.warn(`Player with socket ID ${socketId} not found in waiting list.`);
-}
-
-export function addPlayerToWaitingList(display_name: string, userId: number, socket: Socket) {
-   // check if display_name is already in waiting list
-   if (waitingList.has(socket.id)) {
-        fastify.log.info(`Player ${display_name} with socket: ${socket.id} is already in waiting list. List size: ${waitingList.size}`);
-        return false;
-    }
-    // add display_name and socket.id to waiting list
-    waitingList.set(socket.id, { display_name, userId, socket } );
-    fastify.log.info(`Player ${display_name} with socket: ${socket.id} added to waiting list. List size: ${waitingList.size}`);
-    return true;
-}
 
 // --- Helper functions
 let matchmakingLock = false;
