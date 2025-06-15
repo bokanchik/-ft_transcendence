@@ -33,7 +33,7 @@ export type Match = z.infer<typeof MatchBaseSchema>;
 
 // --- Schemas for API requests (Body, Params, Responses) ---
 
-//-- Match creation for localGame
+//-- Create a local match ---
 export const createLocalMatchBody = z.object({
     player1: z.string().min(1),
     player2: z.string().min(1),
@@ -48,7 +48,22 @@ export const createLocalMatchRouteSchema = {
     }
 };
 
-// GET MATCH by MATCH_ID (unique URL)
+//  --- Invite a friend to play --- 
+export const inviteFriendBody = z.object({
+    friendUserId: z.string().regex(/^\d+$/, "User ID must be a positive integer."),
+    // inviterDisplayName: z.string(),
+}).strict();
+
+export type inviteFriendRequestBody = z.infer<typeof inviteFriendBody>;
+
+export const InviteFriendRouteSchema = {
+    body: inviteFriendBody,
+    response: {
+        201: z.object({ message: z.string() })
+    }
+};
+
+// --- Get Match by MatchId (which is unique URL) ---
 export const MatchIdParamsSchema = z.object({
     matchId: z.string().uuid()
 })
@@ -63,10 +78,9 @@ export const GetMatchIdRouteSchema = {
     }
 };
 
-// GET MATCH HISTORY by USER_ID
+// --- Get Match History by UserID --- 
 export const MatchUserIdParamsSchema = z.object({
     userId: z.string().regex(/^\d+$/, "User ID must be a positive integer."),
-    // userId: z.number().int(), // check avec arthur ? pourquoi il utilise regex -> parce que fastify t'envoie une string
 });
 
 export type MatchUserIdParams = z.infer<typeof MatchUserIdParamsSchema>;
@@ -79,3 +93,4 @@ export const GetMatchByUserIdRouteSchema = {
         500: z.object({ error: z.string() })
     }
 }
+

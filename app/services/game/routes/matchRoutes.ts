@@ -1,7 +1,8 @@
 //import fastify from '../server.ts';
 import type { FastifyInstance } from 'fastify';
-import { createMatchHandler, getMatchIdHandler, getMatchByUserHandler } from '../handlers/matchHandlers.ts'
-import { createLocalMatchBody, GetMatchIdRouteSchema, GetMatchByUserIdRouteSchema } from '../shared/schemas/matchesSchemas.ts';
+import { createMatchHandler, getMatchIdHandler, getMatchByUserHandler, inviteFriendHandler } from '../handlers/matchHandlers.ts'
+//import { createLocalMatchBody, GetMatchIdRouteSchema, GetMatchByUserIdRouteSchema, InviteFriendRouteSchema } from '../shared/schemas/matchesSchemas.ts';
+import { createLocalMatchBody, GetMatchIdRouteSchema, GetMatchByUserIdRouteSchema, InviteFriendRouteSchema } from '../middleware/matchesSchemas.ts';
 
 function matchRoutes(fastify: FastifyInstance, _options: unknown) {
 
@@ -20,6 +21,14 @@ function matchRoutes(fastify: FastifyInstance, _options: unknown) {
       handler: createMatchHandler,
    
    });
+
+   fastify.post('/match/invites',
+      {
+         preHandler: [fastify.authenticate, fastify.csrfProtection],
+         schema: InviteFriendRouteSchema
+      },
+      inviteFriendHandler
+   );
 
    fastify.get('/match/:matchId', {
       onRequest: [fastify.authenticate],

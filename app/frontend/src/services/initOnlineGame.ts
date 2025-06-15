@@ -3,6 +3,7 @@ import { navigateTo } from "./router.js";
 import socket from "./socket.js";
 import { removeWaitingToast, showToast, showWaitingToast } from "../components/toast.js";
 import { initCountdown } from "../components/countdown.js";
+const WAITING_TIME = 60;
 
 // --- Main Fonction for online game: 
 export async function handleOnlineGame(display_name: string, userId: number, container: HTMLElement, button: HTMLButtonElement, title: HTMLHeadElement): Promise<void> {
@@ -40,7 +41,7 @@ export async function initOnlineGame(display_name: string, userId: number, butto
     
     socket.on('inQueue', () => {
         console.log('Dans la queue...');
-        showWaitingToast(socket, controller);
+        showWaitingToast(socket, controller, WAITING_TIME);
     });
 
     // --- Socket listener on matchFound event --> if opponenet is found

@@ -1,6 +1,7 @@
 import { navigateTo } from '../services/router.js';
 import { handleOnlineGame } from '../services/initOnlineGame.js';
 import { HeaderComponent } from '../components/headerComponent.js';
+// @ts-ignore
 import { User } from '../shared/schemas/usersSchemas.js';
 import { getUserDataFromStorage } from '../services/authService.js';
 import { showToast } from './toast.js';
@@ -64,15 +65,15 @@ export function GamePage(): HTMLElement {
     onlineGameButton.id = 'online-button';
    
     onlineGameButton.className = 'bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mb-4 transition duration-300 ease-in-out';
-    onlineGameButton.textContent = 'Online game';
+    onlineGameButton.textContent = 'Start Game';
     
     // TODO (not finished at all)
-    const customSettingsButton: HTMLButtonElement  = document.createElement('button');
-    customSettingsButton.id = 'custom-settings-button';
-    customSettingsButton.className = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full transition duration-300 ease-in-out';
-    customSettingsButton.textContent = 'Custom Settings';
+    const inviteFriendButton: HTMLButtonElement  = document.createElement('button');
+    inviteFriendButton.id = 'invite-friend-button';
+    inviteFriendButton.className = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full transition duration-300 ease-in-out';
+    inviteFriendButton.textContent = 'Play a friend';
     
-    buttonsContainer.append(onlineGameButton, customSettingsButton); 
+    buttonsContainer.append(onlineGameButton, inviteFriendButton); 
     
     // --- Le pied du page ---
     const footer: HTMLDivElement = document.createElement('div');
@@ -92,28 +93,37 @@ export function GamePage(): HTMLElement {
     pageWrapper.appendChild(gameContentContainer);
     
     // --- Event: Online game button clicked ---
-    onlineGameButton.addEventListener('click', async () => { 
-        
-        try {
-            const userRes: Response = await fetch('/api/users/me');
-            if (!userRes.ok) {
-                showToast('You must be logged in to play online', 'error');
-                return;
-            }
-            const userData = await userRes.json();
-            const display_name: string = userData.display_name;
-            const userId: number = userData.id;
-
-            sessionStorage.setItem('gameMode', 'remote');
-
-            await handleOnlineGame(display_name, userId, buttonsContainer, onlineGameButton, title);
-
-        } catch (err: unknown) {
-            console.log(`Failed to fetch from user`);
-            showToast('Something went wrong. Please try again later.', 'error');
-            throw err;
-        }
+    onlineGameButton.addEventListener('click', () => {
+        onlineGameHandler(buttonsContainer, onlineGameButton, title);
     });
-        return pageWrapper;
+    
+    inviteFriendButton.addEventListener('click', () => {
+        navigateTo('/invite');
+    });
+    
+    return pageWrapper;
 }
 
+async function onlineGameHandler(buttonsContainer: HTMLDivElement, onlineGameButton: HTMLButtonElement, title: HTMLHeadElement) {
+    
+    try {
+        const userRes: Response = await fetch('/api/users/me');
+        if (!userRes.ok) {
+            showToast('You must be logged in to play online', 'error');
+            return;
+        }
+        const userData = await userRes.json();
+        const display_name: string = userData.display_name;
+        const userId: number = userData.id;
+    
+        sessionStorage.setItem('gameMode', 'remote');
+    
+        await handleOnlineGame(display_name, userId, buttonsContainer, onlineGameButton, title);
+    
+    } catch (err: unknown) {
+        console.log(`Failed to fetch from user`);
+        showToast('Something went wrong. Please try again later.', 'error');
+        throw err;
+    }
+    
+}

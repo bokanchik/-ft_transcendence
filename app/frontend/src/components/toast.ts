@@ -1,3 +1,5 @@
+import { time } from "console";
+
 export function showToast(message: string, type: 'success' | 'error' = 'success') {
     const existingToast = document.querySelector('.custom-toast');
     if (existingToast) {
@@ -112,7 +114,7 @@ export function showCustomConfirm(message: string, title: string = "Confirmation
     });
 }
 
-export function showWaitingToast(socket: SocketIOClient.Socket, controller: AbortController) {
+export function showWaitingToast(socket: SocketIOClient.Socket, controller: AbortController, timeLeft: number) {
     const existingToast = document.querySelector('.custom-waiting-toast');
     if (existingToast) {
         existingToast.remove();
@@ -135,12 +137,12 @@ export function showWaitingToast(socket: SocketIOClient.Socket, controller: Abor
 
     // Message
     const message = document.createElement('p');
-    message.textContent = 'Looking for an opponent...';
+    message.textContent = 'Waiting for an opponent...';
     message.className = 'text-center text-sm font-medium';
 
     // Timer
     const timer = document.createElement('div');
-    timer.textContent = '60';
+    timer.textContent = formatTime(timeLeft);
     timer.className = 'absolute inset-0 flex items-center justify-center text-lg font-bold text-green-700';
     
     spinnerContainer.appendChild(spinner);
@@ -166,10 +168,10 @@ export function showWaitingToast(socket: SocketIOClient.Socket, controller: Abor
     }, 10);
 
     // Timer countdown
-    let secondsLeft = 60;
+    let secondsLeft = timeLeft;
     const countdown = setInterval(() => {
         secondsLeft--;
-        timer.textContent = `${secondsLeft}`;
+        timer.textContent = formatTime(secondsLeft);
         if (secondsLeft <= 0) {
             clearInterval(countdown);
         }
@@ -193,4 +195,12 @@ export function removeWaitingToast() {
         toast.style.transform = 'translateY(20px)';
         setTimeout(() => toast.remove(), 300);
     }
+}
+
+function formatTime(timeLeft: number): string {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    const paddedMinutes = String(minutes).padStart(2, '0');
+    const paddedSeconds = String(seconds).padStart(2, '0');
+    return `${paddedMinutes}:${paddedSeconds}`;
 }

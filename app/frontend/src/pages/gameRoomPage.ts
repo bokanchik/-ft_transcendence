@@ -34,6 +34,9 @@ const gameState: GameState = {
 // boolean qui sert pour arreter dessiner le jeu
 let isGameOver = false;
 
+
+// TODO: JE PEUX UTILISER MODE ICI ET NE PAS FAIRE UN APPEL A SESSION STORAGE !
+
 export function GameRoomPage(mode: GameMode): HTMLElement {
 	
 	// Conteneur principal

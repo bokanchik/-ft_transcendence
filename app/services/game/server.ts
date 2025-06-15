@@ -1,13 +1,12 @@
-import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
+import Fastify, {  FastifyInstance,  FastifyReply, FastifyRequest } from 'fastify';
 import { Server, Socket } from 'socket.io';
-import { serializerCompiler, validatorCompiler } from "fastify-type-provider-zod";
+import { serializerCompiler, validatorCompiler, ZodTypeProvider } from "fastify-type-provider-zod";
 import fastifyRateLimit from '@fastify/rate-limit';
 import db from './database/connectDB.ts'
 // @ts-ignore
 import { setupPlugins } from './shared/auth-plugin/tokens.js'
 import matchRoutes from './routes/matchRoutes.ts'
 import { matchSocketHandler } from './sockets/matchSocketHandler.ts';
-import { ZodTypeProvider } from "fastify-type-provider-zod"
 
 
 // import settingsRoutes from './routes/settings.ts' TODO
@@ -35,6 +34,12 @@ fastify.setSerializerCompiler(serializerCompiler);
 
 // Register routes
 const registerRoutes = () => {
+  fastify.get('/api/users/csrf-token', async (request: FastifyRequest, reply: FastifyReply) => {
+    const token: string = await reply.generateCsrf();
+		request.log.debug(`[CSRF Endpoint] Token CSRF fourni au client: ${token}`);
+		return { csrfToken: token };
+  })
+  
   fastify.register(matchRoutes, { prefix: '/api/game/' });
   // fastify.register(settingsRoutes); TODO
 };

@@ -1,8 +1,10 @@
-import { type FastifyReply, type FastifyRequest } from 'fastify';
+import fastify, { FastifyReply, FastifyRequest } from 'fastify';
 import { getRowByMatchId, getMatchesByUserId } from '../database/dbModels.ts';
 import { MatchIdParams, MatchUserIdParams } from '../middleware/matchesSchemas.ts';
 import { MatchBaseSchema } from '../middleware/matchesSchemas.ts';
 import { z } from 'zod';
+import { JWTPayload } from '../shared/schemas/usersSchemas.js';
+
 // http post /api/game/match
 export async function createMatchHandler(req: FastifyRequest, reply: FastifyReply) {
     req.log.info(`Client envoie: ${JSON.stringify(req.validatedBody)}`);
@@ -88,10 +90,19 @@ export async function getMatchByUserHandler(req: FastifyRequest<{ Params: MatchU
 
 }
 
-// --- PAS ENCORE IMPLEMENTE -----------
-export async function getMatchStateHandler(eq: FastifyRequest, reply: FastifyReply) {
+type AuthenticatedRequest = FastifyRequest & { user: JWTPayload};
+export async function inviteFriendHandler(request: AuthenticatedRequest, reply: FastifyReply) {
+    const inviterId = (request.user as JWTPayload).id;
+    request.log.info('inviterId: [' + inviterId + ']');
+    const friendId = request.body;
+    request.log.info('friendId: [' + friendId + ']');
 
+     return reply.code(201);
 }
+
+
+
+// --- PAS ENCORE IMPLEMENTE -----------
 
 export async function quitMatchHandler(req: FastifyRequest, reply: FastifyReply) {
 
