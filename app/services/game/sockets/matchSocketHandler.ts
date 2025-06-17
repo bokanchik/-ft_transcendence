@@ -87,13 +87,13 @@ export async function matchSocketHandler(socket: Socket): Promise<void> {
 function serverSocketEvents(socket: Socket) {
     
     
-    socket.on('startLocal',  () => {    
+    socket.on('startLocal',  (matchId: string) => {    
         
         fastify.log.info('Game started locally'); 
         
         const state = createGameState();
         
-        startLocalGameInterval(state, socket);      
+        startLocalGameInterval(state, socket, matchId);      
     });
     
     handleClientInput(socket);
@@ -150,8 +150,10 @@ export function startRemoteGame(client1: Socket, client2: Socket, matchId: strin
     
 }
 
+export const localGames: Map<string, { state: GameState, intervalId: NodeJS.Timeout }> = new Map();
 
-function startLocalGameInterval(state: GameState, socket: Socket) {
+
+function startLocalGameInterval(state: GameState, socket: Socket, mathcId: string) {
 
     const intervalId = setInterval(() => {
         const { winner, goalScored } = gameLoop(state, 'local');
@@ -166,6 +168,8 @@ function startLocalGameInterval(state: GameState, socket: Socket) {
         }
     }, 1000 / FRAME_RATE);
     
+    localGames.set(mathcId, { state, intervalId });
+
     socket.on('quitGame', () => {
         clearInterval(intervalId);
         return ;

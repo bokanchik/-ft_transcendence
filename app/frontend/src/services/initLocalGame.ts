@@ -67,7 +67,7 @@ export async function initLocalGame(form: HTMLFormElement) {
  */
 async function createLocalMatch(alias1: string, alias2: string) {
     try {
-        const response = await fetch('/api/game/match/', {
+        const response = await fetch('/api/game/match/local', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -93,6 +93,7 @@ async function createLocalMatch(alias1: string, alias2: string) {
         sessionStorage.setItem('player1', data.player1);
         sessionStorage.setItem('player2', data.player2);
         sessionStorage.setItem('gameMode', 'local');
+        sessionStorage.setItem('matchId', matchId);
 
         navigateTo(`/game-room?matchId=${matchId}`);
 

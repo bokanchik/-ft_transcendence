@@ -1,12 +1,11 @@
-import fastify, { FastifyReply, FastifyRequest } from 'fastify';
+import { FastifyReply, FastifyRequest } from 'fastify';
 import { getRowByMatchId, getMatchesByUserId } from '../database/dbModels.ts';
 import { MatchIdParams, MatchUserIdParams } from '../middleware/matchesSchemas.ts';
 import { MatchBaseSchema } from '../middleware/matchesSchemas.ts';
-import { z } from 'zod';
-import { JWTPayload } from '../shared/schemas/usersSchemas.js';
+import { localGames } from '../sockets/matchSocketHandler.ts';
+// @ts-ignore
 
-// http post /api/game/match
-export async function createMatchHandler(req: FastifyRequest, reply: FastifyReply) {
+export async function createLocalMatchHandler(req: FastifyRequest, reply: FastifyReply) {
     req.log.info(`Client envoie: ${JSON.stringify(req.validatedBody)}`);
     
     const { player1, player2 } = req.validatedBody;
@@ -20,6 +19,8 @@ export async function createMatchHandler(req: FastifyRequest, reply: FastifyRepl
 
     return reply.code(201).send(match);
 }
+
+
 
 // Handler to get match details by matchId
 export async function getMatchIdHandler(req: FastifyRequest<{ Params: MatchIdParams }>, reply: FastifyReply) {
@@ -90,36 +91,12 @@ export async function getMatchByUserHandler(req: FastifyRequest<{ Params: MatchU
 
 }
 
-type AuthenticatedRequest = FastifyRequest & { user: JWTPayload};
-export async function inviteFriendHandler(request: AuthenticatedRequest, reply: FastifyReply) {
-    const inviterId = (request.user as JWTPayload).id;
-    request.log.info('inviterId: [' + inviterId + ']');
-    const friendId = request.body;
-    request.log.info('friendId: [' + friendId + ']');
-
-     return reply.code(201);
-}
-
-
-
 // --- PAS ENCORE IMPLEMENTE -----------
 
 export async function quitMatchHandler(req: FastifyRequest, reply: FastifyReply) {
 
 }
 
-// MAYBE BE DEPRECATED
-export async function startMatchHandler(req: FastifyRequest, reply: FastifyReply) {
 
-}
-
-// FOR INVITATION FUNCTIONALITY
-export async function acceptMatchHandler(req: FastifyRequest, reply: FastifyReply) {
-
-}
-
-export async function rejectMatchHandler(req: FastifyRequest, reply: FastifyReply) {
-
-}
 
 // --------------------------------------

@@ -48,25 +48,10 @@ export const createLocalMatchRouteSchema = {
     }
 };
 
-//  --- Invite a friend to play --- 
-export const inviteFriendBody = z.object({
-    friendUserId: z.string().regex(/^\d+$/, "User ID must be a positive integer."),
-    // inviterDisplayName: z.string(),
-}).strict();
-
-export type inviteFriendRequestBody = z.infer<typeof inviteFriendBody>;
-
-export const InviteFriendRouteSchema = {
-    body: inviteFriendBody,
-    response: {
-        201: z.object({ message: z.string() })
-    }
-};
-
 // --- Get Match by MatchId (which is unique URL) ---
 export const MatchIdParamsSchema = z.object({
     matchId: z.string().uuid()
-})
+});
 
 export type MatchIdParams = z.infer<typeof MatchIdParamsSchema>;
 
@@ -92,5 +77,5 @@ export const GetMatchByUserIdRouteSchema = {
         400: z.object({ error: z.string() }),
         500: z.object({ error: z.string() })
     }
-}
+};
 

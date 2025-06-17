@@ -12,7 +12,6 @@ import { getUserDataFromStorage } from './services/authService.js';
 import { promptAliasForm } from './components/aliasFormPage.js';
 import { GameMode } from './components/gamePage.js'
 import { initI18n, t } from './services/i18nService.js';
-import { PlayAFriendPage } from './components/playAFriendPage.js';
 const appContainer = document.getElementById('main');
 
 interface RouteConfig {
@@ -44,7 +43,6 @@ const routes: { [key: string]: RouteConfig } = {
         requiredAuth: true
     },
     '/game': { component: GamePage },
-    '/invite': { component: PlayAFriendPage },
     '/local-game': { component: promptAliasForm },
     '/game-room': { component: () => GameRoomPageFromParams() },
 };

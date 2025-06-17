@@ -3,20 +3,20 @@ import db from './connectDB.ts';
 type MatchStatus = 'pending' | 'in_progress' | 'finished';
 
 const matchTable: string = `
-CREATE TABLE IF NOT EXISTS matches (
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-matchId TEXT UNIQUE NOT NULL,
-player1_id INTEGER NOT NULL,
-player2_id INTEGER NOT NULL,
-player1_socket TEXT NOT NULL,
-player2_socket TEXT NOT NULL,
-player1_score INTEGER,
-player2_score INTEGER,
-winner_id INTEGER,
-win_type TEXT DEFAULT 'score',
-created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-status TEXT NOT NULL CHECK (status IN ('pending', 'in_progress', 'finished'))
-)`;
+	CREATE TABLE IF NOT EXISTS matches (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	matchId TEXT UNIQUE NOT NULL,
+	player1_id INTEGER NOT NULL,
+	player2_id INTEGER NOT NULL,
+	player1_socket TEXT NOT NULL,
+	player2_socket TEXT NOT NULL,
+	player1_score INTEGER,
+	player2_score INTEGER,
+	winner_id INTEGER,
+	win_type TEXT DEFAULT 'score',
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	status TEXT NOT NULL CHECK (status IN ('pending', 'in_progress', 'finished'))
+	)`;
 
 const fillMatchTable: string = `
 INSERT INTO matches (matchId, player1_id, player2_id, player1_socket, player2_socket, player1_score, player2_score, winner_id, win_type, status)

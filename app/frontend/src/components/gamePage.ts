@@ -67,14 +67,6 @@ export function GamePage(): HTMLElement {
     onlineGameButton.className = 'bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mb-4 transition duration-300 ease-in-out';
     onlineGameButton.textContent = 'Start Game';
     
-    // TODO (not finished at all)
-    const inviteFriendButton: HTMLButtonElement  = document.createElement('button');
-    inviteFriendButton.id = 'invite-friend-button';
-    inviteFriendButton.className = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full transition duration-300 ease-in-out';
-    inviteFriendButton.textContent = 'Play a friend';
-    
-    buttonsContainer.append(onlineGameButton, inviteFriendButton); 
-    
     // --- Le pied du page ---
     const footer: HTMLDivElement = document.createElement('div');
     footer.className = 'mt-6 text-center';
@@ -95,10 +87,6 @@ export function GamePage(): HTMLElement {
     // --- Event: Online game button clicked ---
     onlineGameButton.addEventListener('click', () => {
         onlineGameHandler(buttonsContainer, onlineGameButton, title);
-    });
-    
-    inviteFriendButton.addEventListener('click', () => {
-        navigateTo('/invite');
     });
     
     return pageWrapper;

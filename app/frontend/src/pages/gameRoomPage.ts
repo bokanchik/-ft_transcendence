@@ -269,7 +269,12 @@ async function onGameOver() {
 }
 
 function handleLocalEvents(ctx: CanvasRenderingContext2D, scoreDisplay: HTMLDivElement) {
-	socket.emit('startLocal');
+	const matchId = sessionStorage.getItem('matchId');
+	if (!matchId) {
+		console.error("Match ID not found in sessionStorage.");
+		return;
+	}
+	socket.emit('startLocal', matchId);
 	
 	socket.on('gameState', (state: GameState) => {
 		handleGameState(state, ctx, scoreDisplay);
