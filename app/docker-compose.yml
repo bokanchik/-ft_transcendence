@@ -87,6 +87,26 @@ services:
     networks:
       - tranet
 
+  tournament:
+    build: ./services/tournament
+    container_name: tournament
+    ports:
+      - "6001:6001"
+    env_file:
+      - ./env/common.env
+      - ./env/routes.env
+    environment:
+      - JWT_SECRET__FILE=/run/secrets/jwt_secret
+      - COOKIE_SECRET__FILE=/run/secrets/cookie_secret
+    secrets:
+      - jwt_secret
+      - cookie_secret
+    restart: always
+    volumes:
+      - ./services/shared:/app/shared:ro
+    networks:
+      - tranet
+
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.49.2
     container_name: cadvisor

@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+		"target": "ES2022",
+		"module": "nodenext", // the latest Node.js version
+		"moduleResolution": "nodenext",
+		"rootDir": "./",	
+		"outDir": "./dist",
+		"strict": true,
+		"noEmit": true,
+		"allowImportingTsExtensions": true,
+		"noImplicitAny": false,
+		"sourceMap": true,
+		"allowJs": true,
+	},
+	//"include": ["./**/*.ts", "../shared/constants.ts"],
+	"exclude": [
+		"node_modules",
+		"dist",
+		"**/*.test.ts",
+		"**/*.spec.ts",
+	],
+}
