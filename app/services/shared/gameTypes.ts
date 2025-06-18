@@ -5,8 +5,6 @@ export interface Paddle {
 export interface Ball {
     x: number,
     y: number,
-   // vx: number, // vitesse x
-   // vy: number, // vitesse y
 }
 
 export interface GameState {
@@ -16,6 +14,11 @@ export interface GameState {
     score1: number,
     score2: number,
 }
+
+export interface Velocity {
+  x: number;
+  y: number;
+};
 
 // ! n'a pas fonctionne pour le frontends avec './shared/constants.js' !
 export const TIMEOUT_MS: number  = 60000;

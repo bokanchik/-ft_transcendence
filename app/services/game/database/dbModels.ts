@@ -18,28 +18,31 @@ const matchTable: string = `
 	status TEXT NOT NULL CHECK (status IN ('pending', 'in_progress', 'finished'))
 	)`;
 
-const fillMatchTable: string = `
-INSERT INTO matches (matchId, player1_id, player2_id, player1_socket, player2_socket, player1_score, player2_score, winner_id, win_type, status)
-VALUES ('match1', 1, 2, 'socket1', 'socket2', 5, 2, 1, 'score', 'finished'),
-('match2', 1, 3, 'socket1', 'socket3', 5, 0, 1, 'score', 'finished'),
-('match3', 2, 1, 'socket2', 'socket1', 5, 2, 2, 'score', 'finished'),
-('match4', 3, 1, 'socket3', 'socket1', 5, 3, 1, 'score', 'finished');`;
-
 
 // --- HELPER FUNCTIONS FOR GENERAL DB ACTIONS (all(), get(), run(), exec() etc.)
 export async function createMatchTable() {
 	try {
 		await execute(db, matchTable);
 		console.log('Matches table created or already exists.');
-		// --- TEST ----
-		await execute(db, fillMatchTable);
-		console.log('Sample data inserted into matches table.');
+
 	} catch (err: unknown) {
 		console.error(`Error creating matches table: ${err}`);
+		throw err;
 	}
 };
 
 export async function setGameResult(matchId: string, player1_score: number, player2_score: number, winner_id: string, win_type: string) {
+	
+	const existingMatch = await getRowByMatchId(matchId);
+
+	if (!existingMatch) {
+		throw new Error(`Match with id ${matchId} does not exists in DB.`);
+	}
+
+	if (existingMatch.status === 'finished') {
+		throw new Error(`Match with id ${matchId} is already finished.`);
+	}
+	
 	const sql = `
 	UPDATE matches
 	SET player1_score = ?,
@@ -59,10 +62,15 @@ export async function setGameResult(matchId: string, player1_score: number, play
 
 	try {
 		await execute(db, sql, params);
+
+		// --- FOR DEBUGGING ----
 		console.log(`\x1b[32m Game result saved for match ${matchId} \x1b[0m`);
 		getRowByMatchId(matchId);
+		// ----------------------
+
 	} catch (err: unknown) {
-		console.log(`Failed to insert game result to DB: ${err} `);
+		console.error(`Failed to insert game result to DB: ${err} `);
+		throw err;
 	}
 
 }
@@ -91,11 +99,15 @@ INSERT INTO matches(
 
 	try {
 		await execute(db, sql, params);
+
+		// --- FOR DEBUGGING ----
 		console.log(`\x1b[32m Match ${matchId} inserted to DB \x1b[0m`);
 		getRowByMatchId(matchId);
+		// ----------------------
 
 	} catch (err: unknown) {
 		console.log(`Failed to insert match into DB ${err} `);
+		throw err;
 	}
 }
 
@@ -108,11 +120,12 @@ export async function getMatchesByUserId(userId: number) {
 
 	try {
 		const matches = await fetchAll(db, sql, [userId, userId]);
-		console.log(matches);
+		console.log(`All fetched matches for ${userId} : ${JSON.stringify(matches)}`);
 		return matches;
 
 	} catch (err: unknown) {
 		console.log(`Failed to find matches for this user: ${err} `);
+		throw err;
 	}
 }
 
@@ -122,7 +135,7 @@ export async function getRowByMatchId(matchId: string) {
 
 	try {
 		const match = await fetchFirst(db, sql, [matchId]);
-		console.log(match);
+		console.log(`Match ${matchId} : ${match}`);
 		return match;
 
 	} catch (err: unknown) {
@@ -131,6 +144,21 @@ export async function getRowByMatchId(matchId: string) {
 	}
 }
 
+// peut-etre a enlever
+export async function updateStatus(status: MatchStatus, matchId: string) {
+	
+	let sql = `UPDATE matches SET status = ? WHERE matchId = ? `;
+	
+	try {
+		await execute(db, sql, [status, matchId]);
+		console.log(`Status for match ${matchId} updated to ${status} `);
+	} catch (err: unknown) {
+		console.log(`Failed to update status: ${err} `);
+		throw err;
+	}
+}
+
+// helper function for debugging purpose
 export async function getAllRows() {
 
 	let sql = `SELECT * FROM matches`;
@@ -139,53 +167,20 @@ export async function getAllRows() {
 		const matches = await fetchAll(db, sql, []);
 		console.log(matches);
 	} catch (err: unknown) {
-		console.log(`Failed to retrieve all rows drom DB: ${err} `);
-	}
-}
-
-export async function getOpponentSocketId(socketId: string): Promise<string | null> {
-	const sql = `
-		SELECT * FROM matches
-		WHERE player1_socket = ? OR player2_socket = ?
-		ORDER BY created_at DESC
-		LIMIT 1
-	`;
-	
-	try {
-		const match = await fetchFirst(db, sql, [socketId, socketId]);
-		if (!match) return null;       
-		if (match.player1_socket === socketId) {
-			return match.player2_socket;
-		} else {
-			return match.player1_socket;
-		}
-	} catch (err: unknown) {
-		console.log(`Failed to find the match: ${err}`);
-		return null;
-	}
-}
-
-export async function updateStatus(status: MatchStatus, matchId: string) {
-
-	let sql = `UPDATE matches SET status = ? WHERE matchId = ? `;
-
-	try {
-		await execute(db, sql, [status, matchId]);
-		console.log(`Status for match ${matchId} updated to ${status} `);
-	} catch (err: unknown) {
-		console.log(`Failed to update status: ${err} `);
+		console.log(`Failed to retrieve all rows from DB: ${err} `);
 	}
 }
 
 export async function deleteRow(id: number) {
 
 	let sql = `DELETE FROM matches WHERE id = ? `;
-
+	
 	try {
 		await execute(db, sql, [id]);
 		console.log(`Match ${id} deleted from DB`);
 	} catch (err: unknown) {
 		console.log(`Failed to delete match ${id} from DB: ${err} `);
+		throw err
 	}
 }
 

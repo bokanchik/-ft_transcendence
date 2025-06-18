@@ -1,11 +1,11 @@
 import { fastify } from "../server.ts";
-import { clearMatchTimeout, startRemoteGame, timeouts } from "../sockets/matchSocketHandler.ts";
-import { insertMatchToDB, updateStatus } from "../database/dbModels.ts";
+import { startRemoteGame, timeouts } from "../pong/matchSocketHandler.ts";
+import { insertMatchToDB } from "../database/dbModels.ts";
 import type { Socket } from "socket.io";
 import { firstInFirstOut, addPlayerToWaitingList, removePlayerFromWaitingList, getWaitingListSize } from "./waitingListUtils.ts";
 // @ts-ignore
 import { TIMEOUT_MS } from "../shared/gameTypes.ts";
-
+import { clearMatchmakingTimeout, cleanOnDisconnection } from "./waitingRoomUtils.ts";
 
 export async function waitingRoomHandler(socket: Socket) {
     
@@ -49,8 +49,8 @@ export async function waitingRoom() {
         }
         
         // --- clear match timeout for matchmaking
-        clearMatchTimeout(player1.socket.id);
-        clearMatchTimeout(player2.socket.id);
+        clearMatchmakingTimeout(player1.socket.id);
+        clearMatchmakingTimeout(player2.socket.id);
 
         const matchId = crypto.randomUUID();
         
@@ -111,10 +111,4 @@ async function tryMatchPlayers() {
     } finally {
         matchmakingLock = false;
     }
-}
-
-export function cleanOnDisconnection(socketId: string) {
-    fastify.log.info(`Player disconnected: ${socketId}`);
-    removePlayerFromWaitingList(socketId);
-    clearMatchTimeout(socketId);
 }

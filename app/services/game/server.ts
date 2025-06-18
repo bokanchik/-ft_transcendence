@@ -1,22 +1,19 @@
 import Fastify, {  FastifyInstance,  FastifyReply, FastifyRequest } from 'fastify';
-import { Server, Socket } from 'socket.io';
 import { serializerCompiler, validatorCompiler, ZodTypeProvider } from "fastify-type-provider-zod";
 import fastifyRateLimit from '@fastify/rate-limit';
+import { Server, Socket } from 'socket.io';
 import db from './database/connectDB.ts'
+import matchRoutes from './routes/matchRoutes.ts'
+import { matchSocketHandler } from './pong/matchSocketHandler.ts';
 // @ts-ignore
 import { setupPlugins } from './shared/auth-plugin/tokens.js'
-import matchRoutes from './routes/matchRoutes.ts'
-import { matchSocketHandler } from './sockets/matchSocketHandler.ts';
-
-
-// import settingsRoutes from './routes/settings.ts' TODO
 
 
 const fastify: FastifyInstance = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
 
 // Initilize socket.io
 const io: Server = new Server(fastify.server, {
-    path: "/socket-client/"
+    path: "/socket-client/" // correspond a 'location' de nginx.conf, pour connecter le front et le back
 });
 
 // Attach io to fastify instance
@@ -41,7 +38,7 @@ const registerRoutes = () => {
   })
   
   fastify.register(matchRoutes, { prefix: '/api/game/' });
-  // fastify.register(settingsRoutes); TODO
+  fastify.log.info('Routes registred');
 };
 
 // Start server game and setup socket.io

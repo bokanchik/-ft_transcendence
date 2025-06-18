@@ -1,5 +1,5 @@
 //@ts-ignore
-import { GameState, W, S, ARROW_UP, ARROW_DOWN, PADDLE_SPEED, GAME_HEIGHT, GAME_WIDTH, PADDLE_HEIGHT, PADDLE_WIDTH, FINAL_SCORE, MAX_SPEED, PADDLE_X_LEFT, PADDLE_X_RIGHT, BALL_RADIUS } from "../shared/gameTypes.js";
+import { GameState, Velocity, W, S, ARROW_UP, ARROW_DOWN, PADDLE_SPEED, GAME_HEIGHT, GAME_WIDTH, PADDLE_HEIGHT, PADDLE_WIDTH, FINAL_SCORE, MAX_SPEED, PADDLE_X_LEFT, PADDLE_X_RIGHT, BALL_RADIUS } from "../shared/gameTypes.js";
 import { fastify } from "../server.ts";
 
 const keyState = {
@@ -21,6 +21,13 @@ const keyState = {
     }
 };
 
+export function createBallState(): Velocity {
+    return {
+        x: 5,
+        y: 2
+    }
+}
+
 export function createGameState(): GameState {
     return {
         leftPaddle: {
@@ -38,18 +45,15 @@ export function createGameState(): GameState {
     }
 }
 
-let BALL_VELOCITY_X = 5;
-let BALL_VELOCITY_Y = 2;
-
-export function gameLoop(state: GameState, mode: string): { winner: number, goalScored: boolean } {    
+export function gameLoop(state: GameState, velocity: Velocity, mode: string): { winner: number, goalScored: boolean } {    
     const ball = state.ball;
     const leftPaddle = state.leftPaddle;
     const rightPaddle = state.rightPaddle;
     let goalScored = false;
 
     // --- 1. move the ball ---
-    ball.x += BALL_VELOCITY_X;
-    ball.y += BALL_VELOCITY_Y;
+    ball.x += velocity.x;
+    ball.y += velocity.y;
     
     // --- 2. move the paddles according to a game mode: ---
     //        local: W, S -> leftPaddle, UP, DOWN -> rightPaddle
@@ -75,32 +79,32 @@ export function gameLoop(state: GameState, mode: string): { winner: number, goal
     
     // --- 4. bounce the ball on top or bottom ---
     if (ball.y - BALL_RADIUS <= 0 || ball.y + BALL_RADIUS >= GAME_HEIGHT) {
-       BALL_VELOCITY_Y *= -1; // renverser la direction Y de la balle
+       velocity.y *= -1; // renverser la direction Y de la balle
     }
     
     // --- 5. detect collision of a ball (with walls and paddles) and change
     //        the direction and angle for the ball --- 
-    if (isBallCollision(ball, PADDLE_X_LEFT, leftPaddle.y) && BALL_VELOCITY_X < 0) {
+    if (isBallCollision(ball, PADDLE_X_LEFT, leftPaddle.y) && velocity.x < 0) {
         const impactY = (ball.y - (leftPaddle.y + PADDLE_HEIGHT / 2)) / (PADDLE_HEIGHT / 2);
-        BALL_VELOCITY_X = Math.min(-BALL_VELOCITY_X * 1.05, MAX_SPEED); // Inverser et accélérer horizontalement
-        BALL_VELOCITY_Y = BALL_VELOCITY_Y + impactY * 2; // Modifier l’angle verticalement
-    } else if (isBallCollision(ball, PADDLE_X_RIGHT, rightPaddle.y) && BALL_VELOCITY_X > 0) {
+        velocity.x = Math.min(-velocity.x * 1.05, MAX_SPEED); // Inverser et accélérer horizontalement
+        velocity.y = velocity.y + impactY * 2; // Modifier l’angle verticalement
+    } else if (isBallCollision(ball, PADDLE_X_RIGHT, rightPaddle.y) && velocity.x > 0) {
         const impactY = (ball.y - (rightPaddle.y + PADDLE_HEIGHT / 2)) / (PADDLE_HEIGHT / 2);
-        BALL_VELOCITY_X = Math.max(-BALL_VELOCITY_X * 1.05, -MAX_SPEED);
-        BALL_VELOCITY_Y = BALL_VELOCITY_Y + impactY * 2;
+        velocity.x = Math.max(-velocity.x * 1.05, -MAX_SPEED);
+        velocity.y = velocity.y + impactY * 2;
     }
     
     // --- 6. check if a player scored (si la balle a touche le mur -> but !), then reset 
     //         ball direction and notify the client with goalScored=true value ---
     if (ball.x - BALL_RADIUS <= 0) {
         updateScore('right', state);
-        resetBall(state);
+        resetBall(state, velocity);
         goalScored = true;
     }
 
     if (ball.x + BALL_RADIUS >= GAME_WIDTH) {
         updateScore('left', state);
-        resetBall(state);
+        resetBall(state, velocity);
         goalScored = true;
     }
     
@@ -125,7 +129,7 @@ function updateScore(side: string, state: GameState) {
     fastify.log.info(`New score {${state.score1}} : {${state.score2}}`);
 }
 
-function resetBall(state: GameState) {
+function resetBall(state: GameState, velocity: Velocity) {
     state.ball.x = GAME_WIDTH / 2;
     state.ball.y = GAME_HEIGHT / 2;
 
@@ -137,8 +141,8 @@ function resetBall(state: GameState) {
     const directionX = Math.random() < 0.5 ? -1 : 1;
     const directionY = Math.random() < 0.5 ? -1 : 1;
 
-    BALL_VELOCITY_X = baseSpeedX * directionX;
-    BALL_VELOCITY_Y = baseSpeedY * directionY;
+    velocity.x = baseSpeedX * directionX;
+    velocity.y = baseSpeedY * directionY;
 }
 
 
@@ -169,7 +173,6 @@ function isBallCollision(ball: any, paddleX: any, paddleY): boolean {
     return (cornerDistanceSq <= (Math.pow(BALL_RADIUS, 2)));
     
 }
-
 
 // --- KeyInput Handlers for local && remote mode ---
 export function handleKeydownRemote(key: number, side: string) {

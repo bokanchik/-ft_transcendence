@@ -45,7 +45,7 @@ export const config = {
         },
         game: {
             // URL_MATCH (POST pour créer, GET pour récupérer)
-            match: (matchId?: string) => matchId ? `${GAME_API_PREFIX}/match/${matchId}` : `${GAME_API_PREFIX}/match`,
+            match: (matchId?: string) => matchId ? `${GAME_API_PREFIX}/match/remote/${matchId}` : `${GAME_API_PREFIX}/match`,
             // URL_MATCH_USER
             matchHistory: (userId: number | string) => `${GAME_API_PREFIX}/history/${userId}`,
         }

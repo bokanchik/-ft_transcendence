@@ -36,7 +36,6 @@ let isGameOver = false;
 
 
 // TODO: JE PEUX UTILISER MODE ICI ET NE PAS FAIRE UN APPEL A SESSION STORAGE !
-
 export function GameRoomPage(mode: GameMode): HTMLElement {
 	
 	// Conteneur principal
@@ -236,7 +235,7 @@ async function onGameOver() {
 	
 	// fetch results with game DB
 	try {
-		const matchRes = await fetch(`/api/game/match/${matchId}`);
+		const matchRes = await fetch(`/api/game/match/remote/${matchId}`);
 		if (!matchRes.ok) throw new Error('Failed to fetch match info');
 		const data = await matchRes.json();
 		
@@ -264,6 +263,7 @@ async function onGameOver() {
 		
 	} catch (err: unknown) {
 		console.log(`Failed to fetch data from db: ${err}`);
+		throw err;
 	}
 	
 }
@@ -328,8 +328,6 @@ function keydown(e: KeyboardEvent) {
 function keyup(e: KeyboardEvent) {
 	socket.emit('keyup', e.keyCode);
 }
-
-
 
 async function getDisplayName(userId: number) : Promise<string> {
 	const userRes = await fetch(`api/users/${userId}`);

@@ -67,6 +67,7 @@ export function GamePage(): HTMLElement {
     onlineGameButton.className = 'bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mb-4 transition duration-300 ease-in-out';
     onlineGameButton.textContent = 'Start Game';
     
+    buttonsContainer.appendChild(onlineGameButton);
     // --- Le pied du page ---
     const footer: HTMLDivElement = document.createElement('div');
     footer.className = 'mt-6 text-center';
@@ -78,6 +79,7 @@ export function GamePage(): HTMLElement {
     homeLink.className = 'text-blue-600 hover:text-blue-800 text-sm';
     
     footer.appendChild(homeLink);
+
     
     // --- Ajout des éléments au conteneur principal ---
     formContainer.append(title, buttonsContainer, footer);

@@ -19,6 +19,7 @@ async function initGameDb() {
         await createMatchTable();
     } catch (err: unknown) {
         console.error(`Error while initializing gameDb ${err}`);
+        throw err;
     }
 }
 
