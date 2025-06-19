@@ -1,5 +1,11 @@
-export function shuffle(players: string[]) {
-    let j, x, i;
+export interface Match {
+    round: number;
+    player1: string;
+    player2: string;
+}
+
+export function shuffle(players: string[]): string[] {
+    let j: number, x: string, i: number;
     for (i = players.length - 1; i > 0; i--) {
         j = Math.floor(Math.random() * (i + 1));
         x = players[i];
@@ -9,19 +15,28 @@ export function shuffle(players: string[]) {
     return players;
 }
 
-export function makePairs(arr: string[]) {
-    let oddElem: string | undefined;
-    const pairs: [string, string | null][]  = [];
+export function makePairs(arr: string[]): [string, string][] {
+    const copy: string[] = [...arr];
+    const pairs: [string, string][] = [];
 
-    if (arr.length % 2 !== 0) {
-        oddElem = arr.pop();
-    }
-
-    for (let i = 0; i < arr.length; i+= 2) {
-        if (arr[i + 1] !== undefined) {
-            pairs.push([arr[i], arr[i + 1]]);
+    for (let i = 0; i < copy.length; i+= 2) {
+        if (copy[i + 1] !== undefined) {
+            pairs.push([copy[i], copy[i + 1]]);
         }
     }
 
-    return { pairs, oddElem };
+    return pairs;
+}
+
+// function to create matches for Round 1
+export function singleEliminationMatches(participants: string[]): Match[] {
+    const shuffled: string[] = shuffle([...participants]);
+
+    const pairs: [string, string][] = makePairs(shuffled);
+
+    return pairs.map(([p1, p2]) => ({
+        round: 1,
+        player1: p1,
+        player2: p2,
+    }))
 }

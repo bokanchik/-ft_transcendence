@@ -6,9 +6,19 @@ export const LocalTournamentBodySchema = z.object({
 
 export type LocalTournamentRequestBody = z.infer<typeof LocalTournamentBodySchema>;
 
+
+export const LocalTournamentResponseSchema = z.object({
+  pairs: z.array(z.object({
+    round: z.number(),
+    player1: z.string(),
+    player2: z.string(),
+  })),
+});
+
+
 export const LocalTournamentRouteSchema = {
     body: LocalTournamentBodySchema,
     response: {
-        200: z.object({ message: z.string() }), // a changer apres
+        200: LocalTournamentResponseSchema,
     }
 }

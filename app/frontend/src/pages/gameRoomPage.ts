@@ -284,8 +284,11 @@ function handleLocalEvents(ctx: CanvasRenderingContext2D, scoreDisplay: HTMLDivE
 		isGameOver = true;
 		cleanupSocket(socket);
 		cleanupListeners();
-		sessionStorage.clear();
+		if (sessionStorage.getItem('gameRegime') === 'tournament') {
+			navigateTo('/tournament');
+		}
 		navigateTo('/local-game');
+		sessionStorage.clear();
 		isGameOver = false;
 	});
 	

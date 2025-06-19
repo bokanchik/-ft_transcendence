@@ -1,5 +1,6 @@
 import { navigateTo } from "../services/router.js";
 import { initLocalGame } from "../services/initLocalGame.js";
+import { showToast } from "./toast.js";
 // import { createInputField, createInputField } from "../utils/domUtils.js";
 
 export function promptAliasForm(): HTMLDivElement {
@@ -59,8 +60,8 @@ export function promptAliasForm(): HTMLDivElement {
 
     // --- Event: Cancel button clicked
     cancelButton.addEventListener('click', async () => {
-        // need to abort the fetch ?
-        navigateTo('/game');
+        sessionStorage.clear();
+        navigateTo('/');
     });
     
     // --- Input depends on gameMode
@@ -74,10 +75,10 @@ export function promptAliasForm(): HTMLDivElement {
                 createInputField('alias1', 'Player1'),
                 createInputField('alias2', 'Player2')
             );
-        } else if (value === 'Tournament' || value === 'Battle Royale') {
+        } else if (value === 'Tournament') {
             const countField = createInputField('playerCount', 'How many players?');
             const inputElement = countField.querySelector('input') as HTMLInputElement;
-            inputElement.placeholder = 'Enter a number between 3 and 10';
+            inputElement.placeholder = 'Enter 2, 4, or 8';
             
             dynamicInputs.append(countField);
 
@@ -86,13 +87,16 @@ export function promptAliasForm(): HTMLDivElement {
             dynamicInputs.append(aliasFields);
 
             inputElement.type = 'number';
-            inputElement.min = '3';
-            inputElement.max = '10';
+            inputElement.min = '2';
+            inputElement.max = '8';
 
             inputElement.addEventListener('input', () => {
                 aliasFields.innerHTML = ''; // reset a chaque changement
                 const count: number = parseInt(inputElement.value);
-                if (isNaN(count) || count < 3 || count > 10) return;
+                if (isNaN(count) || count < 2 || count > 10 || ((count & (count - 1)) !== 0)) {
+                    showToast('Number of players must be a power of 2 (e.g., 4, 8)', 'error');
+                    return;
+                }
 
                 for (let i = 1; i <= count; i++) {
                     const field = createInputField(`alias${i}`, `Player ${i}`);
@@ -108,6 +112,7 @@ export function promptAliasForm(): HTMLDivElement {
 
     // --- Event: Submit form event triggered
     form.addEventListener('submit', async (event) => {
+        sessionStorage.clear();
         event.preventDefault(); // prevents the page from refreshing
         await initLocalGame(form);
     });
@@ -128,6 +133,7 @@ function createInputField(id: string, labelText: string): HTMLDivElement {
     const input = document.createElement('input');
     input.type = 'text';
     input.id = id;
+    input.name = id;
     input.required = true;
     input.className = 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500';
 
