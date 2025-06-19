@@ -1,12 +1,8 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import * as friendService from '../services/friendService.js';
-import { ERROR_KEYS, AppError, ValidationError } from '../utils/appError.js';
 import { JWTPayload } from '../shared/schemas/usersSchemas.js';
 
 // Types pour les requêtes avec params
-interface FriendshipIdRequest extends FastifyRequest<{ Params: { friendshipId: string } }> {
-	user: JWTPayload;
-}
 interface BlockUserRequest extends FastifyRequest<{ Params: { userIdToBlock: string } }> {
 	user: JWTPayload;
 }
@@ -17,7 +13,6 @@ interface UnblockUserRequest extends FastifyRequest<{ Params: { userIdToUnblock:
 export async function sendFriendRequestHandler(req: FastifyRequest, reply: FastifyReply) {
 	const requesterId = (req.user as JWTPayload).id;
 	const { friendId } = req.body as { friendId: number };
-
 	req.log.info({ requesterId, friendId }, 'Attempting to send friend request');
 	const newFriendship = await friendService.sendFriendRequest(requesterId, friendId);
 	return reply.code(201).send({
@@ -43,7 +38,6 @@ export async function getSentRequestsHandler(req: FastifyRequest, reply: Fastify
 export async function acceptFriendRequestHandler(req: FastifyRequest, reply: FastifyReply) {
 	const currentUserId = (req.user as JWTPayload).id;
 	const friendshipId = parseInt((req.params as any).friendshipId, 10);
-
 	req.log.info({ currentUserId, friendshipId }, 'Attempting to accept friend request');
 	const result = await friendService.acceptFriendRequest(friendshipId, currentUserId);
 	return reply.send(result);
@@ -52,7 +46,6 @@ export async function acceptFriendRequestHandler(req: FastifyRequest, reply: Fas
 export async function declineFriendRequestHandler(req: FastifyRequest, reply: FastifyReply) {
 	const currentUserId = (req.user as JWTPayload).id;
 	const friendshipId = parseInt((req.params as any).friendshipId, 10);
-
 	req.log.info({ currentUserId, friendshipId }, 'Attempting to decline friend request');
 	const result = await friendService.declineOrCancelFriendRequest(friendshipId, currentUserId);
 	return reply.send(result);
@@ -61,7 +54,6 @@ export async function declineFriendRequestHandler(req: FastifyRequest, reply: Fa
 export async function cancelFriendRequestHandler(req: FastifyRequest, reply: FastifyReply) {
 	const currentUserId = (req.user as JWTPayload).id;
 	const friendshipId = parseInt((req.params as any).friendshipId, 10);
-
 	req.log.info({ currentUserId, friendshipId }, 'Attempting to cancel friend request');
 	const result = await friendService.declineOrCancelFriendRequest(friendshipId, currentUserId);
 	return reply.send(result);
@@ -77,7 +69,6 @@ export async function getMyFriendsHandler(req: FastifyRequest, reply: FastifyRep
 export async function removeFriendshipHandler( req: FastifyRequest, reply: FastifyReply ) {
 	const currentUserId = (req.user as JWTPayload).id;
 	const friendshipId = parseInt((req.params as any).friendshipId, 10);
-
 	req.log.info({ currentUserId, friendshipId }, 'Attempting to remove friendship');
 	const result = await friendService.removeFriendship(friendshipId, currentUserId);
 	return reply.send(result);
@@ -86,7 +77,6 @@ export async function removeFriendshipHandler( req: FastifyRequest, reply: Fasti
 export async function blockUserHandler(req: BlockUserRequest, reply: FastifyReply) {
 	const blockerId = req.user.id;
 	const userIdToBlock = parseInt((req.params as any).userIdToBlock, 10);
-
 	req.log.info({ blockerId, userIdToBlock }, 'Attempting to block user');
 	const result = await friendService.blockUser(blockerId, userIdToBlock);
 	return reply.send(result);
@@ -95,7 +85,6 @@ export async function blockUserHandler(req: BlockUserRequest, reply: FastifyRepl
 export async function unblockUserHandler(req: UnblockUserRequest, reply: FastifyReply) {
 	const unblockerId = req.user.id;
 	const userIdToUnblock = parseInt((req.params as any).userIdToUnblock, 10);
-
 	req.log.info({ unblockerId, userIdToUnblock }, 'Attempting to unblock user');
 	const result = await friendService.unblockUser(unblockerId, userIdToUnblock);
 	return reply.send(result);
