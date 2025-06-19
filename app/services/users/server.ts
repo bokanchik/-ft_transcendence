@@ -45,9 +45,9 @@ async function buildApp(): Promise<FastifyInstance> {
 		await initializeDb();
 		fastify.log.info('Database initialized');
 		await setupPlugins(fastify);
+		setupErrorHandler(fastify);
 		setupHooks();
 		setupRoutes();
-		setupErrorHandler(fastify);
 		return fastify;
 	} catch (err: any) {
 		fastify.log.error({ err: err.message, stack: err.stack }, 'Error initializing app');

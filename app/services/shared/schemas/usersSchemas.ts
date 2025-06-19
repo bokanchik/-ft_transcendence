@@ -29,6 +29,11 @@ export type UserWithPasswordHash = z.infer<typeof UserWithPasswordHashSchema>;
 
 // --- Schemas for API requests (Body, Params, Responses) ---
 
+export const ErrorResponseSchema = z.object({
+    error: z.string(),
+    statusCode: z.number().int()
+});
+
 // REGISTER
 export const RegisterBodySchema = z.object({
     username: UserBaseSchema.shape.username,
@@ -60,7 +65,11 @@ export const LoginRouteSchema = {
             message: z.string(),
             user: UserBaseSchema,
             // csrfToken: z.string().optional(),
-        })
+        }),
+        400: ErrorResponseSchema,
+        401: ErrorResponseSchema,
+        404: ErrorResponseSchema,
+        500: ErrorResponseSchema
     }
 };
 

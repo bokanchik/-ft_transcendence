@@ -1,7 +1,7 @@
 // app/services/users/services/userService.ts
 import * as userModel from '../models/userModel.js';
 import * as passwordUtils from '../utils/pswdUtils.js';
-import { ERROR_MESSAGES, ConflictError, ValidationError, NotFoundError } from '../utils/appError.js';
+import { ERROR_MESSAGES, ConflictError, UnauthorizedError, NotFoundError } from '../utils/appError.js';
 import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, CreateUserPayload, UserOnlineStatus } from '../shared/schemas/usersSchemas.js';
 
 /**
@@ -18,7 +18,7 @@ function generateDefaultAvatarUrl(name: string): string {
  * Logs in a user by verifying their credentials.
  * @param {string} params.identifier - The username or email of the user.
  * @param {string} params.password - The user's password.
- * @throws {ValidationError} If the credentials are invalid.
+ * @throws {UnauthorizedError} If the credentials are invalid.
  * @returns {Promise<User>} The user object without the password hash.
  */
 export async function loginUser({ identifier, password }: LoginRequestBody): Promise<User> {
@@ -32,7 +32,7 @@ export async function loginUser({ identifier, password }: LoginRequestBody): Pro
 	}
 
 	if (!userEntity || !(await passwordUtils.comparePassword(password, userEntity.password_hash))) {
-		throw new ValidationError('Invalid username/email or password.');
+		throw new UnauthorizedError('Invalid username/email or password.');
 	}
 
 	const { password_hash, ...userPassLess } = userEntity;

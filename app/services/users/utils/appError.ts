@@ -63,20 +63,25 @@ export function setupErrorHandler(fastify: FastifyInstance): void {
 	fastify.setErrorHandler(function(error: FastifyError | AppError | Error, request: FastifyRequest, reply: FastifyReply) {
 		request.log.error(error);
 
-		let statusCode: number;
-		let message: string;
+		let statusCode: number = 500;
+		let message: string = ERROR_MESSAGES.DATABASE_ERROR;
 
 		if (error instanceof AppError) {
             statusCode = error.statusCode;
             message = error.message;
-        } else {
-            statusCode = (error as FastifyError).statusCode || 500;
-            message = error.message || ERROR_MESSAGES.DATABASE_ERROR;
+        } else if ((error as FastifyError).statusCode) {
+            statusCode = (error as FastifyError).statusCode!;
+            message = error.message;
         }
-		reply.code(statusCode).send({
+        const payload = {
 			error: message,
 			statusCode: statusCode,
-		});
+		};
+        console.log('--- ERROR HANDLER IS SENDING THIS PAYLOAD ---');
+        console.log(payload);
+        console.log('--- END OF PAYLOAD ---');
+
+		reply.code(statusCode).send(payload);
 	});
 	fastify.log.info('Error handler registered');
 }
