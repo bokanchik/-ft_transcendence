@@ -31,7 +31,9 @@ export type UserWithPasswordHash = z.infer<typeof UserWithPasswordHashSchema>;
 
 export const ErrorResponseSchema = z.object({
     error: z.string(),
-    statusCode: z.number().int()
+    statusCode: z.number().int(),
+    messageKey: z.string().optional(), // for translation purposes
+    messageParams: z.record(z.any()).optional(), // for translation purposes
 });
 
 // REGISTER

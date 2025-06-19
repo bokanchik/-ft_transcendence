@@ -3,13 +3,15 @@ import { SendFriendRequestRouteSchema, FriendshipActionRouteSchema, GetFriendsLi
 import { config } from "../shared/env.js";
 import {
 	acceptFriendRequestHandler,
+	cancelFriendRequestHandler,
+	removeFriendshipHandler,
 	declineFriendRequestHandler,
+	// friendshipActionHandler,
+	// FriendshipActionRequest,
 	getReceivedRequestsHandler,
 	getSentRequestsHandler,
 	sendFriendRequestHandler,
-	cancelFriendRequestHandler,
 	getMyFriendsHandler,
-	removeFriendshipHandler,
 } from "../handlers/friendsHandlers.js";
 
 export default async function friendRoutes(fastify: FastifyInstance, options: FastifyPluginOptions) {
@@ -44,6 +46,7 @@ export default async function friendRoutes(fastify: FastifyInstance, options: Fa
 			schema: FriendshipActionRouteSchema
 		},
 		acceptFriendRequestHandler
+		// (req, reply) => friendshipActionHandler(req, reply, 'accept')
 	);
 	fastify.post(
 		config.URL_FRIEND_DECLINE,
@@ -52,6 +55,7 @@ export default async function friendRoutes(fastify: FastifyInstance, options: Fa
 			schema: FriendshipActionRouteSchema
 		},
 		declineFriendRequestHandler
+		// (req, reply) => friendshipActionHandler(req, reply, 'decline')
 	);
 	fastify.post(
 		config.URL_FRIEND_CANCEL,
@@ -60,6 +64,7 @@ export default async function friendRoutes(fastify: FastifyInstance, options: Fa
 			schema: FriendshipActionRouteSchema
 		},
 		cancelFriendRequestHandler
+		// (req, reply) => friendshipActionHandler(req, reply, 'cancel')
 	);
 	fastify.get(
 		config.URL_FRIEND_LIST,
@@ -76,5 +81,6 @@ export default async function friendRoutes(fastify: FastifyInstance, options: Fa
 			schema: FriendshipActionRouteSchema
 		},
 		removeFriendshipHandler
+		// (req, reply) => friendshipActionHandler(req, reply, 'remove')
 	);
 };

@@ -1,14 +1,15 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { createUserAccount, loginUser, updateUserStatus } from '../services/userService.js';
 import { jwtToken, cookieOptions, csrfCookieName, csrfOptions } from '../shared/auth-plugin/tokens.js';
-import { ERROR_MESSAGES } from '../utils/appError.js';
+import { ERROR_KEYS, UnauthorizedError } from '../utils/appError.js';
+// import { ERROR_MESSAGES } from '../utils/appError.js';
 import { JWTPayload, RegisterRequestBody, LoginRequestBody, UserOnlineStatus } from '../shared/schemas/usersSchemas.js';
 
 export async function registerHandler(req: FastifyRequest<{ Body: RegisterRequestBody }>, reply: FastifyReply) {
 	await createUserAccount(req.body);
 
 	return reply.code(201).send({
-		message: 'Registration successful. Please log in.'
+		message: 'Registration successful. Please log in.' // to translate
 	});
 }
 
@@ -25,7 +26,7 @@ export async function loginHandler(req: FastifyRequest<{ Body: LoginRequestBody 
 	});
 
 	return reply.send({
-		message: 'Login accepted',
+		message: 'Login accepted', // to translate
 		user,
 	});
 }
@@ -35,13 +36,13 @@ export async function logoutHandler(req: FastifyRequest, reply: FastifyReply) {
 	await updateUserStatus(id, UserOnlineStatus.OFFLINE);
 	reply.clearCookie(jwtToken, cookieOptions);
 	reply.clearCookie(csrfCookieName, csrfOptions);
-	return reply.send({ message: 'Logout successful' });
+	return reply.send({ message: 'Logout successful' }); // to translate
 }
 
 export async function refreshTokenHandler(req: FastifyRequest, reply: FastifyReply) {
 	const refreshToken = (req.cookies as any).refreshToken;
 	if (!refreshToken) {
-		return reply.code(401).send({ error: ERROR_MESSAGES.REFRESH_TOKEN_MISSING });
+		throw new UnauthorizedError(ERROR_KEYS.REFRESH_TOKEN_MISSING);
 	}
 
 	try {
@@ -51,8 +52,8 @@ export async function refreshTokenHandler(req: FastifyRequest, reply: FastifyRep
 			...cookieOptions,
 			expires: new Date(decoded.exp * 1000),
 		});
-		return reply.send({ message: 'Token refreshed successfully' });
+		return reply.send({ message: 'Token refreshed successfully' }); // to translate
 	} catch (err) {
-		return reply.code(401).send({ error: ERROR_MESSAGES.INVALID_REFRESH_TOKEN });
+		return reply.code(401).send({ error: ERROR_KEYS.INVALID_REFRESH_TOKEN });
 	}
 }

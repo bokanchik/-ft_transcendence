@@ -1,8 +1,11 @@
 import { z } from 'zod';
+import { t } from './i18nService.js';
 
 export const ServerErrorPayloadSchema = z.object({
   error: z.string(),
   statusCode: z.number(),
+  messageKey: z.string().optional(), // On ajoute la clé de traduction
+  messageParams: z.record(z.any()).optional(), // Et les paramètres optionnels
   details: z.any().optional(),
 });
 
@@ -55,9 +58,14 @@ export async function handleApiResponse(
         const parsedError = errorSchema.safeParse(json);
         if (parsedError.success) {
             errorPayload = parsedError.data;
-            errorMessage = errorPayload?.error || errorMessage;
+            if (errorPayload && errorPayload.messageKey) {
+                errorMessage = t(errorPayload.messageKey, errorPayload.messageParams);
+            } else {
+                errorMessage = errorPayload?.error || t('error.general.unknown');
+            }
         } else {
-            errorMessage = `Erreur HTTP ${response.status}: La réponse d'erreur du serveur est mal formée.`;
+            errorMessage = t('error.general.malformedResponse');
+            // errorMessage = `Erreur HTTP ${response.status}: La réponse d'erreur du serveur est mal formée.`;
             console.error("Zod validation failed on error response:", parsedError.error);
         }
       } else {
@@ -65,6 +73,7 @@ export async function handleApiResponse(
       }
 
     } catch (e) {
+      errorMessage = t('error.general.networkError');
     }
 
     throw new ClientApiError(errorMessage, response.status, errorPayload?.statusCode, errorPayload);

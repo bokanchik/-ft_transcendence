@@ -1,7 +1,8 @@
 // app/services/users/services/userService.ts
 import * as userModel from '../models/userModel.js';
 import * as passwordUtils from '../utils/pswdUtils.js';
-import { ERROR_MESSAGES, ConflictError, UnauthorizedError, NotFoundError } from '../utils/appError.js';
+import { ERROR_KEYS, ConflictError, UnauthorizedError, NotFoundError } from '../utils/appError.js';
+// import { ERROR_MESSAGES, ConflictError, UnauthorizedError, NotFoundError } from '../utils/appError.js';
 import { User, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, CreateUserPayload, UserOnlineStatus } from '../shared/schemas/usersSchemas.js';
 
 /**
@@ -32,7 +33,8 @@ export async function loginUser({ identifier, password }: LoginRequestBody): Pro
 	}
 
 	if (!userEntity || !(await passwordUtils.comparePassword(password, userEntity.password_hash))) {
-		throw new UnauthorizedError('Invalid username/email or password.');
+		// throw new UnauthorizedError('Invalid username/email or password.');
+		throw new UnauthorizedError(ERROR_KEYS.LOGIN_INVALID_CREDENTIALS);
 	}
 
 	const { password_hash, ...userPassLess } = userEntity;
@@ -50,13 +52,16 @@ export async function createUserAccount(userData: RegisterRequestBody): Promise<
 	const { username, email, password, display_name, avatar_url } = userData;
 
 	if (await userModel.isUsernameInDb(username)) {
-		throw new ConflictError(ERROR_MESSAGES.USERNAME_ALREADY_EXISTS);
+		// throw new ConflictError(ERROR_MESSAGES.USERNAME_ALREADY_EXISTS);
+		throw new ConflictError(ERROR_KEYS.REGISTER_USERNAME_EXISTS, { username: username });
 	}
 	if (await userModel.isDisplayNameInDb(display_name)) {
-		throw new ConflictError(ERROR_MESSAGES.DISPLAY_NAME_ALREADY_EXISTS);
+		// throw new ConflictError(ERROR_MESSAGES.DISPLAY_NAME_ALREADY_EXISTS);
+		throw new ConflictError(ERROR_KEYS.REGISTER_DISPLAYNAME_EXISTS, { display_name: display_name });
 	}
 	if (await userModel.isEmailInDb(email)) {
-		throw new ConflictError(ERROR_MESSAGES.EMAIL_ALREADY_EXISTS);
+		// throw new ConflictError(ERROR_MESSAGES.EMAIL_ALREADY_EXISTS);
+		throw new ConflictError(ERROR_KEYS.REGISTER_EMAIL_EXISTS, { email: email });
 	}
 
 	const hashedPassword = await passwordUtils.hashPassword(password);
@@ -89,7 +94,7 @@ export async function getUserById(userId: number): Promise<User> {
 	console.log('Fetching user by ID from the database');
 	const user = await userModel.getUserByIdFromDb(userId);
 	if (!user) {
-		throw new NotFoundError('User not found');
+		throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND);
 	}
 	return user;
 }
@@ -108,7 +113,7 @@ export async function updateUserProfile(userId: number, updates: UpdateUserPaylo
 
 	const currentUser = await userModel.getUserByIdFromDb(userId);
 	if (!currentUser) {
-		throw new NotFoundError(`User with ID ${userId} not found`);
+		throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND);
 	}
 
 	const processedUpdates: UpdateUserPayload = {};
@@ -136,10 +141,12 @@ export async function updateUserProfile(userId: number, updates: UpdateUserPaylo
 	}
 
 	if (changesToApply.display_name && await userModel.isDisplayNameInDb(changesToApply.display_name, userId)) {
-		throw new ConflictError(`Display name '${changesToApply.display_name}' is already taken.`);
+		// throw new ConflictError(`Display name '${changesToApply.display_name}' is already taken.`);
+		throw new ConflictError(ERROR_KEYS.REGISTER_DISPLAYNAME_EXISTS, { display_name: changesToApply.display_name });
 	}
 	if (changesToApply.email && await userModel.isEmailInDb(changesToApply.email, userId)) {
-		throw new ConflictError(`Email '${changesToApply.email}' is already taken.`);
+		// throw new ConflictError(`Email '${changesToApply.email}' is already taken.`);
+		throw new ConflictError(ERROR_KEYS.REGISTER_EMAIL_EXISTS, { email: changesToApply.email });
 	}
 
 	try {
