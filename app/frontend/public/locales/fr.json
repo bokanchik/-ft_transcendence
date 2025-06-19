@@ -27,6 +27,10 @@
     "accept": "Accepter",
     "decline": "Refuser",
     "remove": "Supprimer",
+    "block": "Bloquer",
+    "unblock": "Débloquer",
+    "blockSuccess": "Utilisateur bloqué avec succès",
+    "unblockSuccess": "Utilisateur débloqué avec succès",
     "requestSent": "Demande d'ami envoyée",
     "requestReceived": "Demande d'ami reçue",
     "requestAccepted": "Demande d'ami acceptée",
@@ -38,6 +42,7 @@
     "status": {
       "friend": "Ami",
       "pending": "En attente",
+      "blocked": "Bloqué",
       "notFriend": "Pas ami"
     },
     "pendingRequest": "Demande d'ami en attente",
@@ -97,9 +102,6 @@
     },
     "error": {
       "initializing": "Erreur lors de l'initialisation de la page. Veuillez essayer de rafraîchir la page."
-    },
-    "user": {
-      "notFound": "Utilisateur non trouvé."
     }
   },
   "sidebar": {

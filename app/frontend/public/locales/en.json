@@ -27,6 +27,10 @@
     "accept": "Accept",
     "decline": "Decline",
     "remove": "Remove",
+    "block": "Block",
+    "unblock": "Unblock",
+    "blockSuccess": "User blocked successfully",
+    "unblockSuccess": "User unblocked successfully",
     "requestSent": "Friend request sent",
     "requestReceived": "Friend request received",
     "requestAccepted": "Friend request accepted",
@@ -38,6 +42,7 @@
     "status": {
       "friend": "Friends",
       "pending": "Pending",
+      "blocked": "Blocked",
       "notFriend": "Not a friend"
     },
     "pendingRequest": "Pending friend request",
@@ -97,9 +102,6 @@
     },
     "error": {
       "initializing": "Error initializing Page. Please try refreshing the page."
-    },
-    "user": {
-      "notFound": "User not found."
     }
   },
   "sidebar": {
