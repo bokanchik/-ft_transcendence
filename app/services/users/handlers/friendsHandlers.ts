@@ -53,11 +53,6 @@ export async function declineFriendRequestHandler(req: FastifyRequest, reply: Fa
 	const currentUserId = (req.user as JWTPayload).id;
 	const friendshipId = parseInt((req.params as any).friendshipId, 10);
 
-	if (isNaN(friendshipId)) {
-		// throw new AppError(ERROR_MESSAGES.INVALID_FRIENDSHIP_ID, 400);
-		throw new ValidationError(ERROR_KEYS.INVALID_FRIENDSHIP_ID);
-	}
-
 	req.log.info({ currentUserId, friendshipId }, 'Attempting to decline friend request');
 	const result = await friendService.declineOrCancelFriendRequest(friendshipId, currentUserId);
 	return reply.send(result);
@@ -66,11 +61,6 @@ export async function declineFriendRequestHandler(req: FastifyRequest, reply: Fa
 export async function cancelFriendRequestHandler(req: FastifyRequest, reply: FastifyReply) {
 	const currentUserId = (req.user as JWTPayload).id;
 	const friendshipId = parseInt((req.params as any).friendshipId, 10);
-
-	if (isNaN(friendshipId)) {
-		// throw new AppError(ERROR_MESSAGES.INVALID_FRIENDSHIP_ID, 400);
-		throw new ValidationError(ERROR_KEYS.INVALID_FRIENDSHIP_ID);
-	}
 
 	req.log.info({ currentUserId, friendshipId }, 'Attempting to cancel friend request');
 	const result = await friendService.declineOrCancelFriendRequest(friendshipId, currentUserId);
@@ -88,9 +78,6 @@ export async function removeFriendshipHandler( req: FastifyRequest, reply: Fasti
 	const currentUserId = (req.user as JWTPayload).id;
 	const friendshipId = parseInt((req.params as any).friendshipId, 10);
 
-	if (isNaN(friendshipId)) {
-		return reply.code(400).send({ error: "Invalid friendship ID." });
-	}
 	req.log.info({ currentUserId, friendshipId }, 'Attempting to remove friendship');
 	const result = await friendService.removeFriendship(friendshipId, currentUserId);
 	return reply.send(result);
@@ -98,11 +85,8 @@ export async function removeFriendshipHandler( req: FastifyRequest, reply: Fasti
 
 export async function blockUserHandler(req: BlockUserRequest, reply: FastifyReply) {
 	const blockerId = req.user.id;
-	const userIdToBlock = parseInt(req.params.userIdToBlock, 10);
+	const userIdToBlock = parseInt((req.params as any).userIdToBlock, 10);
 
-	if (isNaN(userIdToBlock)) {
-		throw new AppError('Invalid user ID to block.', 400);
-	}
 	req.log.info({ blockerId, userIdToBlock }, 'Attempting to block user');
 	const result = await friendService.blockUser(blockerId, userIdToBlock);
 	return reply.send(result);
@@ -110,11 +94,8 @@ export async function blockUserHandler(req: BlockUserRequest, reply: FastifyRepl
 
 export async function unblockUserHandler(req: UnblockUserRequest, reply: FastifyReply) {
 	const unblockerId = req.user.id;
-	const userIdToUnblock = parseInt(req.params.userIdToUnblock, 10);
+	const userIdToUnblock = parseInt((req.params as any).userIdToUnblock, 10);
 
-	if (isNaN(userIdToUnblock)) {
-		throw new AppError('Invalid user ID to unblock.', 400);
-	}
 	req.log.info({ unblockerId, userIdToUnblock }, 'Attempting to unblock user');
 	const result = await friendService.unblockUser(unblockerId, userIdToUnblock);
 	return reply.send(result);
