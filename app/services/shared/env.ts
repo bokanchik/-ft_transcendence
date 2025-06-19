@@ -37,6 +37,9 @@ const envSchema = z.object({
 	URL_FRIEND_DECLINE: z.string().min(1, "URL_FRIEND_DECLINE is required"),
 	URL_FRIEND_REMOVE: z.string().min(1, "URL_FRIEND_REMOVE is required"),
 	URL_FRIEND_CANCEL: z.string().min(1, "URL_FRIEND_CANCEL is required"),
+	URL_FRIEND_BLOCK: z.string().min(1, "URL_FRIEND_BLOCK is required"),
+	URL_FRIEND_UNBLOCK: z.string().min(1, "URL_FRIEND_UNBLOCK is required"),
+	URL_FRIEND_BLOCKED: z.string().min(1, "URL_FRIEND_BLOCKED is required"),
 	URL_FRIEND_LIST: z.string().min(1, "URL_FIEND_LIST is required"),
 });
 

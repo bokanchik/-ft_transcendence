@@ -1,13 +1,13 @@
 // services/friendService.js
 import * as friendModel from '../models/friendModel.js';
 import * as userModel from '../models/userModel.js';
-import { ConflictError, NotFoundError, ValidationError, ForbiddenError } from '../utils/appError.js';
+import { ERROR_KEYS, ConflictError, NotFoundError, ValidationError, ForbiddenError } from '../utils/appError.js';
 import { Friend, PendingFriendRequest, Friendship, FriendshipStatus } from '../shared/schemas/friendsSchemas.js';
 
 /**
  * Creates a friend request.
  * @param {number} requesterId - ID of the user sending the request.
- * @param {string} receiverUsername - Username of the user receiving the request.
+ * @param {number} receiverId - Username of the user receiving the request.
  * @throws {ValidationError} If required parameters are missing or invalid.
  * @throws {NotFoundError} If the receiver does not exist.
  * @throws {ConflictError} If a friendship or request already exists.
@@ -20,7 +20,7 @@ export async function sendFriendRequest(requesterId: number, receiverId: number)
 
 	const receiver = await userModel.getUserByIdFromDb(receiverId);
 	if (!receiver) {
-		throw new NotFoundError(`User with username '${receiverId}' not found.`);
+		throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND);
 	}
 
 	if (requesterId === receiverId) {
@@ -59,7 +59,7 @@ export async function acceptFriendRequest(friendshipId: number, currentUserId: n
 	const friendship = await friendModel.getFriendshipByIdInDb(friendshipId);
 
 	if (!friendship) {
-		throw new NotFoundError('Friend request not found.');
+		throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND);
 	}
 	if (friendship.status !== FriendshipStatus.PENDING) {
 		throw new ConflictError(`This friend request is already '${friendship.status}'.`);
@@ -90,7 +90,7 @@ export async function declineOrCancelFriendRequest(friendshipId: number, current
 	const friendship = await friendModel.getFriendshipByIdInDb(friendshipId);
 
 	if (!friendship) {
-		throw new NotFoundError('Friendship or request not found.');
+		throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND);
 	}
 	if (friendship.user1_id !== currentUserId && friendship.user2_id !== currentUserId) {
 		throw new ForbiddenError("You are not part of this friendship.");
@@ -123,7 +123,7 @@ export async function declineOrCancelFriendRequest(friendshipId: number, current
 export async function getFriends(userId: number): Promise<Friend[]> {
 	const user = await userModel.getUserByIdFromDb(userId);
 	if (!user) {
-		throw new NotFoundError('User not found.');
+		throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND);
 	}
 	return friendModel.getAcceptedFriendsForUserInDb(userId);
 }
@@ -137,7 +137,7 @@ export async function getFriends(userId: number): Promise<Friend[]> {
 export async function getReceivedFriendRequests(userId: number): Promise<PendingFriendRequest[]> {
 	const user = await userModel.getUserByIdFromDb(userId);
 	if (!user) {
-		throw new NotFoundError('User not found.');
+		throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND);
 	}
 	return friendModel.getPendingReceivedFriendRequestsInDb(userId);
 }
@@ -151,7 +151,7 @@ export async function getReceivedFriendRequests(userId: number): Promise<Pending
 export async function getSentFriendRequests(userId: number): Promise<PendingFriendRequest[]> {
 	const user = await userModel.getUserByIdFromDb(userId);
 	if (!user) {
-		throw new NotFoundError('User not found.');
+		throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND);
 	}
 	return friendModel.getPendingSentFriendRequestsInDb(userId);
 }
@@ -163,7 +163,7 @@ export async function removeFriendship(friendshipId: number, currentUserId: numb
 	console.log('[removeFriendship] DB result for friendship:', friendship);
 
 	if (!friendship) {
-		throw new NotFoundError('Friendship not found.');
+		throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND);
 	}
 	if (friendship.user1_id !== currentUserId && friendship.user2_id !== currentUserId) {
 		throw new ForbiddenError("You are not part of this friendship.");
@@ -195,16 +195,13 @@ export async function getAllFriendships(): Promise<Friendship[]> {
  * @throws {NotFoundError} If the user to block does not exist.
  * @returns {Promise<{ message: string }>} A success message.
  */
-export async function blockUser(
-	blockerId: number,
-	blockedUserId: number
-): Promise<{ message: string }> {
+export async function blockUser(blockerId: number, blockedUserId: number): Promise<{ message: string }> {
 	if (blockerId === blockedUserId) {
 		throw new ValidationError("You cannot block yourself.");
 	}
 	const userToBlock = await userModel.getUserByIdFromDb(blockedUserId);
 	if (!userToBlock) {
-		throw new NotFoundError("User to block not found.");
+		throw new NotFoundError("No active block found for this user or you cannot unblock.");
 	}
 
 	const [id1, id2] = blockerId < blockedUserId ? [blockerId, blockedUserId] : [blockedUserId, blockerId];
@@ -226,15 +223,12 @@ export async function blockUser(
  * @throws {NotFoundError} If no active block exists.
  * @returns {Promise<{ message: string }>} A success message.
  */
-export async function unblockUser(
-	unblockerId: number,
-	unblockedUserId: number
-): Promise<{ message: string }> {
+export async function unblockUser(unblockerId: number, unblockedUserId: number): Promise<{ message: string }> {
 	const [id1, id2] = unblockerId < unblockedUserId ? [unblockerId, unblockedUserId] : [unblockedUserId, unblockerId];
 	const friendship = await friendModel.getFriendshipByUsersInDb(id1, id2);
 
 	if (!friendship || friendship.status !== 'blocked') {
-		throw new NotFoundError("No active block found for this user or you cannot unblock.");
+		throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND);
 	}
 	await friendModel.deleteFriendshipInDb(friendship.id);
 	return { message: "User has been unblocked. They can send/receive friend requests again." };

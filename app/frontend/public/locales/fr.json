@@ -1,73 +1,113 @@
 {
-  "app.title": "King-Pong",
-  "header.home": "Accueil",
-  "header.game": "Jeu",
-  "header.dashboard": "Tableau de Bord",
-  "header.settings": "Paramètres",
-  "header.logout": "Déconnexion",
-  "header.language": "ENG",
-  "login.title": "Connexion",
-  "login.backToHome": "Retour à l'accueil",
-  "login.identifierLabel": "Nom d'utilisateur ou Email",
-  "login.identifierPlaceholder": "Entrez votre nom d'utilisateur ou e-mail",
-  "login.passwordLabel": "Mot de passe",
-  "login.button": "Se connecter",
-  "login.registerLink": "Pas de compte ? S'inscrire",
-  "login.attemptingLogin": "Tentative de connexion...",
-  "login.invalidCredentials": "Identifiants invalides. Veuillez réessayer.",
-  "login.missingCredentials": "Entrer votre nom d'utilisateur/email et mot de passe.",
-  "friend.request": "Inviter",
-  "friend.accept": "Accepter",
-  "friend.decline": "Refuser",
-  "friend.remove": "Supprimer",
-  "friend.requestSent": "Demande d'ami envoyée",
-  "friend.requestReceived": "Demande d'ami reçue",
-  "friend.requestAccepted": "Demande d'ami acceptée",
-  "friend.requestDeclined": "Demande d'ami refusée",
-  "friend.requestRemoved": "Demande d'ami supprimée",
-  "friend.cancelRequest": "Annuler la demande",
-  "friend.alreadyFriends": "Vous êtes déjà amis",
-  "friend.notFriends": "Vous n'êtes pas amis",
-  "friend.status.friend": "Ami",
-  "friend.status.pending": "En attente",
-  "friend.status.notFriend": "Pas ami",
-  "friend.pendingRequest": "Demande d'ami en attente",
-  "friend.noFriends": "Aucun ami trouvé",
-  "friend.noPendingRequests": "Aucune demande d'ami en attente",
-  "status.title": "Statut",
-  "status.online": "En ligne",
-  "status.offline": "Hors ligne",
-  "status.inGame": "En jeu",
-  "dashboard.tabs.users": "Tous les utilisateurs",
-  "dashboard.tabs.friends": "Amis",
-  "dashboard.tabs.pending": "En attente",
-  "dashboard.tabs.history": "Historique des matchs",
-  "general.error": "Erreur",
-  "general.loading": "Chargement...",
-  "general.cancel": "Annuler",
-  "general.confirm": "Confirmer",
-  "error.login.invalidCredentials": "Identifiant ou mot de passe invalide.",
-  "error.login.accountBanned": "Ce compte a été banni.",
-  "error.register.usernameExists": "Le nom d'utilisateur '{username}' est déjà pris.",
-  "error.register.emailExists": "L'email '{email}' est déjà utilisé.",
-  "error.register.displayNameExists": "Le nom d'affichage '{display_name}' est déjà utilisé.",
-  "error.refreshToken.invalid": "Jeton de rafraîchissement invalide ou expiré.",
-  "error.refreshToken.missing": "Jeton de rafraîchissement manquant.",
-  "error.user.notFound": "Utilisateur non trouvé.",
-  "error.general.unauthorized": "Non autorisé. Veuillez vous connecter.",
-  "error.general.forbidden": "Accès interdit. Vous n'avez pas les permissions nécessaires.",
-  "error.general.unknown": "Une erreur inconnue est survenue.",
-  "error.general.malformedResponse": "La réponse du serveur est mal formée.",
-  "error.general.networkError": "Erreur de réseau ou impossible de joindre le serveur.",
-  "msg.redirect.login": "Redirection vers la page de connexion...",
-  "msg.redirect.dashboard": "Redirection vers le tableau de bord...",
-  "msg.redirect.game": "Redirection vers le jeu...",
-  "msg.error.initializing": "Erreur lors de l'initialisation de la page. Veuillez essayer de rafraîchir la page.",
-  "msg.user.notFound": "Utilisateur non trouvé.",
-  "sidebar.username": "Nom d'utilisateur",
-  "sidebar.displayName": "Nom d'affichage",
-  "sidebar.email": "Email",
-  "sidebar.createdAt": "Créé le",
-  "sidebar.wins": "Victoires",
-  "sidebar.losses": "Défaites"
+  "app": {
+    "title": "King-Pong"
+  },
+  "header": {
+    "home": "Accueil",
+    "game": "Jeu",
+    "dashboard": "Tableau de Bord",
+    "settings": "Paramètres",
+    "logout": "Déconnexion",
+    "language": "ENG"
+  },
+  "login": {
+    "title": "Connexion",
+    "backToHome": "Retour à l'accueil",
+    "identifierLabel": "Nom d'utilisateur ou Email",
+    "identifierPlaceholder": "Entrez votre nom d'utilisateur ou e-mail",
+    "passwordLabel": "Mot de passe",
+    "button": "Se connecter",
+    "registerLink": "Pas de compte ? S'inscrire",
+    "attemptingLogin": "Tentative de connexion...",
+    "invalidCredentials": "Identifiants invalides. Veuillez réessayer.",
+    "missingCredentials": "Entrer votre nom d'utilisateur/email et mot de passe."
+  },
+  "friend": {
+    "request": "Inviter",
+    "accept": "Accepter",
+    "decline": "Refuser",
+    "remove": "Supprimer",
+    "requestSent": "Demande d'ami envoyée",
+    "requestReceived": "Demande d'ami reçue",
+    "requestAccepted": "Demande d'ami acceptée",
+    "requestDeclined": "Demande d'ami refusée",
+    "cancelRequest": "Annuler la demande",
+    "requestRemoved": "Demande d'ami supprimée",
+    "alreadyFriends": "Vous êtes déjà amis",
+    "notFriends": "Vous n'êtes pas amis",
+    "status": {
+      "friend": "Ami",
+      "pending": "En attente",
+      "notFriend": "Pas ami"
+    },
+    "pendingRequest": "Demande d'ami en attente",
+    "noFriends": "Aucun ami trouvé",
+    "noPendingRequests": "Aucune demande d'ami en attente"
+  },
+  "status": {
+    "title": "Statut",
+    "online": "En ligne",
+    "offline": "Hors ligne",
+    "inGame": "En jeu"
+  },
+  "dashboard": {
+    "tabs": {
+      "users": "Tous les utilisateurs",
+      "friends": "Amis",
+      "pending": "En attente",
+      "history": "Historique des matchs"
+    }
+  },
+  "general": {
+    "error": "Erreur",
+    "loading": "Chargement...",
+    "cancel": "Annuler",
+    "confirm": "Confirmer"
+  },
+  "error": {
+    "login": {
+      "invalidCredentials": "Identifiant ou mot de passe invalide.",
+      "accountBanned": "Ce compte a été banni."
+    },
+    "register": {
+      "usernameExists": "Le nom d'utilisateur '{username}' est déjà pris.",
+      "emailExists": "L'email '{email}' est déjà utilisé.",
+      "displayNameExists": "Le nom d'affichage '{display_name}' est déjà utilisé."
+    },
+    "refreshToken": {
+      "invalid": "Jeton de rafraîchissement invalide ou expiré.",
+      "missing": "Jeton de rafraîchissement manquant."
+    },
+    "user": {
+      "notFound": "Utilisateur non trouvé."
+    },
+    "general": {
+      "unauthorized": "Non autorisé. Veuillez vous connecter.",
+      "forbidden": "Accès interdit. Vous n'avez pas les permissions nécessaires.",
+      "unknown": "Une erreur inconnue est survenue.",
+      "malformedResponse": "La réponse du serveur est mal formée.",
+      "networkError": "Erreur de réseau ou impossible de joindre le serveur."
+    }
+  },
+  "msg": {
+    "redirect": {
+      "login": "Redirection vers la page de connexion...",
+      "dashboard": "Redirection vers le tableau de bord...",
+      "game": "Redirection vers le jeu..."
+    },
+    "error": {
+      "initializing": "Erreur lors de l'initialisation de la page. Veuillez essayer de rafraîchir la page."
+    },
+    "user": {
+      "notFound": "Utilisateur non trouvé."
+    }
+  },
+  "sidebar": {
+    "username": "Nom d'utilisateur",
+    "displayName": "Nom d'affichage",
+    "email": "Email",
+    "createdAt": "Créé le",
+    "wins": "Victoires",
+    "losses": "Défaites"
+  }
 }
