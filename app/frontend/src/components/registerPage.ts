@@ -146,7 +146,7 @@ export async function RegisterPage(): Promise<HTMLElement> {
 			setTimeout(() => { navigateTo('/login'); }, 500);
 
 		} else {
-			messageDiv.textContent = 'Registration failed. Please check the details and try again.'; // Message générique post-alert
+			messageDiv.textContent = `Registration failed: ${registrationResult.error} `; // Message générique post-alert
 			messageDiv.className = 'mt-4 text-center text-sm text-red-600';
 			passwordInput.value = ''; // Clear password fields on failure
 			confirmPasswordInput.value = '';

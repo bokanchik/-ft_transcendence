@@ -119,7 +119,6 @@ export async function updateUserProfile(userId: number, updates: UpdateUserPaylo
 		processedUpdates.email = updates.email;
 	}
 	if (updates.avatar_url !== null) {
-		// if (updates.avatar_url !== undefined) {
 		processedUpdates.avatar_url = updates.avatar_url;
 	}
 

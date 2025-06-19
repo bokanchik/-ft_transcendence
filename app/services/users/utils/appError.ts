@@ -52,6 +52,7 @@ export const ERROR_MESSAGES: Record<string, string> = {
 	INVALID_CREDENTIALS: 'Invalid username/email or password.',
 	EMAIL_ALREADY_EXISTS: 'Email already exists.',
 	USERNAME_ALREADY_EXISTS: 'Username already exists.',
+	DISPLAY_NAME_ALREADY_EXISTS: 'Display name already exists.',
 	INVALID_REFRESH_TOKEN: 'Invalid or expired refresh token.',
 	REFRESH_TOKEN_MISSING: 'Refresh token missing.',
 	SELF_FRIEND_REQUEST: 'You cannot send a friend request to yourself.',
@@ -77,10 +78,6 @@ export function setupErrorHandler(fastify: FastifyInstance): void {
 			error: message,
 			statusCode: statusCode,
 		};
-        console.log('--- ERROR HANDLER IS SENDING THIS PAYLOAD ---');
-        console.log(payload);
-        console.log('--- END OF PAYLOAD ---');
-
 		reply.code(statusCode).send(payload);
 	});
 	fastify.log.info('Error handler registered');
