@@ -152,8 +152,7 @@ async function fetchTournamentPlayers(players: string[]) {
         }
 
         const data = await response.json();
-
-
+        
         return data;
     } catch (err: unknown) {
         console.error("Error while fetching players: ", err);
