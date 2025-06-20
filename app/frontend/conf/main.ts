@@ -12,7 +12,6 @@ import { getUserDataFromStorage } from './services/authService.ts';
 import { promptAliasForm } from './components/aliasFormPage.ts';
 import { GameMode } from './components/gamePage.ts'
 import { showcase } from './components/showcase.ts';
-import { addBranches } from './components/background.ts';
 import './style/style.css';
 import './style/plant1.css';
 
@@ -104,7 +103,7 @@ export async function router() {
             return;
         }
     }
-	addBranches();
+	// addBranches();
     const renderFunction = routeCfg.component;
     appContainer.innerHTML = `
 `;

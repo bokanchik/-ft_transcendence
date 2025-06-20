@@ -1,6 +1,5 @@
 console.log("✅ background.js loaded!");
 
-export function addBranches() {
 const branchHTML = `
 <div class="rotate-parent fixed -top-10 right-0 -translate-40 -rotate-120 origin-bottom">
 				<div class="rotate-hover origin-bottom">
@@ -1105,4 +1104,3 @@ const branchHTML = `
         </div>
 `;
 document.body.insertAdjacentHTML("beforeend", branchHTML);
-}

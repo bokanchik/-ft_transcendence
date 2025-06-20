@@ -12,7 +12,7 @@ export function showcase(): HTMLElement {
 		</svg>
 		<!-- HTML !-->
         <div class=" gap-10 text-align-center mt-40 z-0">
-			<a class="button-53" role="button" href="/homePage" >Enter the jungle</a>
+			<a href="/homePage" data-link class="button-53" role="button">Enter the jungle</a>
         </div>
     `;
 	container.appendChild(innerDiv);
