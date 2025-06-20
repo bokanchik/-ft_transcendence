@@ -4,6 +4,9 @@
 	margin: 0;
 	padding: 0;
 }
+body {
+  overflow: hidden;
+}
 
 .king_pong{
 	fill-opacity: 0;
@@ -32,10 +35,8 @@
   animation: subtleRotate 4s ease-in-out infinite;
   transform-origin: right;
   position: absolute;     /* or fixed, depending on behavior you want */
-  top: 0;                 /* start at the top */
-  right: 0;
-  height: 100vh;          /* optional: full height of viewport */
-  display: flex;
+  /* height: 100vh;          optional: full height of viewport */
+  /* display: flex; */
   align-items: center;    /* vertical centering, optional */
   justify-content: flex-end; /* push content to the edge */
   pointer-events: none;   /* optional: let clicks pass through if it's decorative */
@@ -54,43 +55,94 @@
 
 	/* KEYFRAMES  */
 
-	@keyframes smallPositiveRotation{
-		from{
-			transform: rotateZ(0deg);
-		}
-		to{
-			transform: rotateZ(5deg);
-		}
+@keyframes smallPositiveRotation{
+	from{
+		transform: rotateZ(0deg);
 	}
+	to{
+		transform: rotateZ(5deg);
+	}
+}
+@keyframes smallNegativeRotation{
+	from{
+		transform: rotateZ(0deg);
+	}
+	to{
+		transform: rotateZ(5deg);
+	}
+}
+@keyframes verySmallPositiveRotation{
+	from{
+		transform: rotateZ(0deg);
+	}
+	to{
+		transform: rotateZ(2deg);
+	}
+}
+@keyframes verySmallNegativeRotation{
+	from{
+		transform: rotateZ(0deg);
+	}
+	to{
+		transform: rotateZ(-2deg);
+	}
+}
 
-	@keyframes smallNegativeRotation{
-		from{
-			transform: rotateZ(0deg);
-		}
-		to{
-			transform: rotateZ(5deg);
-		}
-	}
-	@keyframes verySmallPositiveRotation{
-		from{
-			transform: rotateZ(0deg);
-		}
-		to{
-			transform: rotateZ(2deg);
-		}
-	}
+@keyframes subtleRotate {
+  0%   { transform: rotate(0deg); }
+  50%  { transform: rotate(5deg); }
+  100% { transform: rotate(0deg); }
+}
 
-	@keyframes verySmallNegativeRotation{
-		from{
-			transform: rotateZ(0deg);
-		}
-		to{
-			transform: rotateZ(-2deg);
-		}
-	}
+	/* CSS */
+.button-53 {
+  background-color: #13b02f;
+  border: 0 solid #E5E7EB;
+  box-sizing: border-box;
+  color: #ffffff;
+  display: flex;
+  font-family: ui-sans-serif,system-ui,-apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+  font-size: 1rem;
+  font-weight: 700;
+  justify-content: center;
+  line-height: 1.75rem;
+  padding: .75rem 1.65rem;
+  position: relative;
+  text-align: center;
+  text-decoration: none #000000 solid;
+  text-decoration-thickness: auto;
+  width: 100%;
+  max-width: 460px;
+  position: relative;
+  cursor: pointer;
+  transform: rotate(-2deg);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
 
-	@keyframes subtleRotate {
-	  0%   { transform: rotate(0deg); }
-	  50%  { transform: rotate(5deg); }
-	  100% { transform: rotate(0deg); }
-	}
+.button-53:focus {
+  outline: 0;
+}
+
+.button-53:after {
+  content: '';
+  position: absolute;
+  border: 1px solid #000000;
+  bottom: 4px;
+  left: 4px;
+  width: calc(100% - 1px);
+  height: calc(100% - 1px);
+}
+
+.button-53:hover:after {
+  bottom: 2px;
+  left: 2px;
+}
+
+@media (min-width: 768px) {
+  .button-53 {
+    padding: .75rem 3rem;
+    font-size: 1.25rem;
+  }
+}
