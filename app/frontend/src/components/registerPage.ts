@@ -2,21 +2,22 @@ import { attemptRegister } from '../services/authService.js';
 import { RegisterRequestBody } from '../shared/schemas/usersSchemas.js'
 import { ApiResult } from '../utils/types.js'
 import { navigateTo } from '../services/router.js';
+import { t } from '../services/i18nService.js';
 
 export async function RegisterPage(): Promise<HTMLElement> {
 
 
 	const container = document.createElement('div');
 	container.className = 'bg-white flex justify-center items-center min-h-screen p-8';
-	
+
 	const formContainer = document.createElement('div');
 	formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';
 
 	formContainer.innerHTML = `
-        <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">Register</h2>
+        <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">${t('register.title')}</h2>
         <form id="register-form">
             <div class="mb-4">
-                <label for="username" class="block text-gray-700 text-sm font-bold mb-2">Username</label>
+                <label for="username" class="block text-gray-700 text-sm font-bold mb-2">${t('register.username')}</label>
                 <input type="text" id="username" name="username" required minlength="3" maxlength="20"
                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 <p class="text-xs text-gray-600 mt-1">3 to 20 characters.</p>
@@ -34,7 +35,7 @@ export async function RegisterPage(): Promise<HTMLElement> {
             </div>
             <div class="mb-4">
                 <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-                <input type="password" id="password" name="password" required minlength="8" maxlength="100"
+                <input type="password" id="password" name="password" required minlength="8" maxlength="20"
                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                  <p class="text-xs text-gray-600 mt-1">8 to 100 characters.</p>
             </div>
@@ -88,11 +89,10 @@ export async function RegisterPage(): Promise<HTMLElement> {
 		const username = usernameInput.value.trim();
 		const email = emailInput.value.trim();
 		const displayName = displayNameInput.value.trim();
-		const password = passwordInput.value; // No trim on password
+		const password = passwordInput.value;
 		const confirmPassword = confirmPasswordInput.value;
 		const avatarUrl = avatarUrlInput.value.trim();
 
-		// --- Validation des champs ---
 		if (!username || !email || !displayName || !password || !confirmPassword) {
 			messageDiv.textContent = 'Please fill in all required fields.';
 			messageDiv.className = 'mt-4 text-center text-sm text-red-600';

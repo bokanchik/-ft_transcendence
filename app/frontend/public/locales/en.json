@@ -2,6 +2,19 @@
   "app": {
     "title": "King-Pong"
   },
+  "register": {
+    "title": "Register",
+	"username": "Username",
+	"nameSpec": "3 to 20 characters.",
+	"email": "Email",
+	"displayName": "Display Name",
+	"password": "Password",
+	"passwordSpec": "At least 8 characters, max 20.",
+	"confirmPassword": "Confirm Password",
+	"avatarUrl": "Avatar URL (Optional)",
+	"avatarPlaceholder": "https://example.com/avatar.jpg",
+	"avatarSpec": "Must be a valid image URL.",
+  },
   "header": {
     "home": "Home",
     "game": "Game",
@@ -112,5 +125,4 @@
     "wins": "Wins",
     "losses": "Losses"
   }
-  
 }
