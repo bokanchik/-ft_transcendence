@@ -5,6 +5,7 @@ export function TournamentPage(): HTMLElement {
     const rawData = sessionStorage.getItem('tournamentData');
    
     if (!rawData) {
+        // remplacer par une page d'erreur ?
         container.innerHTML = `<p class="text-red-500">Aucune donnée de tournoi disponible.</p>`;
         return container;
     }
@@ -13,6 +14,7 @@ export function TournamentPage(): HTMLElement {
     try {
         data = JSON.parse(rawData);
     } catch (err) {
+        // remplacer par une page d'erreur ?
         container.innerHTML = `<p class="text-red-500">Erreur de parsing des données du tournoi.</p>`;
         return container;
     }

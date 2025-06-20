@@ -47,7 +47,6 @@ export const createLocalMatchRouteSchema = {
     }
 };
 
-
 // --- Get Local Match State ----
 export const getLocalMatchStateParams = z.object({
     matchId: z.string().uuid()
@@ -77,7 +76,6 @@ export const cancelLocalMatchRouteSchema = {
 }
 
 // ---------------------------------------------------------------------------------------- //
-
 
 // --- Remote Base Schemas ---
 export const RemoteMatchBaseSchema = z.object({

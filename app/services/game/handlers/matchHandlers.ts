@@ -54,7 +54,6 @@ export async function getLocalMatchState(req: FastifyRequest<{ Params: MatchIdPa
     return reply.code(200).send(game.state); 
 }
 
-
 // GET /api/match/remote/:matchId
 export async function getMatchIdHandler(req: FastifyRequest<{ Params: MatchIdParams }>, reply: FastifyReply) {
     const { matchId } = req.params;
@@ -98,7 +97,6 @@ export async function getMatchIdHandler(req: FastifyRequest<{ Params: MatchIdPar
     }
 }
 
-
 type AuthenticatedRequest = FastifyRequest & { user: JWTPayload };
 
 // GET /history/:userId : all matches fetched for this userId
@@ -124,5 +122,4 @@ export async function getMatchByUserHandler(req: AuthenticatedRequest, reply: Fa
             return reply.code(500).send({ error: err.message });
         }
     }
-
 }
