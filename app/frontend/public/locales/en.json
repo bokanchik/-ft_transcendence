@@ -13,7 +13,7 @@
 	"confirmPassword": "Confirm Password",
 	"avatarUrl": "Avatar URL (Optional)",
 	"avatarPlaceholder": "https://example.com/avatar.jpg",
-	"avatarSpec": "Must be a valid image URL.",
+	"avatarSpec": "Must be a valid image URL."
   },
   "header": {
     "home": "Home",
