@@ -9,7 +9,7 @@
     "build:clean": "rm -rf ./dist/*",
     "build:html": "cp index.html ./dist/index.html",
     "build:ts": "tsc",
-    "build:css": "./node_modules/.bin/tailwindcss -i ./src/style/input.css -o ./dist/css/style.css --minify",
+    "build:css": "./node_modules/.bin/tailwindcss -i ./src/style/style.css -o ./dist/css/style.css --minify",
     "build:public": "cp -r public/* dist/",
     "build": "npm run build:clean && npm run prepare:dist && npm run build:html && npm run build:ts && npm run build:css && npm run build:public",
     "watch:ts": "tsc --watch > ./logs/tsc.log 2>&1",

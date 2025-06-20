@@ -1,6 +1,6 @@
 // app/services/users/models/userModel.ts
 import { getDb } from '../utils/dbConfig.js';
-import { ERROR_MESSAGES } from '../utils/appError.js';
+// import { ERROR_KEYS } from '../utils/appError.js';
 import { User, UserWithPasswordHash, CreateUserPayload, UpdatedUserResult, UpdateUserPayload, UserOnlineStatus } from '../shared/schemas/usersSchemas.js'; // Importez vos types
 
 /**
@@ -94,7 +94,7 @@ export async function updateUserInDb(userId: number, updates: UpdateUserPayload)
 		return { changes: result.changes };
 	} catch (error: any) {
 		console.error('Error updating user:', error);
-		throw new Error(ERROR_MESSAGES.DATABASE_ERROR);
+		throw error;;
 	}
 }
 
@@ -111,7 +111,8 @@ export async function deleteUserFromDb(userId: number): Promise<void> {
 	const db = getDb();
 	const result = await db.run('DELETE FROM users WHERE id = ?', [userId]);
 	if (result.changes === 0) {
-		throw new Error(ERROR_MESSAGES.USER_NOT_FOUND);
+		// throw new Error(ERROR_MESSAGES.USER_NOT_FOUND);
+		throw new Error(`User with ID ${userId} not found for deletion.`);
 	}
 }
 

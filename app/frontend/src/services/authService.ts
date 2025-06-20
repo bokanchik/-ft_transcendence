@@ -53,7 +53,7 @@ export function getUserDataFromStorage(): User | null {
 export async function fetchUsers(): Promise<User[]> {
 	try {
 		const response = await fetch(config.api.users.all);
-		const data = await handleApiResponse(response, GetUsersListRouteSchema.response[200]);
+		const data = await handleApiResponse(response, GetUsersListRouteSchema.response);
 		return data;
 	} catch (error) {
 		console.error("Failed to fetch users:", error);
@@ -70,7 +70,7 @@ export async function fetchUserDetails(userId: number): Promise<User> {
 	const response = await fetch(config.api.users.byId(userId), {
 		credentials: 'include',
 	});
-	return handleApiResponse(response, GetMeRouteSchema.response[200]);
+	return handleApiResponse(response, GetMeRouteSchema.response);
 }
 
 /**
@@ -82,7 +82,7 @@ export async function fetchMatchHistoryForUser(userId: number): Promise<Match[]>
 	const response = await fetch(config.api.game.matchHistory(userId), {
 		credentials: 'include',
 	});
-	return await handleApiResponse(response, GetMatchByUserIdRouteSchema.response[200]);
+	return await handleApiResponse(response, GetMatchByUserIdRouteSchema.response);
 }
 
 /**
@@ -92,7 +92,7 @@ export async function fetchMatchHistoryForUser(userId: number): Promise<Match[]>
 export async function checkAuthStatus(): Promise<User | null> {
 	try {
 		const response = await fetch(config.api.users.me, { credentials: 'include' });
-		const user = await handleApiResponse(response, GetMeRouteSchema.response[200]);
+		const user = await handleApiResponse(response, GetMeRouteSchema.response);
 		const ttl = 60 * 60 * 1000; // 1 heure en ms
 		localStorage.setItem(USER_DATA_KEY, JSON.stringify(user));
 		localStorage.setItem(USER_DATA_EXPIRATION_KEY, (new Date().getTime() + ttl).toString());
@@ -122,7 +122,7 @@ export async function attemptLogin(credentials: LoginRequestBody): Promise<ApiRe
 			credentials: 'include',
 		});
 
-		const data = await handleApiResponse(response, LoginRouteSchema.response[200]);
+		const data = await handleApiResponse(response, LoginRouteSchema.response);
 		localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.user));
 		// setCsrfToken(data.csrfToken);
 
@@ -144,7 +144,7 @@ export async function logout(): Promise<void> {
 
 	try {
 		const response = await fetchWithCsrf(config.api.auth.logout, { method: 'POST' });
-		await handleApiResponse(response, LogoutRouteSchema.response[200]);
+		await handleApiResponse(response, LogoutRouteSchema.response);
 		console.log("Server-side logout successful.");
 	} catch (error) {
 		console.error("Error attempting server logout:", error);
@@ -169,7 +169,7 @@ export async function attemptRegister(credentials: RegisterRequestBody): Promise
 			body: JSON.stringify(payload),
 		});
 
-		const data = await handleApiResponse(response, RegisterRouteSchema.response[201]);
+		const data = await handleApiResponse(response, RegisterRouteSchema.response);
 		return { success: true, data: { message: data.message, user: {} as User } };
 
 	} catch (error) {
@@ -196,7 +196,7 @@ export async function updateUserProfile(payload: UpdateUserPayload): Promise<Api
 			body: JSON.stringify(cleanPayload),
 		});
 
-		const data = await handleApiResponse(response, UpdateUserRouteSchema.response[200]);
+		const data = await handleApiResponse(response, UpdateUserRouteSchema.response);
 
 		localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.user));
 		console.log("User data updated in localStorage.");

@@ -2,6 +2,8 @@
 
 - environnement dev / prod ? on rend le projet deja compiler en prod ? fichiers persistants
 
-- road map
+- on traduit tout le back (meme console ? pareil pour front console ? )
 
-- repartition travail
+- 2fa ?
+
+- road map

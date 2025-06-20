@@ -1,33 +1,128 @@
 {
-  "app.title": "King-Pong",
-  "header.home": "Home",
-  "header.game": "Game",
-  "header.dashboard": "Dashboard",
-  "header.settings": "Settings",
-  "header.logout": "Logout",
-  "header.language": "FR",
-  "login.title": "Login",
-  "login.identifierLabel": "Username or Email",
-  "login.passwordLabel": "Password",
-  "login.button": "Sign In",
-  "login.registerLink": "Don't have an account? Register",
-  "dashboard.tabs.users": "All Users",
-  "dashboard.tabs.friends": "Friends",
-  "dashboard.tabs.pending": "Pending",
-  "dashboard.tabs.history": "Match History",
-  "general.error": "Error",
-  "general.loading": "Loading...",
-  "general.cancel": "Cancel",
-  "general.confirm": "Confirm",
-  "msg.redirect.login": "Redirecting to login page...",
-  "msg.redirect.dashboard": "Redirecting to dashboard...",
-  "msg.redirect.game": "Redirecting to game...",
-  "msg.error.initializing": "Error initializing Page. Please try refreshing the page.",
-  "msg.user.notFound": "User not found.",
-  "sidebar.username": "Username",
-  "sidebar.displayName": "Display Name",
-  "sidebar.email": "Email",
-  "sidebar.createdAt": "Creation Date",
-  "sidebar.wins": "Wins",
-  "sidebar.losses": "Losses"
+  "app": {
+    "title": "King-Pong"
+  },
+  "register": {
+    "title": "Register",
+	"username": "Username",
+	"nameSpec": "3 to 20 characters.",
+	"email": "Email",
+	"displayName": "Display Name",
+	"password": "Password",
+	"passwordSpec": "At least 8 characters, max 20.",
+	"confirmPassword": "Confirm Password",
+	"avatarUrl": "Avatar URL (Optional)",
+	"avatarPlaceholder": "https://example.com/avatar.jpg",
+	"avatarSpec": "Must be a valid image URL."
+  },
+  "header": {
+    "home": "Home",
+    "game": "Game",
+    "dashboard": "Dashboard",
+    "settings": "Settings",
+    "logout": "Logout",
+    "language": "FR"
+  },
+  "login": {
+    "title": "Login",
+    "backToHome": "Back to Home",
+    "identifierLabel": "Username or Email",
+    "identifierPlaceholder": "Enter your username or email",
+    "passwordLabel": "Password",
+    "button": "Sign In",
+    "registerLink": "Don't have an account? Register",
+    "attemptingLogin": "Attempting to Login...",
+    "invalidCredentials": "Invalid credentials. Please try again.",
+    "missingCredentials": "Please enter your username/email and password."
+  },
+  "friend": {
+    "request": "Invite",
+    "accept": "Accept",
+    "decline": "Decline",
+    "remove": "Remove",
+    "block": "Block",
+    "unblock": "Unblock",
+    "blockSuccess": "User blocked successfully",
+    "unblockSuccess": "User unblocked successfully",
+    "requestSent": "Friend request sent",
+    "requestReceived": "Friend request received",
+    "requestAccepted": "Friend request accepted",
+    "requestDeclined": "Friend request declined",
+    "cancelRequest": "Cancel request",
+    "requestRemoved": "Friend request removed",
+    "alreadyFriends": "You are already friends",
+    "notFriends": "You are not friends",
+    "status": {
+      "friend": "Friends",
+      "pending": "Pending",
+      "blocked": "Blocked",
+      "notFriend": "Not a friend"
+    },
+    "pendingRequest": "Pending friend request",
+    "noFriends": "No friends found",
+    "noPendingRequests": "No pending friend requests"
+  },
+  "status": {
+    "title": "Status",
+    "online": "Online",
+    "offline": "Offline",
+    "inGame": "In Game"
+  },
+  "dashboard": {
+    "tabs": {
+      "users": "All Users",
+      "friends": "Friends",
+      "pending": "Pending",
+      "history": "Match History"
+    }
+  },
+  "general": {
+    "error": "Error",
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
+  },
+  "error": {
+    "login": {
+      "invalidCredentials": "Invalid identifier or password.",
+      "accountBanned": "This account has been banned."
+    },
+    "register": {
+      "usernameExists": "Username '{username}' is already taken.",
+      "emailExists": "Email '{email}' is already in use.",
+      "displayNameExists": "Display name '{display_name}' is already taken."
+    },
+    "refreshToken": {
+      "invalid": "Invalid or expired refresh token.",
+      "missing": "Missing refresh token."
+    },
+    "user": {
+      "notFound": "User not found."
+    },
+    "general": {
+      "unauthorized": "Unauthorized. Please log in.",
+      "forbidden": "Forbidden. You do not have the necessary permissions.",
+      "unknown": "An unknown error occurred.",
+      "malformedResponse": "The server's error response was malformed.",
+      "networkError": "Network error or could not reach the server."
+    }
+  },
+  "msg": {
+    "redirect": {
+      "login": "Redirecting to login page...",
+      "dashboard": "Redirecting to dashboard...",
+      "game": "Redirecting to game..."
+    },
+    "error": {
+      "initializing": "Error initializing Page. Please try refreshing the page."
+    }
+  },
+  "sidebar": {
+    "username": "Username",
+    "displayName": "Display Name",
+    "email": "Email",
+    "createdAt": "Creation Date",
+    "wins": "Wins",
+    "losses": "Losses"
+  }
 }

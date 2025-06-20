@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { UserBaseSchema, UserOnlineStatusSchema } from './usersSchemas.js';
+import { UserBaseSchema, UserOnlineStatusSchema, ErrorResponseSchema } from './usersSchemas.js';
 
 export enum FriendshipStatus {
 	PENDING = 'pending',
@@ -33,7 +33,6 @@ export const FriendSchema = z.object({
 	friend_id: z.number().int(),
 	friend_username: z.string(),
 	friend_display_name: z.string(),
-	// friend_avatar_url: z.string().url().nullable().optional(), // re-tester : UserBaseSchema.shape.avatar_url
 	friend_avatar_url: UserBaseSchema.shape.avatar_url.optional(),
 	friend_wins: z.number().int().default(0),
 	friend_losses: z.number().int().default(0),
@@ -76,7 +75,13 @@ export const SendFriendRequestRouteSchema = {
 		201: z.object({
 			message: z.string(),
 			friendship: FriendshipBaseSchema
-		})
+		}),
+		400: ErrorResponseSchema,
+		401: ErrorResponseSchema,
+		403: ErrorResponseSchema,
+		404: ErrorResponseSchema,
+		409: ErrorResponseSchema,
+		500: ErrorResponseSchema
 	}
 };
 
@@ -84,21 +89,33 @@ export const MessageResponseSchema = z.object({ message: z.string() });
 export const FriendshipActionRouteSchema = {
 	params: FriendshipIdParamsSchema,
 	response: {
-		200: MessageResponseSchema
+		200: MessageResponseSchema,
+		400: ErrorResponseSchema,
+		401: ErrorResponseSchema,
+		403: ErrorResponseSchema,
+		404: ErrorResponseSchema,
+		409: ErrorResponseSchema,
+		500: ErrorResponseSchema
 	}
 };
 
 export const FriendsListResponseSchema = z.array(FriendSchema);
 export const GetFriendsListRouteSchema = {
 	response: {
-		200: FriendsListResponseSchema
+		200: FriendsListResponseSchema,
+		401: ErrorResponseSchema,
+		404: ErrorResponseSchema,
+		500: ErrorResponseSchema
 	}
 };
 
 export const PendingRequestsResponseSchema = z.array(PendingFriendRequestSchema);
 export const GetPendingRequestsRouteSchema = {
 	response: {
-		200: PendingRequestsResponseSchema
+		200: PendingRequestsResponseSchema,
+		401: ErrorResponseSchema,
+		404: ErrorResponseSchema,
+		500: ErrorResponseSchema
 	}
 };
 

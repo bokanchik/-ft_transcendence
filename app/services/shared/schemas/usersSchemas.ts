@@ -29,6 +29,13 @@ export type UserWithPasswordHash = z.infer<typeof UserWithPasswordHashSchema>;
 
 // --- Schemas for API requests (Body, Params, Responses) ---
 
+export const ErrorResponseSchema = z.object({
+    error: z.string(),
+    statusCode: z.number().int(),
+    messageKey: z.string().optional(), // for translation purposes
+    messageParams: z.record(z.any()).optional(), // for translation purposes
+});
+
 // REGISTER
 export const RegisterBodySchema = z.object({
     username: UserBaseSchema.shape.username,
@@ -42,7 +49,10 @@ export type RegisterRequestBody = z.infer<typeof RegisterBodySchema>;
 export const RegisterRouteSchema = {
     body: RegisterBodySchema,
     response: {
-        201: z.object({ message: z.string() })
+        201: z.object({ message: z.string() }),
+        400: ErrorResponseSchema,
+        409: ErrorResponseSchema,
+        500: ErrorResponseSchema
     }
 };
 
@@ -60,29 +70,38 @@ export const LoginRouteSchema = {
             message: z.string(),
             user: UserBaseSchema,
             // csrfToken: z.string().optional(),
-        })
+        }),
+        400: ErrorResponseSchema,
+        401: ErrorResponseSchema,
+        403: ErrorResponseSchema,
+        500: ErrorResponseSchema
     }
 };
 
 export const LogoutRouteSchema = {
     response: {
-        200: z.object({
-            message: z.string()
-        })
+        200: z.object({ message: z.string()}),
+        401: ErrorResponseSchema,
+        500: ErrorResponseSchema
     }
 };
 
 // GET ALL USERS
 export const GetUsersListRouteSchema = {
     response: {
-        200: z.array(UserBaseSchema)
+        200: z.array(UserBaseSchema),
+        401: ErrorResponseSchema,
+        500: ErrorResponseSchema
     }
 };
 
 // GET /me
 export const GetMeRouteSchema = {
     response: {
-        200: UserBaseSchema
+        200: UserBaseSchema,
+        401: ErrorResponseSchema,
+        404: ErrorResponseSchema,
+        500: ErrorResponseSchema
     }
 };
 
@@ -102,7 +121,11 @@ export const UpdateUserRouteSchema = {
         200: z.object({
             message: z.string(),
             user: UserBaseSchema
-        })
+        }),
+        401: ErrorResponseSchema,
+        404: ErrorResponseSchema,
+        409: ErrorResponseSchema,
+        500: ErrorResponseSchema
     }
 };
 
@@ -121,7 +144,9 @@ export const GetUserByIdRouteSchema = {
     params: UserIdParamsSchema,
     response: {
         200: UserBaseSchema,
-        404: z.object({ error: z.string() })
+        401: ErrorResponseSchema,
+        404: ErrorResponseSchema,
+        500: ErrorResponseSchema
     }
 };
 
