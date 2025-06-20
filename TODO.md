@@ -13,7 +13,7 @@
 - [x] verifier matches avec sasha
 - [x] -> zod/back 
 - [x] -> zod/front 
-- [ ] Réponse schemas
+- [x] Réponse schemas
 - [x] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde) -> cookie jwt_token
 - [x] httpOnly cookie for server-side ? -> yes
 - [ ] 2FA
