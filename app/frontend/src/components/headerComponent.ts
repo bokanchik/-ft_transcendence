@@ -18,7 +18,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 	const { currentUser } = props;
 
 	const headerContainer = document.createElement('div');
-	headerContainer.className = 'flex justify-between items-center p-4 border-b border-gray-200 bg-white';
+	headerContainer.className = 'flex justify-between items-center p-4 border-b border-gray-200 bg-white relative';
 
 	// --- Left side: Language Button ---
 	const leftSection = document.createElement('div');

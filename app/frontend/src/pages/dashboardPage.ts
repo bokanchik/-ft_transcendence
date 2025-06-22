@@ -56,7 +56,7 @@ export async function DashboardPage(): Promise<HTMLElement> {
 
 	// --- Section principale (Sidebar + Contenu à onglets) ---
 	const mainSection = document.createElement('div');
-	mainSection.className = 'flex flex-1 min-h-[calc(100vh-150px)]'; // Hauteur minimale pour le contenu
+	mainSection.className = 'flex flex-1 min-h-[calc(100vh-150px)] z-index-8'; // Hauteur minimale pour le contenu
 
 	// --- Sidebar ---
 	const sidebar = document.createElement('div');
