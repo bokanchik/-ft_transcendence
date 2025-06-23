@@ -1,6 +1,10 @@
 {
 	"app": {
-		"title": "King-Pong"
+		"title": "King-Pong",
+		"subtitle": "Un jeu de Pong multijoueur",
+		"catchPhrase": "Dominez la table. Devenez le Roi du Pong !",
+		"button": "JOUER",
+		"gameApi": "Consulter l'API du jeu"
 	},
 	"user": {
 		"username": "Nom d'utilisateur",
@@ -10,6 +14,7 @@
 		"createdAt": "Créé le",
 		"wins": "Victoires",
 		"losses": "Défaites",
+		"loading": "Chargement des données utilisateur...",
 		"settings": {
 			"usernameMsg": "Le nom d'utilisateur ne peut pas être modifié.",
 			"emailPlaceholder": "Votre adresse email",
@@ -24,11 +29,7 @@
 	},
 	"register": {
 		"title": "Inscription",
-		"username": "Nom d'utilisateur",
 		"nameSpec": "3 à 20 caractères.",
-		"email": "Email",
-		"displayName": "Nom d'affichage",
-		"password": "Mot de passe",
 		"passwordSpec": "Au moins 8 caractères, max 20.",
 		"confirmPassword": "Confirmer le mot de passe",
 		"avatarUrl": "URL de l'avatar (Optionnel)",
@@ -113,6 +114,28 @@
 		"noFriends": "Aucun ami trouvé",
 		"noPendingRequests": "Aucune demande d'ami en attente"
 	},
+	"match": {
+		"history": {
+			"title": "Historique des matchs",
+			"loading": "Chargement de l'historique des matchs...",
+			"noMatches": "Aucun match trouvé.",
+			"unknownOpponent": "Adversaire inconnu",
+			"victory": "Victoire",
+			"defeat": "Défaite",
+			"draw": "Match nul/Annulé",
+			"opponent": "Adversaire",
+			"error": "Erreur lors du chargement de l'historique des matchs."
+		},
+		"details": {
+			"player": "Joueur",
+			"players": "Joueurs",
+			"detailsError": "Impossible de charger les détails du match.",
+			"score": "Score",
+			"type": "Type de match",
+			"date": "Date",
+			"winner": "Gagnant"
+		}
+	},
 	"status": {
 		"title": "Statut",
 		"online": "En ligne",
@@ -150,6 +173,9 @@
 			"missing": "Jeton de rafraîchissement manquant."
 		},
 		"user": {
+			"invalidId": "Identifiant utilisateur invalide.",
+			"errorCsrf": "Erreur de securité: jeton CSRF invalide. Rafraîchissez la page et essayez à nouveau.",
+			"loadingProfile": "Une erreur est survenue lors du chargement du profil utilisateur.",
 			"notFound": "Utilisateur non trouvé."
 		},
 		"general": {
@@ -170,13 +196,5 @@
 		"error": {
 			"initializing": "Erreur lors de l'initialisation de la page. Veuillez essayer de rafraîchir la page."
 		}
-	},
-	"sidebar": {
-		"username": "Nom d'utilisateur",
-		"displayName": "Nom d'affichage",
-		"email": "Email",
-		"createdAt": "Créé le",
-		"wins": "Victoires",
-		"losses": "Défaites"
 	}
 }

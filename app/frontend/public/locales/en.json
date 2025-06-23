@@ -1,6 +1,10 @@
 {
 	"app": {
-		"title": "King-Pong"
+		"title": "King-Pong",
+		"subtitle": "A Multiplayer Pong Game",
+		"catchPhrase": "Dominate the table. Become the King of Pong!",
+		"button": "PLAY",
+		"gameApi": "Check Game API"
 	},
 	"user": {
 		"username": "Username",
@@ -10,6 +14,7 @@
 		"createdAt": "Created At",
 		"wins": "Wins",
 		"losses": "Losses",
+		"loading": "Loading user data...",
 		"settings": {
 			"usernameMsg": "Username cannot be changed.",
 			"emailPlaceholder": "Your email address",
@@ -24,11 +29,7 @@
 	},
 	"register": {
 		"title": "Register",
-		"username": "Username",
 		"nameSpec": "3 to 20 characters.",
-		"email": "Email",
-		"displayName": "Display Name",
-		"password": "Password",
 		"passwordSpec": "At least 8 characters, max 20.",
 		"confirmPassword": "Confirm Password",
 		"avatarUrl": "Avatar URL (Optional)",
@@ -113,6 +114,28 @@
 		"noFriends": "No friends found",
 		"noPendingRequests": "No pending friend requests"
 	},
+	"match": {
+		"history": {
+			"title": "Match History",
+			"loading": "Loading match history...",
+			"noMatches": "No matches found for this user.",
+			"unknownOpponent": "Unknown Opponent",
+			"victory": "Victory",
+			"defeat": "Defeat",
+			"draw": "Draw/Cancel",
+			"opponent": "Opponent",
+			"error": "Error while loading match history."
+		},
+		"details": {
+			"player": "Player",
+			"players": "Players",
+			"detailsError": "Unable to load match details.",
+			"score": "Score",
+			"type": "Type",
+			"date": "Date",
+			"winner": "Winner"
+		}
+	},
 	"status": {
 		"title": "Status",
 		"online": "Online",
@@ -150,6 +173,9 @@
 			"missing": "Missing refresh token."
 		},
 		"user": {
+			"invalidId": "Invalid User ID",
+			"errorCsrf": "Security Error: CSRF token mismatch. Please refresh the page and try again.",
+			"loadingProfile": "An Error occurred while loading the user profile.",
 			"notFound": "User not found."
 		},
 		"general": {
@@ -170,13 +196,5 @@
 		"error": {
 			"initializing": "Error initializing Page. Please try refreshing the page."
 		}
-	},
-	"sidebar": {
-		"username": "Username",
-		"displayName": "Display Name",
-		"email": "Email",
-		"createdAt": "Creation Date",
-		"wins": "Wins",
-		"losses": "Losses"
 	}
 }

@@ -1,7 +1,6 @@
 import { HomePage } from './pages/homePage.js';
 import { LoginPage } from './pages/loginPage.js'
 import { RegisterPage } from './components/registerPage.js'
-// import { UsersPage } from './pages/userPage.js';
 import { GamePage } from './components/gamePage.js';
 import { GameRoomPage } from './pages/gameRoomPage.js';
 import { navigateTo } from './services/router.js';
@@ -35,7 +34,6 @@ function renderNotFoundPage(): HTMLElement {
 }
 
 const routes: { [key: string]: RouteConfig } = {
-	// '/': { component: HomePage },
 	'/': { component: showcase },
 	'/homePage': { component: HomePage },
 	'/login': { component: LoginPage },
@@ -49,7 +47,7 @@ const routes: { [key: string]: RouteConfig } = {
 	'/game': { component: GamePage },
 	'/local-game': { component: promptAliasForm },
 	'/game-room': { component: () => GameRoomPageFromParams() },
-    '/tournament': { component: TournamentPage }
+	'/tournament': { component: TournamentPage }
 };
 
 function GameRoomPageFromParams(): HTMLElement {

@@ -9,27 +9,24 @@ import { t } from '../services/i18nService.js';
 export function LoginPage(): HTMLElement {
 	const container = document.createElement('div');
 	container.className = 'bg-white flex justify-center items-center min-h-screen p-8';
-	
+
 	const formContainer = document.createElement('div');
 	formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';
 
 	const title = document.createElement('h2');
 	title.className = 'text-3xl font-bold mb-6 text-center text-gray-800';
-	title.textContent = t('login.title'); // Traduction
+	title.textContent = t('login.title');
 
 	formContainer.appendChild(title);
 
-	// Fonction de rappel pour la soumission du formulaire
 	const handleLoginAttempt = async (credentials: LoginRequestBody): Promise<ApiResult> => {
 		return attemptLogin(credentials);
 	};
 
-	// Fonction de rappel pour le succès de la connexion
 	const handleLoginSuccess = (userData: any) => {
 		setTimeout(() => { navigateTo('/dashboard'); }, 500);
 	};
 
-	// Créer et ajouter le composant formulaire
 	const loginFormComponent = LoginForm({
 		onLoginAttempt: handleLoginAttempt,
 		onLoginSuccess: handleLoginSuccess,

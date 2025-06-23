@@ -74,7 +74,7 @@ export function UserList(props: UserListProps): HTMLElement {
                     <strong class="text-lg text-gray-700">${displayName}</strong>
                 </div>
                 <div class="text-xs text-gray-500">
-                    <span>Wins: ${wins}</span> | <span>Losses: ${losses}</span>
+                    <span>${t('user.wins')}: ${wins}</span> | <span>${t('user.losses')}: ${losses}</span>
                 </div>
             </div>
         `;
@@ -110,21 +110,21 @@ export function UserList(props: UserListProps): HTMLElement {
 			friendshipStatus.className += ' text-indigo-600';
 
 			actionButtonsContainer = document.createElement('div');
-			actionButtonsContainer.className = 'flex space-x-1'; // Mettre les boutons côte à côte
+			actionButtonsContainer.className = 'flex space-x-1';
 			const acceptBtn = createActionButton({
 				text: t('friend.accept'),
 				variant: 'success',
 				onClick: () => onAcceptRequest(receivedRequestFromThisUser.friendship_id)
-				});
+			});
 			const declineBtn = createActionButton({
 				text: t('friend.decline'),
 				variant: 'danger',
 				onClick: () => onDeclineRequest(receivedRequestFromThisUser.friendship_id)
-				});
+			});
 			actionButtonsContainer.appendChild(acceptBtn);
 			actionButtonsContainer.appendChild(declineBtn);
 		} else {
-			friendshipStatus.textContent = t('friend.status.notFriend'); // Statut par défaut si aucune des conditions
+			friendshipStatus.textContent = t('friend.status.notFriend');
 			actionButton = createActionButton({
 				text: t('friend.request'),
 				variant: 'primary',

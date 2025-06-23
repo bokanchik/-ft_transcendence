@@ -23,18 +23,18 @@ export async function RegisterPage(): Promise<HTMLElement> {
                 <p class="text-xs text-gray-600 mt-1">${t('register.nameSpec')}</p>
             </div>
             <div class="mb-4">
-                <label for="email" class="block text-gray-700 text-sm font-bold mb-2">${t('register.email')}</label>
+                <label for="email" class="block text-gray-700 text-sm font-bold mb-2">${t('user.email')}</label>
                 <input type="email" id="email" name="email" required
                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
             </div>
              <div class="mb-4">
-                <label for="display_name" class="block text-gray-700 text-sm font-bold mb-2">${t('register.displayName')}</label>
+                <label for="display_name" class="block text-gray-700 text-sm font-bold mb-2">${t('user.displayName')}</label>
                 <input type="text" id="display_name" name="display_name" required minlength="3" maxlength="20"
                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                 <p class="text-xs text-gray-600 mt-1">${t('register.nameSpec')}</p>
             </div>
             <div class="mb-4">
-                <label for="password" class="block text-gray-700 text-sm font-bold mb-2">${t('register.password')}</label>
+                <label for="password" class="block text-gray-700 text-sm font-bold mb-2">${t('user.password')}</label>
                 <input type="password" id="password" name="password" required minlength="8" maxlength="20"
                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                  <p class="text-xs text-gray-600 mt-1">${t('register.passwordSpec')}</p>
@@ -70,7 +70,6 @@ export async function RegisterPage(): Promise<HTMLElement> {
 
 	container.appendChild(formContainer);
 
-	// --- Logique du formulaire d'inscription ---
 	const form = container.querySelector('#register-form') as HTMLFormElement;
 	const usernameInput = container.querySelector('#username') as HTMLInputElement;
 	const emailInput = container.querySelector('#email') as HTMLInputElement;
@@ -83,8 +82,8 @@ export async function RegisterPage(): Promise<HTMLElement> {
 
 	form.addEventListener('submit', async (event) => {
 		event.preventDefault();
-		messageDiv.textContent = ''; // Clear previous messages
-		messageDiv.className = 'mt-4 text-center text-sm'; // Reset style
+		messageDiv.textContent = '';
+		messageDiv.className = 'mt-4 text-center text-sm';
 
 		const username = usernameInput.value.trim();
 		const email = emailInput.value.trim();

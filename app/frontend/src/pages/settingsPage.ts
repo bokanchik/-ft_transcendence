@@ -1,15 +1,15 @@
-// /pages/profilePage.ts
 import { getUserDataFromStorage, updateUserProfile } from '../services/authService.js';
 import { navigateTo } from '../services/router.js';
 import { User, UpdateUserPayload } from '../shared/schemas/usersSchemas.js';
 import { ApiResult } from '../utils/types.js';
 import { SettingsForm } from '../components/settingsForm.js'; // Importer le composant
 import { fetchCsrfToken } from '../services/csrf.js';
+import { t } from '../services/i18nService.js';
 
 export async function SettingsPage(): Promise<HTMLElement> {
 	const user: User | null = getUserDataFromStorage();
 
-	const pageContainer = document.createElement('div'); // Conteneur principal de la page
+	const pageContainer = document.createElement('div');
 	pageContainer.className = 'min-h-screen bg-gray-100 p-4 md:p-8';
 
 	if (!user) {
@@ -17,7 +17,7 @@ export async function SettingsPage(): Promise<HTMLElement> {
 		navigateTo('/login');
 
 		const deniedContainer = document.createElement('div');
-		deniedContainer.className = 'flex items-center justify-center h-full'; // Pour centrer dans pageContainer
+		deniedContainer.className = 'flex items-center justify-center h-full';
 		deniedContainer.innerHTML = `
             <div class="bg-white rounded-xl shadow-lg p-8 text-center">
                 <h1 class="text-2xl font-bold text-red-600 mb-4">Accès Refusé</h1>
@@ -51,7 +51,6 @@ export async function SettingsPage(): Promise<HTMLElement> {
 	title.textContent = 'Mon Profil';
 	contentWrapper.appendChild(title);
 
-	// Fonction de rappel pour la mise à jour du profil
 	const handleProfileUpdate = async (payload: UpdateUserPayload): Promise<ApiResult> => {
 		const result = await updateUserProfile(payload);
 		if (result.success) {
@@ -61,32 +60,28 @@ export async function SettingsPage(): Promise<HTMLElement> {
 		return result;
 	};
 
-	// Créer et ajouter le composant formulaire
 	const profileFormComponent = SettingsForm({
-		user: user, // Passer l'utilisateur actuel au composant
+		user: user,
 		onProfileUpdate: handleProfileUpdate,
 	});
 	contentWrapper.appendChild(profileFormComponent);
 
-	// Lien de retour
 	const backLink = document.createElement('a');
 	backLink.href = '/dashboard';
-	backLink.setAttribute('data-link', ''); // Pour le routeur
-	backLink.className = 'block text-center text-gray-600 hover:text-gray-800 text-sm mt-6'; // Style ajusté
+	backLink.setAttribute('data-link', '');
+	backLink.className = 'block text-center text-gray-600 hover:text-gray-800 text-sm mt-6';
 	backLink.textContent = 'Retour au Tableau de Bord';
 
-	// Vérifier si le formulaire existe avant d'essayer de l'insérer
 	const formElement = contentWrapper.querySelector('#profile-form-component');
 	if (formElement && formElement.parentNode) {
-		// Insérer le lien après la dernière div du formulaire (celle avec le bouton)
 		const lastDivInForm = formElement.children[formElement.children.length - 1];
 		if (lastDivInForm && lastDivInForm.parentNode) {
 			(lastDivInForm.parentNode as HTMLElement).insertBefore(backLink, lastDivInForm.nextSibling);
 		} else {
-			contentWrapper.appendChild(backLink); // Fallback
+			contentWrapper.appendChild(backLink);
 		}
 	} else {
-		contentWrapper.appendChild(backLink); // Fallback
+		contentWrapper.appendChild(backLink);
 	}
 
 	pageContainer.appendChild(contentWrapper);

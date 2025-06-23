@@ -42,23 +42,17 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		return errorMsg;
 	}
 
-	// --- Conteneur principal de la page ---
 	const pageContainer = document.createElement('div');
 	pageContainer.className = 'min-h-screen bg-gray-200 p-4 sm:p-8 flex flex-col items-center';
 
-	// --- Le "Dashboard" lui-même ---
 	const dashboardWrapper = document.createElement('div');
 	dashboardWrapper.className = 'bg-white rounded-2xl shadow-2xl w-full max-w-6xl flex flex-col overflow-hidden';
 
-	// --- Section du haut (Langue, User Header) ---
 	const headerElement = HeaderComponent({ currentUser: currentUser! });
-	// Note: The global click listener for menu close is in HeaderComponent.
 
-	// --- Section principale (Sidebar + Contenu à onglets) ---
 	const mainSection = document.createElement('div');
-	mainSection.className = 'flex flex-1 min-h-[calc(100vh-150px)]'; // Hauteur minimale pour le contenu
+	mainSection.className = 'flex flex-1 min-h-[calc(100vh-150px)]';
 
-	// --- Sidebar ---
 	const sidebar = document.createElement('div');
 	sidebar.className = 'w-1/4 p-6 bg-gray-50 border-r border-gray-200 space-y-3 overflow-y-auto';
 
@@ -87,7 +81,6 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	sidebar.appendChild(createSidebarItem(t('user.wins'), currentUser.wins ?? 'N/A'));
 	sidebar.appendChild(createSidebarItem(t('user.losses'), currentUser.losses ?? 'N/A'));
 
-	// --- Contenu à onglets ---
 	const tabContentWrapper = document.createElement('div');
 	tabContentWrapper.className = 'w-3/4 p-6 flex flex-col overflow-y-auto';
 
@@ -130,7 +123,6 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	dashboardWrapper.appendChild(mainSection);
 	pageContainer.appendChild(dashboardWrapper);
 
-	// --- Fonctions de rappel pour les actions d'amitié (utilisées par UserList) ---
 	const handleSendFriendRequest = async (targetUserId: number) => {
 		const result = await sendFriendRequest(targetUserId);
 		showToast(result.message);
@@ -155,7 +147,6 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		if (activeTabId === 'users' || activeTabId === 'pending') await loadActiveTabContent();
 	};
 
-	// --- Logique de chargement et de changement d'onglet ---
 	async function switchTab(tabId: string) {
 		activeTabId = tabId;
 		tabNavigation.querySelectorAll('button').forEach(btn => {
@@ -183,7 +174,6 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		}
 	}
 
-	// --- Fonctions de chargement spécifiques pour chaque onglet ---
 	async function loadUsersContent(): Promise<HTMLElement> {
 		const [usersData, friendsData, sentRequestsData, receivedRequestsData] = await Promise.all([
 			fetchUsers(),

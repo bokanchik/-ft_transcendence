@@ -1,4 +1,3 @@
-// profilePage.ts
 import { navigateTo } from '../services/router.js';
 import { getUserDataFromStorage, fetchUserDetails } from '../services/authService.js';
 import { fetchCsrfToken } from '../services/csrf.js';
@@ -6,6 +5,7 @@ import { User } from '../shared/schemas/usersSchemas.js';
 import { HeaderComponent } from '../components/headerComponent.js';
 import { showToast } from '../components/toast.js';
 import { MatchHistoryComponent } from '../components/matchHistoryComponent.js';
+import { t } from '../services/i18nService.js';
 
 export async function ProfilePage(params: { userId?: string }): Promise<HTMLElement> {
 	const loggedInUser: User | null = getUserDataFromStorage();
@@ -14,7 +14,7 @@ export async function ProfilePage(params: { userId?: string }): Promise<HTMLElem
 		navigateTo('/login');
 		const redirectMsg = document.createElement('div');
 		redirectMsg.className = 'min-h-screen flex items-center justify-center text-xl';
-		redirectMsg.textContent = 'Redirection vers la page de connexion...';
+		redirectMsg.textContent = t('msg.redirect.login');
 		return redirectMsg;
 	}
 
@@ -24,18 +24,18 @@ export async function ProfilePage(params: { userId?: string }): Promise<HTMLElem
 	if (isNaN(userIdToView)) {
 		const errorMsg = document.createElement('div');
 		errorMsg.className = 'min-h-screen flex items-center justify-center text-xl text-red-500';
-		errorMsg.textContent = 'ID utilisateur invalide.';
+		errorMsg.textContent = t('error.user.invalidUserId');
 		return errorMsg;
 	}
 
 	try {
 		await fetchCsrfToken();
 	} catch (error) {
-		console.error("Échec de la récupération du jeton CSRF:", error);
-		showToast("Erreur d'initialisation de la sécurité. Veuillez rafraîchir.", 'error');
+		console.error("Fail to recover CSRF token:", error);
+		showToast(t('error.user.errorCsrf'), 'error');
 		const errorMsg = document.createElement('div');
 		errorMsg.className = 'min-h-screen flex items-center justify-center text-xl text-red-500';
-		errorMsg.textContent = 'Erreur de sécurité. Veuillez rafraîchir la page.';
+		errorMsg.textContent = t('error.user.errorCsrf');
 		return errorMsg;
 	}
 
@@ -59,14 +59,14 @@ export async function ProfilePage(params: { userId?: string }): Promise<HTMLElem
 
 	const loadingProfileMsg = document.createElement('p');
 	loadingProfileMsg.className = 'text-center text-gray-500 py-20 flex-1 text-lg';
-	loadingProfileMsg.textContent = 'Chargement du profil...';
+	loadingProfileMsg.textContent = t('user.loading');
 	contentArea.appendChild(loadingProfileMsg);
 
 	try {
 		const profiledUser = await fetchUserDetails(userIdToView);
 
 		if (!profiledUser) {
-			loadingProfileMsg.textContent = `Profil utilisateur avec ID ${userIdToView} non trouvé.`;
+			loadingProfileMsg.textContent = t('error.user.notFound');
 			loadingProfileMsg.classList.remove('text-gray-500');
 			loadingProfileMsg.classList.add('text-red-500');
 			return pageContainer;
@@ -74,7 +74,6 @@ export async function ProfilePage(params: { userId?: string }): Promise<HTMLElem
 
 		loadingProfileMsg.remove();
 
-		// --- Sidebar (infos de l'utilisateur `profiledUser`) ---
 		const sidebar = document.createElement('aside');
 		sidebar.className = 'w-1/4 p-6 bg-gray-50 border-r border-gray-200 space-y-4 overflow-y-auto flex flex-col';
 
@@ -100,7 +99,6 @@ export async function ProfilePage(params: { userId?: string }): Promise<HTMLElem
 			return item;
 		}
 
-		// Affichage de l'avatar dans la sidebar
 		const avatarContainer = document.createElement('div');
 		avatarContainer.className = 'flex flex-col items-center mb-4';
 		const avatarImg = document.createElement('img');
@@ -117,15 +115,14 @@ export async function ProfilePage(params: { userId?: string }): Promise<HTMLElem
 		sidebar.appendChild(avatarContainer);
 
 		const infoItems = [
-			createSidebarItem('Email', profiledUser.email, true), // isSensitive = true
-			createSidebarItem('Date de création', new Date(profiledUser.created_at)),
-			createSidebarItem('Victoires', profiledUser.wins ?? 0),
-			createSidebarItem('Défaites', profiledUser.losses ?? 0),
-			createSidebarItem('Statut', profiledUser.status),
+			createSidebarItem(t('user.email'), profiledUser.email, true),
+			createSidebarItem(t('user.createdAt'), new Date(profiledUser.created_at)),
+			createSidebarItem(t('user.wins'), profiledUser.wins ?? 0),
+			createSidebarItem(t('user.losses'), profiledUser.losses ?? 0),
+			createSidebarItem(t('status.title'), profiledUser.status),
 		];
 		infoItems.forEach(item => item && sidebar.appendChild(item));
 
-		// --- Contenu principal (Match History uniquement) ---
 		const contentWrapper = document.createElement('main');
 		contentWrapper.className = 'w-3/4 p-6 flex flex-col overflow-y-auto';
 
@@ -136,8 +133,8 @@ export async function ProfilePage(params: { userId?: string }): Promise<HTMLElem
 		contentArea.appendChild(contentWrapper);
 
 	} catch (error) {
-		console.error("Erreur lors de la construction de la page de profil:", error);
-		loadingProfileMsg.textContent = `Erreur lors du chargement du profil : ${(error as Error).message}. Veuillez réessayer.`;
+		console.error("An error occurred when loading profile page:", error);
+		loadingProfileMsg.textContent = `${t('error.user.loadingProfile')} : ${(error as Error).message}.`;
 		loadingProfileMsg.classList.remove('text-gray-500');
 		loadingProfileMsg.classList.add('text-red-500');
 	}
