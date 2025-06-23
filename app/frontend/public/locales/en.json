@@ -128,6 +128,8 @@
 		}
 	},
 	"general": {
+		"yes": "Yes",
+		"no": "No",
 		"error": "Error",
 		"loading": "Loading...",
 		"cancel": "Cancel",

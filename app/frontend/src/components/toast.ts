@@ -1,4 +1,5 @@
 import { time } from "console";
+import { t } from './i18nService.js'
 
 export function showToast(message: string, type: 'success' | 'error' = 'success') {
     const existingToast = document.querySelector('.custom-toast');
@@ -9,7 +10,7 @@ export function showToast(message: string, type: 'success' | 'error' = 'success'
     const toast = document.createElement('div');
     toast.textContent = message;
 
-    const successBgClass = 'bg-green-400'; // Ou bg-teal-400, bg-emerald-400
+    const successBgClass = 'bg-green-400';
     const errorBgClass = 'bg-red-500';
 
     toast.className = `custom-toast fixed top-6 left-6 transform z-[1000] px-6 py-3 
@@ -44,7 +45,7 @@ export function showCustomConfirm(message: string, title: string = "Confirmation
         overlay.className = `custom-confirm-overlay fixed inset-0 
                              flex items-center justify-center z-[999] p-4 
                              transition-opacity duration-200 ease-out`;
-        overlay.style.backdropFilter = 'blur(2px)'; // flou
+        overlay.style.backdropFilter = 'blur(2px)';
 
         overlay.style.opacity = '0';
 
@@ -70,12 +71,12 @@ export function showCustomConfirm(message: string, title: string = "Confirmation
 
         // Confirm Button
         const confirmButton = document.createElement('button');
-        confirmButton.textContent = 'Yes';
+        confirmButton.textContent = t('general.yes');
         confirmButton.className = 'px-4 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2';
         
         // Cancel Button
         const cancelButton = document.createElement('button');
-        cancelButton.textContent = 'No';
+        cancelButton.textContent = t('general.no');
         cancelButton.className = 'px-4 py-2 rounded-md text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2';
 
         const closeDialog = (value: boolean) => {

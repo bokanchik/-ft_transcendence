@@ -15,7 +15,7 @@ export function FriendsListComponent(props: FriendsListProps): HTMLElement {
 
 	const section = document.createElement('div');
 	section.id = 'friends-list-section';
-	section.className = 'mt-8 p-6 bg-white border border-gray-200 rounded-lg shadow-lg'; // Changed background for better contrast
+	section.className = 'mt-8 p-6 bg-white border border-gray-200 rounded-lg shadow-lg';
 
 	const title = document.createElement('h2');
 	title.className = 'text-2xl font-semibold text-gray-800 mb-6';
@@ -40,7 +40,7 @@ export function FriendsListComponent(props: FriendsListProps): HTMLElement {
 			const avatar = avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random&color=fff&size=40`;
 
 			let statusIndicatorClass = 'bg-gray-400';
-			let statusText = t('status.offline'); // Default to offline status
+			let statusText = t('status.offline');
 
 			if (status === UserOnlineStatus.ONLINE) {
 				statusIndicatorClass = 'bg-green-500';
@@ -93,7 +93,6 @@ export function FriendsListComponent(props: FriendsListProps): HTMLElement {
 		} else if (action === 'remove-friend') {
 			const friendshipIdToRemove = button.dataset.friendshipId; // Get friendshipId from button
 			if (friendshipIdToRemove) {
-				// const confirmed = await showCustomConfirm('Êtes-vous sûr de vouloir supprimer cet ami de votre liste ? Cette action est irréversible.', 'Supprimer l\'ami');
 				const confirmed = await showCustomConfirm(t('friend.list.accepted.removeMsg'), t('friend.list.accepted.removeMsgTitle'));
 
 				if (confirmed) {
@@ -101,7 +100,7 @@ export function FriendsListComponent(props: FriendsListProps): HTMLElement {
 					button.textContent = '...';
 					try {
 						await onRemoveFriend(parseInt(friendshipIdToRemove, 10));
-						showToast(t('friend.list.accepted.removeSuccess'), 'success'); // Exemple
+						showToast(t('friend.list.accepted.removeSuccess'), 'success');
 					} catch (error: any) {
 						console.error('Error while removing friend: ', error);
 						showToast(`Erreur: ${error.message || t('friend.list.accepted.removeError')}`, 'error');
