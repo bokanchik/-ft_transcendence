@@ -2,10 +2,47 @@
 	"app": {
 		"title": "King-Pong"
 	},
+	"user": {
+		"username": "Nom d'utilisateur",
+		"displayName": "Nom d'affichage",
+		"email": "Email",
+		"password": "Mot de passe",
+		"createdAt": "Créé le",
+		"wins": "Victoires",
+		"losses": "Défaites",
+		"settings": {
+			"usernameMsg": "Le nom d'utilisateur ne peut pas être modifié.",
+			"emailPlaceholder": "Votre adresse email",
+			"displayNamePlaceholder": "Votre nom d'affichage",
+			"avatarMsg": "Laissez vide si vous n'avez pas d'avatar.",
+			"button": "Enregistrer les modifications",
+			"savingMsg1": "Sauvegarde en cours...",
+			"savingMsg2": "Sauvegarde...",
+			"success": "Modifications enregistrées avec succès !",
+			"error": "Erreur lors de l'enregistrement des modifications."
+		}
+	},
 	"register": {
 		"title": "Inscription",
 		"username": "Nom d'utilisateur",
-		"email": "Email"
+		"nameSpec": "3 à 20 caractères.",
+		"email": "Email",
+		"displayName": "Nom d'affichage",
+		"password": "Mot de passe",
+		"passwordSpec": "Au moins 8 caractères, max 20.",
+		"confirmPassword": "Confirmer le mot de passe",
+		"avatarUrl": "URL de l'avatar (Optionnel)",
+		"avatarSpec": "Doit être une URL d'image valide.",
+		"button": "S'inscrire",
+		"loginLink": "Vous avez déjà un compte ? Se connecter",
+		"fieldsRequired": "Veuillez remplir tous les champs requis.",
+		"passwordMismatch": "Les mots de passe ne correspondent pas.",
+		"passwordLength": "Le mot de passe doit contenir au moins 8 caractères.",
+		"avatarSpec": "Doit être une URL d'image valide.",
+		"attemptingRegistration": "Tentative d'inscription...",
+		"registering": "Inscription en cours...",
+		"success": "Inscription réussie ! Redirection vers la page de connexion...",
+		"failure": "Échec de l'inscription :"
 	},
 	"header": {
 		"home": "Accueil",
@@ -13,7 +50,9 @@
 		"dashboard": "Tableau de Bord",
 		"settings": "Paramètres",
 		"logout": "Déconnexion",
-		"language": "ENG"
+		"language": "ENG",
+		"logoutSuccess": "Vous avez été déconnecté avec succès.",
+		"logoutError": "Erreur lors de la déconnexion."
 	},
 	"login": {
 		"title": "Connexion",
@@ -24,13 +63,33 @@
 		"button": "Se connecter",
 		"registerLink": "Pas de compte ? S'inscrire",
 		"attemptingLogin": "Tentative de connexion...",
+		"success": "Connexion réussie ! Bienvenue",
 		"invalidCredentials": "Identifiants invalides. Veuillez réessayer.",
 		"missingCredentials": "Entrer votre nom d'utilisateur/email et mot de passe."
 	},
 	"friend": {
+		"list": {
+			"request": {
+				"title": "Demandes d'amis",
+				"received": "Demandes d'amis reçues",
+				"sent": "Demandes d'amis envoyées",
+				"noRequests": "Aucune demande recue",
+				"noSentRequests": "Aucune demande envoyée"
+			},
+			"accepted": {
+				"title": "Mes Amis",
+				"noFriends": "Aucun ami trouvé.",
+				"viewProfile": "Voir le Profil",
+				"removeMsg": "Êtes-vous sûr de vouloir supprimer cet ami de votre liste ? Cette action est irréversible.",
+				"removeMsgTitle": "Supprimer l'ami",
+				"removeSuccess": "Ami supprimé avec succès",
+				"removeError": "Erreur lors de la suppression de l'ami"
+			}
+		},
 		"request": "Inviter",
 		"accept": "Accepter",
 		"decline": "Refuser",
+		"cancel": "Annuler",
 		"remove": "Supprimer",
 		"block": "Bloquer",
 		"unblock": "Débloquer",
@@ -92,6 +151,7 @@
 			"notFound": "Utilisateur non trouvé."
 		},
 		"general": {
+			"any": "Une erreur est survenue.",
 			"unauthorized": "Non autorisé. Veuillez vous connecter.",
 			"forbidden": "Accès interdit. Vous n'avez pas les permissions nécessaires.",
 			"unknown": "Une erreur inconnue est survenue.",

@@ -11,7 +11,7 @@ interface HeaderProps {
 
 interface NavLink {
 	href: string;
-	textKey: string; // On utilise une clé de traduction au lieu de texte en dur
+	textKey: string;
 }
 
 export function HeaderComponent(props: HeaderProps): HTMLElement {
@@ -24,14 +24,13 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 	const leftSection = document.createElement('div');
 	const langButton = document.createElement('button');
 	langButton.className = 'bg-blue-500 text-white font-bold py-2 px-4 rounded-lg text-sm hover:bg-blue-600 transition-colors';
-    
-    // Le bouton affiche la langue vers laquelle on veut basculer
+
 	langButton.textContent = getLanguage() === 'fr' ? 'EN' : 'FR';
-	
-    langButton.addEventListener('click', () => {
-        const newLang = getLanguage() === 'fr' ? 'en' : 'fr';
-        setLanguage(newLang); // Appelle la fonction qui change la langue et rafraîchit tout
-    });
+
+	langButton.addEventListener('click', () => {
+		const newLang = getLanguage() === 'fr' ? 'en' : 'fr';
+		setLanguage(newLang);
+	});
 	leftSection.appendChild(langButton);
 
 	// --- Center: Navigation Links ---
@@ -55,7 +54,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 
 	// --- Right side: User Header (Avatar & Menu) ---
 	const rightSection = document.createElement('div');
-    const userHeader = document.createElement('div');
+	const userHeader = document.createElement('div');
 	userHeader.className = 'flex items-center space-x-4 relative';
 
 	const avatarDisplayWrapper = document.createElement('div');
@@ -92,9 +91,9 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		e.stopPropagation();
 		try {
 			await logout();
-			showToast('You have been logged out.', 'success'); // a traduire
+			showToast(t('header.logoutSuccess'), 'success');
 		} catch (error) {
-			showToast('Error logging out.', 'error'); // a traduire
+			showToast(t('header.logoutError'), 'error');
 		} finally {
 			navigateTo('/login');
 		}
@@ -106,7 +105,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 	userHeader.appendChild(miniMenu);
 	rightSection.appendChild(userHeader);
 
-    let menuOpen = false;
+	let menuOpen = false;
 	const toggleMenu = (show: boolean) => {
 		menuOpen = show;
 		miniMenu.classList.toggle('hidden', !menuOpen);

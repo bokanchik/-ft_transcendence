@@ -80,12 +80,12 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		return item;
 	}
 
-	sidebar.appendChild(createSidebarItem(t('sidebar.username'), currentUser.username));
-	sidebar.appendChild(createSidebarItem(t('sidebar.displayName'), currentUser.display_name));
-	sidebar.appendChild(createSidebarItem(t('sidebar.email'), currentUser.email));
-	sidebar.appendChild(createSidebarItem(t('sidebar.createdAt'), new Date(currentUser.created_at)));
-	sidebar.appendChild(createSidebarItem(t('sidebar.wins'), currentUser.wins ?? 'N/A'));
-	sidebar.appendChild(createSidebarItem(t('sidebar.losses'), currentUser.losses ?? 'N/A'));
+	sidebar.appendChild(createSidebarItem(t('user.username'), currentUser.username));
+	sidebar.appendChild(createSidebarItem(t('user.displayName'), currentUser.display_name));
+	sidebar.appendChild(createSidebarItem(t('user.email'), currentUser.email));
+	sidebar.appendChild(createSidebarItem(t('user.createdAt'), new Date(currentUser.created_at)));
+	sidebar.appendChild(createSidebarItem(t('user.wins'), currentUser.wins ?? 'N/A'));
+	sidebar.appendChild(createSidebarItem(t('user.losses'), currentUser.losses ?? 'N/A'));
 
 	// --- Contenu à onglets ---
 	const tabContentWrapper = document.createElement('div');

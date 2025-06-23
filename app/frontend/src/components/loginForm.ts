@@ -5,7 +5,7 @@ import { t } from '../services/i18nService.js';
 
 interface LoginFormProps {
 	onLoginAttempt: (credentials: LoginRequestBody) => Promise<ApiResult>;
-	onLoginSuccess: (userData: any) => void; // Callback pour informer la page du succès
+	onLoginSuccess: (userData: any) => void;
 }
 
 export function LoginForm(props: LoginFormProps): HTMLElement {
@@ -46,7 +46,7 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 		messageDiv.textContent = t('login.attemptingLogin');
 		messageDiv.className = 'mt-4 text-center text-sm text-gray-600';
 		loginButton.disabled = true;
-		loginButton.textContent = 'Signing In...';
+		loginButton.textContent = t('login.attemptingLogin');
 
 		const identifier = identifierInput.value.trim();
 		const password = passwordInput.value;
@@ -65,13 +65,13 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 		loginButton.textContent = t('login.button');
 
 		if (result.success) {
-			messageDiv.textContent = `Login successful! Welcome ${result.data.user.display_name || result.data.user.username}!`;
+			messageDiv.textContent = `${t('login.success')} ${result.data.user.display_name || result.data.user.username}!`;
 			messageDiv.className = 'mt-4 text-center text-sm text-green-600';
 			onLoginSuccess(result.data.user); // Appeler le callback de succès
 		} else {
 			messageDiv.textContent = result.error || t('login.invalidCredentials');
 			messageDiv.className = 'mt-4 text-center text-sm text-red-600';
-			passwordInput.value = ''; // Vider le mot de passe en cas d'échec
+			passwordInput.value = '';
 		}
 	});
 
