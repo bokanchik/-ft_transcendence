@@ -18,7 +18,8 @@ export function LoginPage(): HTMLElement {
 	pageWrapper.appendChild(headerElement);
 
 	const container = document.createElement('div');
-	container.className = 'bg-white flex justify-center items-center min-h-screen p-8';
+	// container.className = 'bg-white flex justify-center items-center min-h-screen p-8';
+	container.className = 'bg-white flex-grow flex justify-center items-center p-8';
 
 	const formContainer = document.createElement('div');
 	formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';
@@ -34,11 +35,18 @@ export function LoginPage(): HTMLElement {
 	};
 
 	const handleLoginSuccess = (userData: any) => {
+		// Store user data in localStorage
+		localStorage.setItem('userDataKey', JSON.stringify(userData));
+        
+        const ttl = 60 * 60 * 1000;
+		localStorage.setItem('userDataExpiration', (new Date().getTime() + ttl).toString());
+		// end of storing user data
+		
 		setTimeout(() => { navigateTo('/dashboard'); }, 500);
 	};
 
 	const loginFormComponent = LoginForm({
-		onLoginAttempt: handleLoginAttempt,
+		// onLoginAttempt: handleLoginAttempt,
 		onLoginSuccess: handleLoginSuccess,
 	});
 	formContainer.appendChild(loginFormComponent);

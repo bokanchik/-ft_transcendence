@@ -7,7 +7,6 @@ declare module 'fastify' {
     user: JWTPayload;
   }
   export interface Session extends FastifySessionObject {
-    csrfToken?: string;
     '2fa_user_id'?: number;
     userId?: number;
   }

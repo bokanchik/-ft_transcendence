@@ -28,14 +28,14 @@ CREATE TABLE IF NOT EXISTS friendships (
     CONSTRAINT unique_pair UNIQUE (user1_id, user2_id)
 );
 
-INSERT OR IGNORE INTO users (username, email, password_hash, display_name, avatar_url)
+INSERT OR IGNORE INTO users (username, email, password_hash, display_name, avatar_url, is_two_fa_enabled, two_fa_secret)
 VALUES
-	('Serge', 'serge@student.42.fr', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Serge P', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSq2Q26rH3nI4ossmbYm8jpCyYwuytbyk6iYXJ4_C4tO8FFgv4Wk488h9CB24G5jB46Qjk&usqp=CAU'),
-	('Xavier', 'xavier@student.42.fr', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Xavier N', 'https://www.lemediaplus.com/wp-content/uploads/2023/02/Xavier-niel-fortune.png'),
-	('Donkey_Kong', 'donkeyKong@nitendo.com', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Donkey Kong', 'https://m1.quebecormedia.com/emp/emp/dk1b93f6bb-34a1-498c-8234-fb9c7c6f794a_ORIGINAL.jpg?impolicy=crop-resize&x=0&y=0&w=1200&h=675&width=925'),
-	('jane_doe', 'jane@example.com', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Jane Doe', 'https://ui-avatars.com/api/?name=Jane+Doe&background=random&color=fff&size=128'),
-	('alice_smith', 'alice@example.com', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Alice Smith', 'https://gravatar.com/avatar/3bd177d6fdf72eecc626c6cc19dfbdc6?s=400&d=identicon&r=g'),
-	('Alexis B', 'alexb@example.com', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Alexis le Brun', 'https://media.ouest-france.fr/v1/pictures/MjAyMzA5NjIyNGQ3MmNlNzkyNTdjYzgwY2IyNDllOWQ2MmQzYzM?width=1260&height=708&focuspoint=50%2C36&cropresize=1&client_id=bpeditorial&sign=06fccb8b939b1ef4f9042a38edab621665dc6428590f6fa79a643ed33535af5f');
+	('Serge', 'serge@student.42.fr', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Serge P', 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSq2Q26rH3nI4ossmbYm8jpCyYwuytbyk6iYXJ4_C4tO8FFgv4Wk488h9CB24G5jB46Qjk&usqp=CAU', FALSE, NULL),
+	('Xavier', 'xavier@student.42.fr', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Xavier N', 'https://www.lemediaplus.com/wp-content/uploads/2023/02/Xavier-niel-fortune.png', TRUE, 'JBSWY3DPEHPK3PXP'),
+	('Donkey_Kong', 'donkeyKong@nitendo.com', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Donkey Kong', 'https://m1.quebecormedia.com/emp/emp/dk1b93f6bb-34a1-498c-8234-fb9c7c6f794a_ORIGINAL.jpg?impolicy=crop-resize&x=0&y=0&w=1200&h=675&width=925', FALSE, NULL),
+	('jane_doe', 'jane@example.com', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Jane Doe', 'https://ui-avatars.com/api/?name=Jane+Doe&background=random&color=fff&size=128', FALSE, NULL),
+	('alice_smith', 'alice@example.com', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Alice Smith', 'https://gravatar.com/avatar/3bd177d6fdf72eecc626c6cc19dfbdc6?s=400&d=identicon&r=g', FALSE, NULL),
+	('Alexis B', 'alexb@example.com', '$2b$10$3Gy9uzvm61CTJ0kuPN3FYu1vJrmylnrmKNmkdoHNTF2owheMzkucu', 'Alexis le Brun', 'https://media.ouest-france.fr/v1/pictures/MjAyMzA5NjIyNGQ3MmNlNzkyNTdjYzgwY2IyNDllOWQ2MmQzYzM?width=1260&height=708&focuspoint=50%2C36&cropresize=1&client_id=bpeditorial&sign=06fccb8b939b1ef4f9042a38edab621665dc6428590f6fa79a643ed33535af5f', FALSE, NULL);
 
 
 
