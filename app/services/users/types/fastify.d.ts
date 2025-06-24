@@ -1,10 +1,14 @@
 import 'fastify';
 import { JWTPayload } from '../shared/schemas/usersSchemas';
+import { FastifySessionObject } from '@fastify/session'
 
-// Ce code va "fusionner" notre définition avec celle de la librairie 'fastify'
 declare module 'fastify' {
-  // On déclare une nouvelle interface FastifyRequest qui contient notre propriété 'user'
   export interface FastifyRequest {
     user: JWTPayload;
+  }
+  export interface Session extends FastifySessionObject {
+    csrfToken?: string;
+    '2fa_user_id'?: number;
+    userId?: number;
   }
 }

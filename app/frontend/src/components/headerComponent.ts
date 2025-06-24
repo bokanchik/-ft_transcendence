@@ -49,7 +49,6 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		const newLang = getLanguage() === 'fr' ? 'en' : 'fr';
 		setLanguage(newLang);
 		updateFlag();
-		// showToast(t('header.languageChanged', { lang: newLang }), 'success');
 	});
 	leftSection.appendChild(langButton);
 

@@ -22,10 +22,10 @@
 - [x] env
 - [x] fichiers partagés
 - [ ] tout traduire
-- [ ] La gestion d'erreurs 
+- [x] La gestion d'erreurs 
 - [ ] nettoyage
-- [ ] Boutons pour amis pour lancer un match
 - [ ] Route pour update win loses / Permissions pour faire ca ?
+- [x] Header partout
 
 ## 📌 Tâches initiales
 

@@ -52,7 +52,7 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
              <p class="text-xs text-gray-500 mt-1">${t('user.settings.avatarMsg')}</p>
         </div>
 
-        <div class="flex items-center justify-between mt-6 border-t pt-6">
+        <div class="flex items-center justify-center mt-6 border-t pt-6">
             <button type="submit" id="save-profile-button"
                     class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full sm:w-auto transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed">
                 ${t('user.settings.button')}
@@ -110,7 +110,7 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 				}
 			}, 3000);
 		} else {
-			messageDiv.textContent = `Erreur: ${result.error || t('user.settings.error')}`;
+			messageDiv.textContent = `${t('general.error')}: ${result.error || t('user.settings.error')}`;
 			messageDiv.className = 'mb-4 text-center text-sm text-red-600 font-semibold min-h-[1.25rem]';
 		}
 	});

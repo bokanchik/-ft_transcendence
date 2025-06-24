@@ -9,7 +9,9 @@ CREATE TABLE IF NOT EXISTS users (
     losses INTEGER DEFAULT 0,
     status TEXT NOT NULL DEFAULT 'offline',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_two_fa_enabled BOOLEAN DEFAULT FALSE,
+    two_fa_secret TEXT
 );
 
 CREATE TABLE IF NOT EXISTS friendships (

@@ -5,6 +5,8 @@ secrets:
     file: ../secrets/jwt_secret.txt
   cookie_secret:
     file: ../secrets/cookie_secret.txt
+  session_secret:
+    file: ../secrets/session_secret.txt
 
 networks:
   tranet:
@@ -58,9 +60,11 @@ services:
     environment:
       - JWT_SECRET__FILE=/run/secrets/jwt_secret
       - COOKIE_SECRET__FILE=/run/secrets/cookie_secret
+      - SESSION_SECRET__FILE=/run/secrets/session_secret
     secrets:
       - jwt_secret
       - cookie_secret
+      - session_secret
     restart: always
     volumes:
       - ./services/shared:/app/shared:ro

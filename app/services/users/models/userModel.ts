@@ -1,7 +1,6 @@
 // app/services/users/models/userModel.ts
 import { getDb } from '../utils/dbConfig.js';
-// import { ERROR_KEYS } from '../utils/appError.js';
-import { User, UserWithPasswordHash, CreateUserPayload, UpdatedUserResult, UpdateUserPayload, UserOnlineStatus } from '../shared/schemas/usersSchemas.js'; // Importez vos types
+import { User, UserWithSecrets, CreateUserPayload, UpdatedUserResult, UpdateUserPayload, UserOnlineStatus } from '../shared/schemas/usersSchemas.js'; // Importez vos types
 
 /**
  * Retrieves all users from the database.
@@ -9,37 +8,37 @@ import { User, UserWithPasswordHash, CreateUserPayload, UpdatedUserResult, Updat
  */
 export async function getAllUsersFromDb(): Promise<User[]> {
 	const db = getDb();
-	return db.all<User[]>('SELECT id, username, email, display_name, avatar_url, wins, losses, status, created_at, updated_at FROM users');
+	return db.all<User[]>('SELECT id, username, email, display_name, avatar_url, wins, losses, status, created_at, updated_at, is_two_fa_enabled FROM users');
 }
 
 /**
  * Retrieves a user by their display name.
  * @param {string} displayName - The display name of the user.
- * @returns {Promise<UserWithPasswordHash | undefined>} The user object or undefined if not found.
+ * @returns {Promise<UserWithSecrets | undefined>} The user object or undefined if not found.
  */
-export async function getUserByDisplayNameFromDb(displayName: string): Promise<UserWithPasswordHash | undefined> {
+export async function getUserByDisplayNameFromDb(displayName: string): Promise<UserWithSecrets | undefined> {
 	const db = getDb();
-	return db.get<UserWithPasswordHash>('SELECT * FROM users WHERE display_name = ?', [displayName]);
+	return db.get<UserWithSecrets>('SELECT * FROM users WHERE display_name = ?', [displayName]);
 }
 
 /**
  * Retrieves a user by their username.
  * @param {string} username - The username of the user.
- * @returns {Promise<UserWithPasswordHash | undefined>} The user object or undefined if not found.
+ * @returns {Promise<UserWithSecrets | undefined>} The user object or undefined if not found.
  */
-export async function getUserByUsernameFromDb(username: string): Promise<UserWithPasswordHash | undefined> {
+export async function getUserByUsernameFromDb(username: string): Promise<UserWithSecrets | undefined> {
 	const db = getDb();
-	return db.get<UserWithPasswordHash>('SELECT * FROM users WHERE username = ?', [username]);
+	return db.get<UserWithSecrets>('SELECT * FROM users WHERE username = ?', [username]);
 }
 
 /**
  * Retrieves a user by their email.
  * @param {string} email - The email of the user.
- * @returns {Promise<UserWithPasswordHash | undefined>} The user object or undefined if not found.
+ * @returns {Promise<UserWithSecrets | undefined>} The user object or undefined if not found.
  */
-export async function getUserByEmailFromDb(email: string): Promise<UserWithPasswordHash | undefined> {
+export async function getUserByEmailFromDb(email: string): Promise<UserWithSecrets | undefined> {
 	const db = getDb();
-	return db.get<UserWithPasswordHash>('SELECT * FROM users WHERE email = ?', [email]);
+	return db.get<UserWithSecrets>('SELECT * FROM users WHERE email = ?', [email]);
 }
 
 /**
@@ -49,7 +48,17 @@ export async function getUserByEmailFromDb(email: string): Promise<UserWithPassw
  */
 export async function getUserByIdFromDb(userId: number): Promise<User | undefined> {
 	const db = getDb();
-	return db.get<User>('SELECT id, username, email, display_name, avatar_url, wins, losses, status, created_at, updated_at FROM users WHERE id = ?', [userId]);
+	return db.get<User>('SELECT id, username, email, display_name, avatar_url, wins, losses, status, created_at, updated_at, is_two_fa_enabled FROM users WHERE id = ?', [userId]);
+}
+
+/**
+ * Retrieves a user with their secrets by ID. For internal use.
+ * @param {number} userId - The ID of the user to retrieve.
+ * @returns {Promise<UserWithSecrets | undefined>} The user object with secrets, or undefined if not found.
+ */
+export async function getUserWithSecretsByIdFromDb(userId: number): Promise<UserWithSecrets | undefined> {
+	const db = getDb();
+	return db.get<UserWithSecrets>('SELECT * FROM users WHERE id = ?', [userId]);
 }
 
 /**
