@@ -1,0 +1,8 @@
+## Components
+	- background
+	- countdown
+	- gamePage
+	- gameResults
+	- SelectGameModeForm
+	- showcase
+	- toast(last fn)

@@ -16,15 +16,19 @@
 		"losses": "Défaites",
 		"loading": "Chargement des données utilisateur...",
 		"settings": {
+			"title": "Paramètres utilisateur",
 			"usernameMsg": "Le nom d'utilisateur ne peut pas être modifié.",
 			"emailPlaceholder": "Votre adresse email",
 			"displayNamePlaceholder": "Votre nom d'affichage",
 			"avatarMsg": "Laissez vide si vous n'avez pas d'avatar.",
 			"button": "Enregistrer les modifications",
+			"dashboardLink": "Retour au tableau de bord",
 			"savingMsg1": "Sauvegarde en cours...",
 			"savingMsg2": "Sauvegarde...",
 			"success": "Modifications enregistrées avec succès !",
-			"error": "Erreur lors de l'enregistrement des modifications."
+			"error": "Erreur lors de l'enregistrement des modifications.",
+			"denied": "Accès refusé.",
+			"deniedMsg": "Vous devez être connecté pour accéder à cette page."
 		}
 	},
 	"register": {

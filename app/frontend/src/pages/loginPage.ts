@@ -5,8 +5,18 @@ import { LoginForm } from '../components/loginForm.js';
 import { LoginRequestBody } from '../shared/schemas/usersSchemas.js';
 import { ApiResult } from '../utils/types.js';
 import { t } from '../services/i18nService.js';
+import { HeaderComponent } from '../components/headerComponent.js';
+import { getUserDataFromStorage } from '../services/authService.js';
 
 export function LoginPage(): HTMLElement {
+	const currentUser = getUserDataFromStorage();
+
+	const pageWrapper = document.createElement('div');
+	pageWrapper.className = 'flex flex-col min-h-screen bg-gray-100';
+
+	const headerElement = HeaderComponent({ currentUser });
+	pageWrapper.appendChild(headerElement);
+
 	const container = document.createElement('div');
 	container.className = 'bg-white flex justify-center items-center min-h-screen p-8';
 
@@ -48,6 +58,8 @@ export function LoginPage(): HTMLElement {
 	formContainer.appendChild(linksDiv);
 
 	container.appendChild(formContainer);
+	pageWrapper.appendChild(container);
 
-	return container;
+	// return container;
+	return pageWrapper;
 }

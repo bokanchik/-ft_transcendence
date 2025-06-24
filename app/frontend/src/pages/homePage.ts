@@ -1,33 +1,22 @@
 import { t } from '../services/i18nService.js';
+import { HeaderComponent } from '../components/headerComponent.js';
+import { getUserDataFromStorage } from '../services/authService.js';
 
 export function HomePage(): HTMLElement {
+	const currentUser = getUserDataFromStorage();
+
+	const pageWrapper = document.createElement('div');
+	pageWrapper.className = 'flex flex-col min-h-screen bg-gray-100';
+
+	const headerElement = HeaderComponent({ currentUser });
+	pageWrapper.appendChild(headerElement);
 
 	const container = document.createElement('div');
-	container.className = 'relative bg-cover bg-center min-h-screen text-white flex flex-col items-center justify-between p-4 sm:p-8';
+	container.className = 'relative bg-cover bg-center flex-grow text-white flex flex-col items-center justify-center p-4 sm:p-8';
 	container.style.backgroundImage = "url('https://images.unsplash.com/photo-1470058869958-2a77ade41c02?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8anVuZ2xlfGVufDB8fDB8fHww')";
 
 	const overlay = document.createElement('div');
 	overlay.className = 'absolute inset-0 bg-black/40';
-
-	const header = document.createElement('header');
-	header.className = 'relative z-10 w-full flex justify-between items-center';
-
-	const logo = document.createElement('h1');
-	logo.className = 'text-2xl sm:text-3xl font-bold tracking-wider text-shadow';
-	logo.innerHTML = `🏓 <span class="hidden sm:inline">${t('app.title')}</span>`;
-
-	const authLinks = document.createElement('div');
-	authLinks.className = 'flex items-center space-x-2 sm:space-x-4';
-	authLinks.innerHTML = `
-		<a href="/login" data-link class="text-sm sm:text-base font-semibold px-4 py-2 rounded-full hover:bg-white hover:bg-opacity-20 transition-colors duration-300">
-			${t('login.title')}
-		</a>
-		<a href="/register" data-link class="text-sm sm:text-base bg-green-600 hover:bg-green-500 text-white font-bold px-4 py-2 rounded-full shadow-lg transition-transform duration-300 transform hover:scale-105">
-			${t('register.title')}
-		</a>
-	`;
-	header.appendChild(logo);
-	header.appendChild(authLinks);
 
 	const mainContent = document.createElement('main');
 	mainContent.className = 'relative z-10 flex flex-col items-center text-center';
@@ -42,6 +31,7 @@ export function HomePage(): HTMLElement {
 
 	const playButton = document.createElement('a');
 	playButton.href = '/local-game';
+	// playButton.href = currentUser ? '/game' : '/local-game'; // If you want to redirect to the game page for logged-in users
 	playButton.setAttribute('data-link', '');
 	playButton.className = `
 		bg-red-600 hover:bg-red-500 text-white font-black 
@@ -57,7 +47,8 @@ export function HomePage(): HTMLElement {
 	mainContent.appendChild(playButton);
 
 	const footer = document.createElement('footer');
-	footer.className = 'relative z-10 w-full text-center';
+	// footer.className = 'relative z-10 w-full text-center py-4';
+	footer.className = 'relative z-10 w-full text-center py-2 bg-gray-900 bg-opacity-70';
 
 	const apiLink = document.createElement('a');
 	apiLink.href = '/game';
@@ -68,9 +59,10 @@ export function HomePage(): HTMLElement {
 	footer.appendChild(apiLink);
 
 	container.appendChild(overlay);
-	container.appendChild(header);
 	container.appendChild(mainContent);
-	container.appendChild(footer);
+
+	pageWrapper.appendChild(container);
+	pageWrapper.appendChild(footer);
 
 	const style = document.createElement('style');
 	style.textContent = `
@@ -79,5 +71,5 @@ export function HomePage(): HTMLElement {
 	`;
 	container.appendChild(style);
 
-	return container;
+	return pageWrapper;
 }

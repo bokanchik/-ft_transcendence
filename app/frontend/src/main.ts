@@ -1,15 +1,15 @@
 import { HomePage } from './pages/homePage.js';
 import { LoginPage } from './pages/loginPage.js'
-import { RegisterPage } from './components/registerPage.js'
-import { GamePage } from './components/gamePage.js';
+import { RegisterPage } from './pages/registerPage.js'
 import { GameRoomPage } from './pages/gameRoomPage.js';
-import { navigateTo } from './services/router.js';
 import { DashboardPage } from './pages/dashboardPage.js'
 import { SettingsPage } from './pages/settingsPage.js';
 import { ProfilePage } from './pages/profilePage.js';
+import { GamePage } from './components/gamePage.js';
+import { GameMode } from './components/gamePage.js'
 import { getUserDataFromStorage } from './services/authService.js';
 import { promptAliasForm } from './components/SelectGameModeForm.js';
-import { GameMode } from './components/gamePage.js'
+import { navigateTo } from './services/router.js';
 import { initI18n, t } from './services/i18nService.js';
 import { showcase } from './components/showcase.js';
 // import './css/style.css';

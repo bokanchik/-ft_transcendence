@@ -2,7 +2,7 @@ import { getUserDataFromStorage, updateUserProfile } from '../services/authServi
 import { navigateTo } from '../services/router.js';
 import { User, UpdateUserPayload } from '../shared/schemas/usersSchemas.js';
 import { ApiResult } from '../utils/types.js';
-import { SettingsForm } from '../components/settingsForm.js'; // Importer le composant
+import { SettingsForm } from '../components/settingsForm.js';
 import { fetchCsrfToken } from '../services/csrf.js';
 import { t } from '../services/i18nService.js';
 
@@ -20,9 +20,9 @@ export async function SettingsPage(): Promise<HTMLElement> {
 		deniedContainer.className = 'flex items-center justify-center h-full';
 		deniedContainer.innerHTML = `
             <div class="bg-white rounded-xl shadow-lg p-8 text-center">
-                <h1 class="text-2xl font-bold text-red-600 mb-4">Accès Refusé</h1>
-                <p class="text-gray-700 mb-4">Vous devez être connecté pour accéder à votre profil.</p>
-                <p class="text-gray-700">Redirection vers la page de connexion...</p>
+                <h1 class="text-2xl font-bold text-red-600 mb-4">${t('user.settings.denied')}</h1>
+                <p class="text-gray-700 mb-4">${t('user.settings.deniedMsg')}</p>
+                <p class="text-gray-700">${t('msg.redirect.login')}</p>
                 <!-- <a href="/login" data-link class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                     Se connecter
                 </a> -->
@@ -39,7 +39,7 @@ export async function SettingsPage(): Promise<HTMLElement> {
 		console.error("Failed to fetch CSRF token:", error);
 		const errorMsg = document.createElement('div');
 		errorMsg.className = 'min-h-screen flex items-center justify-center text-xl text-red-500';
-		errorMsg.textContent = 'Error initializing page. Please try refreshing.';
+		errorMsg.textContent = t('msg.error.initializing');
 		return errorMsg;
 	}
 
@@ -48,7 +48,7 @@ export async function SettingsPage(): Promise<HTMLElement> {
 
 	const title = document.createElement('h1');
 	title.className = 'text-3xl font-bold text-gray-800 mb-6 border-b pb-4';
-	title.textContent = 'Mon Profil';
+	title.textContent = t('user.settings.title');
 	contentWrapper.appendChild(title);
 
 	const handleProfileUpdate = async (payload: UpdateUserPayload): Promise<ApiResult> => {
@@ -70,7 +70,7 @@ export async function SettingsPage(): Promise<HTMLElement> {
 	backLink.href = '/dashboard';
 	backLink.setAttribute('data-link', '');
 	backLink.className = 'block text-center text-gray-600 hover:text-gray-800 text-sm mt-6';
-	backLink.textContent = 'Retour au Tableau de Bord';
+	backLink.textContent = t('user.settings.dashboardLink');
 
 	const formElement = contentWrapper.querySelector('#profile-form-component');
 	if (formElement && formElement.parentNode) {

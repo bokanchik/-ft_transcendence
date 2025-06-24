@@ -1,5 +1,4 @@
-// /components/profileForm.ts
-import { User, UpdateUserPayload } from '../shared/schemas/usersSchemas.js'; // S'assurer que ApiResult est importé
+import { User, UpdateUserPayload } from '../shared/schemas/usersSchemas.js';
 import { ApiResult } from '../utils/types.js';
 import { t } from '../services/i18nService.js';
 

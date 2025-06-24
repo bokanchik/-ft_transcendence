@@ -16,15 +16,19 @@
 		"losses": "Losses",
 		"loading": "Loading user data...",
 		"settings": {
+			"title": "User Settings",
 			"usernameMsg": "Username cannot be changed.",
 			"emailPlaceholder": "Your email address",
 			"displayNamePlaceholder": "Your display name",
 			"avatarMsg": "Leave empty if you don't have an avatar.",
 			"button": "Save Changes",
+			"dashboardLink": "Back to Dashboard",
 			"savingMsg1": "Saving changes...",
 			"savingMsg2": "Saving...",
 			"success": "Changes saved successfully!",
-			"error": "Error saving changes."
+			"error": "Error saving changes.",
+			"denied": "Access denied.",
+			"deniedMsg": "You must be logged in to access this page."
 		}
 	},
 	"register": {

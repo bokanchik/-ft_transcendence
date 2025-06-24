@@ -3,8 +3,17 @@ import { RegisterRequestBody } from '../shared/schemas/usersSchemas.js'
 import { ApiResult } from '../utils/types.js'
 import { navigateTo } from '../services/router.js';
 import { t } from '../services/i18nService.js';
+import { HeaderComponent } from '../components/headerComponent.js';
+import { getUserDataFromStorage } from '../services/authService.js';
 
 export async function RegisterPage(): Promise<HTMLElement> {
+	const currentUser = getUserDataFromStorage();
+
+	const pageWrapper = document.createElement('div');
+	pageWrapper.className = 'flex flex-col min-h-screen bg-gray-100';
+
+	const headerElement = HeaderComponent({ currentUser });
+	pageWrapper.appendChild(headerElement);
 
 
 	const container = document.createElement('div');
@@ -69,6 +78,7 @@ export async function RegisterPage(): Promise<HTMLElement> {
     `;
 
 	container.appendChild(formContainer);
+	pageWrapper.appendChild(container);
 
 	const form = container.querySelector('#register-form') as HTMLFormElement;
 	const usernameInput = container.querySelector('#username') as HTMLInputElement;
@@ -152,7 +162,7 @@ export async function RegisterPage(): Promise<HTMLElement> {
 		}
 	});
 
-	return container;
+	return pageWrapper;
 }
 
 function isValidHttpUrl(string: string): boolean {
