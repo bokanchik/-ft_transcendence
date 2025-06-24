@@ -17,16 +17,39 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 	const { currentUser } = props;
 
 	const headerContainer = document.createElement('div');
-	headerContainer.className = 'flex justify-between items-center px-6 py-3 border-b border-gray-200 bg-white shadow-md';
+	headerContainer.className = 'flex justify-between items-center px-6 py-2 border-b border-gray-200 bg-white shadow-md';
 
 	// --- Left side: Language Button ---
 	const leftSection = document.createElement('div');
 	const langButton = document.createElement('button');
-	langButton.className = 'bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-5 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75';
-	langButton.textContent = getLanguage() === 'fr' ? 'EN' : 'FR';
+	// langButton.className = 'bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-5 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75';
+	// langButton.textContent = getLanguage() === 'fr' ? 'EN' : 'FR';
+	
+	// Flags
+	langButton.className = 'flex items-center justify-center p-1.5 rounded-full transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75';
+	
+	const flagImg = document.createElement('img');
+	// flagImg.className = 'w-10 h-auto object-contain rounded-md shadow-sm';
+	flagImg.className = 'h-8 w-auto object-contain rounded-md shadow-sm';
+
+	const updateFlag = () => {
+		const currentLang = getLanguage();
+		if (currentLang === 'fr') {
+			flagImg.src = '/assets/flagEn.svg'; 
+			flagImg.alt = 'Switch to English';
+		} else {
+			flagImg.src = '/assets/flagFr.svg';
+			flagImg.alt = 'Passer en Français';
+		}
+	};
+	updateFlag(); // Initial flag update
+	langButton.appendChild(flagImg);
+
 	langButton.addEventListener('click', () => {
 		const newLang = getLanguage() === 'fr' ? 'en' : 'fr';
 		setLanguage(newLang);
+		updateFlag();
+		// showToast(t('header.languageChanged', { lang: newLang }), 'success');
 	});
 	leftSection.appendChild(langButton);
 
@@ -70,7 +93,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		displayNameHeader.textContent = currentUser.display_name || currentUser.username;
 
 		const avatarHeader = document.createElement('img');
-		avatarHeader.className = 'w-10 h-10 rounded-full object-cover border-2 border-white';
+		avatarHeader.className = 'w-8 h-8 rounded-full object-cover border-2 border-white';
 		const avatarFallbackName = currentUser.display_name || currentUser.username;
 		avatarHeader.src = currentUser.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(avatarFallbackName)}&background=0D8ABC&color=fff&size=128`;
 		avatarHeader.alt = 'User Avatar';
