@@ -29,16 +29,16 @@ export function LoginPage(): HTMLElement {
 
 	formContainer.appendChild(title);
 
-	const handleLoginAttempt = async (credentials: LoginRequestBody): Promise<ApiResult> => {
-		return attemptLogin(credentials);
-	};
+	// const handleLoginAttempt = async (credentials: LoginRequestBody): Promise<ApiResult> => {
+	// 	return attemptLogin(credentials);
+	// };
 
 	const handleLoginSuccess = (userData: any) => {
 		setTimeout(() => { navigateTo('/dashboard'); }, 500);
 	};
 
 	const loginFormComponent = LoginForm({
-		onLoginAttempt: handleLoginAttempt,
+		// onLoginAttempt: handleLoginAttempt,
 		onLoginSuccess: handleLoginSuccess,
 	});
 	formContainer.appendChild(loginFormComponent);
