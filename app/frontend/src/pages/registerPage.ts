@@ -1,6 +1,6 @@
 import { attemptRegister } from '../services/authService.js';
 import { RegisterRequestBody } from '../shared/schemas/usersSchemas.js'
-import { ApiResult } from '../utils/types.js'
+import { ApiResult, ApiRegisterSuccessData } from '../utils/types.js'
 import { navigateTo } from '../services/router.js';
 import { t } from '../services/i18nService.js';
 import { HeaderComponent } from '../components/headerComponent.js';
@@ -143,7 +143,7 @@ export async function RegisterPage(): Promise<HTMLElement> {
 			credentials.avatar_url = avatarUrl;
 		}
 
-		const registrationResult: ApiResult = await attemptRegister(credentials);
+		const registrationResult: ApiResult<ApiRegisterSuccessData> = await attemptRegister(credentials);
 
 		registerButton.disabled = false; // Re-enable button
 		registerButton.textContent = t('register.button');

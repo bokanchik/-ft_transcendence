@@ -1,4 +1,3 @@
-// app/frontend/src/components/twoFactorAuthSetup.ts
 import { fetchWithCsrf } from '../services/csrf.js';
 
 interface TwoFactorAuthSetupProps {

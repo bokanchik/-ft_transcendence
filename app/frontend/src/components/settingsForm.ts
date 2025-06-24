@@ -1,10 +1,10 @@
 import { User, UpdateUserPayload } from '../shared/schemas/usersSchemas.js';
-import { ApiResult } from '../utils/types.js';
+import { ApiResult, ApiUpdateUserSuccessData } from '../utils/types.js';
 import { t } from '../services/i18nService.js';
 
 interface ProfileFormProps {
 	user: User;
-	onProfileUpdate: (payload: UpdateUserPayload) => Promise<ApiResult>;
+	onProfileUpdate: (payload: UpdateUserPayload) => Promise<ApiResult<ApiUpdateUserSuccessData>>;
 }
 
 export function SettingsForm(props: ProfileFormProps): HTMLElement {

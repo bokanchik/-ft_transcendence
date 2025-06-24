@@ -1,5 +1,10 @@
-import { fetchWithCsrf } from './csrf.js';
-import { ApiResult } from '../utils/types.js';
+import { fetchWithCsrf, fetchCsrfToken } from './csrf.js';
+import { 
+    ApiResult, 
+    ApiLoginSuccessData, 
+    ApiRegisterSuccessData,
+    ApiUpdateUserSuccessData
+} from '../utils/types.js';
 import {
 	User,
 	UserBaseSchema,
@@ -112,8 +117,10 @@ export async function checkAuthStatus(): Promise<User | null> {
  * Tente de connecter un utilisateur.
  * @param {LoginRequestBody} credentials - Les identifiants de connexion.
  * @returns {Promise<ApiResult>} Un objet indiquant le succès ou l'échec.
+ * @returns {Promise<ApiLoginSuccessResponse>} Un objet indiquant le succès ou l'échec.
+ *
  */
-export async function attemptLogin(credentials: LoginRequestBody): Promise<ApiResult> {
+export async function attemptLogin(credentials: LoginRequestBody): Promise<ApiResult<ApiLoginSuccessData>> {
 	try {
 		const response = await fetch(config.api.auth.login, {
 			method: 'POST',
@@ -123,15 +130,48 @@ export async function attemptLogin(credentials: LoginRequestBody): Promise<ApiRe
 		});
 
 		const data = await handleApiResponse(response, LoginRouteSchema.response);
-		localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.user));
-		// setCsrfToken(data.csrfToken);
-
-		return { success: true, data: { message: data.message, user: data.user } };
-
+		if (data.user) {
+			localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.user));
+			const ttl = 60 * 60 * 1000;
+			localStorage.setItem(USER_DATA_EXPIRATION_KEY, (new Date().getTime() + ttl).toString());
+			await fetchCsrfToken();
+		}
+		return { success: true, data };
 	} catch (error) {
 		const errorMessage = error instanceof Error ? error.message : "Unknown error during login";
-		return { success: false, error: errorMessage };
+		const statusCode = error instanceof ClientApiError ? error.httpStatus : undefined;
+		return { success: false, error: errorMessage, statusCode };
 	}
+}
+
+/**
+ * Vérifie le code 2FA et finalise la connexion.
+ * @param token Le code 2FA à 6 chiffres.
+ * @returns {Promise<ApiResult<ApiLoginSuccessResponse>>} Un objet avec les données utilisateur en cas de succès.
+ */
+export async function verifyTwoFactorLogin(token: string): Promise<ApiResult<ApiLoginSuccessData>> {
+    try {
+        // const response = await fetchWithCsrf('/api/users/2fa/login', {
+        const response = await fetch('/api/users/2fa/login', {
+
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token })
+        });
+        const data = await handleApiResponse(response, LoginRouteSchema.response); // On peut réutiliser le schéma ici aussi
+        
+        if (data.user) {
+            localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.user));
+            const ttl = 60 * 60 * 1000;
+            localStorage.setItem(USER_DATA_EXPIRATION_KEY, (new Date().getTime() + ttl).toString());
+            return { success: true, data };
+        }
+        throw new Error('2FA verification failed to return user data.');
+    } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error during 2FA verification";
+		const statusCode = error instanceof ClientApiError ? error.httpStatus : undefined;
+        return { success: false, error: errorMessage, statusCode };
+    }
 }
 
 /**
@@ -156,8 +196,7 @@ export async function logout(): Promise<void> {
  * @param {RegisterRequestBody} credentials - Les informations d'inscription.
  * @returns {Promise<ApiResult>} Un objet indiquant le succès ou l'échec.
  */
-export async function attemptRegister(credentials: RegisterRequestBody): Promise<ApiResult> {
-	try {
+export async function attemptRegister(credentials: RegisterRequestBody): Promise<ApiResult<ApiRegisterSuccessData>> {	try {
 		const payload = { ...credentials };
 		if (!payload.avatar_url) {
 			delete payload.avatar_url;
@@ -170,7 +209,8 @@ export async function attemptRegister(credentials: RegisterRequestBody): Promise
 		});
 
 		const data = await handleApiResponse(response, RegisterRouteSchema.response);
-		return { success: true, data: { message: data.message, user: {} as User } };
+		// return { success: true, data: { message: data.message, user: {} as User } };
+		return { success: true, data: { message: data.message } };
 
 	} catch (error) {
 		const errorMessage = error instanceof Error ? error.message : "Unknown error during registration";
@@ -183,7 +223,7 @@ export async function attemptRegister(credentials: RegisterRequestBody): Promise
  * @param {UpdateUserPayload} payload - Les données à mettre à jour.
  * @returns {Promise<ApiResult>} Un objet indiquant le succès ou l'échec.
  */
-export async function updateUserProfile(payload: UpdateUserPayload): Promise<ApiResult> {
+export async function updateUserProfile(payload: UpdateUserPayload): Promise<ApiResult<ApiUpdateUserSuccessData>> {
 	const cleanPayload: Partial<UpdateUserPayload> = { ...payload };
 	if (cleanPayload.avatar_url === '') {
 		cleanPayload.avatar_url = null; // Envoyer null pour effacer l'avatar

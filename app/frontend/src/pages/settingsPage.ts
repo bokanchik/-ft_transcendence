@@ -1,7 +1,7 @@
 import { getUserDataFromStorage, updateUserProfile } from '../services/authService.js';
 import { navigateTo } from '../services/router.js';
 import { User, UpdateUserPayload } from '../shared/schemas/usersSchemas.js';
-import { ApiResult } from '../utils/types.js';
+import { ApiResult, ApiUpdateUserSuccessData } from '../utils/types.js';
 import { SettingsForm } from '../components/settingsForm.js';
 import { fetchCsrfToken } from '../services/csrf.js';
 import { t } from '../services/i18nService.js';
@@ -63,7 +63,7 @@ export async function SettingsPage(): Promise<HTMLElement> {
 	title.textContent = t('user.settings.title');
 	contentWrapper.appendChild(title);
 
-	const handleProfileUpdate = async (payload: UpdateUserPayload): Promise<ApiResult> => {
+const handleProfileUpdate = async (payload: UpdateUserPayload): Promise<ApiResult<ApiUpdateUserSuccessData>> => {
 		const result = await updateUserProfile(payload);
 		if (result.success) {
 			console.log('Profile updated in service, local storage should be updated too.');
@@ -120,7 +120,6 @@ export async function SettingsPage(): Promise<HTMLElement> {
                 qrCodeDataURL,
                 onVerified: () => {
                     showToast('2FA enabled successfully!', 'success');
-                    // Mettre à jour l'utilisateur dans le local storage (très important !)
                     const user = getUserDataFromStorage();
                     if (user) {
                         user.is_two_fa_enabled = true;

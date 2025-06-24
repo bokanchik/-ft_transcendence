@@ -1,95 +1,16 @@
-// import { LoginRequestBody } from '../shared/schemas/usersSchemas.js';
-// import { ApiResult } from '../utils/types.js';
-// import { t } from '../services/i18nService.js';
-
-// interface LoginFormProps {
-// 	onLoginAttempt: (credentials: LoginRequestBody) => Promise<ApiResult>;
-// 	onLoginSuccess: (userData: any) => void;
-// }
-
-// export function LoginForm(props: LoginFormProps): HTMLElement {
-// 	const { onLoginAttempt, onLoginSuccess } = props;
-
-// 	const formWrapper = document.createElement('div');
-
-// 	formWrapper.innerHTML = `
-//         <form id="login-form-component">
-//             <div class="mb-4">
-//                 <label for="identifier" class="block text-gray-700 text-sm font-bold mb-2">${t('login.identifierLabel')}</label>
-//                 <input type="text" id="identifier" name="identifier" required placeholder="${t('login.identifierPlaceholder')}"
-//                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-//             </div>
-//             <div class="mb-6">
-//                 <label for="password" class="block text-gray-700 text-sm font-bold mb-2">${t('login.passwordLabel')}</label>
-//                 <input type="password" id="password" name="password" required
-//                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline">
-//             </div>
-//             <div class="flex items-center justify-between">
-//                 <button type="submit" id="login-button"
-//                         class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full transition duration-300 ease-in-out">
-//                     ${t('login.button')}
-//                 </button>
-//             </div>
-//         </form>
-//         <div id="login-message-component" class="mt-4 text-center text-sm"></div>
-//     `;
-
-// 	const form = formWrapper.querySelector('#login-form-component') as HTMLFormElement;
-// 	const identifierInput = formWrapper.querySelector('#identifier') as HTMLInputElement;
-// 	const passwordInput = formWrapper.querySelector('#password') as HTMLInputElement;
-// 	const messageDiv = formWrapper.querySelector('#login-message-component') as HTMLDivElement;
-// 	const loginButton = formWrapper.querySelector('#login-button') as HTMLButtonElement;
-
-// 	form.addEventListener('submit', async (event) => {
-// 		event.preventDefault();
-// 		messageDiv.textContent = t('login.attemptingLogin');
-// 		messageDiv.className = 'mt-4 text-center text-sm text-gray-600';
-// 		loginButton.disabled = true;
-// 		loginButton.textContent = t('login.attemptingLogin');
-
-// 		const identifier = identifierInput.value.trim();
-// 		const password = passwordInput.value;
-
-// 		if (!identifier || !password) {
-// 			messageDiv.textContent = t('login.missingCredentials');
-// 			messageDiv.className = 'mt-4 text-center text-sm text-red-600';
-// 			loginButton.disabled = false;
-// 			loginButton.textContent = t('login.button');
-// 			return;
-// 		}
-
-// 		const result = await onLoginAttempt({ identifier, password });
-
-// 		loginButton.disabled = false;
-// 		loginButton.textContent = t('login.button');
-
-// 		if (result.success) {
-// 			messageDiv.textContent = `${t('login.success')} ${result.data.user.display_name || result.data.user.username}!`;
-// 			messageDiv.className = 'mt-4 text-center text-sm text-green-600';
-// 			onLoginSuccess(result.data.user); // Appeler le callback de succès
-// 		} else {
-// 			messageDiv.textContent = result.error || t('login.invalidCredentials');
-// 			messageDiv.className = 'mt-4 text-center text-sm text-red-600';
-// 			passwordInput.value = '';
-// 		}
-// 	});
-
-// 	return formWrapper;
-// }
-
-
 import { LoginRequestBody, User } from '../shared/schemas/usersSchemas.js';
-import { ApiResult } from '../utils/types.js';
+import { ApiResult, ApiLoginSuccessData } from '../utils/types.js';
 import { t } from '../services/i18nService.js';
-import { showToast } from './toast.js';
-import { fetchWithCsrf } from '../services/csrf.js';
+import { fetchCsrfToken } from '../services/csrf.js';
 
 interface LoginFormProps {
+	onLoginAttempt: (credentials: LoginRequestBody) => Promise<ApiResult<ApiLoginSuccessData>>;
+    on2FAAttempt: (token: string) => Promise<ApiResult<ApiLoginSuccessData>>;
 	onLoginSuccess: (userData: User) => void;
 }
 
 export function LoginForm(props: LoginFormProps): HTMLElement {
-	const { onLoginSuccess } = props;
+	const { onLoginAttempt, on2FAAttempt, onLoginSuccess } = props;
 	const wrapper = document.createElement('div');
 	
 	const renderPasswordStep = () => {
@@ -107,7 +28,7 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
                 </div>
                 <div>
                     <button type="submit" id="login-button" 
-                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50">
+                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50">
                         ${t('login.button')}
                     </button>
                 </div>
@@ -150,27 +71,18 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 		const identifier = (form.elements.namedItem('identifier') as HTMLInputElement).value;
 		const password = (form.elements.namedItem('password') as HTMLInputElement).value;
 
-		try {
-			const response = await fetch('/api/users/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ identifier, password }),
-                credentials: 'include',
-            });
-			const data = await response.json();
+		const result = await onLoginAttempt({ identifier, password });
 
-			if (!response.ok) throw new Error(data.messageKey ? t(data.messageKey, data.messageParams) : data.error);
-
-			if (data.two_fa_required) {
-				renderTwoFactorStep();
-			} else if (data.user) {
-				onLoginSuccess(data.user);
-			}
-
-		} catch (error: any) {
-			if (messageDiv) messageDiv.textContent = error.message;
-			if (button) button.disabled = false;
-		}
+		if (result.success) {
+            if (result.data.two_fa_required) {
+                renderTwoFactorStep();
+            } else if (result.data.user) {
+                onLoginSuccess(result.data.user);
+            }
+        } else {
+            if (messageDiv) messageDiv.textContent = result.error;
+            if (button) button.disabled = false;
+        }
 	};
 
 	const handleTwoFactorSubmit = async (event: Event) => {
@@ -184,21 +96,39 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 
 		const token = (form.elements.namedItem('2fa-token') as HTMLInputElement).value;
 
-		try {
-			const response = await fetchWithCsrf('/api/users/2fa/login', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ token })
-			});
-			const data = await response.json();
-			if (!response.ok) throw new Error(data.messageKey ? t(data.messageKey) : data.error);
+        const result = await on2FAAttempt(token);
 
-			onLoginSuccess(data.user);
-		} catch (error: any) {
-			if (messageDiv) messageDiv.textContent = error.message;
+        if (result.success) {
+            if (result.data.user) {
+                onLoginSuccess(result.data.user);
+            }
+        } else {
+            if (messageDiv) messageDiv.textContent = result.error;
 			if (button) button.disabled = false;
-		}
+        }
 	};
+
+	// 	try {
+	// 		const response = await fetch('/api/users/2fa/login', {
+	// 			method: 'POST',
+	// 			headers: { 'Content-Type': 'application/json' },
+	// 			body: JSON.stringify({ token }),
+    //             credentials: 'include'
+	// 		});
+	// 		const data = await response.json();
+	// 		if (!response.ok) {
+    //             throw new Error(data.messageKey ? t(data.messageKey) : data.error);
+    //         }
+
+    //         // Après un login réussi (y compris 2FA), on récupère le token CSRF pour les futures requêtes.
+    //         await fetchCsrfToken();
+
+	// 		onLoginSuccess(data.user);
+	// 	} catch (error: any) {
+	// 		if (messageDiv) messageDiv.textContent = error.message;
+	// 		if (button) button.disabled = false;
+	// 	}
+	// };
 
 	renderPasswordStep();
 	return wrapper;
