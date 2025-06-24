@@ -13,22 +13,21 @@ export async function registerHandler(req: FastifyRequest<{ Body: RegisterReques
 }
 
 export async function loginHandler(req: FastifyRequest<{ Body: LoginRequestBody }>, reply: FastifyReply) {
-	const userWithSecrets = await loginUser(req.body);
-    if (userWithSecrets.is_two_fa_enabled) {
-        req.session.set('2fa_user_id', userWithSecrets.id);
-        return reply.send({ message: 'Two-factor authentication required.',two_fa_required: true });
+	const user = await loginUser(req.body);
+    if (user.is_two_fa_enabled) {
+        req.session.set('2fa_user_id', user.id);
+        return reply.send({ two_fa_required: true });
     }
-	const tokenPayload: JWTPayload = { id: userWithSecrets.id, username: userWithSecrets.username };
+	const tokenPayload: JWTPayload = { id: user.id, username: user.username };
 	const token = reply.server.jwt.sign(tokenPayload);
 	const decodedToken = reply.server.jwt.decode(token) as { exp: number };
-	await updateUserStatus(userWithSecrets.id, UserOnlineStatus.ONLINE);
+	await updateUserStatus(user.id, UserOnlineStatus.ONLINE);
 
 	reply.setCookie(jwtToken, token, {
 		...cookieOptions,
 		expires: new Date(decodedToken.exp * 1000),
 	});
 
-	const { password_hash, two_fa_secret, ...user } = userWithSecrets;
 	return reply.send({
 		message: 'Login accepted', // to translate
 		user,

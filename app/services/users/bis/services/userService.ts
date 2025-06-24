@@ -18,9 +18,9 @@ function generateDefaultAvatarUrl(name: string): string {
  * @param {string} params.identifier - The username or email of the user.
  * @param {string} params.password - The user's password.
  * @throws {UnauthorizedError} If the credentials are invalid.
- * @returns {Promise<UserWithSecrets>} The full user object with secrets.
+ * @returns {Promise<User>} The user object without the password hash.
  */
-export async function loginUser({ identifier, password }: LoginRequestBody): Promise<UserWithSecrets> {
+export async function loginUser({ identifier, password }: LoginRequestBody): Promise<User> {
 	console.log(`Attempting to log user with identifier: ${identifier}`);
 	let userEntity;
 	const isEmail = identifier.includes('@');
@@ -34,7 +34,8 @@ export async function loginUser({ identifier, password }: LoginRequestBody): Pro
 		throw new UnauthorizedError(ERROR_KEYS.LOGIN_INVALID_CREDENTIALS);
 	}
 
-	return userEntity;
+	const { password_hash, two_fa_secret, ...userPassLess } = userEntity;
+	return userPassLess;
 }
 
 /**
@@ -118,8 +119,8 @@ export async function getUserByIdWithSecrets(userId: number): Promise<UserWithSe
 export async function updateUserProfile(userId: number, updates: UpdateUserPayload): Promise<User> {
 	console.log(`Attempting to update profile for user ID: ${userId}`);
 
-	const currentUserWithSecrets = await userModel.getUserWithSecretsByIdFromDb(userId);
-	if (!currentUserWithSecrets) {
+	const currentUser = await userModel.getUserByIdFromDb(userId);
+	if (!currentUser) {
 		throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND);
 	}
 
@@ -138,14 +139,13 @@ export async function updateUserProfile(userId: number, updates: UpdateUserPaylo
 	for (const key in processedUpdates) {
 		const typedKey = key as keyof UpdateUserPayload;
 		const value = processedUpdates[typedKey];
-		if (value !== null && value !== undefined && value !== currentUserWithSecrets[typedKey]) {
-			(changesToApply as any)[typedKey] = value;
+		if (value !== null && value !== currentUser[typedKey]) {
+			changesToApply[typedKey] = value;
 		}
 	}
 	if (Object.keys(changesToApply).length === 0) {
 		console.log(`No effective changes detected for user ${userId}. Profile remains unchanged.`);
-		const { password_hash, two_fa_secret, ...user } = currentUserWithSecrets;
-		return user;
+		return currentUser;
 	}
 
 	if (changesToApply.display_name && await userModel.isDisplayNameInDb(changesToApply.display_name, userId)) {
@@ -156,7 +156,12 @@ export async function updateUserProfile(userId: number, updates: UpdateUserPaylo
 	}
 
 	try {
-		await userModel.updateUserInDb(userId, changesToApply);
+		const result = await userModel.updateUserInDb(userId, changesToApply);
+		if (!result.changes || result.changes === 0) {
+			const finalUserCheck = await userModel.getUserByIdFromDb(userId);
+			if (!finalUserCheck) throw new NotFoundError(`User ${userId} disappeared after update attempt or no changes made.`);
+			return finalUserCheck;
+		}
 	} catch (dbError: any) {
 		console.error(`Database error during profile update for user ${userId}:`, dbError);
 		throw new Error(`Failed to update profile for user ${userId} due to a database issue.`);
@@ -191,8 +196,8 @@ export async function getUserByEmail(email: string): Promise<User> {
 	if (!userWithHash) {
 		throw new NotFoundError('User not found');
 	}
-	const { password_hash, two_fa_secret, ...user } = userWithHash;
-	return user;
+	const { password_hash, ...user } = userWithHash;
+	return user as User;
 }
 
 /**
@@ -207,6 +212,6 @@ export async function getUserByUsername(username: string): Promise<User> {
 	if (!userWithHash) {
 		throw new NotFoundError('User not found');
 	}
-	const { password_hash, two_fa_secret, ...user } = userWithHash;
-	return user;
+	const { password_hash, ...user } = userWithHash;
+	return user as User;
 }

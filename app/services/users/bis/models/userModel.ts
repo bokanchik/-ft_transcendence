@@ -1,30 +1,13 @@
 import { getDb } from '../utils/dbConfig.js';
 import { User, UserWithSecrets, CreateUserPayload, UpdatedUserResult, UpdateUserPayload, UserOnlineStatus } from '../shared/schemas/usersSchemas.js'; // Importez vos types
 
-function toAppUser(dbUser: any): User {
-    if (!dbUser) return dbUser;
-    return {
-        ...dbUser,
-        is_two_fa_enabled: dbUser.is_two_fa_enabled === 1
-    };
-}
-
-function toAppUserWithSecrets(dbUser: any): UserWithSecrets {
-    if (!dbUser) return dbUser;
-    return {
-        ...dbUser,
-        is_two_fa_enabled: dbUser.is_two_fa_enabled === 1
-    };
-}
-
 /**
  * Retrieves all users from the database.
  * @returns {Promise<User[]>} A list of all users.
  */
 export async function getAllUsersFromDb(): Promise<User[]> {
 	const db = getDb();
-	const users = await db.all<any[]>('SELECT id, username, email, display_name, avatar_url, wins, losses, status, created_at, updated_at, is_two_fa_enabled FROM users');
-    return users.map(toAppUser);
+	return db.all<User[]>('SELECT id, username, email, display_name, avatar_url, wins, losses, status, created_at, updated_at, is_two_fa_enabled FROM users');
 }
 
 /**
@@ -34,8 +17,7 @@ export async function getAllUsersFromDb(): Promise<User[]> {
  */
 export async function getUserByDisplayNameFromDb(displayName: string): Promise<UserWithSecrets | undefined> {
 	const db = getDb();
-	const user = await db.get<any>('SELECT * FROM users WHERE display_name = ?', [displayName]);
-    return user ? toAppUserWithSecrets(user) : undefined;
+	return db.get<UserWithSecrets>('SELECT * FROM users WHERE display_name = ?', [displayName]);
 }
 
 /**
@@ -45,8 +27,7 @@ export async function getUserByDisplayNameFromDb(displayName: string): Promise<U
  */
 export async function getUserByUsernameFromDb(username: string): Promise<UserWithSecrets | undefined> {
 	const db = getDb();
-	const user = await db.get<any>('SELECT * FROM users WHERE username = ?', [username]);
-    return user ? toAppUserWithSecrets(user) : undefined;
+	return db.get<UserWithSecrets>('SELECT * FROM users WHERE username = ?', [username]);
 }
 
 /**
@@ -56,8 +37,7 @@ export async function getUserByUsernameFromDb(username: string): Promise<UserWit
  */
 export async function getUserByEmailFromDb(email: string): Promise<UserWithSecrets | undefined> {
 	const db = getDb();
-	const user = await db.get<any>('SELECT * FROM users WHERE email = ?', [email]);
-    return user ? toAppUserWithSecrets(user) : undefined;
+	return db.get<UserWithSecrets>('SELECT * FROM users WHERE email = ?', [email]);
 }
 
 /**
@@ -67,8 +47,7 @@ export async function getUserByEmailFromDb(email: string): Promise<UserWithSecre
  */
 export async function getUserByIdFromDb(userId: number): Promise<User | undefined> {
 	const db = getDb();
-	const user = await db.get<any>('SELECT id, username, email, display_name, avatar_url, wins, losses, status, created_at, updated_at, is_two_fa_enabled FROM users WHERE id = ?', [userId]);
-    return user ? toAppUser(user) : undefined;
+	return db.get<User>('SELECT id, username, email, display_name, avatar_url, wins, losses, status, created_at, updated_at, is_two_fa_enabled FROM users WHERE id = ?', [userId]);
 }
 
 /**
@@ -78,8 +57,7 @@ export async function getUserByIdFromDb(userId: number): Promise<User | undefine
  */
 export async function getUserWithSecretsByIdFromDb(userId: number): Promise<UserWithSecrets | undefined> {
 	const db = getDb();
-	const user = await db.get<any>('SELECT * FROM users WHERE id = ?', [userId]);
-    return user ? toAppUserWithSecrets(user) : undefined;
+	return db.get<UserWithSecrets>('SELECT * FROM users WHERE id = ?', [userId]);
 }
 
 /**
@@ -109,12 +87,12 @@ export async function createUser(
  */
 export async function updateUserInDb(userId: number, updates: UpdateUserPayload): Promise<UpdatedUserResult> {
 	const db = getDb();
-	const fields = Object.keys(updates).filter(k => (updates as any)[k] !== undefined) as Array<keyof UpdateUserPayload>;
+	const fields = Object.keys(updates).filter(k => typeof k === 'string') as Array<keyof UpdateUserPayload>; // Clés typées
 	if (fields.length === 0) {
 		return { changes: 0 };
 	}
 	const setClause = fields.map((field) => `${String(field)} = ?`).join(', ');
-	const values: (string | number | boolean | null)[] = fields.map((field) => (updates as any)[field]);
+	const values: (string | number)[] = fields.map((field) => updates[field] as string | number);
 
 	const sql = `UPDATE users SET ${setClause}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
 	values.push(userId);
@@ -141,6 +119,7 @@ export async function deleteUserFromDb(userId: number): Promise<void> {
 	const db = getDb();
 	const result = await db.run('DELETE FROM users WHERE id = ?', [userId]);
 	if (result.changes === 0) {
+		// throw new Error(ERROR_MESSAGES.USER_NOT_FOUND);
 		throw new Error(`User with ID ${userId} not found for deletion.`);
 	}
 }
