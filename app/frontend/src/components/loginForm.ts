@@ -1,7 +1,6 @@
 import { LoginRequestBody, User } from '../shared/schemas/usersSchemas.js';
 import { ApiResult, ApiLoginSuccessData } from '../utils/types.js';
 import { t } from '../services/i18nService.js';
-import { fetchCsrfToken } from '../services/csrf.js';
 
 interface LoginFormProps {
 	onLoginAttempt: (credentials: LoginRequestBody) => Promise<ApiResult<ApiLoginSuccessData>>;
@@ -41,15 +40,15 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 	const renderTwoFactorStep = () => {
 		wrapper.innerHTML = `
             <form id="2fa-form-component" class="space-y-6">
-                <h3 class="text-xl font-semibold text-center text-gray-800">Two-Factor Authentication</h3>
+                <h3 class="text-xl font-semibold text-center text-gray-800">${t('login.2fa.title')}</h3>
                 <div>
-                    <label for="2fa-token" class="block text-sm font-medium text-gray-700">Enter the 6-digit code from your authenticator app</label>
+                    <label for="2fa-token" class="block text-sm font-medium text-gray-700">${t('login.2fa.instruction')}</label>
                     <input type="text" id="2fa-token" name="2fa-token" required autocomplete="one-time-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6"
                            class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-center tracking-[1em]">
                 </div>
                 <div>
                     <button type="submit" id="2fa-button" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50">
-                        Verify
+                        ${t('login.2fa.button')}
                     </button>
                 </div>
             </form>
@@ -66,7 +65,7 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 		const messageDiv = wrapper.querySelector<HTMLDivElement>('#login-message-component');
 
 		if (button) button.disabled = true;
-		if (messageDiv) messageDiv.textContent = 'Logging in...';
+		if (messageDiv) messageDiv.textContent = t('login.attemptingLogin');
 
 		const identifier = (form.elements.namedItem('identifier') as HTMLInputElement).value;
 		const password = (form.elements.namedItem('password') as HTMLInputElement).value;
@@ -92,7 +91,7 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 		const messageDiv = wrapper.querySelector<HTMLDivElement>('#login-message-component');
 
 		if (button) button.disabled = true;
-		if (messageDiv) messageDiv.textContent = 'Verifying...';
+		if (messageDiv) messageDiv.textContent = t('login.2fa.verifying');
 
 		const token = (form.elements.namedItem('2fa-token') as HTMLInputElement).value;
 
@@ -107,28 +106,6 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 			if (button) button.disabled = false;
         }
 	};
-
-	// 	try {
-	// 		const response = await fetch('/api/users/2fa/login', {
-	// 			method: 'POST',
-	// 			headers: { 'Content-Type': 'application/json' },
-	// 			body: JSON.stringify({ token }),
-    //             credentials: 'include'
-	// 		});
-	// 		const data = await response.json();
-	// 		if (!response.ok) {
-    //             throw new Error(data.messageKey ? t(data.messageKey) : data.error);
-    //         }
-
-    //         // Après un login réussi (y compris 2FA), on récupère le token CSRF pour les futures requêtes.
-    //         await fetchCsrfToken();
-
-	// 		onLoginSuccess(data.user);
-	// 	} catch (error: any) {
-	// 		if (messageDiv) messageDiv.textContent = error.message;
-	// 		if (button) button.disabled = false;
-	// 	}
-	// };
 
 	renderPasswordStep();
 	return wrapper;

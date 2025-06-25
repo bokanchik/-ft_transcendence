@@ -70,7 +70,13 @@
 		"attemptingLogin": "Tentative de connexion...",
 		"success": "Connexion réussie ! Bienvenue",
 		"invalidCredentials": "Identifiants invalides. Veuillez réessayer.",
-		"missingCredentials": "Entrer votre nom d'utilisateur/email et mot de passe."
+		"missingCredentials": "Entrer votre nom d'utilisateur/email et mot de passe.",
+		"2fa": {
+			"title": "Authentification à deux facteurs",
+			"instruction": "Entrez le code à 6 chiffres de votre application d'authentification.",
+			"button": "Vérifier",
+			"verifying": "Vérification en cours..."
+		}
 	},
 	"friend": {
 		"list": {

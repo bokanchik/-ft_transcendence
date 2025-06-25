@@ -158,7 +158,7 @@ export async function verifyTwoFactorLogin(token: string): Promise<ApiResult<Api
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ token })
         });
-        const data = await handleApiResponse(response, LoginRouteSchema.response); // On peut réutiliser le schéma ici aussi
+        const data = await handleApiResponse(response, LoginRouteSchema.response);
         
         if (data.user) {
             localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.user));

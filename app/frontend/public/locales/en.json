@@ -70,7 +70,13 @@
 		"attemptingLogin": "Attempting to Login...",
 		"success": "Login successful! Welcome",
 		"invalidCredentials": "Invalid credentials. Please try again.",
-		"missingCredentials": "Please enter your username/email and password."
+		"missingCredentials": "Please enter your username/email and password.",
+		"2fa": {
+			"title": "Two-Factor Authentication",
+			"instruction": "Enter the 6-digit code from your authenticator app.",
+			"button": "Verify",
+			"verifying": "Verifying..."
+		}
 	},
 	"friend": {
 		"list": {
