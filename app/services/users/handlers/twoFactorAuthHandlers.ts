@@ -26,6 +26,12 @@ export async function verify2FAHandler(req: FastifyRequest, reply: FastifyReply)
     }
 }
 
+export async function disable2FAHandler(req: FastifyRequest, reply: FastifyReply) {
+    const user = req.user as JWTPayload;
+    await twoFactorAuthService.disableTwoFactor(user.id);
+    reply.send({ message: '2FA has been disabled.' });
+}
+
 export async function login2FAHandler(req: FastifyRequest, reply: FastifyReply) {
     const { token } = req.body as { token: string };
     const userId = req.session.get('2fa_user_id');
