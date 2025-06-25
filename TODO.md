@@ -22,7 +22,8 @@
 - [ ] grafana/dashboards
 - [x] env
 - [x] fichiers partagés
-- [ ] tout traduire
+- [x] tout traduire
+- [ ] Vérifier les traductions
 - [x] La gestion d'erreurs 
 - [ ] nettoyage
 - [x] Route pour update win loses / Permissions pour faire ca ? -> pour l'instant n'importe qui d'identifié -> /api/users/:userId/stats en envoyant result: win/lose
