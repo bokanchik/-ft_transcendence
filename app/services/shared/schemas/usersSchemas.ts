@@ -88,6 +88,18 @@ export const LoginRouteSchema = {
     }
 };
 
+// --- CSRF TOKEN ---
+export const GetCsrfTokenResponseSchema = z.object({
+    csrfToken: z.string(),
+});
+
+export const GetCsrfTokenRouteSchema = {
+    response: {
+        200: GetCsrfTokenResponseSchema,
+        500: ErrorResponseSchema // En cas d'erreur de génération du token
+    }
+};
+
 // LOGIN WITH 2FA
 export const Login2FARouteSchema = {
     response: {

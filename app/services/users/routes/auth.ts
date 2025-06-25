@@ -58,4 +58,11 @@ export default async function authRoute(fastify: FastifyInstance, options: Fasti
 			handler: tfah.login2FAHandler
 		},
 	);
+	fastify.get(
+        config.URL_CSRF,
+        {
+            schema: as.GetCsrfTokenRouteSchema,
+            handler: ah.getCsrfTokenHandler
+        }
+    );
 }

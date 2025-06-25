@@ -6,8 +6,7 @@ declare module 'fastify' {
   export interface FastifyRequest {
     user: JWTPayload;
   }
-  // export interface Session extends FastifySessionObject {
-  //   '2fa_user_id'?: number;
-  //   userId?: number;
-  // }
+  export interface FastifyReply {
+    generateCsrf: (options?: { userInfo?: string }) => Promise<string>;
+  }
 }

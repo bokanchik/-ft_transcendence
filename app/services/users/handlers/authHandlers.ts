@@ -12,6 +12,12 @@ export async function registerHandler(req: FastifyRequest<{ Body: RegisterReques
 	});
 }
 
+export async function getCsrfTokenHandler(req: FastifyRequest, reply: FastifyReply) {
+    const token: string = await reply.generateCsrf();
+    req.log.debug(`[CSRF Endpoint] CSRF token provided to client: ${token}`);
+    return reply.send({ csrfToken: token });
+}
+
 export async function loginHandler(req: FastifyRequest<{ Body: LoginRequestBody }>, reply: FastifyReply) {
 	const userWithSecrets = await loginUser(req.body);
 

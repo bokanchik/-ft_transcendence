@@ -3,7 +3,6 @@ import { JWTPayload } from '../schemas/usersSchemas.js';
 import { config } from '../env.js';
 import fastifyJwt from '@fastify/jwt';
 import fastifyCookie, { CookieSerializeOptions } from '@fastify/cookie';
-// import fastifySession from '@fastify/session';
 import fastifyCsrfProtection from '@fastify/csrf-protection';
 
 export const jwtToken: string = 'jwt_token';
@@ -13,7 +12,6 @@ export const cookieOptions: CookieSerializeOptions = {
 	path: '/',
 	httpOnly: true,
 	secure: true,
-	// secure: config.NODE_ENV === 'production',
 	sameSite: 'strict',
 	maxAge: 60 * 60 * 24 * 7,
 };
@@ -22,7 +20,6 @@ export const csrfOptions: CookieSerializeOptions = {
 	path: '/',
 	httpOnly: true,
 	secure: true,
-	// secure: config.NODE_ENV === 'production',
 	sameSite: 'lax',
 	signed: true,
 	maxAge: 60 * 60 * 24 * 7,
@@ -30,11 +27,6 @@ export const csrfOptions: CookieSerializeOptions = {
 
 export async function setupPlugins(fastify: FastifyInstance): Promise<void> {
 	await registerCookiePlugin(fastify);
-	// await fastify.register(fastifySession, {
-	// 	secret: config.SESSION_SECRET,
-	// 	cookie: cookieOptions,
-	// 	saveUninitialized: false,
-	// });
 	await registerJWTPlugin(fastify);
 	authenticateDecorator(fastify);
 	await registerCsrfPlugin(fastify);
@@ -97,7 +89,6 @@ declare module 'fastify' {
 		user: JWTPayload;
 	}
 }
-
 
 declare module '@fastify/jwt' {
 	interface FastifyJWT {

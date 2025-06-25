@@ -84,12 +84,4 @@ export default async function friendRoutes(fastify: FastifyInstance, options: Fa
 			handler: fh.unblockUserHandler
 		},
 	);
-	// fastify.get(
-	// 	config.URL_FRIEND_BLOCKED,
-	// 	{
-	// 		onRequest: [fastify.authenticate],
-	// 		schema: GetBlockedUsersRouteSchema,
-	// 		handler: getBlockedUsersHandler
-	// 	},
-	// );
 };
