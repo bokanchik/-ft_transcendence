@@ -73,7 +73,6 @@ export async function handleApiResponse(
             }
         } else {
             errorMessage = t('error.general.malformedResponse');
-            // errorMessage = `Erreur HTTP ${response.status}: La réponse d'erreur du serveur est mal formée.`;
             console.error("Zod validation failed on error response:", parsedError.error);
         }
       } else {

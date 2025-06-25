@@ -24,7 +24,7 @@ import {
 	Generate2FAResponse
 } from '../shared/schemas/usersSchemas.js';
 import { Match, GetMatchByUserIdRouteSchema } from '../shared/schemas/matchesSchemas.js';
-import { handleApiResponse, ClientApiError } from './error.js';
+import { handleApiResponse, ClientApiError } from './responseService.js';
 import { config } from '../utils/config.js';
 
 // Clés pour le localStorage

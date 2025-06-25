@@ -20,7 +20,7 @@ import { HeaderComponent } from '../components/headerComponent.js';
 import { showToast } from '../components/toast.js';
 import { MatchHistoryComponent } from '../components/matchHistoryComponent.js';
 import { t } from '../services/i18nService.js';
-import { translateResultMessage } from '../services/error.js';
+import { translateResultMessage } from '../services/responseService.js';
 
 export async function DashboardPage(): Promise<HTMLElement> {
 	const currentUser: User | null = getUserDataFromStorage();

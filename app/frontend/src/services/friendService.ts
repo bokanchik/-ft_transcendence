@@ -7,7 +7,7 @@ import {
 	FriendshipActionRouteSchema,
 } from '../shared/schemas/friendsSchemas.js';
 import { config } from '../utils/config.js';
-import { handleApiResponse } from './error.js';
+import { handleApiResponse } from './responseService.js';
 
 /**
  * Retrieves the friend requests received by the logged-in user.
