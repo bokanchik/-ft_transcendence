@@ -27,6 +27,7 @@
 - [x] La gestion d'erreurs 
 - [ ] nettoyage
 - [x] Route pour update win loses / Permissions pour faire ca ? -> pour l'instant n'importe qui d'identifié -> /api/users/:userId/stats en envoyant result: win/lose
+- [ ] Droit admin pour la route update win/lose
 - [x] Header partout
 
 ## 📌 Tâches initiales
@@ -39,8 +40,7 @@
 - [ ] Create Data Models + put match to DB (how we're handling data for score, etc ? -> local variable sent with socket to front
 at the end of a match -> call to database if need matchhistory)
 - [ ] La gestion d'erreurs 
-- [ ] Implementer les models pour les appels a la base de donnee
-- [ ] POST a Artur avec les donnees du match
+- [x] POST a Artur avec les donnees du match -> route pour les recuperer
 - [ ] Uniformiser les module et mduleResolution dans tsconfig.json
 
 ---

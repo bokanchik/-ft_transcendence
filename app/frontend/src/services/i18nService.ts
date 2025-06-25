@@ -1,7 +1,6 @@
 import { router } from '../main.js';
 
-let currentLanguage: string = 'en'; // by default
-// let translations: Record<string, string> = {};
+let currentLanguage: string = 'en';
 let translations: Record<string, any> = {};
 const supportedLanguages = ['fr', 'en'];
 
@@ -15,7 +14,6 @@ async function loadTranslations(lang: string): Promise<void> {
         console.log(`Translations for '${lang}' loaded.`);
     } catch (error) {
         console.error(error);
-        // Fallback to default language if loading fails
         if (lang !== 'fr') {
             await loadTranslations('fr');
         }
@@ -26,10 +24,8 @@ async function loadTranslations(lang: string): Promise<void> {
  * Initialise le service i18n. Doit être appelé au démarrage de l'application.
  */
 export async function initI18n(): Promise<void> {
-    // 1. Tente de récupérer la langue depuis le localStorage
     let lang = localStorage.getItem('language');
 
-    // 2. Sinon, utilise la langue du navigateur si elle est supportée
     if (!lang) {
         const browserLang = navigator.language.split('-')[0];
         if (supportedLanguages.includes(browserLang)) {
@@ -37,11 +33,9 @@ export async function initI18n(): Promise<void> {
         }
     }
 
-    // 3. Sinon, utilise la langue par défaut ('fr')
-    currentLanguage = lang || 'fr';
+    currentLanguage = lang || 'en';
     localStorage.setItem('language', currentLanguage);
 
-    // Charge les traductions initiales
     await loadTranslations(currentLanguage);
 }
 
@@ -73,28 +67,16 @@ export function getLanguage(): string {
  * @param replacements Un objet pour les remplacements dynamiques (ex: { username: "John" }).
  * @returns La chaîne traduite.
  */
-// export function t(key: string, replacements?: Record<string, string>): string {
-//     let translation = translations[key] || key; // Retourne la clé si la traduction n'est pas trouvée
-
-//     if (replacements) {
-//         for (const placeholder in replacements) {
-//             translation = translation.replace(`{${placeholder}}`, replacements[placeholder]);
-//         }
-//     }
-//     return translation;
-// }
 export function t(key: string, replacements?: Record<string, string>): string {
-    // On divise la clé par les points
     const keys = key.split('.');
     
-    // On parcourt l'objet translations en utilisant les parties de la clé
     let result = keys.reduce((acc, currentKey) => {
         // acc est l'objet/valeur accumulé, on vérifie qu'il existe et qu'il a la clé suivante
         if (acc && typeof acc === 'object' && acc.hasOwnProperty(currentKey)) {
             return acc[currentKey];
         }
-        return undefined; // Si une clé n'est pas trouvée, on retourne undefined
-    }, translations as any); // On caste translations en 'any' pour le reduce initial
+        return undefined;
+    }, translations as any);
 
     // Si on a trouvé une traduction (et que ce n'est pas un objet mais bien une string)
     if (typeof result === 'string') {

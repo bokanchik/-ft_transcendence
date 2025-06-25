@@ -156,8 +156,6 @@ export async function attemptLogin(credentials: LoginRequestBody): Promise<ApiRe
  */
 export async function verifyTwoFactorLogin(token: string): Promise<ApiResult<ApiLoginSuccessData>> {
     try {
-        // const response = await fetchWithCsrf('/api/users/2fa/login', {
-        // const response = await fetch('/api/users/2fa/login', {
 		const response = await fetch(config.api.users.twoFa.login, {
 
             method: 'POST',
