@@ -29,6 +29,7 @@
 			"error": "Erreur lors de l'enregistrement des modifications.",
 			"denied": "Accès refusé.",
 			"deniedMsg": "Vous devez être connecté pour accéder à cette page.",
+			"profileInfoTitle": "Identité",
 			"securityTitle": "Paramètres de sécurité",
 			"enable2FA": "Activer l'authentification à deux facteurs",
 			"disable2FA": "Désactiver l'authentification à deux facteurs",

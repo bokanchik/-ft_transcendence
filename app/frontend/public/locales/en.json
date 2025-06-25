@@ -29,6 +29,7 @@
 			"error": "Error saving changes.",
 			"denied": "Access denied.",
 			"deniedMsg": "You must be logged in to access this page.",
+			"profileInfoTitle": "Identity",
 			"securityTitle": "Security Settings",
 			"enable2FA": "Enable Two-Factor Authentication",
 			"disable2FA": "Disable Two-Factor Authentication",
