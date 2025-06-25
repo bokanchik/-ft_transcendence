@@ -69,12 +69,26 @@ export async function SettingsPage(): Promise<HTMLElement> {
 		return result;
 	};
 
+    const handleVerifyAndEnable2FA = async (token: string): Promise<{ message: string }> => {
+        const result = await verify2FASetup(token);
+        console.log('2FA enabled, redirecting to dashboard.');
+        setTimeout(() => { navigateTo('/dashboard'); }, 500);
+        return result;
+    };
+
+    const handleDisable2FA = async (): Promise<{ message: string }> => {
+        const result = await disable2FA();
+        console.log('2FA disabled, redirecting to dashboard.');
+        setTimeout(() => { navigateTo('/dashboard'); }, 500);
+        return result;
+    };
+
     const settingsFormComponent = SettingsForm({
         user: user,
         onProfileUpdate: handleProfileUpdate,
         onGenerate2FA: generate2FASetup,
-        onVerifyAndEnable2FA: verify2FASetup,
-        onDisable2FA: disable2FA,
+        onVerifyAndEnable2FA: handleVerifyAndEnable2FA,
+        onDisable2FA: handleDisable2FA,
     });
     contentWrapper.appendChild(settingsFormComponent);
 
