@@ -180,3 +180,41 @@ export const JWTPayloadSchema = z.object({
 });
 export type JWTPayload = z.infer<typeof JWTPayloadSchema>;
 
+// --- 2FA Schemas ---
+export const Generate2FAResponseSchema = z.object({
+    qrCodeDataURL: z.string().url(),
+});
+export type Generate2FAResponse = z.infer<typeof Generate2FAResponseSchema>;
+
+export const Verify2FABodySchema = z.object({
+    token: z.string().length(6, "Token must be 6 digits.").regex(/^\d+$/),
+});
+export type Verify2FABodySchema = z.infer<typeof Verify2FABodySchema>;
+
+export const MessageResponseSchema = z.object({ message: z.string() });
+
+export const Generate2FARouteSchema = {
+    response: {
+        200: Generate2FAResponseSchema,
+        401: ErrorResponseSchema,
+        500: ErrorResponseSchema,
+    }
+};
+
+export const Verify2FARouteSchema = {
+    body: Verify2FABodySchema,
+    response: {
+        200: MessageResponseSchema,
+        400: ErrorResponseSchema,
+        401: ErrorResponseSchema,
+        500: ErrorResponseSchema,
+    }
+};
+
+export const Disable2FARouteSchema = {
+    response: {
+        200: MessageResponseSchema,
+        401: ErrorResponseSchema,
+        500: ErrorResponseSchema,
+    }
+};
