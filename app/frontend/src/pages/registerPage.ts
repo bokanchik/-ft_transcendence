@@ -145,13 +145,13 @@ export async function RegisterPage(): Promise<HTMLElement> {
 
 		const registrationResult: ApiResult<ApiRegisterSuccessData> = await attemptRegister(credentials);
 
-		registerButton.disabled = false; // Re-enable button
+		registerButton.disabled = false;
 		registerButton.textContent = t('register.button');
 
 		if (registrationResult.success) {
-			messageDiv.textContent = t('register.succes');
+			messageDiv.textContent = t('register.success');
 			messageDiv.className = 'mt-4 text-center text-sm text-green-600';
-			form.reset(); // Clear the form fields
+			form.reset();
 			setTimeout(() => { navigateTo('/login'); }, 500);
 
 		} else {

@@ -120,8 +120,8 @@ export const UpdateUserBodySchema = z.object({
     email: UserBaseSchema.shape.email.optional(),
     display_name: UserBaseSchema.shape.display_name.optional(),
     avatar_url: UserBaseSchema.shape.avatar_url.optional(),
-    is_two_fa_enabled: z.boolean().optional(),
-    two_fa_secret: z.string().nullable().optional(),
+    is_two_fa_enabled: UserBaseSchema.shape.is_two_fa_enabled.optional(),
+    two_fa_secret: UserWithSecretsSchema.shape.two_fa_secret.optional(),
 }).refine(data => Object.keys(data).length > 0, {
     message: "At least one change."
 });

@@ -79,66 +79,66 @@ const handleProfileUpdate = async (payload: UpdateUserPayload): Promise<ApiResul
 	contentWrapper.appendChild(profileFormComponent);
 
 	// 2fa section
-    const twoFactorSection = document.createElement('div');
-    twoFactorSection.className = 'mt-8 border-t pt-6';
-    contentWrapper.appendChild(twoFactorSection);
+    // const twoFactorSection = document.createElement('div');
+    // twoFactorSection.className = 'mt-8 border-t pt-6';
+    // contentWrapper.appendChild(twoFactorSection);
     
-    const twoFactorContent = document.createElement('div');
-    twoFactorSection.appendChild(twoFactorContent);
+    // const twoFactorContent = document.createElement('div');
+    // twoFactorSection.appendChild(twoFactorContent);
 
-    const update2FA_UI = () => {
-        twoFactorContent.innerHTML = '';
-        const freshUserData = getUserDataFromStorage();
+    // const update2FA_UI = () => {
+    //     twoFactorContent.innerHTML = '';
+    //     const freshUserData = getUserDataFromStorage();
 
-        twoFactorContent.innerHTML = `
-            <h2 class="text-xl font-semibold mb-2">Two-Factor Authentication</h2>
-        `;
+    //     twoFactorContent.innerHTML = `
+    //         <h2 class="text-xl font-semibold mb-2">Two-Factor Authentication</h2>
+    //     `;
 
-        if (freshUserData?.is_two_fa_enabled) {
-            twoFactorContent.innerHTML += `
-                <p class="text-green-600 mb-4">2FA is enabled.</p>
-                <button id="disable-2fa-btn" class="bg-red-600 ...">Disable 2FA</button>
-            `;
-            // TODO: Ajouter la logique pour le bouton de désactivation
-        } else {
-            twoFactorContent.innerHTML += `
-                <p class="text-gray-600 mb-4">Add an extra layer of security to your account.</p>
-                <button id="enable-2fa-btn" class="bg-indigo-600 ...">Enable 2FA</button>
-            `;
-            twoFactorContent.querySelector('#enable-2fa-btn')?.addEventListener('click', start2FASetup);
-        }
-    };
+    //     if (freshUserData?.is_two_fa_enabled) {
+    //         twoFactorContent.innerHTML += `
+    //             <p class="text-green-600 mb-4">2FA is enabled.</p>
+    //             <button id="disable-2fa-btn" class="bg-red-600 ...">Disable 2FA</button>
+    //         `;
+    //         // TODO: Ajouter la logique pour le bouton de désactivation
+    //     } else {
+    //         twoFactorContent.innerHTML += `
+    //             <p class="text-gray-600 mb-4">Add an extra layer of security to your account.</p>
+    //             <button id="enable-2fa-btn" class="bg-indigo-600 ...">Enable 2FA</button>
+    //         `;
+    //         twoFactorContent.querySelector('#enable-2fa-btn')?.addEventListener('click', start2FASetup);
+    //     }
+    // };
     
-    const start2FASetup = async () => {
-        try {
-            twoFactorContent.innerHTML = `<p>Generating QR Code...</p>`;
-            const response = await fetchWithCsrf('/api/users/2fa/generate', { method: 'POST' });
-            if (!response.ok) throw new Error('Could not generate 2FA setup.');
-            const { qrCodeDataURL } = await response.json();
+    // const start2FASetup = async () => {
+    //     try {
+    //         twoFactorContent.innerHTML = `<p>Generating QR Code...</p>`;
+    //         const response = await fetchWithCsrf('/api/users/2fa/generate', { method: 'POST' });
+    //         if (!response.ok) throw new Error('Could not generate 2FA setup.');
+    //         const { qrCodeDataURL } = await response.json();
 
-            const setupComponent = TwoFactorAuthSetup({
-                qrCodeDataURL,
-                onVerified: () => {
-                    showToast('2FA enabled successfully!', 'success');
-                    const user = getUserDataFromStorage();
-                    if (user) {
-                        user.is_two_fa_enabled = true;
-                        localStorage.setItem('userDataKey', JSON.stringify(user));
-                    }
-                    update2FA_UI();
-                },
-                onCancel: () => update2FA_UI()
-            });
+    //         const setupComponent = TwoFactorAuthSetup({
+    //             qrCodeDataURL,
+    //             onVerified: () => {
+    //                 showToast('2FA enabled successfully!', 'success');
+    //                 const user = getUserDataFromStorage();
+    //                 if (user) {
+    //                     user.is_two_fa_enabled = true;
+    //                     localStorage.setItem('userDataKey', JSON.stringify(user));
+    //                 }
+    //                 update2FA_UI();
+    //             },
+    //             onCancel: () => update2FA_UI()
+    //         });
 
-            twoFactorContent.innerHTML = '';
-            twoFactorContent.appendChild(setupComponent);
-        } catch (error) {
-            showToast((error as Error).message, 'error');
-            update2FA_UI();
-        }
-    };
+    //         twoFactorContent.innerHTML = '';
+    //         twoFactorContent.appendChild(setupComponent);
+    //     } catch (error) {
+    //         showToast((error as Error).message, 'error');
+    //         update2FA_UI();
+    //     }
+    // };
 
-    update2FA_UI();
+    // update2FA_UI();
 
 	const backLink = document.createElement('a');
 	backLink.href = '/dashboard';
