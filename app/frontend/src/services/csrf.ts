@@ -1,3 +1,5 @@
+import { config } from '../utils/config.js';
+
 export let csrfToken: string | null = null;
 
 export function setCsrfToken(token: string) {
@@ -26,7 +28,7 @@ export async function fetchWithCsrf(url: string, options: RequestInit = {}): Pro
 
 export async function fetchCsrfToken() {
 	try {
-		const response = await fetch('/api/users/csrf-token', { credentials: 'include' });
+		const response = await fetch(config.api.auth.csrf, { credentials: 'include' });
 		if (!response.ok) throw new Error('Failed to fetch CSRF token');
 		const data = await response.json();
 		csrfToken = data.csrfToken;

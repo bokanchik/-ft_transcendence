@@ -12,8 +12,6 @@ interface ProfileFormProps {
 
 export function SettingsForm(props: ProfileFormProps): HTMLElement {
 	const { user, onProfileUpdate, onGenerate2FA, onVerifyAndEnable2FA, onDisable2FA } = props;
-
-	// Création d'une copie de l'utilisateur pour ne pas muter l'original directement
 	let currentUserState = { ...user };
 
 	const formElement = document.createElement('form');
@@ -90,7 +88,6 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
         </div>
     `;
 
-	// --- Récupération des éléments du DOM ---
 	const emailInput = formElement.querySelector('#email') as HTMLInputElement;
 	const displayNameInput = formElement.querySelector('#display_name') as HTMLInputElement;
 	const avatarUrlInput = formElement.querySelector('#avatar_url') as HTMLInputElement;
@@ -102,7 +99,6 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
     const twoFaTokenInput = formElement.querySelector('#two_fa_token') as HTMLInputElement;
     const qrCodeContainer = formElement.querySelector('#qr-code-container') as HTMLDivElement;
 
-	// --- Logique 2FA ---
 	twoFaCheckbox.checked = currentUserState.is_two_fa_enabled;
 
 	twoFaCheckbox.addEventListener('change', async () => {
@@ -127,7 +123,6 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 		}
 	});
 
-	// --- Logique de soumission du formulaire ---
 	formElement.addEventListener('submit', async (event) => {
 		event.preventDefault();
 		messageDiv.textContent = '';
@@ -144,20 +139,18 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 		let twoFaUpdateSuccess = false;
 
 		try {
-			// --- 1. Gérer la logique 2FA d'abord ---
 			if (newTwoFaState !== currentUserState.is_two_fa_enabled) {
-				if (newTwoFaState) { // Activation
+				if (newTwoFaState) {
 					if (!twoFaToken || !/^\d{6}$/.test(twoFaToken)) {
 						throw new Error(t('user.settings.2faTokenInvalid'));
 					}
 					await onVerifyAndEnable2FA(twoFaToken);
-				} else { // Désactivation
+				} else {
 					await onDisable2FA();
 				}
 				twoFaUpdateSuccess = true;
 			}
 			
-			// --- 2. Gérer la mise à jour des autres infos de profil ---
 			const profilePayload: UpdateUserPayload = {};
 			if (updatedEmail !== currentUserState.email) profilePayload.email = updatedEmail;
 			if (updatedDisplayName !== currentUserState.display_name) profilePayload.display_name = updatedDisplayName;
@@ -168,19 +161,14 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 				if (!result.success) {
 					throw new Error(result.error);
 				}
-				// Mettre à jour l'état local avec les données de l'API
 				currentUserState = { ...currentUserState, ...result.data.user };
 				profileUpdateSuccess = true;
 			}
-
-			// --- 3. Afficher le message de succès final ---
 			if (profileUpdateSuccess || twoFaUpdateSuccess) {
-				// Mettre à jour l'état 2FA après une action réussie
 				currentUserState.is_two_fa_enabled = newTwoFaState;
 				messageDiv.textContent = t('user.settings.success');
 				messageDiv.className = 'mb-4 text-center text-sm text-green-600 font-semibold min-h-[1.25rem]';
 				
-				// Actualiser les champs du formulaire avec le nouvel état
 				emailInput.value = currentUserState.email;
 				displayNameInput.value = currentUserState.display_name;
 				avatarUrlInput.value = currentUserState.avatar_url || '';

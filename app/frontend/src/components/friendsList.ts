@@ -1,4 +1,3 @@
-// /components/friendsList.ts
 import { Friend } from '../shared/schemas/friendsSchemas.js';
 import { UserOnlineStatus } from '../shared/schemas/usersSchemas.js';
 import { navigateTo } from '../services/router.js';

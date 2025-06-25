@@ -1,5 +1,3 @@
-// app/frontend/conf/services/config.ts
-
 const USER_API_PREFIX = '/api/users';
 const GAME_API_PREFIX = '/api/game';
 

@@ -1,4 +1,3 @@
-// app/frontend/conf/utils/domUtils.ts
 import { showToast } from "../components/toast.js";
 
 export function createElement<K extends keyof HTMLElementTagNameMap>(

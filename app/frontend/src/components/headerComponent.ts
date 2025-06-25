@@ -22,14 +22,11 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 	// --- Left side: Language Button ---
 	const leftSection = document.createElement('div');
 	const langButton = document.createElement('button');
-	// langButton.className = 'bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-5 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75';
-	// langButton.textContent = getLanguage() === 'fr' ? 'EN' : 'FR';
 	
 	// Flags
 	langButton.className = 'flex items-center justify-center p-1.5 rounded-full transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75';
 	
 	const flagImg = document.createElement('img');
-	// flagImg.className = 'w-10 h-auto object-contain rounded-md shadow-sm';
 	flagImg.className = 'h-8 w-auto object-contain rounded-md shadow-sm';
 
 	const updateFlag = () => {
