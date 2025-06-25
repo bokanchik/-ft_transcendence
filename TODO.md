@@ -16,7 +16,8 @@
 - [x] Réponse schemas
 - [x] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde) -> cookie jwt_token
 - [x] httpOnly cookie for server-side ? -> yes
-- [ ] 2FA
+- [x] 2FA
+- [ ] enable 2FA dans register page
 - [x] grafana
 - [ ] grafana/dashboards
 - [x] env
@@ -56,7 +57,7 @@ at the end of a match -> call to database if need matchhistory)
 - [ ] Ajouter des tests d’intégration (communication entre services)
 
 ---
-Implicit conversion of a 'symbol' to a 'string' will fail at runtime. Consider wrapping this expression in 'String(...)'.ts(2731)
+
 ## 🛠️ Observabilité & DevOps
 
 - [ ] Ajouter des logs lisibles et structurés dans chaque service
