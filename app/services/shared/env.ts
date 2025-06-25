@@ -27,6 +27,7 @@ const envSchema = z.object({
 
 	URL_ALL_USERS: z.string().min(1, "URL_ALL_USERS is required"),
 	URL_USER: z.string().min(1, "URL_USER is required"),
+	URL_USER_STATS: z.string().min(1, "URL_USER_STATS is required"),
 	URL_USER_ME: z.string().min(1, "URL_USER_ME is required"),
 	URL_USER_MATCH: z.string().min(1, "URL_USER_MATCH is required"),
 	URL_REGISTER: z.string().min(1, "URL_REGISTER is required"),

@@ -235,3 +235,28 @@ export const Disable2FARouteSchema = {
         500: ErrorResponseSchema,
     }
 };
+
+// UPDATE USER STATS
+export const UpdateUserStatsBodySchema = z.object({
+    result: z.enum(['win', 'loss'], {
+        required_error: "Result required.",
+        invalid_type_error: "Result must be 'win' or 'loss'."
+    })
+});
+export type UpdateUserStatsBody = z.infer<typeof UpdateUserStatsBodySchema>;
+
+export const UpdateUserStatsRouteSchema = {
+    params: UserIdParamsSchema,
+    body: UpdateUserStatsBodySchema,
+    response: {
+        200: z.object({
+            message: z.string(),
+            user: UserBaseSchema
+        }),
+        400: ErrorResponseSchema,
+        401: ErrorResponseSchema,
+        403: ErrorResponseSchema,
+        404: ErrorResponseSchema,
+        500: ErrorResponseSchema
+    }
+};

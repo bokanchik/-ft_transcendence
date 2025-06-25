@@ -25,7 +25,7 @@
 - [ ] tout traduire
 - [x] La gestion d'erreurs 
 - [ ] nettoyage
-- [ ] Route pour update win loses / Permissions pour faire ca ?
+- [x] Route pour update win loses / Permissions pour faire ca ? -> pour l'instant n'importe qui d'identifié -> /api/users/:userId/stats en envoyant result: win/lose
 - [x] Header partout
 
 ## 📌 Tâches initiales

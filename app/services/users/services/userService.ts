@@ -1,7 +1,7 @@
 import * as userModel from '../models/userModel.js';
 import * as passwordUtils from '../utils/pswdUtils.js';
 import { ERROR_KEYS, ConflictError, UnauthorizedError, NotFoundError } from '../utils/appError.js';
-import { User, UserWithSecrets, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, CreateUserPayload, UserOnlineStatus } from '../shared/schemas/usersSchemas.js';
+import { User, UserWithSecrets, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, CreateUserPayload, UserOnlineStatus, UpdateUserStatsBody } from '../shared/schemas/usersSchemas.js';
 
 /**
  * Generates a default avatar URL using ui-avatars.com.
@@ -209,4 +209,31 @@ export async function getUserByUsername(username: string): Promise<User> {
 	}
 	const { password_hash, two_fa_secret, ...user } = userWithHash;
 	return user;
+}
+
+/**
+ * Met à jour les statistiques de victoire/défaite pour un utilisateur.
+ * @param {number} userId - L'ID de l'utilisateur.
+ * @param {UpdateUserStatsBody} statsUpdate - L'objet contenant le résultat du match.
+ * @throws {NotFoundError} Si l'utilisateur n'existe pas.
+ * @returns {Promise<User>} L'objet utilisateur mis à jour.
+ */
+export async function updateUserStats(userId: number, statsUpdate: UpdateUserStatsBody): Promise<User> {
+    console.log(`Attempting to update stats for user ID: ${userId} with result: ${statsUpdate.result}`);
+
+    const userExists = await userModel.getUserByIdFromDb(userId);
+    if (!userExists) {
+        throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND);
+    }
+    
+    await userModel.incrementUserStatsInDb(userId, statsUpdate.result);
+    
+    const updatedUser = await userModel.getUserByIdFromDb(userId);
+    if (!updatedUser) {
+        // Ce cas est improbable si les étapes précédentes ont réussi, mais c'est une bonne pratique de le gérer.
+        throw new Error(`Failed to retrieve user ${userId} immediately after successful stats update.`);
+    }
+
+    console.log(`Stats updated successfully for user ID: ${userId}. New stats: W=${updatedUser.wins}, L=${updatedUser.losses}`);
+    return updatedUser;
 }

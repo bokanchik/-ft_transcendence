@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import * as uh from '../handlers/userHandlers.js';
 import { config } from '../shared/env.js';
-import { UpdateUserRouteSchema, GetUserByIdRouteSchema, GetUsersListRouteSchema, GetMeRouteSchema } from '../shared/schemas/usersSchemas.js';
+import * as us from '../shared/schemas/usersSchemas.js';
 
 
 export default async function userRoutes(fastify: FastifyInstance, options: FastifyPluginOptions) {
@@ -9,7 +9,7 @@ export default async function userRoutes(fastify: FastifyInstance, options: Fast
 		config.URL_ALL_USERS,
 		{
 			onRequest: [fastify.authenticate],
-			schema: GetUsersListRouteSchema,
+			schema: us.GetUsersListRouteSchema,
 			handler: uh.getUsersHandler
 		},
 	);
@@ -17,7 +17,7 @@ export default async function userRoutes(fastify: FastifyInstance, options: Fast
 		config.URL_USER_ME,
 		{
 			onRequest: [fastify.authenticate],
-			schema: GetMeRouteSchema,
+			schema: us.GetMeRouteSchema,
 			handler: uh.getUserMeHandler
 		},
 	);
@@ -25,7 +25,7 @@ export default async function userRoutes(fastify: FastifyInstance, options: Fast
 		config.URL_USER,
 		{
 			onRequest: [fastify.authenticate],
-			schema: GetUserByIdRouteSchema,
+			schema: us.GetUserByIdRouteSchema,
 			handler: uh.getUserInfoHandler
 		},
 	);
@@ -33,8 +33,16 @@ export default async function userRoutes(fastify: FastifyInstance, options: Fast
 		config.URL_USER_ME,
 		{
 			onRequest: [fastify.authenticate, fastify.csrfProtection],
-			schema: UpdateUserRouteSchema,
+			schema: us.UpdateUserRouteSchema,
 			handler: uh.updateUserMeHandler
 		},
 	);
+	fastify.patch(
+        config.URL_USER_STATS,
+        {
+            onRequest: [fastify.authenticate, fastify.csrfProtection], // Sécurisée comme les autres mises à jour
+            schema: us.UpdateUserStatsRouteSchema,
+            handler: uh.updateUserStatsHandler
+        }
+    );
 }

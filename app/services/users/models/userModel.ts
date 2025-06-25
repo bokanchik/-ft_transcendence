@@ -183,3 +183,33 @@ export async function isDisplayNameInDb(display_name: string, id?: number): Prom
 	const row = await db.get<{ exists: number }>(query, params);
 	return row?.exists === 1;
 }
+
+/**
+ * Incrémente le compteur de victoires ou de défaites d'un utilisateur dans la base de données.
+ * @param {number} userId - L'ID de l'utilisateur à mettre à jour.
+ * @param {'win' | 'loss'} result - Le résultat du match.
+ * @returns {Promise<UpdatedUserResult>} Le résultat de l'opération de la base de données.
+ */
+export async function incrementUserStatsInDb(userId: number, result: 'win' | 'loss'): Promise<UpdatedUserResult> {
+    const db = getDb();
+    const columnToUpdate = result === 'win' ? 'wins' : 'losses';
+
+    // On utilise `??` pour s'assurer que columnToUpdate ne sera jamais une valeur non autorisée,
+    // même si c'est déjà garanti par le type. C'est une sécurité supplémentaire contre l'injection SQL.
+    if (!['wins', 'losses'].includes(columnToUpdate)) {
+        throw new Error('Invalid column name for stats update.');
+    }
+
+    const sql = `UPDATE users SET ${columnToUpdate} = ${columnToUpdate} + 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
+
+    try {
+        const dbResult = await db.run(sql, [userId]);
+        if (dbResult.changes === 0) {
+            throw new Error(`User with ID ${userId} not found for stats update.`);
+        }
+        return { changes: dbResult.changes };
+    } catch (error: any) {
+        console.error('Error updating user stats:', error);
+        throw error;
+    }
+}
