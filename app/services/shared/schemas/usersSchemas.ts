@@ -88,6 +88,23 @@ export const LoginRouteSchema = {
     }
 };
 
+// LOGIN WITH 2FA
+export const Login2FARouteSchema = {
+    response: {
+        200: z.object({
+            message: z.string(),
+            user: UserBaseSchema.optional(),
+            two_fa_required: z.boolean().optional(),
+        }).refine(data => data.user || data.two_fa_required, {
+            message: "Either user data or two-factor authentication requirement must be present."
+        }),
+        400: ErrorResponseSchema,
+        401: ErrorResponseSchema,
+        403: ErrorResponseSchema,
+        500: ErrorResponseSchema
+    }
+};
+
 export const LogoutRouteSchema = {
     response: {
         200: z.object({ message: z.string()}),

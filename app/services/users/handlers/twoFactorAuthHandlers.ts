@@ -49,8 +49,9 @@ export async function login2FAHandler(req: FastifyRequest, reply: FastifyReply) 
     const isValid = authenticator.verify({ token, secret: user.two_fa_secret });
 
     if (isValid) {
-        req.session.set('userId', user.id);
+        // req.session.set('userId', user.id);
         req.session.set('2fa_user_id', undefined);
+        await req.session.save();
 
         const tokenPayload: JWTPayload = { id: user.id, username: user.username };
         const jwt = reply.server.jwt.sign(tokenPayload);
@@ -63,7 +64,10 @@ export async function login2FAHandler(req: FastifyRequest, reply: FastifyReply) 
         });
 
 	    const { password_hash, two_fa_secret, ...userPassLess } = user;
-        return reply.send({ user: userPassLess });
+        return reply.send({
+            message: "Login with 2FA successful",
+            user: userPassLess,
+        });
     } else {
         throw new UnauthorizedError(ERROR_KEYS.LOGIN_INVALID_CREDENTIALS);
     }

@@ -28,7 +28,7 @@ export default async function authRoute(fastify: FastifyInstance, options: Fasti
 		},
 	);
 	fastify.post(
-		'/api/users/2fa/generate',
+		config.URL_2FA_GENERATE,
 		{
 			onRequest: [fastify.authenticate, fastify.csrfProtection],
 			schema: as.Generate2FARouteSchema,
@@ -36,7 +36,7 @@ export default async function authRoute(fastify: FastifyInstance, options: Fasti
 		},
 	);
 	fastify.post(
-		'/api/users/2fa/verify',
+		config.URL_2FA_VERIFY,
 		{
 			onRequest: [fastify.authenticate, fastify.csrfProtection],
 			schema: as.Verify2FARouteSchema,
@@ -44,7 +44,7 @@ export default async function authRoute(fastify: FastifyInstance, options: Fasti
 		},
 	);
 	fastify.post(
-		'/api/users/2fa/disable',
+		config.URL_2FA_DISABLE,
 		{
 			onRequest: [fastify.authenticate, fastify.csrfProtection],
 			schema: as.Disable2FARouteSchema,
@@ -52,8 +52,9 @@ export default async function authRoute(fastify: FastifyInstance, options: Fasti
 		},
 	);
 	fastify.post(
-		'/api/users/2fa/login',
+		config.URL_2FA_LOGIN,
 		{
+			schema: as.Login2FARouteSchema,
 			handler: tfah.login2FAHandler
 		},
 	);

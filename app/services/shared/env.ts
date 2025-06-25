@@ -24,6 +24,7 @@ const envSchema = z.object({
 	COOKIE_SECRET: z.string().min(1, "COOKIE_SECRET is required"),
 	SESSION_SECRET: z.string().min(1, "SESSION_SECRET is required"),
 	API_USER_PORT: z.coerce.number().int().positive().default(4000),
+
 	URL_ALL_USERS: z.string().min(1, "URL_ALL_USERS is required"),
 	URL_USER: z.string().min(1, "URL_USER is required"),
 	URL_USER_ME: z.string().min(1, "URL_USER_ME is required"),
@@ -31,6 +32,13 @@ const envSchema = z.object({
 	URL_REGISTER: z.string().min(1, "URL_REGISTER is required"),
 	URL_LOGIN: z.string().min(1, "URL_LOGIN is required"),
 	URL_LOGOUT: z.string().min(1, "URL_LOGOUT is required"),
+
+	URL_CSRF: z.string().min(1, "URL_CSRF is required"),
+	URL_2FA_GENERATE: z.string().min(1, "URL_2FA is required"),
+	URL_2FA_VERIFY: z.string().min(1, "URL_2FA_VERIFY is required"),
+	URL_2FA_DISABLE: z.string().min(1, "URL_2FA_DISABLE is required"),
+	URL_2FA_LOGIN: z.string().min(1, "URL_2FA_LOGIN is required"),
+
 	URL_FRIEND_REQUEST: z.string().min(1, "URL_FRIEND_REQUEST is required"),
 	URL_FRIEND_RECEIVED: z.string().min(1, "URL_FRIEND_RECEIVED is required"),
 	URL_FRIEND_SENT: z.string().min(1, "URL_FRIEND_SENT is required"),

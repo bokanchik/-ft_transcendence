@@ -16,6 +16,7 @@ export async function loginHandler(req: FastifyRequest<{ Body: LoginRequestBody 
 	const userWithSecrets = await loginUser(req.body);
     if (userWithSecrets.is_two_fa_enabled) {
         req.session.set('2fa_user_id', userWithSecrets.id);
+		await req.session.save();
         return reply.send({ message: 'Two-factor authentication required.',two_fa_required: true });
     }
 	const tokenPayload: JWTPayload = { id: userWithSecrets.id, username: userWithSecrets.username };

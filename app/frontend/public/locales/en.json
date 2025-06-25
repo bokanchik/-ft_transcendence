@@ -28,7 +28,16 @@
 			"success": "Changes saved successfully!",
 			"error": "Error saving changes.",
 			"denied": "Access denied.",
-			"deniedMsg": "You must be logged in to access this page."
+			"deniedMsg": "You must be logged in to access this page.",
+			"securityTitle": "Security Settings",
+			"enable2FA": "Enable Two-Factor Authentication",
+			"disable2FA": "Disable Two-Factor Authentication",
+			"2faSetupInstructions": "To enable Two-Factor Authentication, scan the QR code with your authenticator app and enter the 6-digit code below.",
+			"verificationCode": "Verification Code",
+			"2faTokenHelp": "Enter the 6-digit code from your authenticator app.",
+			"qrCodeAlt": "Scan this QR code with your authenticator app to set up Two-Factor Authentication.",
+			"qrCodeError": "Error generating QR code. Please try again later.",
+			"2faTokenInvalid": "Invalid verification code. Please try again."
 		}
 	},
 	"register": {

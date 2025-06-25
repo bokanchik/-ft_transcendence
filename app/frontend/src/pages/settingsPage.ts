@@ -1,4 +1,4 @@
-import { getUserDataFromStorage, updateUserProfile } from '../services/authService.js';
+import { getUserDataFromStorage, updateUserProfile, generate2FASetup, verify2FASetup, disable2FA } from '../services/authService.js';
 import { navigateTo } from '../services/router.js';
 import { User, UpdateUserPayload } from '../shared/schemas/usersSchemas.js';
 import { ApiResult, ApiUpdateUserSuccessData } from '../utils/types.js';
@@ -6,9 +6,6 @@ import { SettingsForm } from '../components/settingsForm.js';
 import { fetchCsrfToken } from '../services/csrf.js';
 import { t } from '../services/i18nService.js';
 import { HeaderComponent } from '../components/headerComponent.js';
-import { TwoFactorAuthSetup } from '../components/twoFactorAuthSetup.js';
-import { showToast } from '../components/toast.js';
-import { fetchWithCsrf } from '../services/csrf.js';
 
 export async function SettingsPage(): Promise<HTMLElement> {
 	const user: User | null = getUserDataFromStorage();
@@ -63,7 +60,7 @@ export async function SettingsPage(): Promise<HTMLElement> {
 	title.textContent = t('user.settings.title');
 	contentWrapper.appendChild(title);
 
-const handleProfileUpdate = async (payload: UpdateUserPayload): Promise<ApiResult<ApiUpdateUserSuccessData>> => {
+    const handleProfileUpdate = async (payload: UpdateUserPayload): Promise<ApiResult<ApiUpdateUserSuccessData>> => {
 		const result = await updateUserProfile(payload);
 		if (result.success) {
 			console.log('Profile updated in service, local storage should be updated too.');
@@ -72,73 +69,14 @@ const handleProfileUpdate = async (payload: UpdateUserPayload): Promise<ApiResul
 		return result;
 	};
 
-	const profileFormComponent = SettingsForm({
-		user: user,
-		onProfileUpdate: handleProfileUpdate,
-	});
-	contentWrapper.appendChild(profileFormComponent);
-
-	// 2fa section
-    // const twoFactorSection = document.createElement('div');
-    // twoFactorSection.className = 'mt-8 border-t pt-6';
-    // contentWrapper.appendChild(twoFactorSection);
-    
-    // const twoFactorContent = document.createElement('div');
-    // twoFactorSection.appendChild(twoFactorContent);
-
-    // const update2FA_UI = () => {
-    //     twoFactorContent.innerHTML = '';
-    //     const freshUserData = getUserDataFromStorage();
-
-    //     twoFactorContent.innerHTML = `
-    //         <h2 class="text-xl font-semibold mb-2">Two-Factor Authentication</h2>
-    //     `;
-
-    //     if (freshUserData?.is_two_fa_enabled) {
-    //         twoFactorContent.innerHTML += `
-    //             <p class="text-green-600 mb-4">2FA is enabled.</p>
-    //             <button id="disable-2fa-btn" class="bg-red-600 ...">Disable 2FA</button>
-    //         `;
-    //         // TODO: Ajouter la logique pour le bouton de désactivation
-    //     } else {
-    //         twoFactorContent.innerHTML += `
-    //             <p class="text-gray-600 mb-4">Add an extra layer of security to your account.</p>
-    //             <button id="enable-2fa-btn" class="bg-indigo-600 ...">Enable 2FA</button>
-    //         `;
-    //         twoFactorContent.querySelector('#enable-2fa-btn')?.addEventListener('click', start2FASetup);
-    //     }
-    // };
-    
-    // const start2FASetup = async () => {
-    //     try {
-    //         twoFactorContent.innerHTML = `<p>Generating QR Code...</p>`;
-    //         const response = await fetchWithCsrf('/api/users/2fa/generate', { method: 'POST' });
-    //         if (!response.ok) throw new Error('Could not generate 2FA setup.');
-    //         const { qrCodeDataURL } = await response.json();
-
-    //         const setupComponent = TwoFactorAuthSetup({
-    //             qrCodeDataURL,
-    //             onVerified: () => {
-    //                 showToast('2FA enabled successfully!', 'success');
-    //                 const user = getUserDataFromStorage();
-    //                 if (user) {
-    //                     user.is_two_fa_enabled = true;
-    //                     localStorage.setItem('userDataKey', JSON.stringify(user));
-    //                 }
-    //                 update2FA_UI();
-    //             },
-    //             onCancel: () => update2FA_UI()
-    //         });
-
-    //         twoFactorContent.innerHTML = '';
-    //         twoFactorContent.appendChild(setupComponent);
-    //     } catch (error) {
-    //         showToast((error as Error).message, 'error');
-    //         update2FA_UI();
-    //     }
-    // };
-
-    // update2FA_UI();
+    const settingsFormComponent = SettingsForm({
+        user: user,
+        onProfileUpdate: handleProfileUpdate,
+        onGenerate2FA: generate2FASetup,
+        onVerifyAndEnable2FA: verify2FASetup,
+        onDisable2FA: disable2FA,
+    });
+    contentWrapper.appendChild(settingsFormComponent);
 
 	const backLink = document.createElement('a');
 	backLink.href = '/dashboard';

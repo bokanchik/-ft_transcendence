@@ -28,7 +28,16 @@
 			"success": "Modifications enregistrées avec succès !",
 			"error": "Erreur lors de l'enregistrement des modifications.",
 			"denied": "Accès refusé.",
-			"deniedMsg": "Vous devez être connecté pour accéder à cette page."
+			"deniedMsg": "Vous devez être connecté pour accéder à cette page.",
+			"securityTitle": "Paramètres de sécurité",
+			"enable2FA": "Activer l'authentification à deux facteurs",
+			"disable2FA": "Désactiver l'authentification à deux facteurs",
+			"2faSetupInstructions": "Pour activer l'authentification à deux facteurs, scannez le code QR avec votre application d'authentification et entrez le code à 6 chiffres ci-dessous.",
+			"verificationCode": "Code de vérification",
+			"2faTokenHelp": "Entrez le code à 6 chiffres de votre application d'authentification.",
+			"qrCodeAlt": "Scannez ce code QR avec votre application d'authentification pour configurer l'authentification à deux facteurs.",
+			"qrCodeError": "Erreur lors de la génération du code QR. Veuillez réessayer plus tard.",
+			"2faTokenInvalid": "Code de vérification invalide. Veuillez réessayer."
 		}
 	},
 	"register": {

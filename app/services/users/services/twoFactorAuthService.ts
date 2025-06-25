@@ -32,14 +32,12 @@ export async function verifyAndEnableTwoFactor(userId: number, token: string): P
     const user = await userModel.getUserWithSecretsByIdFromDb(userId);
 
     if (!user || !user.two_fa_secret) {
-        // Cet état ne devrait pas arriver dans un flux normal.
         throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND);
     }
     
     const isValid = authenticator.verify({ token, secret: user.two_fa_secret });
 
     if (isValid) {
-        // Le token est valide, on active définitivement la 2FA.
         await userModel.updateUserInDb(userId, { is_two_fa_enabled: true });
         return true;
     }
@@ -59,7 +57,6 @@ export async function disableTwoFactor(userId: number): Promise<void> {
         throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND);
     }
 
-    // On efface le secret et on désactive la 2FA
     await userModel.updateUserInDb(userId, { 
         is_two_fa_enabled: false,
         two_fa_secret: null 

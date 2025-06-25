@@ -162,7 +162,8 @@ export async function verifyTwoFactorLogin(token: string): Promise<ApiResult<Api
 
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token })
+            body: JSON.stringify({ token }),
+			credentials: 'include',
         });
         const data = await handleApiResponse(response, LoginRouteSchema.response);
         
