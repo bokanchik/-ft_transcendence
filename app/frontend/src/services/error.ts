@@ -32,6 +32,14 @@ export class ClientApiError extends Error {
   }
 }
 
+export function translateResultMessage(
+  message: string,
+  params?: Record<string, any>
+): string {
+  if (!message) return t('error.general.unknown');
+  return t(message, params);
+}
+
 /**
  * Gère une réponse de l'API, valide le corps avec le schéma Zod approprié
  * en fonction du code de statut HTTP, et gère les erreurs.

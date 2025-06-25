@@ -20,6 +20,7 @@ import { HeaderComponent } from '../components/headerComponent.js';
 import { showToast } from '../components/toast.js';
 import { MatchHistoryComponent } from '../components/matchHistoryComponent.js';
 import { t } from '../services/i18nService.js';
+import { translateResultMessage } from '../services/error.js';
 
 export async function DashboardPage(): Promise<HTMLElement> {
 	const currentUser: User | null = getUserDataFromStorage();
@@ -125,25 +126,25 @@ export async function DashboardPage(): Promise<HTMLElement> {
 
 	const handleSendFriendRequest = async (targetUserId: number) => {
 		const result = await sendFriendRequest(targetUserId);
-		showToast(result.message);
+		showToast(translateResultMessage(result.message), 'success');
 		if (activeTabId === 'users' || activeTabId === 'pending') await loadActiveTabContent(); // Recharger si l'onglet users ou pending est actif
 	};
 
 	const handleCancelFriendRequest = async (friendshipId: number) => {
 		const result = await cancelFriendRequest(friendshipId);
-		showToast(result.message);
+		showToast(translateResultMessage(result.message), 'success');
 		if (activeTabId === 'users' || activeTabId === 'pending') await loadActiveTabContent();
 	};
 
 	const handleAcceptFriendRequest = async (friendshipId: number) => {
 		const result = await acceptFriendRequest(friendshipId);
-		showToast(result.message, 'success');
+		showToast(translateResultMessage(result.message), 'success');
 		if (['users', 'pending', 'friends'].includes(activeTabId)) await loadActiveTabContent();
 	};
 
 	const handleDeclineFriendRequest = async (friendshipId: number) => {
 		const result = await declineFriendRequest(friendshipId);
-		showToast(result.message, 'success');
+		showToast(translateResultMessage(result.message), 'success');
 		if (activeTabId === 'users' || activeTabId === 'pending') await loadActiveTabContent();
 	};
 
@@ -202,7 +203,7 @@ export async function DashboardPage(): Promise<HTMLElement> {
 			friends: friends,
 			onRemoveFriend: async (friendshipId) => {
 				const result = await removeFriend(friendshipId);
-				showToast(result.message);
+				showToast(translateResultMessage(result.message), 'success');
 				if (['friends', 'users'].includes(activeTabId)) await loadActiveTabContent();
 			},
 		});

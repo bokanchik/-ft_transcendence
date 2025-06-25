@@ -8,7 +8,7 @@ export async function sendFriendRequestHandler(req: FastifyRequest, reply: Fasti
 	req.log.info({ requesterId, friendId }, 'Attempting to send friend request');
 	const newFriendship = await friendService.sendFriendRequest(requesterId, friendId);
 	return reply.code(201).send({
-		message: 'Friend request sent successfully.',
+		message: 'friend.requestSent',
 		friendship: newFriendship
 	});
 }
@@ -58,7 +58,7 @@ export async function getMyFriendsHandler(req: FastifyRequest, reply: FastifyRep
 	return reply.send(friends);
 }
 
-export async function removeFriendshipHandler( req: FastifyRequest, reply: FastifyReply ) {
+export async function removeFriendshipHandler(req: FastifyRequest, reply: FastifyReply) {
 	const currentUserId = (req.user as JWTPayload).id;
 	const friendshipId = parseInt((req.params as any).friendshipId, 10);
 	req.log.info({ currentUserId, friendshipId }, 'Attempting to remove friendship');

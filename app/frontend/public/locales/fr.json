@@ -47,7 +47,6 @@
 		"passwordSpec": "Au moins 8 caractères, max 20.",
 		"confirmPassword": "Confirmer le mot de passe",
 		"avatarUrl": "URL de l'avatar (Optionnel)",
-		"avatarSpec": "Doit être une URL d'image valide.",
 		"button": "S'inscrire",
 		"loginLink": "Vous avez déjà un compte ? Se connecter",
 		"fieldsRequired": "Veuillez remplir tous les champs requis.",
@@ -120,8 +119,8 @@
 		"requestReceived": "Demande d'ami reçue",
 		"requestAccepted": "Demande d'ami acceptée",
 		"requestDeclined": "Demande d'ami refusée",
-		"cancelRequest": "Annuler la demande",
-		"requestRemoved": "Demande d'ami supprimée",
+		"requestCanceled": "Demande d'ami annulée",
+		"requestRemoved": "Ami supprimé",
 		"alreadyFriends": "Vous êtes déjà amis",
 		"notFriends": "Vous n'êtes pas amis",
 		"status": {
@@ -208,6 +207,15 @@
 		}
 	},
 	"msg": {
+		"auth": {
+			"loginSuccess": "Connexion réussie ! Bienvenue",
+			"logoutSuccess": "Déconnexion réussie.",
+			"registerSuccess": "Inscription réussie ! Redirection vers la page de connexion...",
+			"registerError": "Erreur lors de l'inscription :",
+			"loginError": "Erreur lors de la connexion :",
+			"loadingUserData": "Chargement des données utilisateur...",
+			"loadingProfile": "Chargement du profil utilisateur..."
+		},
 		"redirect": {
 			"login": "Redirection vers la page de connexion...",
 			"dashboard": "Redirection vers le tableau de bord...",

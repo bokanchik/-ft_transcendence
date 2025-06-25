@@ -47,7 +47,6 @@
 		"passwordSpec": "At least 8 characters, max 20.",
 		"confirmPassword": "Confirm Password",
 		"avatarUrl": "Avatar URL (Optional)",
-		"avatarSpec": "Must be a valid image URL.",
 		"button": "Register",
 		"loginLink": "Already have an account? Login",
 		"fieldsRequired": "Please fill in all required fields.",
@@ -120,8 +119,8 @@
 		"requestReceived": "Friend request received",
 		"requestAccepted": "Friend request accepted",
 		"requestDeclined": "Friend request declined",
-		"cancelRequest": "Cancel request",
-		"requestRemoved": "Friend request removed",
+		"requestCanceled": "Friend request canceled",
+		"requestRemoved": "Friend removed",
 		"alreadyFriends": "You are already friends",
 		"notFriends": "You are not friends",
 		"status": {

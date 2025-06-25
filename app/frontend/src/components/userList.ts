@@ -98,10 +98,10 @@ export function UserList(props: UserListProps): HTMLElement {
 			friendshipStatus.textContent = t('friend.status.friend');
 			friendshipStatus.className += ' text-green-600 font-semibold';
 		} else if (sentRequestToThisUser) {
-			friendshipStatus.textContent = t('friend.notFriends');
+			friendshipStatus.textContent = t('friend.requestSent');
 			friendshipStatus.className += ' text-yellow-600';
 			actionButton = createActionButton({
-				text: t('friend.cancelRequest'),
+				text: t('friend.cancel'),
 				variant: 'warning',
 				onClick: () => onCancelRequest(sentRequestToThisUser.friendship_id)
 			});

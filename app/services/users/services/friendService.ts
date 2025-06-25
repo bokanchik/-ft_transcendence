@@ -75,7 +75,7 @@ export async function acceptFriendRequest(friendshipId: number, currentUserId: n
 	if (result.changes === 0) {
 		throw new Error('Failed to accept friend request, database reported no changes.');
 	}
-	return { message: 'Friend request accepted.' };
+	return { message: 'friend.requestAccepted' };
 }
 
 /**
@@ -99,14 +99,14 @@ export async function declineOrCancelFriendRequest(friendshipId: number, current
 	let actionMessage = '';
 	if (friendship.status === 'pending') {
 		if (friendship.initiator_id === currentUserId) {
-			actionMessage = 'Friend request cancelled.';
+			actionMessage = 'friend.requestCanceled';
 		} else {
-			actionMessage = 'Friend request declined.';
+			actionMessage = 'friend.requestDeclined';
 		}
 		await friendModel.deleteFriendshipInDb(friendshipId);
 	} else if (friendship.status === 'accepted') {
 		await friendModel.deleteFriendshipInDb(friendshipId);
-		actionMessage = 'Friend removed successfully.';
+		actionMessage = 'friend.requestRemoved';
 	} else {
 		await friendModel.deleteFriendshipInDb(friendshipId);
 		actionMessage = `Friendship with status '${friendship.status}' removed.`;
@@ -176,7 +176,7 @@ export async function removeFriendship(friendshipId: number, currentUserId: numb
 	if (result.changes === 0) {
 		throw new Error('Failed to remove friend, database reported no changes.');
 	}
-	return { message: 'Friend removed successfully.' };
+	return { message: 'friend.requestRemoved' };
 }
 
 /**
