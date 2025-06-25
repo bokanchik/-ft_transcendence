@@ -9,7 +9,6 @@ import userRoutes from './routes/users.js';
 import authRoutes from './routes/auth.js';
 
 
-// const fastify: FastifyInstance = Fastify({ logger: { level: config.LOG_LEVEL } });
 const fastify: FastifyInstance = Fastify({ logger: { level: config.LOG_LEVEL } }).withTypeProvider<ZodTypeProvider>();
 
 fastify.setValidatorCompiler(validatorCompiler);

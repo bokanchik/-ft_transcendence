@@ -14,11 +14,23 @@ export async function registerHandler(req: FastifyRequest<{ Body: RegisterReques
 
 export async function loginHandler(req: FastifyRequest<{ Body: LoginRequestBody }>, reply: FastifyReply) {
 	const userWithSecrets = await loginUser(req.body);
-    if (userWithSecrets.is_two_fa_enabled) {
-        req.session.set('2fa_user_id', userWithSecrets.id);
-		await req.session.save();
-        return reply.send({ message: 'Two-factor authentication required.',two_fa_required: true });
+
+	if (userWithSecrets.is_two_fa_enabled) {
+        const tempTokenPayload = { id: userWithSecrets.id, username: userWithSecrets.username, scope: '2fa-pending' };
+        const tempToken = reply.server.jwt.sign(tempTokenPayload, { expiresIn: '5m' });
+
+        reply.setCookie('jwt_temp_2fa', tempToken, {
+            ...cookieOptions,
+            maxAge: 5 * 60, // 5 minutes
+            sameSite: 'strict',
+        });
+
+        return reply.send({ 
+            message: 'Two-factor authentication required.',
+            two_fa_required: true,
+        });
     }
+
 	const tokenPayload: JWTPayload = { id: userWithSecrets.id, username: userWithSecrets.username };
 	const token = reply.server.jwt.sign(tokenPayload);
 	const decodedToken = reply.server.jwt.decode(token) as { exp: number };
@@ -41,6 +53,7 @@ export async function logoutHandler(req: FastifyRequest, reply: FastifyReply) {
 	await updateUserStatus(id, UserOnlineStatus.OFFLINE);
 	reply.clearCookie(jwtToken, cookieOptions);
 	reply.clearCookie(csrfCookieName, csrfOptions);
+	reply.clearCookie('jwt_temp_2fa', { path: '/' });
 	return reply.send({ message: 'Logout successful' }); // to translate
 }
 

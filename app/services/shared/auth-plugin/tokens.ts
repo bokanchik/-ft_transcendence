@@ -3,7 +3,7 @@ import { JWTPayload } from '../schemas/usersSchemas.js';
 import { config } from '../env.js';
 import fastifyJwt from '@fastify/jwt';
 import fastifyCookie, { CookieSerializeOptions } from '@fastify/cookie';
-import fastifySession from '@fastify/session';
+// import fastifySession from '@fastify/session';
 import fastifyCsrfProtection from '@fastify/csrf-protection';
 
 export const jwtToken: string = 'jwt_token';
@@ -30,11 +30,11 @@ export const csrfOptions: CookieSerializeOptions = {
 
 export async function setupPlugins(fastify: FastifyInstance): Promise<void> {
 	await registerCookiePlugin(fastify);
-	await fastify.register(fastifySession, {
-		secret: config.SESSION_SECRET,
-		cookie: cookieOptions,
-		saveUninitialized: false,
-	});
+	// await fastify.register(fastifySession, {
+	// 	secret: config.SESSION_SECRET,
+	// 	cookie: cookieOptions,
+	// 	saveUninitialized: false,
+	// });
 	await registerJWTPlugin(fastify);
 	authenticateDecorator(fastify);
 	await registerCsrfPlugin(fastify);
