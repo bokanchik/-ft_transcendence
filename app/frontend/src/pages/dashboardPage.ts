@@ -1,5 +1,5 @@
 import { navigateTo } from '../services/router.js';
-import { getUserDataFromStorage } from '../services/authService.js';
+import { getUserDataFromStorage, fetchUsers, checkAuthStatus } from '../services/authService.js';
 import { fetchCsrfToken } from '../services/csrf.js';
 import { User } from '../shared/schemas/usersSchemas.js';
 import {
@@ -12,7 +12,6 @@ import {
 	sendFriendRequest,
 	removeFriend,
 } from '../services/friendService.js';
-import { fetchUsers } from '../services/authService.js';
 import { FriendsListComponent } from '../components/friendsList.js';
 import { FriendRequestsComponent } from '../components/friendRequests.js';
 import { UserList, UserListProps } from '../components/userList.js';
@@ -23,7 +22,7 @@ import { t } from '../services/i18nService.js';
 import { translateResultMessage } from '../services/responseService.js';
 
 export async function DashboardPage(): Promise<HTMLElement> {
-	const currentUser: User | null = getUserDataFromStorage();
+	let currentUser: User | null = getUserDataFromStorage();
 
 	if (!currentUser) {
 		navigateTo('/login');
@@ -57,6 +56,16 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	const sidebar = document.createElement('div');
 	sidebar.className = 'w-1/4 p-6 bg-gray-50 border-r border-gray-200 space-y-3 overflow-y-auto';
 
+    function populateSidebar(user: User) {
+        sidebar.innerHTML = '';
+        sidebar.appendChild(createSidebarItem(t('user.username'), user.username));
+        sidebar.appendChild(createSidebarItem(t('user.displayName'), user.display_name));
+        sidebar.appendChild(createSidebarItem(t('user.email'), user.email));
+        sidebar.appendChild(createSidebarItem(t('user.createdAt'), new Date(user.created_at)));
+        sidebar.appendChild(createSidebarItem(t('user.wins'), user.wins));
+        sidebar.appendChild(createSidebarItem(t('user.losses'), user.losses));
+    }
+
 	function createSidebarItem(label: string, value: string | number | Date | undefined | null): HTMLElement {
 		const item = document.createElement('div');
 		item.className = 'p-2.5 bg-white border border-gray-200 rounded-lg shadow-sm';
@@ -75,12 +84,7 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		return item;
 	}
 
-	sidebar.appendChild(createSidebarItem(t('user.username'), currentUser.username));
-	sidebar.appendChild(createSidebarItem(t('user.displayName'), currentUser.display_name));
-	sidebar.appendChild(createSidebarItem(t('user.email'), currentUser.email));
-	sidebar.appendChild(createSidebarItem(t('user.createdAt'), new Date(currentUser.created_at)));
-	sidebar.appendChild(createSidebarItem(t('user.wins'), currentUser.wins ?? 'N/A'));
-	sidebar.appendChild(createSidebarItem(t('user.losses'), currentUser.losses ?? 'N/A'));
+	populateSidebar(currentUser);
 
 	const tabContentWrapper = document.createElement('div');
 	tabContentWrapper.className = 'w-3/4 p-6 flex flex-col overflow-y-auto';
@@ -235,6 +239,17 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	}
 
 	await loadActiveTabContent();
+
+    checkAuthStatus().then(freshUser => {
+        if (freshUser) {
+            currentUser = freshUser;
+            populateSidebar(freshUser);
+            const newHeader = HeaderComponent({ currentUser: freshUser });
+            headerElement.replaceWith(newHeader);
+        }
+    }).catch(err => {
+        console.error("Could not refresh user data in the background:", err);
+    });
 
 	return pageContainer;
 }
