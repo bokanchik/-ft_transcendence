@@ -1,5 +1,6 @@
 import { getDb } from '../utils/dbConfig.js';
 import { User, UserWithSecrets, CreateUserPayload, UpdatedUserResult, UpdateUserPayload, UserOnlineStatus } from '../shared/schemas/usersSchemas.js'; // Importez vos types
+import { AppError, NotFoundError, ERROR_KEYS } from '../utils/appError.js';
 
 function toAppUser(dbUser: any): User {
     if (!dbUser) return dbUser;
@@ -96,7 +97,7 @@ export async function createUser(
 		[username, email, password_hash, display_name, avatar_url]
 	);
 	if (result.lastID === undefined) {
-		throw new Error("Failed to create user, no lastID returned.");
+		throw new AppError(ERROR_KEYS.DATABASE_ERROR, 500, { detail: "User creation failed, no lastID." });
 	}
 }
 
@@ -133,7 +134,7 @@ export async function updateStatusInDb(userId: number, status: UserOnlineStatus)
 	const sql = `UPDATE users SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
 	const result = await db.run(sql, [status, userId]);
 	if (result.changes === 0) {
-		throw new Error(`User ${userId} not found or status unchanged.`);
+		throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND, { userId });
 	}
 }
 
@@ -141,7 +142,7 @@ export async function deleteUserFromDb(userId: number): Promise<void> {
 	const db = getDb();
 	const result = await db.run('DELETE FROM users WHERE id = ?', [userId]);
 	if (result.changes === 0) {
-		throw new Error(`User with ID ${userId} not found for deletion.`);
+		throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND, { userId });
 	}
 }
 
@@ -194,8 +195,6 @@ export async function incrementUserStatsInDb(userId: number, result: 'win' | 'lo
     const db = getDb();
     const columnToUpdate = result === 'win' ? 'wins' : 'losses';
 
-    // On utilise `??` pour s'assurer que columnToUpdate ne sera jamais une valeur non autorisée,
-    // même si c'est déjà garanti par le type. C'est une sécurité supplémentaire contre l'injection SQL.
     if (!['wins', 'losses'].includes(columnToUpdate)) {
         throw new Error('Invalid column name for stats update.');
     }
@@ -205,11 +204,11 @@ export async function incrementUserStatsInDb(userId: number, result: 'win' | 'lo
     try {
         const dbResult = await db.run(sql, [userId]);
         if (dbResult.changes === 0) {
-            throw new Error(`User with ID ${userId} not found for stats update.`);
+            throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND, { userId });
         }
         return { changes: dbResult.changes };
     } catch (error: any) {
         console.error('Error updating user stats:', error);
-        throw error;
+        throw new AppError(ERROR_KEYS.DATABASE_ERROR, 500, { detail: error.message });
     }
 }

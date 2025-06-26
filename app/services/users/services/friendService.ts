@@ -1,7 +1,7 @@
 // services/friendService.js
 import * as friendModel from '../models/friendModel.js';
 import * as userModel from '../models/userModel.js';
-import { ERROR_KEYS, ConflictError, NotFoundError, ValidationError, ForbiddenError } from '../utils/appError.js';
+import { ERROR_KEYS, AppError, ConflictError, NotFoundError, ValidationError, ForbiddenError } from '../utils/appError.js';
 import { Friend, PendingFriendRequest, Friendship, FriendshipStatus } from '../shared/schemas/friendsSchemas.js';
 
 /**
@@ -73,7 +73,7 @@ export async function acceptFriendRequest(friendshipId: number, currentUserId: n
 
 	const result = await friendModel.updateFriendshipStatusInDb(friendshipId, FriendshipStatus.ACCEPTED);
 	if (result.changes === 0) {
-		throw new Error('Failed to accept friend request, database reported no changes.');
+		throw new AppError(ERROR_KEYS.DATABASE_ERROR, 500, { detail: 'Accept friend request DB write failed.' });
 	}
 	return { message: 'friend.requestAccepted' };
 }
@@ -174,7 +174,7 @@ export async function removeFriendship(friendshipId: number, currentUserId: numb
 
 	const result = await friendModel.deleteFriendshipInDb(friendshipId);
 	if (result.changes === 0) {
-		throw new Error('Failed to remove friend, database reported no changes.');
+		throw new AppError(ERROR_KEYS.DATABASE_ERROR, 500, { detail: 'Remove friend DB write failed.' });
 	}
 	return { message: 'friend.requestRemoved' };
 }

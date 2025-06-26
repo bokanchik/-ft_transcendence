@@ -14,25 +14,27 @@
 - [x] -> zod/back 
 - [x] -> zod/front 
 - [x] Réponse schemas
-- [x] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde) -> cookie jwt_token
 - [x] httpOnly cookie for server-side ? -> yes
-- [x] 2FA
-- [ ] enable 2FA dans register page
-- [x] grafana
-- [ ] grafana/dashboards
 - [x] env
 - [x] fichiers partagés
-- [x] tout traduire
-- [ ] Vérifier les traductions
 - [x] La gestion d'erreurs 
+- [x] Remplacer error simple dans back
 - [ ] nettoyage
+
 - [x] Route pour update win loses / Permissions pour faire ca ? -> pour l'instant n'importe qui d'identifié -> /api/users/:userId/stats en envoyant result: win/lose
 - [x] Droit admin pour la route update win/lose -> authenticateService avec API_KEY
 - [x] Header partout
 
-- [ ] Remplacer error simple dans back
-- [ ] ajouter sms (twilio) et emails (sendGrid)
+- [x] tout traduire
+- [ ] Vérifier les traductions
+
+- [x] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde) -> cookie jwt_token
+- [x] 2FA
 - [x] chiffrer 2fa string dans db
+- [ ] ajouter sms (twilio) et emails (sendGrid)
+
+- [x] grafana
+- [ ] grafana/dashboards
 
 - [ ] style que dans background
 

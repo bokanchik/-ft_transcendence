@@ -1,6 +1,6 @@
 import * as userModel from '../models/userModel.js';
 import * as passwordUtils from '../utils/pswdUtils.js';
-import { ERROR_KEYS, ConflictError, UnauthorizedError, NotFoundError } from '../utils/appError.js';
+import { ERROR_KEYS, AppError, ConflictError, UnauthorizedError, NotFoundError } from '../utils/appError.js';
 import { User, UserWithSecrets, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, CreateUserPayload, UserOnlineStatus, UpdateUserStatsBody } from '../shared/schemas/usersSchemas.js';
 
 /**
@@ -159,12 +159,12 @@ export async function updateUserProfile(userId: number, updates: UpdateUserPaylo
 		await userModel.updateUserInDb(userId, changesToApply);
 	} catch (dbError: any) {
 		console.error(`Database error during profile update for user ${userId}:`, dbError);
-		throw new Error(`Failed to update profile for user ${userId} due to a database issue.`);
+		throw new AppError(ERROR_KEYS.DATABASE_ERROR, 500);
 	}
 
 	const updatedUser = await userModel.getUserByIdFromDb(userId);
 	if (!updatedUser) {
-		throw new Error(`Failed to retrieve user ${userId} immediately after successful update.`);
+		throw new AppError(ERROR_KEYS.DATABASE_ERROR, 500, { detail: `Could not re-fetch user ${userId} after update.` });
 	}
 	return updatedUser;
 }
@@ -189,7 +189,7 @@ export async function getUserByEmail(email: string): Promise<User> {
 	console.log('Fetching user by email from the database');
 	const userWithHash = await userModel.getUserByEmailFromDb(email);
 	if (!userWithHash) {
-		throw new NotFoundError('User not found');
+		throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND);
 	}
 	const { password_hash, two_fa_secret, ...user } = userWithHash;
 	return user;
@@ -205,7 +205,7 @@ export async function getUserByUsername(username: string): Promise<User> {
 	console.log('Fetching user by username from the database');
 	const userWithHash = await userModel.getUserByUsernameFromDb(username);
 	if (!userWithHash) {
-		throw new NotFoundError('User not found');
+		throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND);
 	}
 	const { password_hash, two_fa_secret, ...user } = userWithHash;
 	return user;
@@ -230,8 +230,7 @@ export async function updateUserStats(userId: number, statsUpdate: UpdateUserSta
     
     const updatedUser = await userModel.getUserByIdFromDb(userId);
     if (!updatedUser) {
-        // Ce cas est improbable si les étapes précédentes ont réussi, mais c'est une bonne pratique de le gérer.
-        throw new Error(`Failed to retrieve user ${userId} immediately after successful stats update.`);
+        throw new AppError(ERROR_KEYS.DATABASE_ERROR, 500, { detail: `Could not re-fetch user ${userId} after stats update.` });
     }
 
     console.log(`Stats updated successfully for user ID: ${userId}. New stats: W=${updatedUser.wins}, L=${updatedUser.losses}`);
