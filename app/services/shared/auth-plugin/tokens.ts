@@ -4,6 +4,7 @@ import { config } from '../env.js';
 import fastifyJwt from '@fastify/jwt';
 import fastifyCookie, { CookieSerializeOptions } from '@fastify/cookie';
 import fastifyCsrfProtection from '@fastify/csrf-protection';
+import crypto from 'crypto';
 
 export const jwtToken: string = 'jwt_token';
 export const csrfCookieName: string = 'csrf_token';
@@ -30,6 +31,7 @@ export async function setupPlugins(fastify: FastifyInstance): Promise<void> {
 	await registerJWTPlugin(fastify);
 	authenticateDecorator(fastify);
 	await registerCsrfPlugin(fastify);
+	serviceAuthDecorator(fastify);
 }
 
 export async function registerCookiePlugin(fastify: FastifyInstance): Promise<void> {
@@ -80,9 +82,45 @@ export function authenticateDecorator(fastify: FastifyInstance): void {
 	fastify.log.info('JWT & authenticate plugin registered');
 }
 
+const serviceApiKey = config.API_KEY;
+
+
+export function serviceAuthDecorator(fastify: FastifyInstance): void {
+    fastify.decorate('authenticateService', async function(request: FastifyRequest, reply: FastifyReply) {
+        try {
+            const receivedApiKey = request.headers['x-api-key'];
+
+            if (!receivedApiKey || typeof receivedApiKey !== 'string') {
+                fastify.log.warn('Service authentication failed: X-API-Key header missing');
+                return reply.code(401).send({ error: 'Unauthorized: API Key missing' });
+            }
+			if (!serviceApiKey || typeof serviceApiKey !== 'string') {
+				throw new Error('API_KEY is not defined in the environment variables');
+			}
+
+            const keyBuffer = Buffer.from(serviceApiKey, 'utf8');
+            const receivedKeyBuffer = Buffer.from(receivedApiKey, 'utf8');
+
+            if (keyBuffer.length !== receivedKeyBuffer.length || !crypto.timingSafeEqual(keyBuffer, receivedKeyBuffer)) {
+                fastify.log.warn('Service authentication failed: Invalid API Key');
+                return reply.code(403).send({ error: 'Forbidden: Invalid API Key' });
+            }
+            
+            fastify.log.info('Service authentication successful');
+
+        } catch (err) {
+            fastify.log.error(err, 'Error during service authentication');
+            reply.code(500).send({ error: 'Internal Server Error' });
+        }
+    });
+
+    fastify.log.info('Service authentication decorator registered');
+}
+
 declare module 'fastify' {
 	interface FastifyInstance {
 		authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
+		authenticateService: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
 	}
 
 	interface FastifyRequest {

@@ -1,4 +1,5 @@
 import db from './connectDB.ts';
+import { updatePlayerStats } from '../utils/apiClient.ts';
 
 type MatchStatus = 'pending' | 'in_progress' | 'finished';
 
@@ -43,6 +44,13 @@ export async function setGameResult(matchId: string, player1_score: number, play
 		throw new Error(`Match with id ${matchId} is already finished.`);
 	}
 	
+	// Update player stats in the database
+	const winnerId = parseInt(winner_id, 10);
+	const loserId = (winner_id === existingMatch.player1_id) ? existingMatch.player2_id : existingMatch.player1_id;
+
+	await updatePlayerStats(winnerId, 'win');
+	await updatePlayerStats(loserId, 'loss');
+
 	const sql = `
 	UPDATE matches
 	SET player1_score = ?,

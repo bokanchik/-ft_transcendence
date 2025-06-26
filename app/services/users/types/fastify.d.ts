@@ -9,4 +9,7 @@ declare module 'fastify' {
   export interface FastifyReply {
     generateCsrf: (options?: { userInfo?: string }) => Promise<string>;
   }
+  export interface FastifyInstance {
+    authenticateService: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
+  }
 }

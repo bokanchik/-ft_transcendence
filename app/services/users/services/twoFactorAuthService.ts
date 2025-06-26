@@ -3,6 +3,7 @@ import qrcode from 'qrcode';
 import * as userModel from '../models/userModel.js';
 import { User, UpdateUserPayload } from '../shared/schemas/usersSchemas.js';
 import { ERROR_KEYS, ForbiddenError, NotFoundError } from '../utils/appError.js';
+import { encrypt, decrypt } from '../utils/cryptoUtils.js';
 
 /**
  * Génère un nouveau secret et l'URL du QR code pour un utilisateur.
@@ -13,9 +14,9 @@ export async function generateTwoFactorSecret(user: User): Promise<{ secret: str
     const secret = authenticator.generateSecret();
     const otpauth = authenticator.keyuri(user.email, 'KingPong', secret);
 
-    // Stocke le secret (il est temporaire jusqu'à vérification).
-    // En production, il est crucial de chiffrer ce secret.
-    await userModel.updateUserInDb(user.id, { two_fa_secret: secret });
+    // CHIFFRER le secret avant de le stocker
+    const encryptedSecret = encrypt(secret);
+    await userModel.updateUserInDb(user.id, { two_fa_secret: encryptedSecret });
 
     const qrCodeDataURL = await qrcode.toDataURL(otpauth);
     return { secret, qrCodeDataURL };
@@ -35,7 +36,8 @@ export async function verifyAndEnableTwoFactor(userId: number, token: string): P
         throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND);
     }
     
-    const isValid = authenticator.verify({ token, secret: user.two_fa_secret });
+    const decryptedSecret = decrypt(user.two_fa_secret);
+    const isValid = authenticator.verify({ token, secret: decryptedSecret });
 
     if (isValid) {
         await userModel.updateUserInDb(userId, { is_two_fa_enabled: true });

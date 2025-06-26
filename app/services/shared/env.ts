@@ -23,7 +23,10 @@ const envSchema = z.object({
 	JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
 	COOKIE_SECRET: z.string().min(1, "COOKIE_SECRET is required"),
 	SESSION_SECRET: z.string().min(1, "SESSION_SECRET is required"),
+	CRYPTO_SECRET: z.string().min(32, "CRYPTO_SECRET must be at least 32 characters"),
+	API_KEY: z.string().min(1, "API_KEY is required"),
 	API_USER_PORT: z.coerce.number().int().positive().default(4000),
+	API_USER_URL: z.string().min(1, "API_USER_URL is required").default('http://users:4000'),
 
 	URL_ALL_USERS: z.string().min(1, "URL_ALL_USERS is required"),
 	URL_USER: z.string().min(1, "URL_USER is required"),
@@ -60,7 +63,8 @@ try {
         JWT_SECRET: getSecret('JWT_SECRET'),
         COOKIE_SECRET: getSecret('COOKIE_SECRET'),
 		SESSION_SECRET: getSecret('SESSION_SECRET'),
-        // autres secrets
+        CRYPTO_SECRET: getSecret('CRYPTO_SECRET'),
+		API_KEY: getSecret('API_KEY'),
     };
 
 	validatedEnv = envSchema.parse(envVarsToValidate);

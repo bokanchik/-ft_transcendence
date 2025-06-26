@@ -6,6 +6,7 @@ import { JWTPayload, UserOnlineStatus } from '../shared/schemas/usersSchemas.js'
 import { cookieOptions, jwtToken } from '../shared/auth-plugin/tokens.js';
 import { ERROR_KEYS, UnauthorizedError, ForbiddenError } from '../utils/appError.js';
 import { authenticator } from 'otplib';
+import { decrypt } from '../utils/cryptoUtils.js';
 
 export async function generate2FAHandler(req: FastifyRequest, reply: FastifyReply) {
     const user = req.user as JWTPayload;
@@ -54,7 +55,8 @@ export async function login2FAHandler(req: FastifyRequest, reply: FastifyReply) 
         throw new UnauthorizedError(ERROR_KEYS.LOGIN_INVALID_CREDENTIALS, { detail: '2FA is not properly configured for this user.' });
     }
 
-    const isValid = authenticator.verify({ token: twoFactorToken, secret: user.two_fa_secret });
+    const decryptedSecret = decrypt(user.two_fa_secret);
+    const isValid = authenticator.verify({ token: twoFactorToken, secret: decryptedSecret });
 
     if (isValid) {
         const tokenPayload: JWTPayload = { id: user.id, username: user.username };

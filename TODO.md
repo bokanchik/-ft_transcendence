@@ -32,7 +32,8 @@
 
 - [ ] Remplacer error simple dans back
 - [ ] ajouter sms (twilio) et emails (sendGrid)
-- [ ] chiffrer 2fa string dans db
+- [x] chiffrer 2fa string dans db
+
 - [ ] style que dans background
 
 ## 📌 Tâches initiales

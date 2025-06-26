@@ -40,7 +40,8 @@ export default async function userRoutes(fastify: FastifyInstance, options: Fast
 	fastify.patch(
         config.URL_USER_STATS,
         {
-            onRequest: [fastify.authenticate, fastify.csrfProtection],
+            // onRequest: [fastify.authenticate, fastify.csrfProtection],
+			onRequest: [fastify.authenticateService],
             schema: us.UpdateUserStatsRouteSchema,
             handler: uh.updateUserStatsHandler
         }

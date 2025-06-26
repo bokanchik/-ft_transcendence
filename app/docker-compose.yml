@@ -7,6 +7,10 @@ secrets:
     file: ../secrets/cookie_secret.txt
   session_secret:
     file: ../secrets/session_secret.txt
+  crypto_secret:
+    file: ../secrets/crypto_secret.txt
+  api_key:
+    file: ../secrets/api_key.txt
 
 networks:
   tranet:
@@ -61,10 +65,14 @@ services:
       - JWT_SECRET__FILE=/run/secrets/jwt_secret
       - COOKIE_SECRET__FILE=/run/secrets/cookie_secret
       - SESSION_SECRET__FILE=/run/secrets/session_secret
+      - CRYPTO_SECRET__FILE=/run/secrets/crypto_secret
+      - API_KEY__FILE=/run/secrets/api_key
     secrets:
       - jwt_secret
       - cookie_secret
       - session_secret
+      - crypto_secret
+      - api_key
     restart: always
     volumes:
       - ./services/shared:/app/shared:ro
@@ -83,10 +91,14 @@ services:
       - JWT_SECRET__FILE=/run/secrets/jwt_secret
       - COOKIE_SECRET__FILE=/run/secrets/cookie_secret
       - SESSION_SECRET__FILE=/run/secrets/session_secret
+      - CRYPTO_SECRET__FILE=/run/secrets/crypto_secret
+      - API_KEY__FILE=/run/secrets/api_key
     secrets:
       - jwt_secret
       - cookie_secret
       - session_secret
+      - crypto_secret
+      - api_key
     restart: always
     volumes:
       - ./services/shared:/app/shared:ro
@@ -105,10 +117,14 @@ services:
       - JWT_SECRET__FILE=/run/secrets/jwt_secret
       - COOKIE_SECRET__FILE=/run/secrets/cookie_secret
       - SESSION_SECRET__FILE=/run/secrets/session_secret
+      - CRYPTO_SECRET__FILE=/run/secrets/crypto_secret
+      - API_KEY__FILE=/run/secrets/api_key
     secrets:
       - jwt_secret
       - cookie_secret
       - session_secret
+      - crypto_secret
+      - api_key
     restart: always
     volumes:
       - ./services/shared:/app/shared:ro

@@ -13,6 +13,7 @@ export class RemoteGameSession {
     state: GameState;
     players: Map<string, string>;
     intervalId: NodeJS.Timeout | null = null;
+    isFinished: boolean = false;
     
     constructor(roomName: string, matchId: string) {
         this.roomName = roomName;
@@ -38,19 +39,28 @@ export class RemoteGameSession {
         if (this.intervalId) return;
         
         this.intervalId = setInterval(async () => {
+            if (this.isFinished) {
+                this.clearGameInterval();
+                return;
+            }
             const { winner, goalScored } = gameLoop(this.state, this.velocity, 'remote');
 
-            if (goalScored || !winner) {
+            // if (goalScored || !winner) {
+            if (!winner) {
                 fastify.io.to(this.roomName).emit('gameState', this.state)
             } else {
+                if (this.isFinished) return; // Prevent multiple emissions if already finished
+                this.isFinished = true;
                 fastify.io.to(this.roomName).emit('gameOver');
 
                 const match = await getRowByMatchId(this.matchId);
-                if (winner === 1) {
-                    setGameResult(this.matchId, this.state.score1, this.state.score2, match.player1_id, 'score');
-                } else if (winner === 2) {
-                    setGameResult(this.matchId, this.state.score1, this.state.score2, match.player2_id, 'score');
-                }
+                const winnerId = winner === 1 ? match.player1_id : match.player2_id;
+                await setGameResult(this.matchId, this.state.score1, this.state.score2, winnerId, 'score');
+                // if (winner === 1) {
+                //     setGameResult(this.matchId, this.state.score1, this.state.score2, match.player1_id, 'score');
+                // } else if (winner === 2) {
+                //     setGameResult(this.matchId, this.state.score1, this.state.score2, match.player2_id, 'score');
+                // }
                 
                 this.clearGameInterval();
 
