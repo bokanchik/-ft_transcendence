@@ -22,24 +22,24 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 	// --- Left side: Language Button ---
 	const leftSection = document.createElement('div');
 	const langButton = document.createElement('button');
-	
-	// Flags
+
+	// --- Flags language switcher ---
 	langButton.className = 'flex items-center justify-center p-1.5 rounded-full transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75';
-	
+
 	const flagImg = document.createElement('img');
 	flagImg.className = 'h-8 w-auto object-contain rounded-md shadow-sm';
 
 	const updateFlag = () => {
 		const currentLang = getLanguage();
 		if (currentLang === 'fr') {
-			flagImg.src = '/assets/flagEn.svg'; 
+			flagImg.src = '/assets/flagEn.svg';
 			flagImg.alt = 'Switch to English';
 		} else {
 			flagImg.src = '/assets/flagFr.svg';
 			flagImg.alt = 'Passer en Français';
 		}
 	};
-	updateFlag(); // Initial flag update
+	updateFlag();
 	langButton.appendChild(flagImg);
 
 	langButton.addEventListener('click', () => {
@@ -59,10 +59,10 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 			{ href: '/game', textKey: 'header.game' },
 			{ href: '/dashboard', textKey: 'header.dashboard' },
 		] : [
-			{ href: '/local-game', textKey: 'header.game'}
+			{ href: '/local-game', textKey: 'header.game' }
 		]),
 	];
-	
+
 	navLinks.forEach(linkInfo => {
 		const linkElement = document.createElement('a');
 		linkElement.href = linkInfo.href;
@@ -76,8 +76,8 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 	const rightSection = document.createElement('div');
 	rightSection.className = 'flex items-center space-x-4 relative';
 
+	// --- LOGGED-IN STATE ---
 	if (currentUser) {
-		// --- LOGGED-IN STATE ---
 		const userHeader = document.createElement('div');
 		userHeader.className = 'flex items-center space-x-4 relative';
 
@@ -85,7 +85,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		avatarDisplayWrapper.className = 'bg-orange-400 p-1.5 rounded-lg flex items-center space-x-3 cursor-pointer select-none transition-transform duration-200 hover:scale-105';
 
 		const displayNameHeader = document.createElement('span');
-		displayNameHeader.className = 'text-white font-semibold text-base pr-1'; // un peu plus grand
+		displayNameHeader.className = 'text-white font-semibold text-base pr-1';
 		displayNameHeader.textContent = currentUser.display_name || currentUser.username;
 
 		const avatarHeader = document.createElement('img');
@@ -118,7 +118,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 			} catch (error) {
 				showToast(t('header.logoutError'), 'error');
 			} finally {
-				navigateTo('/login');
+				navigateTo('/');
 			}
 		});
 
@@ -146,11 +146,11 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 			}
 		});
 
-	} else {
 		// --- LOGGED-OUT STATE ---
+	} else {
 		const authLinks = document.createElement('div');
 		authLinks.className = 'flex items-center space-x-2 sm:space-x-4';
-		
+
 		const loginLink = document.createElement('a');
 		loginLink.href = "/login";
 		loginLink.setAttribute('data-link', '');

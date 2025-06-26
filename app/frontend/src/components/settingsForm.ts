@@ -16,7 +16,7 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 
 	const formElement = document.createElement('form');
 	formElement.id = 'profile-form-component';
-	formElement.noValidate = true; // Empêche la validation HTML5 native pour gérer les messages nous-mêmes
+	formElement.noValidate = true;
 	formElement.innerHTML = `
         <div id="profile-message" class="mb-4 text-center text-sm min-h-[1.25rem]"></div>
 
@@ -66,7 +66,6 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
              <div id="two-fa-setup-container" class="hidden pl-6 border-l-2 border-gray-200">
                 <p class="text-sm text-gray-600 mb-4">${t('user.settings.2faSetupInstructions')}</p>
                 <div id="qr-code-container" class="mb-4 p-4 rounded text-center flex justify-center items-center bg-gray-100 min-h-[14rem] min-w-[14rem]">
-                    <!-- Le QR Code sera injecté ici -->
                 </div>
                 <div>
                     <label for="two_fa_token" class="block text-gray-700 text-sm font-bold mb-2">${t('user.settings.verificationCode')}</label>
@@ -93,24 +92,24 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 	const avatarUrlInput = formElement.querySelector('#avatar_url') as HTMLInputElement;
 	const messageDiv = formElement.querySelector('#profile-message') as HTMLDivElement;
 	const saveButton = formElement.querySelector('#save-profile-button') as HTMLButtonElement;
-	
+
 	const twoFaCheckbox = formElement.querySelector('#is_two_fa_enabled') as HTMLInputElement;
 	const twoFaSetupContainer = formElement.querySelector('#two-fa-setup-container') as HTMLDivElement;
-    const twoFaTokenInput = formElement.querySelector('#two_fa_token') as HTMLInputElement;
-    const qrCodeContainer = formElement.querySelector('#qr-code-container') as HTMLDivElement;
+	const twoFaTokenInput = formElement.querySelector('#two_fa_token') as HTMLInputElement;
+	const qrCodeContainer = formElement.querySelector('#qr-code-container') as HTMLDivElement;
 
 	twoFaCheckbox.checked = currentUserState.is_two_fa_enabled;
 
 	twoFaCheckbox.addEventListener('change', async () => {
 		if (twoFaCheckbox.checked) {
 			twoFaSetupContainer.classList.remove('hidden');
-			qrCodeContainer.innerHTML = `<span class="loader"></span>`; // Affichez un spinner
+			qrCodeContainer.innerHTML = `<span class="loader"></span>`; // Affiche un spinner
 			try {
 				const { qrCodeDataURL } = await onGenerate2FA();
 				const qrCodeImg = document.createElement('img');
 				qrCodeImg.src = qrCodeDataURL;
 				qrCodeImg.alt = t('user.settings.qrCodeAlt');
-                qrCodeImg.classList.add('mx-auto');
+				qrCodeImg.classList.add('mx-auto');
 				qrCodeContainer.innerHTML = '';
 				qrCodeContainer.appendChild(qrCodeImg);
 			} catch (error) {
@@ -119,7 +118,7 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 			}
 		} else {
 			twoFaSetupContainer.classList.add('hidden');
-            qrCodeContainer.innerHTML = ''; // Nettoyer le QR code si l'utilisateur décoche
+			qrCodeContainer.innerHTML = ''; // Clear qr code
 		}
 	});
 
@@ -133,7 +132,7 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 		const updatedDisplayName = displayNameInput.value.trim();
 		const updatedAvatarUrl = avatarUrlInput.value.trim();
 		const newTwoFaState = twoFaCheckbox.checked;
-        const twoFaToken = twoFaTokenInput.value.trim();
+		const twoFaToken = twoFaTokenInput.value.trim();
 
 		let profileUpdateSuccess = false;
 		let twoFaUpdateSuccess = false;
@@ -150,7 +149,7 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 				}
 				twoFaUpdateSuccess = true;
 			}
-			
+
 			const profilePayload: UpdateUserPayload = {};
 			if (updatedEmail !== currentUserState.email) profilePayload.email = updatedEmail;
 			if (updatedDisplayName !== currentUserState.display_name) profilePayload.display_name = updatedDisplayName;
@@ -168,11 +167,11 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 				currentUserState.is_two_fa_enabled = newTwoFaState;
 				messageDiv.textContent = t('user.settings.success');
 				messageDiv.className = 'mb-4 text-center text-sm text-green-600 font-semibold min-h-[1.25rem]';
-				
+
 				emailInput.value = currentUserState.email;
 				displayNameInput.value = currentUserState.display_name;
 				avatarUrlInput.value = currentUserState.avatar_url || '';
-				twoFaTokenInput.value = ''; // Toujours vider le champ du token
+				twoFaTokenInput.value = '';
 				if (!newTwoFaState) {
 					twoFaSetupContainer.classList.add('hidden');
 				}

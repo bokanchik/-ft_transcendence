@@ -7,13 +7,14 @@ import { SettingsPage } from './pages/settingsPage.js';
 import { ProfilePage } from './pages/profilePage.js';
 import { GamePage } from './components/gamePage.js';
 import { GameMode } from './components/gamePage.js'
+import { TournamentPage } from './pages/tournamentTree.js';
 import { getUserDataFromStorage } from './services/authService.js';
 import { promptAliasForm } from './components/SelectGameModeForm.js';
 import { navigateTo } from './services/router.js';
 import { initI18n, t } from './services/i18nService.js';
 import { showcase } from './components/showcase.js';
 // import './css/style.css';
-import { TournamentPage } from './pages/tournamentTree.js';
+
 const appContainer = document.getElementById('main');
 
 interface RouteConfig {
@@ -24,10 +25,10 @@ interface RouteConfig {
 function renderNotFoundPage(): HTMLElement {
 	const div = document.createElement('div');
 	div.innerHTML = `
-        <h1 class="text-3xl font-bold text-red-500 text-center p-8">404 - Page Non Trouvée</h1>
-        <p class="text-center">Oups! Cette page n'existe pas.</p>
+        <h1 class="text-3xl font-bold text-red-500 text-center p-8">404 - Page Not Found</h1>
+        <p class="text-center">Oops! This page does not exist.</p>
         <div class="text-center mt-4">
-            <a href="/" data-link class="text-blue-500 hover:underline">Retour à l'accueil</a>
+            <a href="/" data-link class="text-blue-500 hover:underline">Back to Home</a>
         </div>
     `;
 	return div;
@@ -40,10 +41,7 @@ const routes: { [key: string]: RouteConfig } = {
 	'/register': { component: RegisterPage },
 	'/dashboard': { component: DashboardPage, requiredAuth: true },
 	'/profile': { component: SettingsPage, requiredAuth: true },
-	'/profile/:id': {
-		component: (params) => ProfilePage(params ?? {}),
-		requiredAuth: true
-	},
+	'/profile/:id': { component: (params) => ProfilePage(params ?? {}), requiredAuth: true },
 	'/game': { component: GamePage },
 	'/local-game': { component: promptAliasForm },
 	'/game-room': { component: () => GameRoomPageFromParams() },
@@ -58,7 +56,7 @@ function GameRoomPageFromParams(): HTMLElement {
 
 export async function router() {
 	if (!appContainer) {
-		console.error("ERREUR: Le conteneur #app est introuvable dans le DOM !");
+		console.error("ERROR: The #app container was not found in the DOM!");
 		return;
 	}
 	const path = window.location.pathname;
@@ -67,9 +65,8 @@ export async function router() {
 	let routeCfg = routes[path];
 	let params: { [key: string]: string } = {};
 
-	// Gestion des routes dynamiques (ex: /profile/:id)
+	// Handle dynamic routes
 	if (!routeCfg) {
-		// Cherche une route dynamique qui matche
 		for (const routePattern in routes) {
 			if (routePattern.includes('/:')) {
 				const base = routePattern.split('/:')[0];
@@ -92,7 +89,7 @@ export async function router() {
 	if (routeCfg.requiredAuth) {
 		const authData = getUserDataFromStorage();
 		if (!authData) {
-			console.log('Utilisateur non authentifié, redirection vers la page de connexion.');
+			console.log('User not logged in, redirecting to login page...');
 			navigateTo('/login');
 			return;
 		}
@@ -100,19 +97,17 @@ export async function router() {
 	const renderFunction = routeCfg.component;
 	appContainer.innerHTML = '';
 	try {
-		// Passe les params à la page si besoin
 		params.userId = params.id;
 		const pageContent = await renderFunction(params);
 		appContainer.appendChild(pageContent);
 	} catch (error) {
-		console.error(`Erreur lors du rendu de la route ${path}:`, error);
-		appContainer.innerHTML = `<p class="text-red-500 text-center p-8">Une erreur est survenue lors du chargement de la page.</p>`;
+		console.error(`Error while rendering route "${path}":`, error);
+		appContainer.innerHTML = `<p class="text-red-500 text-center p-8">An error occurred while loading the page.</p>`;
 	}
 }
 
-// Se déclenche lorsque le HTML initial est chargé
 document.addEventListener('DOMContentLoaded', async () => {
-	await initI18n(); // Initialise le service de traduction
+	await initI18n(); // Initialize translations
 	document.title = t('app.title');
 	document.body.addEventListener('click', (event) => {
 		const target = event.target as HTMLElement;
@@ -128,7 +123,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	router();
 });
 
-// Se déclenche lorsque l'utilisateur utilise les boutons Précédent/Suivant du navigateur
+// Triggered when the user uses the browser's Back/Forward buttons
 window.addEventListener('popstate', () => {
 	router();
 });

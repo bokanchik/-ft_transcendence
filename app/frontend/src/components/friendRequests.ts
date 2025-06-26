@@ -1,5 +1,6 @@
 import { PendingFriendRequest } from '../shared/schemas/friendsSchemas.js';
 import { t } from '../services/i18nService.js';
+import { showToast } from '../components/toast.js';
 
 interface FriendRequestsProps {
 	receivedRequests: PendingFriendRequest[];
@@ -58,7 +59,8 @@ export function FriendRequestsComponent(props: FriendRequestsProps): HTMLElement
 			}
 		} catch (error: any) {
 			console.error(`Error while attempting '${action}':`, error);
-			alert(`Erreur: ${error.message || t('error.general.any')}`);
+			alert(`Error: ${error.message || t('error.general.any')}`);
+			showToast(`${t('general.error')}: ${error.message || t('error.general.any')}`, 'error');
 			button.disabled = false;
 			button.textContent = action.charAt(0).toUpperCase() + action.slice(1);
 		}

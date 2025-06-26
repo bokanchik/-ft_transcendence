@@ -102,7 +102,7 @@ export function FriendsListComponent(props: FriendsListProps): HTMLElement {
 						showToast(t('friend.list.accepted.removeSuccess'), 'success');
 					} catch (error: any) {
 						console.error('Error while removing friend: ', error);
-						showToast(`Erreur: ${error.message || t('friend.list.accepted.removeError')}`, 'error');
+						showToast(`${t('general.error')}: ${error.message || t('friend.list.accepted.removeError')}`, 'error');
 						button.disabled = false;
 						button.textContent = t('friend.remove');
 					}

@@ -30,6 +30,11 @@
 - [ ] Droit admin pour la route update win/lose
 - [x] Header partout
 
+- [ ] Remplacer error simple dans back
+- [ ] ajouter sms (twilio) et emails (sendGrid)
+- [ ] chiffrer 2fa string dans db
+- [ ] style que dans background
+
 ## 📌 Tâches initiales
 
 - [ ] update db user a chaque fin de match (score, win, lose, etc.)

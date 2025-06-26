@@ -1,10 +1,12 @@
+import { t } from '../services/i18nService.js'
+
 export function initCountdown(container: HTMLDivElement): Promise<void> {
 	return new Promise((resolve) => {
 		const countdownIsDone = sessionStorage.getItem('countdown') === 'true';
 
 		if (!countdownIsDone) {
 			let countdownValue = 3;
-			container.textContent = `Start in ${countdownValue}...`;
+			container.textContent = `${t('game.startIn')} ${countdownValue}...`;
 
 			const interval = setInterval(() => {
 				countdownValue--;

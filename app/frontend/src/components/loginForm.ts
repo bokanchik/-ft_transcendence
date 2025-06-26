@@ -4,14 +4,14 @@ import { t } from '../services/i18nService.js';
 
 interface LoginFormProps {
 	onLoginAttempt: (credentials: LoginRequestBody) => Promise<ApiResult<ApiLoginSuccessData>>;
-    on2FAAttempt: (token: string) => Promise<ApiResult<ApiLoginSuccessData>>;
+	on2FAAttempt: (token: string) => Promise<ApiResult<ApiLoginSuccessData>>;
 	onLoginSuccess: (userData: User) => void;
 }
 
 export function LoginForm(props: LoginFormProps): HTMLElement {
 	const { onLoginAttempt, on2FAAttempt, onLoginSuccess } = props;
 	const wrapper = document.createElement('div');
-	
+
 	const renderPasswordStep = () => {
 		wrapper.innerHTML = `
             <form id="login-form-component" class="space-y-6">
@@ -73,15 +73,15 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 		const result = await onLoginAttempt({ identifier, password });
 
 		if (result.success) {
-            if (result.data.two_fa_required) {
-                renderTwoFactorStep();
-            } else if (result.data.user) {
-                onLoginSuccess(result.data.user);
-            }
-        } else {
-            if (messageDiv) messageDiv.textContent = result.error;
-            if (button) button.disabled = false;
-        }
+			if (result.data.two_fa_required) {
+				renderTwoFactorStep();
+			} else if (result.data.user) {
+				onLoginSuccess(result.data.user);
+			}
+		} else {
+			if (messageDiv) messageDiv.textContent = result.error;
+			if (button) button.disabled = false;
+		}
 	};
 
 	const handleTwoFactorSubmit = async (event: Event) => {
@@ -95,16 +95,16 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 
 		const token = (form.elements.namedItem('two-fa-token') as HTMLInputElement).value;
 
-        const result = await on2FAAttempt(token);
+		const result = await on2FAAttempt(token);
 
-        if (result.success) {
-            if (result.data.user) {
-                onLoginSuccess(result.data.user);
-            }
-        } else {
-            if (messageDiv) messageDiv.textContent = result.error;
+		if (result.success) {
+			if (result.data.user) {
+				onLoginSuccess(result.data.user);
+			}
+		} else {
+			if (messageDiv) messageDiv.textContent = result.error;
 			if (button) button.disabled = false;
-        }
+		}
 	};
 
 	renderPasswordStep();

@@ -41,6 +41,24 @@
 			"2faTokenInvalid": "Invalid verification code. Please try again."
 		}
 	},
+	"game": {
+		"title": "Game",
+		"loading": "Loading game...",
+		"start": "Start Game",
+		"startIn": "Starting in",
+		"waitOpponent": "Waiting for opponent...",
+		"join": "Join Game",
+		"create": "Create Game",
+		"settings": {
+			"title": "Game Settings",
+			"gameMode": "Game Mode",
+			"createButton": "Create Game",
+			"joinButton": "Join Game"
+		},
+		"errors": {
+			"gameNotFound": "Game not found.",
+		}
+	},
 	"register": {
 		"title": "Register",
 		"nameSpec": "3 to 20 characters.",

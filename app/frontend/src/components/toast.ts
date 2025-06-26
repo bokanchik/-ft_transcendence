@@ -138,7 +138,7 @@ export function showWaitingToast(socket: SocketIOClient.Socket, controller: Abor
 
 	// Message
 	const message = document.createElement('p');
-	message.textContent = 'Waiting for an opponent...';
+	message.textContent = t('game.waitOpponent');
 	message.className = 'text-center text-sm font-medium';
 
 	// Timer
@@ -151,7 +151,7 @@ export function showWaitingToast(socket: SocketIOClient.Socket, controller: Abor
 
 	// Cancel button
 	const cancelBtn = document.createElement('button');
-	cancelBtn.textContent = 'Cancel';
+	cancelBtn.textContent = t('general.cancel');
 	cancelBtn.className = `bg-red-600 hover:bg-red-700 text-white 
                            font-medium py-1 px-4 rounded`;
 

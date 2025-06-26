@@ -1,5 +1,5 @@
 export function showcase(): HTMLElement {
-	
+
 	const container = document.createElement('div');
 	container.className = 'bg-green flex items-center justify-center min-h-screen text-black p-8';
 
