@@ -56,7 +56,7 @@
 			"joinButton": "Join Game"
 		},
 		"errors": {
-			"gameNotFound": "Game not found.",
+			"gameNotFound": "Game not found."
 		}
 	},
 	"register": {

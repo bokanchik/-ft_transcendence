@@ -41,6 +41,24 @@
 			"2faTokenInvalid": "Code de vérification invalide. Veuillez réessayer."
 		}
 	},
+	"game": {
+		"title": "Jeu",
+		"loading": "Chargement du jeu...",
+		"start": "Démarrer le jeu",
+		"startIn": "Démarrage dans",
+		"waitOpponent": "En attente de l'adversaire...",
+		"join": "Rejoindre le jeu",
+		"create": "Créer un jeu",
+		"settings": {
+			"title": "Paramètres du jeu",
+			"gameMode": "Mode de jeu",
+			"createButton": "Créer un jeu",
+			"joinButton": "Rejoindre un jeu"
+		},
+		"errors": {
+			"gameNotFound": "Jeu non trouvé."
+		}
+	},
 	"register": {
 		"title": "Inscription",
 		"nameSpec": "3 à 20 caractères.",

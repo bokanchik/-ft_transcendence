@@ -4,28 +4,30 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>King-Pong</title>
+  <!-- <link href="css/background.css" rel="stylesheet"> -->
+  <!-- <link href="css/global.css" rel="stylesheet"> -->
+
   <link href="css/style.css" rel="stylesheet">
 </head>
 <body>
   <!-- <background-decor></background-decor> -->
-  <!-- <div>
-      <script src="./js/components/background.js"></script>
-    </div> -->
-  <div id="main"> <!-- contenu de main.ts -->
-    <p>Loading application...</p>
-  </div>
+  <!-- <div id="background-container"></div> -->
+  <!-- <div><script src="./js/components/background.js"></script></div> -->
+  <!-- <div id="background-container"></div> -->
+  <div id="main"><p>Loading application...</p></div>
 
 
   <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.7.2/dist/socket.io.min.js"></script>
-<script type="importmap">
-{
-  "imports": {
-    "zod": "https://cdn.jsdelivr.net/npm/zod@3.24.4/lib/index.mjs"
-  }
-}
-</script>
-<!-- <script type="module" src="/js/components/backgroundDecor.js"></script> composant de fond -->
-<script type="module" src="/js/main.js"></script> <!-- routeur principal -->
+  <script type="importmap">
+    {
+      "imports": {
+      "zod": "https://cdn.jsdelivr.net/npm/zod@3.24.4/lib/index.mjs"
+      }
+    }
+  </script>
+  <!-- <script type="module" src="/js/components/backgroundDecor.js"></script> composant de fond -->
+  <!-- <script type="module" src="/js/components/background.js"></script>  -->
+  <script type="module" src="/js/main.js"></script>
 </body>
 </html>
 
