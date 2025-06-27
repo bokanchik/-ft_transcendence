@@ -194,12 +194,12 @@ function clientSocketHandler(gameMode: string | null, ctx: CanvasRenderingContex
 		socket.connect();
 	}
 	
-	
+
 	if (gameMode === 'remote') {
 		handleRemoteEvents(ctx, scoreDisplay);
 	}
 	
-	if (gameMode === 'local') {
+	if (gameMode === 'local' || gameMode === 'tournament') {
 		handleLocalEvents(ctx, scoreDisplay);
 	}
 	
@@ -284,7 +284,6 @@ function handleLocalEvents(ctx: CanvasRenderingContext2D, scoreDisplay: HTMLDivE
 		isGameOver = true;
 		cleanupSocket(socket);
 		cleanupListeners();
-		console.log(sessionStorage.getItem('gameMode'));
 		if (sessionStorage.getItem('gameMode') === 'tournament') {
 			navigateTo('/tournament');
 		}
