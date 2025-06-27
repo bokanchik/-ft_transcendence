@@ -25,6 +25,7 @@
 - [x] Droit admin pour la route update win/lose -> authenticateService avec API_KEY
 - [x] Header partout
 
+- [ ] Page home bouton settings et logout inaccessible quand logedin
 - [x] tout traduire
 - [ ] Vérifier les traductions
 
@@ -37,6 +38,12 @@
 - [ ] grafana/dashboards
 
 - [ ] style que dans background
+
+## Etienne
+
+- [ ] Feuille quand on scroll
+- [ ] la fenetre bouge avec les fleches directionnelles
+- [ ] fix dashboard (cadvisor) 
 
 ## 📌 Tâches initiales
 
