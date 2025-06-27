@@ -51,6 +51,7 @@ export class RemoteGameSession {
             } else {
                 if (this.isFinished) return; // Prevent multiple emissions if already finished
                 this.isFinished = true;
+                
                 fastify.io.to(this.roomName).emit('gameOver');
 
                 const match = await getRowByMatchId(this.matchId);

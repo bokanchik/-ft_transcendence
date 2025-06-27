@@ -99,7 +99,7 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 	const quitButton = document.createElement('button');
 	quitButton.className = 'mt-6 px-5 py-2 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 shadow-lg transition duration-300 jungle-font';
 	quitButton.className = 'px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-lg transition duration-200 border border-red-500/50';
-	quitButton.textContent = t('game.quit');
+	quitButton.textContent = t('game.quitButton');
 
 	// Ajouter le bouton dans le container principal
 	container.appendChild(quitButton);

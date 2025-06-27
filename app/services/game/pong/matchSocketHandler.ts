@@ -128,8 +128,9 @@ async function disconnectionHandler(socket: Socket)  {
 
         const gameSession = findRemoteGameSessionBySocketId(socket.id);
         if (gameSession) {
-            if (gameSession.isFinished) return;
+            if (gameSession.isFinished) return; // ajout arthur pour éviter de faire des actions sur une gameSession déjà finie
             gameSession.isFinished = true;
+
             const opponentSocketId = [...gameSession.players.keys()].find(id => id !== socket.id);
 
             if (opponentSocketId) {

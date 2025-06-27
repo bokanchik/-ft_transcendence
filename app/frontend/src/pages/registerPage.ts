@@ -107,6 +107,11 @@ export async function RegisterPage(): Promise<HTMLElement> {
 			messageDiv.className = 'mt-4 text-center text-sm text-red-600';
 			return;
 		}
+		if (!isValidEmail(email)) {
+			messageDiv.textContent = t('register.emailInvalid'); // Ajoutez cette clé à vos fichiers de traduction !
+			messageDiv.className = 'mt-4 text-center text-sm text-red-400 font-semibold';
+			return;
+		}
 		if (password !== confirmPassword) {
 			messageDiv.textContent = t('register.passwordMismatch');
 			messageDiv.className = 'mt-4 text-center text-sm text-red-600';
@@ -172,4 +177,9 @@ function isValidHttpUrl(string: string): boolean {
 		return false;
 	}
 	return url.protocol === "http:" || url.protocol === "https:";
+}
+
+function isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
 }

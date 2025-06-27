@@ -31,7 +31,7 @@
 - [x] Page home bouton settings et logout inaccessible quand logedin
 
 - [x] tout traduire
-- [ ] certain check avec des value de string donc faire attention comme par ex: game.quit (anciennement Quit)
+- [ ] certain check avec des value de string donc faire attention comme par ex: game.quitButton (anciennement Quit)
 - [ ] Vérifier les traductions
 
 - [x] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde) -> cookie jwt_token
