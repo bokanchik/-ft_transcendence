@@ -23,7 +23,6 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 	const leftSection = document.createElement('div');
 	const langButton = document.createElement('button');
 
-	// --- Flags language switcher ---
 	langButton.className = 'flex items-center justify-center p-1.5 rounded-full transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75';
 
 	const flagImg = document.createElement('img');
@@ -82,7 +81,6 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		userHeader.className = 'flex items-center space-x-4 relative';
 
 		const avatarDisplayWrapper = document.createElement('div');
-		// avatarDisplayWrapper.className = 'bg-white/10 p-1.5 rounded-lg flex items-center space-x-3 cursor-pointer select-none transition-transform duration-200 hover:scale-105';
 		avatarDisplayWrapper.className = 'bg-teal-600/20 hover:bg-teal-500/30 border border-teal-500/30 p-1.5 rounded-lg flex items-center space-x-3 cursor-pointer select-none transition-all duration-200 hover:scale-105';
 		const displayNameHeader = document.createElement('span');
 		displayNameHeader.className = 'text-white font-semibold text-base pr-1';
@@ -104,12 +102,10 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		const settingsButton = document.createElement('a');
 		settingsButton.href = '/profile';
 		settingsButton.setAttribute('data-link', '');
-		// settingsButton.className = 'block px-4 py-2 text-gray-300 hover:bg-gray-100 rounded-t-lg transition-colors';
 		settingsButton.className = 'block px-4 py-2 text-gray-200 hover:bg-gray-700 rounded-t-lg transition-colors';
 		settingsButton.textContent = t('header.settings');
 
 		const logoutButtonEl = document.createElement('button');
-		// logoutButtonEl.className = 'block w-full text-left px-4 py-2 text-gray-300 hover:bg-gray-100 rounded-b-lg transition-colors';
 		logoutButtonEl.className = 'block w-full text-left px-4 py-2 text-gray-200 hover:bg-gray-700 rounded-b-lg transition-colors';
 		logoutButtonEl.textContent = t('header.logout');
 		logoutButtonEl.addEventListener('click', async (e) => {
