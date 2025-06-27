@@ -90,7 +90,6 @@ export function TournamentPage(): HTMLElement {
                 startButton.textContent = 'Next Match';
                 startButton.className = 'mt-10 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition';
 
-
                 startButton.addEventListener('click', () => {
                     createLocalMatch(match.player1, match.player2, true);
                 });

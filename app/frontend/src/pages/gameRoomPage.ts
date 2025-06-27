@@ -105,7 +105,7 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 		return container;
 	}
 
-	if (gameMode === 'local') {
+	if (gameMode === 'local' || gameMode === 'tournament') {
 		rightUsername.textContent = sessionStorage.getItem('player1');
 		leftUsername.textContent = sessionStorage.getItem('player2');
 	} else {
@@ -284,6 +284,7 @@ function handleLocalEvents(ctx: CanvasRenderingContext2D, scoreDisplay: HTMLDivE
 		isGameOver = true;
 		cleanupSocket(socket);
 		cleanupListeners();
+		console.log(sessionStorage.getItem('gameMode'));
 		if (sessionStorage.getItem('gameMode') === 'tournament') {
 			navigateTo('/tournament');
 		}
