@@ -14,11 +14,9 @@ export function FriendsListComponent(props: FriendsListProps): HTMLElement {
 
 	const section = document.createElement('div');
 	section.id = 'friends-list-section';
-	// section.className = 'mt-8 p-6 bg-white border border-gray-200 rounded-lg shadow-lg';
 	section.className = '';
 
 	const title = document.createElement('h2');
-	// title.className = 'text-2xl font-semibold text-gray-800 mb-6';
 	title.className = 'text-xl font-semibold text-white mb-4';
 	title.innerHTML = `${t('friend.list.accepted.title')} (<span id="friends-count">${friends.length}</span>)`;
 
@@ -27,7 +25,6 @@ export function FriendsListComponent(props: FriendsListProps): HTMLElement {
 	ul.className = 'space-y-4';
 
 	if (!friends.length) {
-		// ul.innerHTML = `<li class="text-gray-500 italic p-4 text-center">${t('friend.list.accepted.noFriends')}</li>`;
 		ul.innerHTML = `<li class="text-gray-300 italic p-4 text-center">${t('friend.list.accepted.noFriends')}</li>`;
 	} else {
 		friends.forEach(friend => {
@@ -55,26 +52,7 @@ export function FriendsListComponent(props: FriendsListProps): HTMLElement {
 			const li = document.createElement('li');
 			li.dataset.friendId = friendId.toString();
 			li.dataset.friendshipId = friendshipId.toString();
-			// li.className = 'p-4 bg-gray-50 border border-gray-200 rounded-lg shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0';
 			li.className = 'p-4 bg-black/20 border border-gray-500/30 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0 hover:bg-black/30 transition-colors duration-200';
-			// li.innerHTML = `
-            //     <div class="flex items-center w-full sm:w-auto">
-            //         <img src="${avatar}" alt="${displayName}" class="w-12 h-12 rounded-full mr-4 object-cover">
-            //         <div class="flex-grow">
-            //             <div class="flex items-center mb-1">
-            //                 <span class="inline-block w-3 h-3 ${statusIndicatorClass} rounded-full mr-2" title="${statusText}"></span>
-            //                 <strong class="text-lg text-gray-700">${displayName}</strong>
-            //             </div>
-            //             <div class="text-xs text-gray-500">
-            //                 <span>${t('user.wins')}: ${wins}</span> | <span>${t('user.losses')}: ${losses}</span>
-            //             </div>
-            //         </div>
-            //     </div>
-            //     <div class="flex space-x-2 self-end sm:self-center pt-2 sm:pt-0">
-            //         <button data-action="view-profile" data-user-id="${friendId}" class="text-xs bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1.5 px-3 rounded-md">${t('friend.list.accepted.viewProfile')}</button>
-            //         <button data-action="remove-friend" data-friendship-id="${friendshipId}" class="text-xs bg-red-500 hover:bg-red-600 text-white font-semibold py-1.5 px-3 rounded-md">${t('friend.remove')}</button>
-            //     </div>
-            // `;
 			li.innerHTML = `
                 <div class="flex items-center w-full sm:w-auto">
                     <img src="${avatar}" alt="${displayName}" class="w-12 h-12 rounded-full mr-4 object-cover">

@@ -1103,12 +1103,3 @@ const branchHTML = `
 `;
 
 document.body.insertAdjacentHTML("beforeend", branchHTML);
-// Ciblez le conteneur spécifique
-// const backgroundContainer = document.getElementById('background-container');
-
-// // Assurez-vous que le conteneur existe avant d'y injecter le HTML
-// if (backgroundContainer) {
-// 	backgroundContainer.innerHTML = branchHTML;
-// } else {
-// 	console.error("Fatal Error: #background-container not found in DOM.");
-// }

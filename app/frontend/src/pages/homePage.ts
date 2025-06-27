@@ -7,19 +7,13 @@ export function HomePage(): HTMLElement {
 
 	const pageWrapper = document.createElement('div');
 	pageWrapper.className = 'flex flex-col min-h-screen bg-cover bg-center';
-	pageWrapper.style.backgroundImage = "url('/assets/jungle1.jpg')";
-	// pageWrapper.className = 'flex flex-col min-h-screen bg-gray-100';
+	pageWrapper.style.backgroundImage = "url('/assets/jungle2.jpg')";
 
 	const headerElement = HeaderComponent({ currentUser });
 	pageWrapper.appendChild(headerElement);
 
 	const container = document.createElement('div');
 	container.className = 'relative bg-cover bg-center flex-grow text-white flex flex-col items-center justify-center p-4 sm:p-8';
-	//  container.className = 'flex-grow flex justify-center items-center p-4 sm:p-8';
-	// container.style.backgroundImage = "url('/assets/jungle1.jpg')";
-
-	const overlay = document.createElement('div');
-	overlay.className = 'absolute inset-0 bg-black/40';
 
 	const mainContent = document.createElement('main');
 	mainContent.className = 'relative z-10 flex flex-col items-center text-center';
@@ -61,7 +55,6 @@ export function HomePage(): HTMLElement {
 
 	footer.appendChild(apiLink);
 
-	container.appendChild(overlay);
 	container.appendChild(mainContent);
 
 	pageWrapper.appendChild(container);

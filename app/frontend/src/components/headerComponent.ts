@@ -17,9 +17,8 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 	const { currentUser } = props;
 
 	const headerContainer = document.createElement('div');
-	// headerContainer.className = 'flex justify-between items-center px-6 py-2 border-b border-gray-200 bg-white shadow-md';
-	 headerContainer.className = 'flex justify-between items-center px-6 py-2 bg-white/70 backdrop-blur-md border-b border-white/20 shadow-lg';
-	 
+	headerContainer.className = 'relative z-50 flex justify-between items-center px-6 py-2 bg-gray-900/60 backdrop-blur-lg border-b border-gray-400/30 shadow-lg';
+
 	// --- Left side: Language Button ---
 	const leftSection = document.createElement('div');
 	const langButton = document.createElement('button');
@@ -68,7 +67,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		const linkElement = document.createElement('a');
 		linkElement.href = linkInfo.href;
 		linkElement.textContent = t(linkInfo.textKey);
-		linkElement.className = 'text-gray-700 hover:text-blue-600 hover:bg-gray-100 font-medium px-4 py-2 rounded-lg transition-all duration-200 ease-in-out text-base';
+		linkElement.className = 'text-gray-200 hover:text-white hover:bg-white/10 font-medium px-4 py-2 rounded-lg transition-all duration-200 ease-in-out text-base';
 		linkElement.setAttribute('data-link', '');
 		centerSection.appendChild(linkElement);
 	});
@@ -83,8 +82,8 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		userHeader.className = 'flex items-center space-x-4 relative';
 
 		const avatarDisplayWrapper = document.createElement('div');
-		avatarDisplayWrapper.className = 'bg-orange-400 p-1.5 rounded-lg flex items-center space-x-3 cursor-pointer select-none transition-transform duration-200 hover:scale-105';
-
+		// avatarDisplayWrapper.className = 'bg-white/10 p-1.5 rounded-lg flex items-center space-x-3 cursor-pointer select-none transition-transform duration-200 hover:scale-105';
+		avatarDisplayWrapper.className = 'bg-teal-600/20 hover:bg-teal-500/30 border border-teal-500/30 p-1.5 rounded-lg flex items-center space-x-3 cursor-pointer select-none transition-all duration-200 hover:scale-105';
 		const displayNameHeader = document.createElement('span');
 		displayNameHeader.className = 'text-white font-semibold text-base pr-1';
 		displayNameHeader.textContent = currentUser.display_name || currentUser.username;
@@ -99,17 +98,19 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		avatarDisplayWrapper.appendChild(avatarHeader);
 
 		const miniMenu = document.createElement('div');
-		miniMenu.className = 'absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 z-50 hidden flex-col origin-top-right';
+		miniMenu.className = 'absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-xl border border-gray-600/50 z-50 hidden flex-col origin-top-right';
 		miniMenu.style.top = '110%';
 
 		const settingsButton = document.createElement('a');
 		settingsButton.href = '/profile';
 		settingsButton.setAttribute('data-link', '');
-		settingsButton.className = 'block px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-t-lg transition-colors';
+		// settingsButton.className = 'block px-4 py-2 text-gray-300 hover:bg-gray-100 rounded-t-lg transition-colors';
+		settingsButton.className = 'block px-4 py-2 text-gray-200 hover:bg-gray-700 rounded-t-lg transition-colors';
 		settingsButton.textContent = t('header.settings');
 
 		const logoutButtonEl = document.createElement('button');
-		logoutButtonEl.className = 'block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-b-lg transition-colors';
+		// logoutButtonEl.className = 'block w-full text-left px-4 py-2 text-gray-300 hover:bg-gray-100 rounded-b-lg transition-colors';
+		logoutButtonEl.className = 'block w-full text-left px-4 py-2 text-gray-200 hover:bg-gray-700 rounded-b-lg transition-colors';
 		logoutButtonEl.textContent = t('header.logout');
 		logoutButtonEl.addEventListener('click', async (e) => {
 			e.stopPropagation();
@@ -155,7 +156,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		const loginLink = document.createElement('a');
 		loginLink.href = "/login";
 		loginLink.setAttribute('data-link', '');
-		loginLink.className = "text-sm sm:text-base font-semibold px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-300";
+		loginLink.className = "text-sm sm:text-base font-semibold px-4 py-2 rounded-lg text-gray-200 bg-white/10 hover:bg-white/20 border border-white/20 transition-colors duration-300";
 		loginLink.textContent = t('login.title');
 
 		const registerLink = document.createElement('a');
