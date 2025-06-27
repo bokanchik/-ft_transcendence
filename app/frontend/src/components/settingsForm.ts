@@ -118,7 +118,7 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 			}
 		} else {
 			twoFaSetupContainer.classList.add('hidden');
-			qrCodeContainer.innerHTML = ''; // Clear qr code
+			qrCodeContainer.innerHTML = '';
 		}
 	});
 
