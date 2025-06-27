@@ -59,8 +59,8 @@ export function FriendRequestsComponent(props: FriendRequestsProps): HTMLElement
 			}
 		} catch (error: any) {
 			console.error(`Error while attempting '${action}':`, error);
-			alert(`Error: ${error.message || t('error.general.any')}`);
-			showToast(`${t('general.error')}: ${error.message || t('error.general.any')}`, 'error');
+			alert(`Error: ${error.message || t('msg.error.any')}`);
+			showToast(`${t('general.error')}: ${error.message || t('msg.error.any')}`, 'error');
 			button.disabled = false;
 			button.textContent = action.charAt(0).toUpperCase() + action.slice(1);
 		}

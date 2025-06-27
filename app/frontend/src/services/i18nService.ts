@@ -71,14 +71,12 @@ export function t(key: string, replacements?: Record<string, string>): string {
     const keys = key.split('.');
     
     let result = keys.reduce((acc, currentKey) => {
-        // acc est l'objet/valeur accumulé, on vérifie qu'il existe et qu'il a la clé suivante
         if (acc && typeof acc === 'object' && acc.hasOwnProperty(currentKey)) {
             return acc[currentKey];
         }
         return undefined;
     }, translations as any);
 
-    // Si on a trouvé une traduction (et que ce n'est pas un objet mais bien une string)
     if (typeof result === 'string') {
         let translation = result;
         if (replacements) {
@@ -89,6 +87,5 @@ export function t(key: string, replacements?: Record<string, string>): string {
         return translation;
     }
     
-    // Sinon, on retourne la clé originale comme fallback
     return key;
 }

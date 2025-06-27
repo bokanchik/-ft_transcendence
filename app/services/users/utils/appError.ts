@@ -2,13 +2,13 @@ import { FastifyInstance, FastifyRequest, FastifyReply, FastifyError } from 'fas
 
 export const ERROR_KEYS = {
     // Erreurs de Login/Register
-    LOGIN_INVALID_CREDENTIALS: 'error.login.invalidCredentials',
-    LOGIN_ACCOUNT_BANNED: 'error.login.accountBanned',
-    REGISTER_USERNAME_EXISTS: 'error.register.usernameExists',
-    REGISTER_EMAIL_EXISTS: 'error.register.emailExists',
-    REGISTER_DISPLAYNAME_EXISTS: 'error.register.displayNameExists',
-	INVALID_REFRESH_TOKEN: 'error.refreshToken.invalid', // Invalid or expired refresh token.
-	REFRESH_TOKEN_MISSING: 'error.refreshToken.missing', // Refresh token missing.
+    LOGIN_INVALID_CREDENTIALS: 'msg.error.login.invalidCredentials',
+    LOGIN_ACCOUNT_BANNED: 'msg.error.login.accountBanned',
+    REGISTER_USERNAME_EXISTS: 'msg.error.register.usernameExists',
+    REGISTER_EMAIL_EXISTS: 'msg.error.register.emailExists',
+    REGISTER_DISPLAYNAME_EXISTS: 'msg.error.register.displayNameExists',
+	INVALID_REFRESH_TOKEN: 'msg.error.refreshToken.invalid', // Invalid or expired refresh token.
+	REFRESH_TOKEN_MISSING: 'msg.error.refreshToken.missing', // Refresh token missing.
 
 	// a virer
 	INVALID_FRIENDSHIP_ID: 'error.friendship.invalidId', // Invalid friendship ID format
@@ -24,11 +24,11 @@ export const ERROR_KEYS = {
     FRIEND_NOT_PART_OF_REQUEST: 'error.friend.notPartOfRequest',
 
     // Erreurs générales
-    USER_NOT_FOUND: 'error.user.notFound', //
-    UNAUTHORIZED: 'error.general.unauthorized',
-    FORBIDDEN: 'error.general.forbidden',
-    DATABASE_ERROR: 'error.general.databaseError',
-    UNKNOWN_ERROR: 'error.general.unknown'
+    USER_NOT_FOUND: 'msg.error.user.notFound', //
+    UNAUTHORIZED: 'msg.error.unauthorized',
+    FORBIDDEN: 'msg.error.forbidden',
+    DATABASE_ERROR: 'msg.error.databaseError',
+    UNKNOWN_ERROR: 'msg.error.unknown'
 } as const;
 
 export class AppError extends Error {

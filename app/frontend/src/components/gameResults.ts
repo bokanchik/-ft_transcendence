@@ -1,6 +1,7 @@
 import { cleanupSocket } from "../services/initOnlineGame.js";
 import { navigateTo } from "../services/router.js";
 import socket from '../services/socket.js';
+import { t } from '../services/i18nService.js';
 
 export function showGameResult(player1: string, player2: string, score1: number, score2: number, url1: string, url2: string) {
 	const modal = document.createElement('div');
@@ -12,7 +13,7 @@ export function showGameResult(player1: string, player2: string, score1: number,
 	// Titre
 	const title = document.createElement('h2');
 	title.className = 'text-3xl font-bold text-gray-800 mb-6';
-	title.textContent = '🏓 Match Finished';
+	title.textContent = t('game.result.finished');
 
 	// Container des joueurs
 	const playersContainer = document.createElement('div');
@@ -23,7 +24,7 @@ export function showGameResult(player1: string, player2: string, score1: number,
 	player1Container.className = 'flex flex-col items-center flex-1';
 
 	const img1 = document.createElement('img');
-    // TODO: fetch a la base de donne d'Arthur
+	// TODO: fetch a la base de donne d'Arthur -> Done dans le back (appel de updatePlayerStats dans setGameResult)
 	img1.src = url1;
 	img1.className = 'w-20 h-20 object-cover rounded-full mb-2 border-4 border-blue-500 shadow';
 
@@ -42,7 +43,7 @@ export function showGameResult(player1: string, player2: string, score1: number,
 	// "vs" texte
 	const vsText = document.createElement('span');
 	vsText.className = 'text-3xl font-bold text-gray-700';
-	vsText.textContent = 'vs';
+	vsText.textContent = t('game.vs');
 
 	// Joueur 2
 	const player2Container = document.createElement('div');
@@ -68,7 +69,7 @@ export function showGameResult(player1: string, player2: string, score1: number,
 	const closeButton = document.createElement('button');
 	closeButton.id = 'close-modal';
 	closeButton.className = 'mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow transition';
-	closeButton.textContent = 'Return to Lobby';
+	closeButton.textContent = t('link.lobby');
 
 	// Assemble tout
 	playersContainer.appendChild(player1Container);

@@ -5,6 +5,7 @@ import { HeaderComponent } from '../components/headerComponent.js';
 import { User } from '../shared/schemas/usersSchemas.js';
 import { getUserDataFromStorage } from '../services/authService.js';
 import { showToast } from './toast.js';
+import { t } from '../services/i18nService.js';
 
 export type GameMode = 'local' | 'remote';
 
@@ -44,76 +45,76 @@ export function GamePage(): HTMLElement {
 	const headerElement = HeaderComponent({ currentUser });
 	pageWrapper.appendChild(headerElement);
 
-    // --- Game Page Content ---
-    const gameContentContainer: HTMLDivElement = document.createElement('div');
-	gameContentContainer.className = 'bg-white flex justify-center items-center min-h-screen p-8';    
-    
-    const formContainer: HTMLDivElement = document.createElement('div');
-    formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';   
+	// --- Game Page Content ---
+	const gameContentContainer: HTMLDivElement = document.createElement('div');
+	gameContentContainer.className = 'bg-white flex justify-center items-center min-h-screen p-8';
 
-    // --- Title ---
-    const title: HTMLHeadElement = document.createElement('h2');
-    title.textContent = 'Welcome to the Game';
-    title.className = 'text-3xl font-bold mb-6 text-center text-gray-800';
-    
-    // --- Buttons ---
-    const buttonsContainer: HTMLDivElement = document.createElement('div');
-    buttonsContainer.id = 'buttons-container';
-    buttonsContainer.className = 'flex flex-col items-center';
-    
-    const onlineGameButton: HTMLButtonElement  = document.createElement('button');
-    onlineGameButton.id = 'online-button';
-   
-    onlineGameButton.className = 'bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mb-4 transition duration-300 ease-in-out';
-    onlineGameButton.textContent = 'Start Game';
-    
-    buttonsContainer.appendChild(onlineGameButton);
-    // --- Le pied du page ---
-    const footer: HTMLDivElement = document.createElement('div');
-    footer.className = 'mt-6 text-center';
-    
-    const homeLink: HTMLAnchorElement = document.createElement('a');
-    homeLink.href = '/'; // lien vers la page d'accueil
-    homeLink.textContent = 'Back to Home';
-    homeLink.setAttribute('data-link', ''); // intercepte par le router dans le main.ts
-    homeLink.className = 'text-blue-600 hover:text-blue-800 text-sm';
-    
-    footer.appendChild(homeLink);
+	const formContainer: HTMLDivElement = document.createElement('div');
+	formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';
 
-    
-    // --- Ajout des éléments au conteneur principal ---
-    formContainer.append(title, buttonsContainer, footer);
-    gameContentContainer.appendChild(formContainer);
-    pageWrapper.appendChild(gameContentContainer);
-    
-    // --- Event: Online game button clicked ---
-    onlineGameButton.addEventListener('click', () => {
-        onlineGameHandler(buttonsContainer, onlineGameButton, title);
-    });
-    
-    return pageWrapper;
+	// --- Title ---
+	const title: HTMLHeadElement = document.createElement('h2');
+	title.textContent = t('game.welcome');
+	title.className = 'text-3xl font-bold mb-6 text-center text-gray-800';
+
+	// --- Buttons ---
+	const buttonsContainer: HTMLDivElement = document.createElement('div');
+	buttonsContainer.id = 'buttons-container';
+	buttonsContainer.className = 'flex flex-col items-center';
+
+	const onlineGameButton: HTMLButtonElement = document.createElement('button');
+	onlineGameButton.id = 'online-button';
+
+	onlineGameButton.className = 'bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mb-4 transition duration-300 ease-in-out';
+	onlineGameButton.textContent = t('game.start');
+
+	buttonsContainer.appendChild(onlineGameButton);
+	// --- Le pied du page ---
+	const footer: HTMLDivElement = document.createElement('div');
+	footer.className = 'mt-6 text-center';
+
+	const homeLink: HTMLAnchorElement = document.createElement('a');
+	homeLink.href = '/'; // lien vers la page d'accueil
+	homeLink.textContent = t('link.home');
+	homeLink.setAttribute('data-link', ''); // intercepte par le router dans le main.ts
+	homeLink.className = 'text-blue-600 hover:text-blue-800 text-sm';
+
+	footer.appendChild(homeLink);
+
+
+	// --- Ajout des éléments au conteneur principal ---
+	formContainer.append(title, buttonsContainer, footer);
+	gameContentContainer.appendChild(formContainer);
+	pageWrapper.appendChild(gameContentContainer);
+
+	// --- Event: Online game button clicked ---
+	onlineGameButton.addEventListener('click', () => {
+		onlineGameHandler(buttonsContainer, onlineGameButton, title);
+	});
+
+	return pageWrapper;
 }
 
 async function onlineGameHandler(buttonsContainer: HTMLDivElement, onlineGameButton: HTMLButtonElement, title: HTMLHeadElement) {
-    
-    try {
-        const userRes: Response = await fetch('/api/users/me');
-        if (!userRes.ok) {
-            showToast('You must be logged in to play online', 'error');
-            return;
-        }
-        const userData = await userRes.json();
-        const display_name: string = userData.display_name;
-        const userId: number = userData.id;
-    
-        sessionStorage.setItem('gameMode', 'remote');
-    
-        await handleOnlineGame(display_name, userId, buttonsContainer, onlineGameButton, title);
-    
-    } catch (err: unknown) {
-        console.log(`Failed to fetch from user`);
-        showToast('Something went wrong. Please try again later.', 'error');
-        throw err;
-    }
-    
+
+	try {
+		const userRes: Response = await fetch('/api/users/me');
+		if (!userRes.ok) {
+			showToast(t('game.deniedMsg'), 'error');
+			return;
+		}
+		const userData = await userRes.json();
+		const display_name: string = userData.display_name;
+		const userId: number = userData.id;
+
+		sessionStorage.setItem('gameMode', 'remote');
+
+		await handleOnlineGame(display_name, userId, buttonsContainer, onlineGameButton, title);
+
+	} catch (err: unknown) {
+		console.log(`Failed to fetch from user`);
+		showToast(t('msg.error.any'), 'error');
+		throw err;
+	}
+
 }

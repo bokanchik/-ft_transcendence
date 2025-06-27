@@ -49,7 +49,7 @@ export function LoginPage(): HTMLElement {
     const linksDiv = document.createElement('div');
     linksDiv.className = 'mt-6 text-center';
     linksDiv.innerHTML = `
-        <a href="/" data-link class="text-blue-600 hover:text-blue-800 text-sm">${t('login.backToHome')}</a>
+        <a href="/" data-link class="text-blue-600 hover:text-blue-800 text-sm">${t('link.home')}</a>
         <span class="mx-2 text-gray-400">|</span>
         <a href="/register" data-link class="text-blue-600 hover:text-blue-800 text-sm">${t('login.registerLink')}</a>
     `;

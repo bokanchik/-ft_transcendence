@@ -12,7 +12,7 @@ export function initCountdown(container: HTMLDivElement): Promise<void> {
 				countdownValue--;
 
 				if (countdownValue > 0) {
-					container.textContent = `Start in ${countdownValue}...`;
+					container.textContent = `${t('game.startIn')} ${countdownValue}...`;
 				} else {
 					clearInterval(interval);
 					container.remove();

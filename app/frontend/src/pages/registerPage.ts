@@ -68,7 +68,7 @@ export async function RegisterPage(): Promise<HTMLElement> {
         <div id="register-message" class="mt-4 text-center text-sm"></div>
         <div class="mt-6 text-center">
           <a href="/" data-link class="text-blue-600 hover:text-blue-800 text-sm">
-            ${t('login.backToHome')}
+            ${t('link.home')}
           </a>
           <span class="mx-2 text-gray-400">|</span>
           <a href="/login" data-link class="text-blue-600 hover:text-blue-800 text-sm">

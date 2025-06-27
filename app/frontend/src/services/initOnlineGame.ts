@@ -35,12 +35,12 @@ export async function initOnlineGame(display_name: string, userId: number, butto
     }
     
     socket.on('connect', () => {
-        console.log('Connecte au serveur');
+        console.log('Connect to the server');
         socket.emit('authenticate', { display_name, userId });
     });
     
     socket.on('inQueue', () => {
-        console.log('Dans la queue...');
+        console.log('In the queue...');
         showWaitingToast(socket, controller, WAITING_TIME);
     });
 

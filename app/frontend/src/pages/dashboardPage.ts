@@ -233,7 +233,7 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		} else {
 			const errorMsg = document.createElement('div');
 			errorMsg.className = 'min-h-screen flex items-center justify-center text-xl text-red-500';
-			errorMsg.textContent = t('error.user.notFound');
+			errorMsg.textContent = t('msg.error.user.notFound');
 			return errorMsg;
 		}
 	}

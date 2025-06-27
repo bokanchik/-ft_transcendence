@@ -39,14 +39,14 @@ export function FriendsListComponent(props: FriendsListProps): HTMLElement {
 			const avatar = avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random&color=fff&size=40`;
 
 			let statusIndicatorClass = 'bg-gray-400';
-			let statusText = t('status.offline');
+			let statusText = t('user.status.offline');
 
 			if (status === UserOnlineStatus.ONLINE) {
 				statusIndicatorClass = 'bg-green-500';
-				statusText = t('status.online');
+				statusText = t('user.status.online');
 			} else if (status === UserOnlineStatus.IN_GAME) {
 				statusIndicatorClass = 'bg-yellow-500';
-				statusText = t('status.inGame');
+				statusText = t('user.status.inGame');
 			}
 
 			const li = document.createElement('li');

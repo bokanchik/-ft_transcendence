@@ -6,6 +6,11 @@
 		"button": "JOUER",
 		"gameApi": "Consulter l'API du jeu"
 	},
+	"link": {
+		"home": "Retour à l'accueil",
+		"dashboard": "Retour au tableau de bord",
+		"lobby": "Retour au salon"
+	},
 	"user": {
 		"username": "Nom d'utilisateur",
 		"displayName": "Nom d'affichage",
@@ -15,6 +20,12 @@
 		"wins": "Victoires",
 		"losses": "Défaites",
 		"loading": "Chargement des données utilisateur...",
+		"status": {
+			"title": "Statut",
+			"online": "En ligne",
+			"offline": "Hors ligne",
+			"inGame": "En jeu"
+		},
 		"settings": {
 			"title": "Paramètres utilisateur",
 			"usernameMsg": "Le nom d'utilisateur ne peut pas être modifié.",
@@ -22,7 +33,6 @@
 			"displayNamePlaceholder": "Votre nom d'affichage",
 			"avatarMsg": "Laissez vide si vous n'avez pas d'avatar.",
 			"button": "Enregistrer les modifications",
-			"dashboardLink": "Retour au tableau de bord",
 			"savingMsg1": "Sauvegarde en cours...",
 			"savingMsg2": "Sauvegarde...",
 			"success": "Modifications enregistrées avec succès !",
@@ -43,20 +53,27 @@
 	},
 	"game": {
 		"title": "Jeu",
+		"welcome": "Bienvenue dans le jeu",
 		"loading": "Chargement du jeu...",
 		"start": "Démarrer le jeu",
 		"startIn": "Démarrage dans",
 		"waitOpponent": "En attente de l'adversaire...",
-		"join": "Rejoindre le jeu",
-		"create": "Créer un jeu",
+		"vs": "VS",
+		"player": "Joueur",
+		"deniedMsg": "Vous devez être connecté pour jouer en ligne.",
+		"button": "Jouer",
+		"result": {
+			"title": "Résultat du jeu",
+			"finished": "🏓 Match terminé"
+		},
 		"settings": {
 			"title": "Paramètres du jeu",
 			"gameMode": "Mode de jeu",
-			"createButton": "Créer un jeu",
-			"joinButton": "Rejoindre un jeu"
-		},
-		"errors": {
-			"gameNotFound": "Jeu non trouvé."
+			"duel": "1 contre 1",
+			"tournament": "Tournoi",
+			"nbPlayers": "Combien de joueurs ?",
+			"nbPlayersPlaceholder": "Enter 2, 4, or 8",
+			"nbPlayersSpec": "Le nombre de joueurs doit être une puissance de 2 (2, 4, 8)."
 		}
 	},
 	"register": {
@@ -88,7 +105,6 @@
 	},
 	"login": {
 		"title": "Connexion",
-		"backToHome": "Retour à l'accueil",
 		"identifierLabel": "Nom d'utilisateur ou Email",
 		"identifierPlaceholder": "Entrez votre nom d'utilisateur ou e-mail",
 		"passwordLabel": "Mot de passe",
@@ -173,12 +189,6 @@
 			"winner": "Gagnant"
 		}
 	},
-	"status": {
-		"title": "Statut",
-		"online": "En ligne",
-		"offline": "Hors ligne",
-		"inGame": "En jeu"
-	},
 	"dashboard": {
 		"tabs": {
 			"users": "Tous les utilisateurs",
@@ -195,52 +205,39 @@
 		"cancel": "Annuler",
 		"confirm": "Confirmer"
 	},
-	"error": {
-		"login": {
-			"invalidCredentials": "Identifiant ou mot de passe invalide.",
-			"accountBanned": "Ce compte a été banni."
-		},
-		"register": {
-			"usernameExists": "Le nom d'utilisateur '{username}' est déjà pris.",
-			"emailExists": "L'email '{email}' est déjà utilisé.",
-			"displayNameExists": "Le nom d'affichage '{display_name}' est déjà utilisé."
-		},
-		"refreshToken": {
-			"invalid": "Jeton de rafraîchissement invalide ou expiré.",
-			"missing": "Jeton de rafraîchissement manquant."
-		},
-		"user": {
-			"invalidId": "Identifiant utilisateur invalide.",
-			"errorCsrf": "Erreur de securité: jeton CSRF invalide. Rafraîchissez la page et essayez à nouveau.",
-			"loadingProfile": "Une erreur est survenue lors du chargement du profil utilisateur.",
-			"notFound": "Utilisateur non trouvé."
-		},
-		"general": {
-			"any": "Une erreur est survenue.",
-			"unauthorized": "Non autorisé. Veuillez vous connecter.",
-			"forbidden": "Accès interdit. Vous n'avez pas les permissions nécessaires.",
-			"unknown": "Une erreur inconnue est survenue.",
-			"malformedResponse": "La réponse du serveur est mal formée.",
-			"networkError": "Erreur de réseau ou impossible de joindre le serveur."
-		}
-	},
 	"msg": {
-		"auth": {
-			"loginSuccess": "Connexion réussie ! Bienvenue",
-			"logoutSuccess": "Déconnexion réussie.",
-			"registerSuccess": "Inscription réussie ! Redirection vers la page de connexion...",
-			"registerError": "Erreur lors de l'inscription :",
-			"loginError": "Erreur lors de la connexion :",
-			"loadingUserData": "Chargement des données utilisateur...",
-			"loadingProfile": "Chargement du profil utilisateur..."
-		},
 		"redirect": {
 			"login": "Redirection vers la page de connexion...",
 			"dashboard": "Redirection vers le tableau de bord...",
 			"game": "Redirection vers le jeu..."
 		},
 		"error": {
-			"initializing": "Erreur lors de l'initialisation de la page. Veuillez essayer de rafraîchir la page."
+			"any": "Une erreur est survenue.",
+			"initializing": "Erreur lors de l'initialisation de la page. Veuillez essayer de rafraîchir la page.",
+			"unauthorized": "Non autorisé. Veuillez vous connecter.",
+			"forbidden": "Accès interdit. Vous n'avez pas les permissions nécessaires.",
+			"unknown": "Une erreur inconnue est survenue.",
+			"malformedResponse": "La réponse du serveur est mal formée.",
+			"networkError": "Erreur de réseau ou impossible de joindre le serveur.",
+			"login": {
+				"invalidCredentials": "Identifiant ou mot de passe invalide.",
+				"accountBanned": "Ce compte a été banni."
+			},
+			"register": {
+				"usernameExists": "Le nom d'utilisateur '{username}' est déjà pris.",
+				"emailExists": "L'email '{email}' est déjà utilisé.",
+				"displayNameExists": "Le nom d'affichage '{display_name}' est déjà utilisé."
+			},
+			"refreshToken": {
+				"invalid": "Jeton de rafraîchissement invalide ou expiré.",
+				"missing": "Jeton de rafraîchissement manquant."
+			},
+			"user": {
+				"invalidId": "Identifiant utilisateur invalide.",
+				"errorCsrf": "Erreur de securité: jeton CSRF invalide. Rafraîchissez la page et essayez à nouveau.",
+				"loadingProfile": "Une erreur est survenue lors du chargement du profil utilisateur.",
+				"notFound": "Utilisateur non trouvé."
+			}
 		}
 	}
 }

@@ -1,5 +1,6 @@
 import { showToast } from "../components/toast.js";
 import { navigateTo } from "./router.js";
+import { t } from "./i18nService.js";
 
 
 /**
@@ -20,14 +21,14 @@ import { navigateTo } from "./router.js";
 export async function initLocalGame(form: HTMLFormElement) {
     const gameMode = form.querySelector<HTMLSelectElement>('#gameMode');
     if (!gameMode) {
-        showToast('Please, select a game mode.', 'error');
+        showToast(t('game.settings.gameMode'), 'error');
         return;
     }
 
     const isValidAlias = (alias: string) => /^[a-zA-Z0-9_-]+$/.test(alias);
 
     switch (gameMode.value) {
-        case '1v1':
+        case t('game.settings.duel'):
             const alias1 = form.querySelector<HTMLInputElement>('#alias1')?.value.trim();
             const alias2 = form.querySelector<HTMLInputElement>('#alias2')?.value.trim();
             
@@ -44,7 +45,7 @@ export async function initLocalGame(form: HTMLFormElement) {
             }
             await createLocalMatch(alias1, alias2, false);
             break;
-        case 'Tournament':
+        case t('game.settings.tournament'):
             const formData = new FormData(form);
             const players: string[] = [];
 

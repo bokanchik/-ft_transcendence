@@ -36,7 +36,7 @@ export function translateResultMessage(
   message: string,
   params?: Record<string, any>
 ): string {
-  if (!message) return t('error.general.unknown');
+  if (!message) return t('msg.error.unknown');
   return t(message, params);
 }
 
@@ -69,10 +69,10 @@ export async function handleApiResponse(
             if (errorPayload && errorPayload.messageKey) {
                 errorMessage = t(errorPayload.messageKey, errorPayload.messageParams);
             } else {
-                errorMessage = errorPayload?.error || t('error.general.unknown');
+                errorMessage = errorPayload?.error || t('msg.error.unknown');
             }
         } else {
-            errorMessage = t('error.general.malformedResponse');
+            errorMessage = t('msg.error.malformedResponse');
             console.error("Zod validation failed on error response:", parsedError.error);
         }
       } else {
@@ -80,7 +80,7 @@ export async function handleApiResponse(
       }
 
     } catch (e) {
-      errorMessage = t('error.general.networkError');
+      errorMessage = t('msg.error.networkError');
     }
 
     throw new ClientApiError(errorMessage, response.status, errorPayload?.statusCode, errorPayload);

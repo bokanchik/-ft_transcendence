@@ -6,6 +6,11 @@
 		"button": "PLAY",
 		"gameApi": "Check Game API"
 	},
+	"link": {
+		"home": "Back to Home",
+		"dashboard": "Back to Dashboard",
+		"lobby": "Back to Lobby"
+	},
 	"user": {
 		"username": "Username",
 		"displayName": "Display Name",
@@ -15,6 +20,12 @@
 		"wins": "Wins",
 		"losses": "Losses",
 		"loading": "Loading user data...",
+		"status": {
+			"title": "Status",
+			"online": "Online",
+			"offline": "Offline",
+			"inGame": "In Game"
+		},
 		"settings": {
 			"title": "User Settings",
 			"usernameMsg": "Username cannot be changed.",
@@ -22,7 +33,6 @@
 			"displayNamePlaceholder": "Your display name",
 			"avatarMsg": "Leave empty if you don't have an avatar.",
 			"button": "Save Changes",
-			"dashboardLink": "Back to Dashboard",
 			"savingMsg1": "Saving changes...",
 			"savingMsg2": "Saving...",
 			"success": "Changes saved successfully!",
@@ -43,20 +53,27 @@
 	},
 	"game": {
 		"title": "Game",
+		"welcome": "Welcome to the Game",
 		"loading": "Loading game...",
 		"start": "Start Game",
 		"startIn": "Starting in",
 		"waitOpponent": "Waiting for opponent...",
-		"join": "Join Game",
-		"create": "Create Game",
+		"vs": "VS",
+		"player": "Player",
+		"deniedMsg": "You must be logged in to play online.",
+		"button": "start",
+		"result": {
+			"title": "Game Result",
+			"finished": "🏓 Match Finished"
+		},
 		"settings": {
 			"title": "Game Settings",
-			"gameMode": "Game Mode",
-			"createButton": "Create Game",
-			"joinButton": "Join Game"
-		},
-		"errors": {
-			"gameNotFound": "Game not found."
+			"gameMode": "Select Game Mode",
+			"duel": "1 vs 1",
+			"tournament": "Tournament",
+			"nbPlayers": "How many players?",
+			"nbPlayersPlaceholder": "Enter 2, 4, or 8",
+			"nbPlayersSpec": "Number of players must be a power of 2 (2, 4, 8)."
 		}
 	},
 	"register": {
@@ -88,7 +105,6 @@
 	},
 	"login": {
 		"title": "Login",
-		"backToHome": "Back to Home",
 		"identifierLabel": "Username or Email",
 		"identifierPlaceholder": "Enter your username or email",
 		"passwordLabel": "Password",
@@ -173,12 +189,6 @@
 			"winner": "Winner"
 		}
 	},
-	"status": {
-		"title": "Status",
-		"online": "Online",
-		"offline": "Offline",
-		"inGame": "In Game"
-	},
 	"dashboard": {
 		"tabs": {
 			"users": "All Users",
@@ -195,35 +205,6 @@
 		"cancel": "Cancel",
 		"confirm": "Confirm"
 	},
-	"error": {
-		"login": {
-			"invalidCredentials": "Invalid identifier or password.",
-			"accountBanned": "This account has been banned."
-		},
-		"register": {
-			"usernameExists": "Username '{username}' is already taken.",
-			"emailExists": "Email '{email}' is already in use.",
-			"displayNameExists": "Display name '{display_name}' is already taken."
-		},
-		"refreshToken": {
-			"invalid": "Invalid or expired refresh token.",
-			"missing": "Missing refresh token."
-		},
-		"user": {
-			"invalidId": "Invalid User ID",
-			"errorCsrf": "Security Error: CSRF token mismatch. Please refresh the page and try again.",
-			"loadingProfile": "An Error occurred while loading the user profile.",
-			"notFound": "User not found."
-		},
-		"general": {
-			"any": "An error occurred.",
-			"unauthorized": "Unauthorized. Please log in.",
-			"forbidden": "Forbidden. You do not have the necessary permissions.",
-			"unknown": "An unknown error occurred.",
-			"malformedResponse": "The server's error response was malformed.",
-			"networkError": "Network error or could not reach the server."
-		}
-	},
 	"msg": {
 		"redirect": {
 			"login": "Redirecting to login page...",
@@ -231,7 +212,32 @@
 			"game": "Redirecting to game..."
 		},
 		"error": {
-			"initializing": "Error initializing Page. Please try refreshing the page."
+			"any": "An error occurred.",
+			"initializing": "Error initializing Page. Please try refreshing the page.",
+			"unauthorized": "Unauthorized. Please log in.",
+			"forbidden": "Forbidden. You do not have the necessary permissions.",
+			"unknown": "An unknown error occurred.",
+			"malformedResponse": "The server's error response was malformed.",
+			"networkError": "Network error or could not reach the server.",
+			"login": {
+				"invalidCredentials": "Invalid identifier or password.",
+				"accountBanned": "This account has been banned."
+			},
+			"register": {
+				"usernameExists": "Username '{username}' is already taken.",
+				"emailExists": "Email '{email}' is already in use.",
+				"displayNameExists": "Display name '{display_name}' is already taken."
+			},
+			"refreshToken": {
+				"invalid": "Invalid or expired refresh token.",
+				"missing": "Missing refresh token."
+			},
+			"user": {
+				"invalidId": "Invalid User ID",
+				"errorCsrf": "Security Error: CSRF token mismatch. Please refresh the page and try again.",
+				"loadingProfile": "An Error occurred while loading the user profile.",
+				"notFound": "User not found."
+			}
 		}
 	}
 }

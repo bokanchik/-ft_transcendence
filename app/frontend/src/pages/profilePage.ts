@@ -24,7 +24,7 @@ export async function ProfilePage(params: { userId?: string }): Promise<HTMLElem
 	if (isNaN(userIdToView)) {
 		const errorMsg = document.createElement('div');
 		errorMsg.className = 'min-h-screen flex items-center justify-center text-xl text-red-500';
-		errorMsg.textContent = t('error.user.invalidUserId');
+		errorMsg.textContent = t('msg.error.user.invalidUserId');
 		return errorMsg;
 	}
 
@@ -32,10 +32,10 @@ export async function ProfilePage(params: { userId?: string }): Promise<HTMLElem
 		await fetchCsrfToken();
 	} catch (error) {
 		console.error("Fail to recover CSRF token:", error);
-		showToast(t('error.user.errorCsrf'), 'error');
+		showToast(t('msg.error.user.errorCsrf'), 'error');
 		const errorMsg = document.createElement('div');
 		errorMsg.className = 'min-h-screen flex items-center justify-center text-xl text-red-500';
-		errorMsg.textContent = t('error.user.errorCsrf');
+		errorMsg.textContent = t('msg.error.user.errorCsrf');
 		return errorMsg;
 	}
 
@@ -66,7 +66,7 @@ export async function ProfilePage(params: { userId?: string }): Promise<HTMLElem
 		const profiledUser = await fetchUserDetails(userIdToView);
 
 		if (!profiledUser) {
-			loadingProfileMsg.textContent = t('error.user.notFound');
+			loadingProfileMsg.textContent = t('msg.error.user.notFound');
 			loadingProfileMsg.classList.remove('text-gray-500');
 			loadingProfileMsg.classList.add('text-red-500');
 			return pageContainer;
@@ -119,7 +119,7 @@ export async function ProfilePage(params: { userId?: string }): Promise<HTMLElem
 			createSidebarItem(t('user.createdAt'), new Date(profiledUser.created_at)),
 			createSidebarItem(t('user.wins'), profiledUser.wins ?? 0),
 			createSidebarItem(t('user.losses'), profiledUser.losses ?? 0),
-			createSidebarItem(t('status.title'), profiledUser.status),
+			createSidebarItem(t('user.status.title'), profiledUser.status),
 		];
 		infoItems.forEach(item => item && sidebar.appendChild(item));
 
@@ -134,7 +134,7 @@ export async function ProfilePage(params: { userId?: string }): Promise<HTMLElem
 
 	} catch (error) {
 		console.error("An error occurred when loading profile page:", error);
-		loadingProfileMsg.textContent = `${t('error.user.loadingProfile')} : ${(error as Error).message}.`;
+		loadingProfileMsg.textContent = `${t('msg.error.user.loadingProfile')} : ${(error as Error).message}.`;
 		loadingProfileMsg.classList.remove('text-gray-500');
 		loadingProfileMsg.classList.add('text-red-500');
 	}

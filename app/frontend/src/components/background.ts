@@ -1108,7 +1108,7 @@ const backgroundContainer = document.getElementById('background-container');
 
 // Assurez-vous que le conteneur existe avant d'y injecter le HTML
 if (backgroundContainer) {
-  backgroundContainer.innerHTML = branchHTML;
+	backgroundContainer.innerHTML = branchHTML;
 } else {
-  console.error("Fatal Error: #background-container not found in DOM.");
+	console.error("Fatal Error: #background-container not found in DOM.");
 }

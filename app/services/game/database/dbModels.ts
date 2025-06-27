@@ -32,6 +32,7 @@ export async function createMatchTable() {
 	}
 };
 
+// pourquoi winner_id est une string ? 
 export async function setGameResult(matchId: string, player1_score: number, player2_score: number, winner_id: string, win_type: string) {
 	
 	const existingMatch = await getRowByMatchId(matchId);

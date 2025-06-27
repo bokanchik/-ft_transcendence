@@ -21,7 +21,6 @@ export async function getReceivedFriendRequests(): Promise<PendingFriendRequest[
 		credentials: 'include',
 	});
 	return handleApiResponse(response, GetPendingRequestsRouteSchema.response);
-	// return handleApiResponse(response);
 }
 
 /**

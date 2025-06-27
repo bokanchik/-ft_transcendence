@@ -96,7 +96,7 @@ export async function SettingsPage(): Promise<HTMLElement> {
 	backLink.href = '/dashboard';
 	backLink.setAttribute('data-link', '');
 	backLink.className = 'block text-center text-gray-600 hover:text-gray-800 text-sm mt-6';
-	backLink.textContent = t('user.settings.dashboardLink');
+	backLink.textContent = t('link.dashboard');
 
 	contentWrapper.appendChild(backLink);
 
