@@ -15,6 +15,7 @@ export function HomePage(): HTMLElement {
 
 	const container = document.createElement('div');
 	container.className = 'relative bg-cover bg-center flex-grow text-white flex flex-col items-center justify-center p-4 sm:p-8';
+	//  container.className = 'flex-grow flex justify-center items-center p-4 sm:p-8';
 	// container.style.backgroundImage = "url('/assets/jungle1.jpg')";
 
 	const overlay = document.createElement('div');
