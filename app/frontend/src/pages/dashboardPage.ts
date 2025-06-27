@@ -62,6 +62,22 @@ export async function DashboardPage(): Promise<HTMLElement> {
 
     function populateSidebar(user: User) {
         sidebar.innerHTML = '';
+		const profileHeader = document.createElement('div');
+		profileHeader.className = 'flex flex-col items-center pb-4 mb-4 border-b border-gray-400/20';
+		
+		const avatarImg = document.createElement('img');
+		avatarImg.src = user.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.display_name)}&background=random&color=fff&size=128`;
+		avatarImg.alt = `Avatar de ${user.display_name}`;
+		avatarImg.className = 'w-24 h-24 rounded-full object-cover border-4 border-gray-400/30 shadow-lg mb-3';
+		
+		const displayNameEl = document.createElement('h2');
+		displayNameEl.className = 'text-xl font-bold text-white text-center';
+		displayNameEl.textContent = user.display_name;
+		
+		profileHeader.appendChild(avatarImg);
+		profileHeader.appendChild(displayNameEl);
+		sidebar.appendChild(profileHeader);
+
         sidebar.appendChild(createSidebarItem(t('user.username'), user.username));
         sidebar.appendChild(createSidebarItem(t('user.displayName'), user.display_name));
         sidebar.appendChild(createSidebarItem(t('user.email'), user.email));
@@ -72,19 +88,21 @@ export async function DashboardPage(): Promise<HTMLElement> {
 
 	function createSidebarItem(label: string, value: string | number | Date | undefined | null): HTMLElement {
 		const item = document.createElement('div');
-		// item.className = 'p-2.5 bg-white border border-gray-200 rounded-lg shadow-sm';
-		item.className = 'p-2.5 bg-black/20 border border-gray-400/20 rounded-lg';
+		// item.className = 'p-2.5 bg-black/20 border border-gray-400/20 rounded-lg';
+		item.className = 'p-4 bg-black/20 border border-gray-400/20 rounded-lg';
 
 		const labelEl = document.createElement('span');
 
-		// labelEl.className = 'text-xs text-gray-500 block mb-0.5';
-		// labelEl.textContent = label;
-		// const valueEl = document.createElement('p');
-		// valueEl.className = 'text-sm text-gray-800 font-medium truncate';
-		labelEl.className = 'text-xs text-gray-300 block mb-0.5'; // Texte plus clair
+		// labelEl.className = 'text-xs text-gray-300 block mb-0.5';
+		labelEl.className = 'text-sm text-gray-300 block mb-1';
 		labelEl.textContent = label;
 		const valueEl = document.createElement('p');
-		valueEl.className = 'text-sm text-white font-medium truncate';
+		// valueEl.className = 'text-sm text-white font-medium truncate';
+		if (label === t('user.email')) {
+			valueEl.className = 'text-base text-white font-semibold truncate';
+		} else {
+			valueEl.className = 'text-lg text-white font-semibold truncate';
+		} 
 
 		if (value instanceof Date) {
 			valueEl.textContent = value.toLocaleDateString();

@@ -67,7 +67,10 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 		const messageDiv = wrapper.querySelector<HTMLDivElement>('#login-message-component');
 
 		if (button) button.disabled = true;
-		if (messageDiv) messageDiv.textContent = t('login.attemptingLogin');
+		if (messageDiv) {
+			messageDiv.textContent = t('login.attemptingLogin');
+			messageDiv.className = 'mt-4 text-center text-sm min-h-[20px] text-gray-300';
+		}
 
 		const identifier = (form.elements.namedItem('identifier') as HTMLInputElement).value;
 		const password = (form.elements.namedItem('password') as HTMLInputElement).value;
@@ -81,8 +84,11 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 				onLoginSuccess(result.data.user);
 			}
 		} else {
-			if (messageDiv) messageDiv.textContent = result.error;
-			if (button) button.disabled = false;
+			if (messageDiv) {
+				messageDiv.textContent = result.error;
+				messageDiv.className = 'mt-4 text-center text-sm min-h-[20px] text-red-400 font-semibold';
+            }
+            if (button) button.disabled = false;
 		}
 	};
 
@@ -93,7 +99,10 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 		const messageDiv = wrapper.querySelector<HTMLDivElement>('#login-message-component');
 
 		if (button) button.disabled = true;
-		if (messageDiv) messageDiv.textContent = t('login.2fa.verifying');
+		if (messageDiv) {
+			messageDiv.textContent = t('login.2fa.verifying');
+			messageDiv.className = 'mt-4 text-center text-sm min-h-[20px] text-gray-300';
+		}
 
 		const token = (form.elements.namedItem('two-fa-token') as HTMLInputElement).value;
 
@@ -104,7 +113,10 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 				onLoginSuccess(result.data.user);
 			}
 		} else {
-			if (messageDiv) messageDiv.textContent = result.error;
+			if (messageDiv) {
+				messageDiv.textContent = result.error;
+				messageDiv.className = 'mt-4 text-center text-sm min-h-[20px] text-red-400 font-semibold';
+			}
 			if (button) button.disabled = false;
 		}
 	};

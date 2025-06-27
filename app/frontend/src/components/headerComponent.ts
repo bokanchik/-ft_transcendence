@@ -107,6 +107,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 
 		const logoutButtonEl = document.createElement('button');
 		// logoutButtonEl.className = 'block w-full text-left px-4 py-2 text-gray-200 hover:bg-gray-700 rounded-b-lg transition-colors';
+		logoutButtonEl.className = 'block w-full text-left px-4 py-2 text-gray-200 hover:bg-gray-700 rounded-b-lg transition-colors';
 		logoutButtonEl.textContent = t('header.logout');
 		logoutButtonEl.addEventListener('click', async (e) => {
 			e.stopPropagation();

@@ -21,14 +21,15 @@
 - [x] Remplacer error simple dans back
 - [ ] nettoyage
 
-- [ ] message login pas bonne couleur
-- [ ] sidebar cases trop petites
+- [x] message login pas bonne couleur
+- [x] sidebar cases trop petites
+- [ ] mails tronqués dans sidebar si trop longs
 
 - [x] Route pour update win loses / Permissions pour faire ca ? -> pour l'instant n'importe qui d'identifié -> /api/users/:userId/stats en envoyant result: win/lose
 - [x] Droit admin pour la route update win/lose -> authenticateService avec API_KEY
 - [x] Header partout
+- [x] Page home bouton settings et logout inaccessible quand logedin
 
-- [ ] Page home bouton settings et logout inaccessible quand logedin
 - [x] tout traduire
 - [ ] Vérifier les traductions
 
@@ -37,16 +38,16 @@
 - [x] chiffrer 2fa string dans db
 - [ ] ajouter sms (twilio) et emails (sendGrid)
 
-- [x] grafana
-- [ ] grafana/dashboards
-
-- [ ] style que dans background
+- [x] style que dans background
 
 ## Etienne
 
 - [ ] Feuille quand on scroll
 - [ ] la fenetre bouge avec les fleches directionnelles
 - [ ] fix dashboard (cadvisor) 
+
+- [x] grafana
+- [ ] grafana/dashboards
 
 ## 📌 Tâches initiales
 
