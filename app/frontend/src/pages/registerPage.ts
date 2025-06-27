@@ -10,68 +10,125 @@ export async function RegisterPage(): Promise<HTMLElement> {
 	const currentUser = getUserDataFromStorage();
 
 	const pageWrapper = document.createElement('div');
-	pageWrapper.className = 'flex flex-col min-h-screen bg-gray-100';
+	// pageWrapper.className = 'flex flex-col min-h-screen bg-gray-100';
+	pageWrapper.className = 'flex flex-col min-h-screen bg-cover bg-center bg-fixed';
+	pageWrapper.style.backgroundImage = "url('/assets/jungle2.jpg')";
 
 	const headerElement = HeaderComponent({ currentUser });
 	pageWrapper.appendChild(headerElement);
 
 
 	const container = document.createElement('div');
-	container.className = 'bg-white flex justify-center items-center min-h-screen p-8';
+	container.className = 'flex-grow flex justify-center items-center p-4 sm:p-8';
 
 	const formContainer = document.createElement('div');
-	formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';
+	// formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';
+	formContainer.className = 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-2xl shadow-2xl p-8 max-w-md w-full';
 
+	// formContainer.innerHTML = `
+    //     <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">${t('register.title')}</h2>
+    //     <form id="register-form">
+    //         <div class="mb-4">
+    //             <label for="username" class="block text-gray-700 text-sm font-bold mb-2">${t('user.username')}</label>
+    //             <input type="text" id="username" name="username" required minlength="3" maxlength="20"
+    //                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+    //             <p class="text-xs text-gray-600 mt-1">${t('register.nameSpec')}</p>
+    //         </div>
+    //         <div class="mb-4">
+    //             <label for="email" class="block text-gray-700 text-sm font-bold mb-2">${t('user.email')}</label>
+    //             <input type="email" id="email" name="email" required
+    //                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+    //         </div>
+    //          <div class="mb-4">
+    //             <label for="display_name" class="block text-gray-700 text-sm font-bold mb-2">${t('user.displayName')}</label>
+    //             <input type="text" id="display_name" name="display_name" required minlength="3" maxlength="20"
+    //                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+    //             <p class="text-xs text-gray-600 mt-1">${t('register.nameSpec')}</p>
+    //         </div>
+    //         <div class="mb-4">
+    //             <label for="password" class="block text-gray-700 text-sm font-bold mb-2">${t('user.password')}</label>
+    //             <input type="password" id="password" name="password" required minlength="8" maxlength="20"
+    //                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+    //              <p class="text-xs text-gray-600 mt-1">${t('register.passwordSpec')}</p>
+    //         </div>
+    //          <div class="mb-6">
+    //             <label for="confirm_password" class="block text-gray-700 text-sm font-bold mb-2">${t('register.confirmPassword')}</label>
+    //             <input type="password" id="confirm_password" name="confirm_password" required minlength="8" maxlength="100"
+    //                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline">
+    //         </div>
+    //         <div class="mb-6">
+    //             <label for="avatar_url" class="block text-gray-700 text-sm font-bold mb-2">${t('register.avatarUrl')}</label>
+    //             <input type="url" id="avatar_url" name="avatar_url" placeholder="https://example.com/avatar.jpg"
+    //                    class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+    //         </div>
+    //         <div class="flex items-center justify-between">
+    //             <button type="submit" id="register-button"
+    //                     class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full transition duration-300 ease-in-out">
+    //                 ${t('register.button')}
+    //             </button>
+    //         </div>
+    //     </form>
+    //     <div id="register-message" class="mt-4 text-center text-sm"></div>
+    //     <div class="mt-6 text-center">
+    //       <a href="/" data-link class="text-blue-600 hover:text-blue-800 text-sm">
+    //         ${t('link.home')}
+    //       </a>
+    //       <span class="mx-2 text-gray-400">|</span>
+    //       <a href="/login" data-link class="text-blue-600 hover:text-blue-800 text-sm">
+    //         ${t('register.loginLink')}
+    //       </a>
+    //     </div>
+    // `;
 	formContainer.innerHTML = `
-        <h2 class="text-3xl font-bold mb-6 text-center text-gray-800">${t('register.title')}</h2>
+        <h2 class="text-3xl font-bold mb-6 text-center text-white">${t('register.title')}</h2>
         <form id="register-form">
             <div class="mb-4">
-                <label for="username" class="block text-gray-700 text-sm font-bold mb-2">${t('user.username')}</label>
+                <label for="username" class="block text-sm font-medium text-gray-300 mb-1">${t('user.username')}</label>
                 <input type="text" id="username" name="username" required minlength="3" maxlength="20"
-                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                <p class="text-xs text-gray-600 mt-1">${t('register.nameSpec')}</p>
+                       class="w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <p class="text-xs text-gray-400 mt-1">${t('register.nameSpec')}</p>
             </div>
             <div class="mb-4">
-                <label for="email" class="block text-gray-700 text-sm font-bold mb-2">${t('user.email')}</label>
+                <label for="email" class="block text-sm font-medium text-gray-300 mb-1">${t('user.email')}</label>
                 <input type="email" id="email" name="email" required
-                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                       class="w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
              <div class="mb-4">
-                <label for="display_name" class="block text-gray-700 text-sm font-bold mb-2">${t('user.displayName')}</label>
+                <label for="display_name" class="block text-sm font-medium text-gray-300 mb-1">${t('user.displayName')}</label>
                 <input type="text" id="display_name" name="display_name" required minlength="3" maxlength="20"
-                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                <p class="text-xs text-gray-600 mt-1">${t('register.nameSpec')}</p>
+                       class="w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <p class="text-xs text-gray-400 mt-1">${t('register.nameSpec')}</p>
             </div>
             <div class="mb-4">
-                <label for="password" class="block text-gray-700 text-sm font-bold mb-2">${t('user.password')}</label>
+                <label for="password" class="block text-sm font-medium text-gray-300 mb-1">${t('user.password')}</label>
                 <input type="password" id="password" name="password" required minlength="8" maxlength="20"
-                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                 <p class="text-xs text-gray-600 mt-1">${t('register.passwordSpec')}</p>
+                       class="w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+                 <p class="text-xs text-gray-400 mt-1">${t('register.passwordSpec')}</p>
             </div>
              <div class="mb-6">
-                <label for="confirm_password" class="block text-gray-700 text-sm font-bold mb-2">${t('register.confirmPassword')}</label>
+                <label for="confirm_password" class="block text-sm font-medium text-gray-300 mb-1">${t('register.confirmPassword')}</label>
                 <input type="password" id="confirm_password" name="confirm_password" required minlength="8" maxlength="100"
-                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline">
+                       class="w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
             <div class="mb-6">
-                <label for="avatar_url" class="block text-gray-700 text-sm font-bold mb-2">${t('register.avatarUrl')}</label>
+                <label for="avatar_url" class="block text-sm font-medium text-gray-300 mb-1">${t('register.avatarUrl')}</label>
                 <input type="url" id="avatar_url" name="avatar_url" placeholder="https://example.com/avatar.jpg"
-                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                       class="w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
             <div class="flex items-center justify-between">
                 <button type="submit" id="register-button"
-                        class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full transition duration-300 ease-in-out">
+                        class="w-full font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300 ease-in-out bg-yellow-500 hover:bg-yellow-600 text-black border border-yellow-400/50">
                     ${t('register.button')}
                 </button>
             </div>
         </form>
         <div id="register-message" class="mt-4 text-center text-sm"></div>
         <div class="mt-6 text-center">
-          <a href="/" data-link class="text-blue-600 hover:text-blue-800 text-sm">
+          <a href="/" data-link class="text-blue-400 hover:text-blue-300 text-sm transition-colors">
             ${t('link.home')}
           </a>
           <span class="mx-2 text-gray-400">|</span>
-          <a href="/login" data-link class="text-blue-600 hover:text-blue-800 text-sm">
+          <a href="/login" data-link class="text-blue-400 hover:text-blue-300 text-sm transition-colors">
             ${t('register.loginLink')}
           </a>
         </div>
@@ -80,15 +137,15 @@ export async function RegisterPage(): Promise<HTMLElement> {
 	container.appendChild(formContainer);
 	pageWrapper.appendChild(container);
 
-	const form = container.querySelector('#register-form') as HTMLFormElement;
-	const usernameInput = container.querySelector('#username') as HTMLInputElement;
-	const emailInput = container.querySelector('#email') as HTMLInputElement;
-	const displayNameInput = container.querySelector('#display_name') as HTMLInputElement;
-	const passwordInput = container.querySelector('#password') as HTMLInputElement;
-	const confirmPasswordInput = container.querySelector('#confirm_password') as HTMLInputElement;
-	const avatarUrlInput = container.querySelector('#avatar_url') as HTMLInputElement;
-	const messageDiv = container.querySelector('#register-message') as HTMLDivElement;
-	const registerButton = container.querySelector('#register-button') as HTMLButtonElement;
+	const form = formContainer.querySelector('#register-form') as HTMLFormElement;
+	const usernameInput = formContainer.querySelector('#username') as HTMLInputElement;
+	const emailInput = formContainer.querySelector('#email') as HTMLInputElement;
+	const displayNameInput = formContainer.querySelector('#display_name') as HTMLInputElement;
+	const passwordInput = formContainer.querySelector('#password') as HTMLInputElement;
+	const confirmPasswordInput = formContainer.querySelector('#confirm_password') as HTMLInputElement;
+	const avatarUrlInput = formContainer.querySelector('#avatar_url') as HTMLInputElement;
+	const messageDiv = formContainer.querySelector('#register-message') as HTMLDivElement;
+	const registerButton = formContainer.querySelector('#register-button') as HTMLButtonElement;
 
 	form.addEventListener('submit', async (event) => {
 		event.preventDefault();

@@ -35,13 +35,16 @@ export function UserList(props: UserListProps): HTMLElement {
 	const otherUsers = users.filter(user => user.id !== currentUserId);
 
 	if (otherUsers.length === 0) {
-		ul.innerHTML = '<li class="text-center text-gray-500 py-4">Aucun autre utilisateur à afficher.</li>';
+		// ul.innerHTML = '<li class="text-center text-gray-500 py-4">Aucun autre utilisateur à afficher.</li>';
+		ul.innerHTML = '<li class="text-center text-gray-300 py-4">Aucun autre utilisateur à afficher.</li>';
 		return ul;
 	}
 
 	otherUsers.forEach(user => {
 		const li = document.createElement('li');
-		li.className = 'p-4 bg-white border border-gray-200 rounded-lg shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0 hover:shadow-md transition-shadow duration-200';
+		// li.className = 'p-4 bg-white border border-gray-200 rounded-lg shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0 hover:shadow-md transition-shadow duration-200';
+		li.className = 'p-4 bg-black/20 border border-gray-500/30 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0 hover:bg-black/30 transition-colors duration-200';
+
 		li.dataset.userId = user.id.toString();
 
 		const userPrimaryInfoContainer = document.createElement('div');
@@ -66,14 +69,26 @@ export function UserList(props: UserListProps): HTMLElement {
 			statusText = t('user.status.inGame');
 		}
 
+		// userPrimaryInfoContainer.innerHTML = `
+        //     <img src="${avatarSrc}" alt="${displayName}" class="w-12 h-12 rounded-full mr-4 object-cover">
+        //     <div class="flex-grow">
+        //         <div class="flex items-center mb-1">
+        //             <span class="inline-block w-3 h-3 ${statusIndicatorClass} rounded-full mr-2" title="${statusText}"></span>
+        //             <strong class="text-lg text-gray-700">${displayName}</strong>
+        //         </div>
+        //         <div class="text-xs text-gray-500">
+        //             <span>${t('user.wins')}: ${wins}</span> | <span>${t('user.losses')}: ${losses}</span>
+        //         </div>
+        //     </div>
+        // `;
 		userPrimaryInfoContainer.innerHTML = `
             <img src="${avatarSrc}" alt="${displayName}" class="w-12 h-12 rounded-full mr-4 object-cover">
             <div class="flex-grow">
                 <div class="flex items-center mb-1">
                     <span class="inline-block w-3 h-3 ${statusIndicatorClass} rounded-full mr-2" title="${statusText}"></span>
-                    <strong class="text-lg text-gray-700">${displayName}</strong>
+                    <strong class="text-lg text-gray-100">${displayName}</strong>
                 </div>
-                <div class="text-xs text-gray-500">
+                <div class="text-xs text-gray-400">
                     <span>${t('user.wins')}: ${wins}</span> | <span>${t('user.losses')}: ${losses}</span>
                 </div>
             </div>
@@ -85,7 +100,8 @@ export function UserList(props: UserListProps): HTMLElement {
 
 
 		const friendshipStatus = document.createElement('span');
-		friendshipStatus.className = 'text-xs italic text-gray-500 mb-1';
+		// friendshipStatus.className = 'text-xs italic text-gray-500 mb-1';
+		friendshipStatus.className = 'text-xs italic text-gray-400 mb-1';
 
 		let actionButton: HTMLButtonElement | null = null;
 		let actionButtonsContainer: HTMLElement | null = null;
@@ -96,10 +112,10 @@ export function UserList(props: UserListProps): HTMLElement {
 
 		if (isFriend) {
 			friendshipStatus.textContent = t('friend.status.friend');
-			friendshipStatus.className += ' text-green-600 font-semibold';
+			friendshipStatus.className += ' text-green-400 font-semibold';
 		} else if (sentRequestToThisUser) {
 			friendshipStatus.textContent = t('friend.requestSent');
-			friendshipStatus.className += ' text-yellow-600';
+			friendshipStatus.className += ' text-yellow-400';
 			actionButton = createActionButton({
 				text: t('friend.cancel'),
 				variant: 'warning',
@@ -107,7 +123,7 @@ export function UserList(props: UserListProps): HTMLElement {
 			});
 		} else if (receivedRequestFromThisUser) {
 			friendshipStatus.textContent = t('friend.requestReceived');
-			friendshipStatus.className += ' text-indigo-600';
+			friendshipStatus.className += ' text-indigo-400';
 
 			actionButtonsContainer = document.createElement('div');
 			actionButtonsContainer.className = 'flex space-x-1';

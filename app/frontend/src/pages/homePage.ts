@@ -6,14 +6,16 @@ export function HomePage(): HTMLElement {
 	const currentUser = getUserDataFromStorage();
 
 	const pageWrapper = document.createElement('div');
-	pageWrapper.className = 'flex flex-col min-h-screen bg-gray-100';
+	pageWrapper.className = 'flex flex-col min-h-screen bg-cover bg-center';
+	pageWrapper.style.backgroundImage = "url('/assets/jungle1.jpg')";
+	// pageWrapper.className = 'flex flex-col min-h-screen bg-gray-100';
 
 	const headerElement = HeaderComponent({ currentUser });
 	pageWrapper.appendChild(headerElement);
 
 	const container = document.createElement('div');
 	container.className = 'relative bg-cover bg-center flex-grow text-white flex flex-col items-center justify-center p-4 sm:p-8';
-	container.style.backgroundImage = "url('https://images.unsplash.com/photo-1470058869958-2a77ade41c02?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8anVuZ2xlfGVufDB8fDB8fHww')";
+	// container.style.backgroundImage = "url('/assets/jungle1.jpg')";
 
 	const overlay = document.createElement('div');
 	overlay.className = 'absolute inset-0 bg-black/40';

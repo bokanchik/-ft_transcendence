@@ -43,18 +43,22 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	}
 
 	const pageContainer = document.createElement('div');
-	pageContainer.className = 'min-h-screen bg-gray-200 p-4 sm:p-8 flex flex-col items-center';
+	// pageContainer.className = 'min-h-screen bg-gray-200 p-4 sm:p-8 flex flex-col items-center';
+	pageContainer.className = 'min-h-screen p-4 sm:p-8 flex flex-col items-center bg-cover bg-center bg-fixed';
+	pageContainer.style.backgroundImage = "url('/assets/jungle2.jpg')";
 
 	const dashboardWrapper = document.createElement('div');
-	dashboardWrapper.className = 'bg-white rounded-2xl shadow-2xl w-full max-w-6xl flex flex-col overflow-hidden';
-
+	// dashboardWrapper.className = 'bg-white rounded-2xl shadow-2xl w-full max-w-6xl flex flex-col overflow-hidden';
+	dashboardWrapper.className = `bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-2xl shadow-2xl w-full max-w-6xl flex flex-col overflow-hidden`;
+	
 	const headerElement = HeaderComponent({ currentUser: currentUser! });
 
 	const mainSection = document.createElement('div');
 	mainSection.className = 'flex flex-1 min-h-[calc(100vh-150px)]';
 
 	const sidebar = document.createElement('div');
-	sidebar.className = 'w-1/4 p-6 bg-gray-50 border-r border-gray-200 space-y-3 overflow-y-auto';
+	// sidebar.className = 'w-1/4 p-6 bg-gray-50 border-r border-gray-200 space-y-3 overflow-y-auto';
+	sidebar.className = 'w-1/4 p-6 border-r border-gray-400/30 space-y-3 overflow-y-auto';
 
     function populateSidebar(user: User) {
         sidebar.innerHTML = '';
@@ -68,12 +72,20 @@ export async function DashboardPage(): Promise<HTMLElement> {
 
 	function createSidebarItem(label: string, value: string | number | Date | undefined | null): HTMLElement {
 		const item = document.createElement('div');
-		item.className = 'p-2.5 bg-white border border-gray-200 rounded-lg shadow-sm';
+		// item.className = 'p-2.5 bg-white border border-gray-200 rounded-lg shadow-sm';
+		item.className = 'p-2.5 bg-black/20 border border-gray-400/20 rounded-lg';
+
 		const labelEl = document.createElement('span');
-		labelEl.className = 'text-xs text-gray-500 block mb-0.5';
+
+		// labelEl.className = 'text-xs text-gray-500 block mb-0.5';
+		// labelEl.textContent = label;
+		// const valueEl = document.createElement('p');
+		// valueEl.className = 'text-sm text-gray-800 font-medium truncate';
+		labelEl.className = 'text-xs text-gray-300 block mb-0.5'; // Texte plus clair
 		labelEl.textContent = label;
 		const valueEl = document.createElement('p');
-		valueEl.className = 'text-sm text-gray-800 font-medium truncate';
+		valueEl.className = 'text-sm text-white font-medium truncate';
+
 		if (value instanceof Date) {
 			valueEl.textContent = value.toLocaleDateString();
 		} else {
@@ -90,7 +102,8 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	tabContentWrapper.className = 'w-3/4 p-6 flex flex-col overflow-y-auto';
 
 	const tabNavigation = document.createElement('div');
-	tabNavigation.className = 'flex space-x-1 border-b border-gray-200 mb-6';
+	// tabNavigation.className = 'flex space-x-1 border-b border-gray-200 mb-6';
+	tabNavigation.className = 'flex space-x-1 border-b border-gray-400/30 mb-6';
 
 	const TABS = [
 		{ id: 'users', label: t('dashboard.tabs.users'), componentLoader: loadUsersContent },
@@ -110,9 +123,11 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		tabButton.textContent = tabInfo.label;
 		tabButton.className = `py-2 px-4 text-sm font-medium focus:outline-none transition-colors`;
 		if (tabInfo.id === activeTabId) {
-			tabButton.classList.add('border-b-2', 'border-blue-600', 'text-blue-600');
+			// tabButton.classList.add('border-b-2', 'border-blue-600', 'text-blue-600');
+			tabButton.className = 'py-2 px-4 text-sm font-medium focus:outline-none transition-colors border-b-2 border-blue-400 text-white';
 		} else {
-			tabButton.classList.add('text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+			// tabButton.classList.add('text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+			tabButton.className = 'py-2 px-4 text-sm font-medium focus:outline-none transition-colors text-gray-300 hover:text-white hover:border-gray-300/70';
 		}
 		tabButton.addEventListener('click', () => switchTab(tabInfo.id));
 		tabNavigation.appendChild(tabButton);
@@ -156,16 +171,19 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		activeTabId = tabId;
 		tabNavigation.querySelectorAll('button').forEach(btn => {
 			if (btn.dataset.tabId === tabId) {
-				btn.className = 'py-2 px-4 text-sm font-medium focus:outline-none transition-colors border-b-2 border-blue-600 text-blue-600';
+				// btn.className = 'py-2 px-4 text-sm font-medium focus:outline-none transition-colors border-b-2 border-blue-600 text-blue-600';
+				btn.className = 'py-2 px-4 text-sm font-medium focus:outline-none transition-colors border-b-2 border-blue-400 text-white';
 			} else {
-				btn.className = 'py-2 px-4 text-sm font-medium focus:outline-none transition-colors text-gray-500 hover:text-gray-700 hover:border-gray-300';
+				// btn.className = 'py-2 px-4 text-sm font-medium focus:outline-none transition-colors text-gray-500 hover:text-gray-700 hover:border-gray-300';
+				btn.className = 'py-2 px-4 text-sm font-medium focus:outline-none transition-colors text-gray-300 hover:text-white hover:border-gray-300/70';
 			}
 		});
 		await loadActiveTabContent();
 	}
 
 	async function loadActiveTabContent() {
-		activeTabContentContainer.innerHTML = '<p class="text-center text-gray-500 py-10">Loading...</p>';
+		// activeTabContentContainer.innerHTML = '<p class="text-center text-gray-500 py-10">Loading...</p>';
+		activeTabContentContainer.innerHTML = '<p class="text-center text-gray-200 py-10">Loading...</p>';
 		const currentTab = TABS.find(t => t.id === activeTabId);
 		if (currentTab) {
 			try {
@@ -174,7 +192,8 @@ export async function DashboardPage(): Promise<HTMLElement> {
 				activeTabContentContainer.appendChild(contentElement);
 			} catch (error) {
 				console.error(`Error loading content for tab ${activeTabId}:`, error);
-				activeTabContentContainer.innerHTML = `<p class="text-center text-red-500 py-10">Error loading content for ${activeTabId}.</p>`;
+				// activeTabContentContainer.innerHTML = `<p class="text-center text-red-500 py-10">Error loading content for ${activeTabId}.</p>`;
+				activeTabContentContainer.innerHTML = `<p class="text-center text-red-400 py-10">Error loading content for ${activeTabId}.</p>`;
 			}
 		}
 	}

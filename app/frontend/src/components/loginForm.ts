@@ -13,47 +13,86 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 	const wrapper = document.createElement('div');
 
 	const renderPasswordStep = () => {
+		// wrapper.innerHTML = `
+        //     <form id="login-form-component" class="space-y-6">
+        //         <div>
+        //             <label for="identifier" class="block text-sm font-medium text-gray-700">${t('login.identifierLabel')}</label>
+        //             <input type="text" id="identifier" name="identifier" required placeholder="${t('login.identifierPlaceholder')}" 
+        //                    class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+        //         </div>
+        //         <div>
+        //             <label for="password" class="block text-sm font-medium text-gray-700">${t('login.passwordLabel')}</label>
+        //             <input type="password" id="password" name="password" required 
+        //                    class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+        //         </div>
+        //         <div>
+        //             <button type="submit" id="login-button" 
+        //                     class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50">
+        //                 ${t('login.button')}
+        //             </button>
+        //         </div>
+        //     </form>
+        //     <div id="login-message-component" class="mt-4 text-center text-sm min-h-[20px]"></div>
+        // `;
 		wrapper.innerHTML = `
             <form id="login-form-component" class="space-y-6">
                 <div>
-                    <label for="identifier" class="block text-sm font-medium text-gray-700">${t('login.identifierLabel')}</label>
+                    <label for="identifier" class="block text-sm font-medium text-gray-300 mb-1">${t('login.identifierLabel')}</label>
                     <input type="text" id="identifier" name="identifier" required placeholder="${t('login.identifierPlaceholder')}" 
-                           class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                           class="w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
                 </div>
                 <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700">${t('login.passwordLabel')}</label>
+                    <label for="password" class="block text-sm font-medium text-gray-300 mb-1">${t('login.passwordLabel')}</label>
                     <input type="password" id="password" name="password" required 
-                           class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                           class="w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
                 </div>
                 <div>
                     <button type="submit" id="login-button" 
-                            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50">
+                            class="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium disabled:opacity-50 transition-colors duration-200 bg-green-500 hover:bg-green-600 text-white border border-green-400/50">
                         ${t('login.button')}
                     </button>
                 </div>
             </form>
             <div id="login-message-component" class="mt-4 text-center text-sm min-h-[20px]"></div>
         `;
+
 		wrapper.querySelector('#login-form-component')?.addEventListener('submit', handlePasswordSubmit);
 	};
 
 	const renderTwoFactorStep = () => {
+		// wrapper.innerHTML = `
+        //     <form id="two-fa-form-component" class="space-y-6">
+        //         <h3 class="text-xl font-semibold text-center text-gray-800">${t('login.2fa.title')}</h3>
+        //         <div>
+        //             <label for="two-fa-token" class="block text-sm font-medium text-gray-700">${t('login.2fa.instruction')}</label>
+        //             <input type="text" id="two-fa-token" name="two-fa-token" required autocomplete="one-time-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6"
+        //                    class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-center tracking-[1em]">
+        //         </div>
+        //         <div>
+        //             <button type="submit" id="two-fa-button" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50">
+        //                 ${t('login.2fa.button')}
+        //             </button>
+        //         </div>
+        //     </form>
+        //     <div id="login-message-component" class="mt-4 text-center text-sm text-red-500 min-h-[20px]"></div>
+        // `;
 		wrapper.innerHTML = `
             <form id="two-fa-form-component" class="space-y-6">
-                <h3 class="text-xl font-semibold text-center text-gray-800">${t('login.2fa.title')}</h3>
+                <h3 class="text-xl font-semibold text-center text-white">${t('login.2fa.title')}</h3>
                 <div>
-                    <label for="two-fa-token" class="block text-sm font-medium text-gray-700">${t('login.2fa.instruction')}</label>
+                    <label for="two-fa-token" class="block text-sm font-medium text-gray-300 mb-1">${t('login.2fa.instruction')}</label>
                     <input type="text" id="two-fa-token" name="two-fa-token" required autocomplete="one-time-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6"
-                           class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-center tracking-[1em]">
+                           class="w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-center tracking-[1em]">
                 </div>
                 <div>
-                    <button type="submit" id="two-fa-button" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50">
+                    <button type="submit" id="two-fa-button" class="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium disabled:opacity-50 transition-colors duration-200 bg-green-500 hover:bg-green-600 text-white border border-green-400/50">
                         ${t('login.2fa.button')}
                     </button>
                 </div>
             </form>
-            <div id="login-message-component" class="mt-4 text-center text-sm text-red-500 min-h-[20px]"></div>
+            <div id="login-message-component" class="mt-4 text-center text-sm min-h-[20px]"></div>
         `;
+		
 		wrapper.querySelector('#two-fa-form-component')?.addEventListener('submit', handleTwoFactorSubmit);
 		(wrapper.querySelector('#two-fa-token') as HTMLInputElement)?.focus();
 	};

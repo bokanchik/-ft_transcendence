@@ -19,12 +19,23 @@ const matchTable: string = `
 	status TEXT NOT NULL CHECK (status IN ('pending', 'in_progress', 'finished'))
 	)`;
 
+const neSupprimePasStpCommente: string = `
+	INSERT INTO matches( matchId, player1_id, player2_id, player1_socket, player2_socket, player1_score, player2_score, winner_id, status)
+	VALUES
+	('match1', 1, 2, 'socket1', 'socket2', 10, 0, 1, 'finished'),
+	('match2', 1, 3, 'socket3', 'socket4', 10, 0, 1, 'finished'),
+	('match3', 1, 4, 'socket5', 'socket6', 8, 10, 4, 'finished'),
+	('match4', 2, 3, 'socket7', 'socket8', 5, 10, 3, 'finished'),
+	('match5', 2, 4, 'socket9', 'socket10', 10, 0, 2, 'finished'),
+	('match6', 3, 4, 'socket11', 'socket12', 10, 0, 3, 'finished');`;
 
 // --- HELPER FUNCTIONS FOR GENERAL DB ACTIONS (all(), get(), run(), exec() etc.)
 export async function createMatchTable() {
 	try {
 		await execute(db, matchTable);
 		console.log('Matches table created or already exists.');
+		await execute(db, neSupprimePasStpCommente);
+		console.log('Sample matches inserted into the table.');
 
 	} catch (err: unknown) {
 		console.error(`Error creating matches table: ${err}`);
