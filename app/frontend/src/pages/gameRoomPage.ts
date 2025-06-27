@@ -105,7 +105,7 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 		return container;
 	}
 
-	if (gameMode === 'local') {
+	if (gameMode === 'local' || gameMode === 'tournament') {
 		rightUsername.textContent = sessionStorage.getItem('player1');
 		leftUsername.textContent = sessionStorage.getItem('player2');
 	} else {
@@ -194,12 +194,12 @@ function clientSocketHandler(gameMode: string | null, ctx: CanvasRenderingContex
 		socket.connect();
 	}
 	
-	
+
 	if (gameMode === 'remote') {
 		handleRemoteEvents(ctx, scoreDisplay);
 	}
 	
-	if (gameMode === 'local') {
+	if (gameMode === 'local' || gameMode === 'tournament') {
 		handleLocalEvents(ctx, scoreDisplay);
 	}
 	
@@ -250,6 +250,9 @@ async function onGameOver() {
 		const name1: string = await getDisplayName(player1);
 		const name2: string = await getDisplayName(player2);
 		
+		// Here I need to find a way to send the score result to the tournament page
+		sessionStorage.setItem('score1', score1.toString());
+		sessionStorage.setItem('score2', score2.toString());
 		setTimeout(() => {
 			showGameResult(name1, name2, score1, score2, url1, url2);
 			// stop drawing && clean
@@ -284,7 +287,7 @@ function handleLocalEvents(ctx: CanvasRenderingContext2D, scoreDisplay: HTMLDivE
 		isGameOver = true;
 		cleanupSocket(socket);
 		cleanupListeners();
-		if (sessionStorage.getItem('gameRegime') === 'tournament') {
+		if (sessionStorage.getItem('gameMode') === 'tournament') {
 			navigateTo('/tournament');
 		}
 		navigateTo('/local-game');
@@ -317,6 +320,8 @@ async function quitButtonHandler() {
 			navigateTo('/local-game');
 		} else if (gameMode === 'remote') {
 			navigateTo('/game');
+		} else if (gameMode === 'tournament') {
+			navigateTo('/tournament');
 		}
 		
 		sessionStorage.clear(); // clean storage --> users have to put there aliases again

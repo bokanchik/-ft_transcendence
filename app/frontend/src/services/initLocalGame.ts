@@ -124,11 +124,14 @@ export async function createLocalMatch(alias1: string, alias2: string, isTournam
         // + not erased after page refresh (but after closing the tab)
         sessionStorage.setItem('player1', data.player1);
         sessionStorage.setItem('player2', data.player2);
-        sessionStorage.setItem('gameMode', 'local');
+        if (!isTournament)
+            sessionStorage.setItem('gameMode', 'local');
+        else
+            sessionStorage.setItem('gameMode', 'tournament');
         sessionStorage.setItem('matchId', matchId);
-        // if (isTournament) {
-        //     sessionStorage.setItem('gameRegime', 'tournament');
-        // }
+        if (isTournament) {
+            sessionStorage.setItem('gameRegime', 'tournament');
+        }
         navigateTo(`/game-room?matchId=${matchId}`);
 
     } catch (err: unknown) {
