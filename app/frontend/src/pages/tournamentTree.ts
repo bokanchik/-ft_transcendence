@@ -115,6 +115,22 @@ export function TournamentPage(): HTMLElement {
                 // buttonsDiv.appendChild(btn2);
                 
                 //need to add the recever for the winner
+                const score1 = sessionStorage.getItem('score1');
+		        const score2 = sessionStorage.getItem('score2');
+                if (score1 && score2) {
+                    const scoreSpan = document.createElement('span');
+                    scoreSpan.className = 'text-gray-500 ml-4';
+                    scoreSpan.textContent = `${match.player1} ${score1} - ${match.player2} ${score2}`;
+                    li.append(player1Span, vsSpan, player2Span, scoreSpan);
+                     if (score1 < score2) {
+                        match.winner = match.player2;
+                    } else if (score1 > score2) {
+                        match.winner = match.player1;
+                    }
+                } else {
+                    li.append(player1Span, vsSpan, player2Span);
+                }
+               
                 if (match.winner) {
                     li.classList.add('bg-green-100');
                     const winnerSpan = document.createElement('span');

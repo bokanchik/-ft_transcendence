@@ -250,6 +250,9 @@ async function onGameOver() {
 		const name1: string = await getDisplayName(player1);
 		const name2: string = await getDisplayName(player2);
 		
+		// Here I need to find a way to send the score result to the tournament page
+		sessionStorage.setItem('score1', score1.toString());
+		sessionStorage.setItem('score2', score2.toString());
 		setTimeout(() => {
 			showGameResult(name1, name2, score1, score2, url1, url2);
 			// stop drawing && clean
