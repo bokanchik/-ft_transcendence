@@ -284,7 +284,7 @@ function handleLocalEvents(ctx: CanvasRenderingContext2D, scoreDisplay: HTMLDivE
 		isGameOver = true;
 		cleanupSocket(socket);
 		cleanupListeners();
-		if (sessionStorage.getItem('gameRegime') === 'tournament') {
+		if (sessionStorage.getItem('gameMode') === 'tournament') {
 			navigateTo('/tournament');
 		}
 		navigateTo('/local-game');
@@ -317,6 +317,8 @@ async function quitButtonHandler() {
 			navigateTo('/local-game');
 		} else if (gameMode === 'remote') {
 			navigateTo('/game');
+		} else if (gameMode === 'tournament') {
+			navigateTo('/tournament');
 		}
 		
 		sessionStorage.clear(); // clean storage --> users have to put there aliases again
