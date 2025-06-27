@@ -7,14 +7,21 @@ import { showCustomConfirm } from "../components/toast.js";
 //@ts-ignore
 import { GameState } from '../shared/gameTypes.js';
 // import { showToast } from '../components/toast.js';
+import { t } from '../services/i18nService.js';
+
 const PADDLE_HEIGHT = 120;
 const PADDLE_WIDTH = 20;
 const PADDLE_X_LEFT = 20;
 const PADDLE_X_RIGHT = 770;
 const BALL_RADIUS = 15;
-const BG_COLOUR = "rgb(0, 0, 0) ";
-const BALL_COLOUR = "rgb(255, 255, 255) ";
-const PADDLE_COLOUR = "rgb(255, 255, 255) ";
+
+// const BG_COLOUR = "rgb(0, 0, 0) ";
+// const BALL_COLOUR = "rgb(255, 255, 255) ";
+// const PADDLE_COLOUR = "rgb(255, 255, 255) ";
+// modif
+const BG_COLOUR = "rgba(17, 24, 39, 0.8)"; // Fond sombre semi-transparent
+const BALL_COLOUR = "rgb(234, 179, 8)"; // Jaune/Or pour la balle
+const PADDLE_COLOUR = "rgb(209, 213, 219)"; // Gris clair pour les raquettes
 
 const gameState: GameState = {
 	leftPaddle: {
@@ -38,25 +45,25 @@ let isGameOver = false;
 // TODO: JE PEUX UTILISER MODE ICI ET NE PAS FAIRE UN APPEL A SESSION STORAGE !
 export function GameRoomPage(mode: GameMode): HTMLElement {
 	
+	//ajout arthur
+	const pageWrapper = document.createElement('div');
+	pageWrapper.className = 'w-full h-screen flex flex-col items-center justify-center bg-cover bg-center bg-fixed';
+	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
+
 	// Conteneur principal
 	const container = document.createElement('div');
-	container.className = `
-		w-full h-screen flex flex-col items-center justify-center 
-		bg-gradient-to-b from-green-900 via-green-700 to-green-600 
-		jungle-font text-white
-	`;
-
+	// container.className = 'w-full h-screen flex flex-col items-center justify-center bg-gradient-to-b from-green-900 via-green-700 to-green-600 jungle-font text-white';
+	// remplacement arthur
+	container.className = 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-2xl shadow-2xl p-6 sm:p-8 flex flex-col items-center gap-4';
+	
 	// Wrapper horizontal pour les usernames et canvas
 	const gameRow = document.createElement('div');
 	gameRow.className = 'flex items-center';
 
 	// Nom du joueur gauche (à gauche du canvas)
 	const leftUsername = document.createElement('div');
-	leftUsername.className = `
-		mr-4 px-3 py-1 bg-lime-200 text-green-900 
-		border border-green-800 rounded font-bold text-xl 
-		shadow jungle-font text-center inline-block
-	`;
+	// leftUsername.className = 'mr-4 px-3 py-1 bg-lime-200 text-green-900 border border-green-800 rounded font-bold text-xl shadow jungle-font text-center inline-block';
+	leftUsername.className = 'w-32 text-center text-lg font-bold text-white bg-teal-600/30 border-2 border-teal-500/50 p-2 rounded-lg shadow-md';
 	leftUsername.id = 'left-username';
 
 	// Canvas de jeu
@@ -64,23 +71,19 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 	canvas.id = 'pong-canvas';
 	canvas.width = 800;
 	canvas.height = 500;
-	canvas.className = 'border-8 border-green-700 rounded-lg bg-neutral-900';
+	// canvas.className = 'border-8 border-green-700 rounded-lg bg-neutral-900';
+	canvas.className = 'border-4 border-white/10 rounded-lg shadow-inner';
 
 	// Nom du joueur droit (à droite du canvas)
 	const rightUsername = document.createElement('div');
-	rightUsername.className = `
-		ml-4 px-3 py-1 bg-lime-200 text-green-900 
-		border border-green-800 rounded font-bold text-xl 
-		shadow jungle-font text-center inline-block
-	`;
+	// rightUsername.className = 'ml-4 px-3 py-1 bg-lime-200 text-green-900 border border-green-800 rounded font-bold text-xl shadow jungle-font text-center inline-block';
+	rightUsername.className = 'w-32 text-center text-lg font-bold text-white bg-rose-600/30 border-2 border-rose-500/50 p-2 rounded-lg shadow-md';
 	rightUsername.id = 'right-username';
 
 	// Score display
 	const scoreDisplay = document.createElement('div');
-	scoreDisplay.className = `
-		absolute top-8 left-1/2 transform -translate-x-1/2
-		text-3xl font-extrabold text-yellow-300 jungle-font drop-shadow
-	`;
+	// scoreDisplay.className = 'absolute top-8 left-1/2 transform -translate-x-1/2 text-3xl font-extrabold text-yellow-300 jungle-font drop-shadow';
+	scoreDisplay.className = 'text-5xl font-extrabold text-yellow-300 drop-shadow-lg [text-shadow:_0_2px_4px_rgb(0_0_0_/_40%)]';
 	scoreDisplay.id = 'score-display';
 	scoreDisplay.textContent = '0 - 0';
 
@@ -90,14 +93,14 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 
 	// Quit button
 	const quitButton = document.createElement('button');
-	quitButton.className = `
-		mt-6 px-5 py-2 bg-red-700 text-white font-bold rounded-lg 
-		hover:bg-red-800 shadow-lg transition duration-300 jungle-font
-	`;
-	quitButton.textContent = 'Quit';
+	quitButton.className = 'mt-6 px-5 py-2 bg-red-700 text-white font-bold rounded-lg hover:bg-red-800 shadow-lg transition duration-300 jungle-font';
+	quitButton.className = 'px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-lg transition duration-200 border border-red-500/50';
+	quitButton.textContent = t('game.quit');
 
 	// Ajouter le bouton dans le container principal
 	container.appendChild(quitButton);
+	// ajout arthur
+	pageWrapper.appendChild(container);
 	
 	const gameMode = sessionStorage.getItem('gameMode');
 	if (!gameMode) {
@@ -127,7 +130,9 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 	
 	clientSocketHandler(gameMode, ctx, scoreDisplay);
 	
-	return container;
+	// ajout arthur
+	// return container;
+	return pageWrapper;
 }
 
 // Function to set usernames if they're playing in remote

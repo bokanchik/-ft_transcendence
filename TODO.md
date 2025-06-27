@@ -21,6 +21,9 @@
 - [x] Remplacer error simple dans back
 - [ ] nettoyage
 
+- [ ] message login pas bonne couleur
+- [ ] sidebar cases trop petites
+
 - [x] Route pour update win loses / Permissions pour faire ca ? -> pour l'instant n'importe qui d'identifié -> /api/users/:userId/stats en envoyant result: win/lose
 - [x] Droit admin pour la route update win/lose -> authenticateService avec API_KEY
 - [x] Header partout

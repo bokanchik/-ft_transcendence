@@ -12,7 +12,7 @@ export async function RegisterPage(): Promise<HTMLElement> {
 	const pageWrapper = document.createElement('div');
 	// pageWrapper.className = 'flex flex-col min-h-screen bg-gray-100';
 	pageWrapper.className = 'flex flex-col min-h-screen bg-cover bg-center bg-fixed';
-	pageWrapper.style.backgroundImage = "url('/assets/jungle2.jpg')";
+	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
 
 	const headerElement = HeaderComponent({ currentUser });
 	pageWrapper.appendChild(headerElement);

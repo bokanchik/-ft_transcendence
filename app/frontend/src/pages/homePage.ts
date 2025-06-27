@@ -7,7 +7,7 @@ export function HomePage(): HTMLElement {
 
 	const pageWrapper = document.createElement('div');
 	pageWrapper.className = 'flex flex-col min-h-screen bg-cover bg-center';
-	pageWrapper.style.backgroundImage = "url('/assets/jungle2.jpg')";
+	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
 
 	const headerElement = HeaderComponent({ currentUser });
 	pageWrapper.appendChild(headerElement);

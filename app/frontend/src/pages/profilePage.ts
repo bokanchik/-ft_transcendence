@@ -42,7 +42,7 @@ export async function ProfilePage(params: { userId?: string }): Promise<HTMLElem
 	const pageContainer = document.createElement('div');
 	// pageContainer.className = 'min-h-screen bg-gray-200 p-4 sm:p-8 flex flex-col items-center';
 	pageContainer.className = 'min-h-screen p-4 sm:p-8 flex flex-col items-center bg-cover bg-center bg-fixed';
-	pageContainer.style.backgroundImage = "url('/assets/jungle2.jpg')";
+	pageContainer.style.backgroundImage = "url('/assets/background.jpg')";
 
 	const profileWrapper = document.createElement('div');
 	// profileWrapper.className = 'bg-white rounded-2xl shadow-2xl w-full max-w-6xl flex flex-col overflow-hidden';
