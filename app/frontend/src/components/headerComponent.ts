@@ -66,7 +66,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		const linkElement = document.createElement('a');
 		linkElement.href = linkInfo.href;
 		linkElement.textContent = t(linkInfo.textKey);
-		linkElement.className = 'text-gray-200 hover:text-white hover:bg-white/10 font-medium px-4 py-2 rounded-lg transition-all duration-200 ease-in-out text-base';
+		linkElement.className = 'text-gray-200 hover:text-gray-200 hover:bg-white/10 font-medium px-4 py-2 rounded-lg transition-all duration-200 ease-in-out text-xl font-roar';
 		linkElement.setAttribute('data-link', '');
 		centerSection.appendChild(linkElement);
 	});
@@ -83,7 +83,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		const avatarDisplayWrapper = document.createElement('div');
 		avatarDisplayWrapper.className = 'bg-teal-600/20 hover:bg-teal-500/30 border border-teal-500/30 p-1.5 rounded-lg flex items-center space-x-3 cursor-pointer select-none transition-all duration-200 hover:scale-105';
 		const displayNameHeader = document.createElement('span');
-		displayNameHeader.className = 'text-white font-semibold text-base pr-1';
+		displayNameHeader.className = 'text-gray-300 font-semibold text-xl pr-1 font-roar';
 		displayNameHeader.textContent = currentUser.display_name || currentUser.username;
 
 		const avatarHeader = document.createElement('img');
@@ -106,7 +106,6 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		settingsButton.textContent = t('header.settings');
 
 		const logoutButtonEl = document.createElement('button');
-		// logoutButtonEl.className = 'block w-full text-left px-4 py-2 text-gray-200 hover:bg-gray-700 rounded-b-lg transition-colors';
 		logoutButtonEl.className = 'block w-full text-left px-4 py-2 text-gray-200 hover:bg-gray-700 rounded-b-lg transition-colors';
 		logoutButtonEl.textContent = t('header.logout');
 		logoutButtonEl.addEventListener('click', async (e) => {

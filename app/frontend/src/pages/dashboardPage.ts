@@ -68,7 +68,7 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		avatarImg.className = 'w-24 h-24 rounded-full object-cover border-4 border-gray-400/30 shadow-lg mb-3';
 
 		const displayNameEl = document.createElement('h2');
-		displayNameEl.className = 'text-xl font-bold text-white text-center';
+		displayNameEl.className = 'text-xl font-bold text-gray-300 text-center font-roar';
 		displayNameEl.textContent = user.display_name;
 
 		profileHeader.appendChild(avatarImg);
@@ -93,9 +93,9 @@ export async function DashboardPage(): Promise<HTMLElement> {
 
 		const valueEl = document.createElement('p');
 		if (label === t('user.email')) {
-			valueEl.className = 'text-base text-white font-semibold truncate';
+			valueEl.className = 'text-base text-gray-300 font-semibold truncate font-roar';
 		} else {
-			valueEl.className = 'text-lg text-white font-semibold truncate';
+			valueEl.className = 'text-lg text-gray-300 font-semibold truncate font-roar';
 		}
 
 		if (value instanceof Date) {
@@ -132,12 +132,17 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		const tabButton = document.createElement('button');
 		tabButton.dataset.tabId = tabInfo.id;
 		tabButton.textContent = tabInfo.label;
-		tabButton.className = `py-2 px-4 text-sm font-medium focus:outline-none transition-colors`;
+		// tabButton.className = `py-2 px-4 text-sm font-medium focus:outline-none transition-colors font-roar`;
+		const baseClasses = 'py-2 px-4 text-lg font-roar focus:outline-none transition-colors';
+		let stateClasses = '';
 		if (tabInfo.id === activeTabId) {
-			tabButton.className = 'py-2 px-4 text-sm font-medium focus:outline-none transition-colors border-b-2 border-blue-400 text-white';
+			// tabButton.className = 'py-2 px-4 text-sm font-medium focus:outline-none transition-colors border-b-2 border-blue-400 text-white font-roar';
+			stateClasses = 'border-b-2 border-blue-400 text-white';
 		} else {
-			tabButton.className = 'py-2 px-4 text-sm font-medium focus:outline-none transition-colors text-gray-300 hover:text-white hover:border-gray-300/70';
+			// tabButton.className = 'py-2 px-4 text-sm font-medium focus:outline-none transition-colors text-gray-300 hover:text-white hover:border-gray-300/70 font-roar';
+			stateClasses = 'text-gray-300 hover:text-white hover:border-gray-300/70';
 		}
+		tabButton.className = `${baseClasses} ${stateClasses}`;
 		tabButton.addEventListener('click', () => switchTab(tabInfo.id));
 		tabNavigation.appendChild(tabButton);
 	});
@@ -178,12 +183,18 @@ export async function DashboardPage(): Promise<HTMLElement> {
 
 	async function switchTab(tabId: string) {
 		activeTabId = tabId;
+		const baseClasses = 'py-2 px-4 text-lg font-roar focus:outline-none transition-colors';
 		tabNavigation.querySelectorAll('button').forEach(btn => {
+		const button = btn as HTMLButtonElement;
+        let stateClasses = '';
 			if (btn.dataset.tabId === tabId) {
-				btn.className = 'py-2 px-4 text-sm font-medium focus:outline-none transition-colors border-b-2 border-blue-400 text-white';
+				// btn.className = 'py-2 px-4 text-sm font-medium focus:outline-none transition-colors border-b-2 border-blue-400 text-white';
+				stateClasses = 'border-b-2 border-blue-400 text-white';
 			} else {
-				btn.className = 'py-2 px-4 text-sm font-medium focus:outline-none transition-colors text-gray-300 hover:text-white hover:border-gray-300/70';
+				// btn.className = 'py-2 px-4 text-sm font-medium focus:outline-none transition-colors text-gray-300 hover:text-white hover:border-gray-300/70';
+				stateClasses = 'text-gray-300 hover:text-white hover:border-gray-300/70';
 			}
+			button.className = `${baseClasses} ${stateClasses}`;
 		});
 		await loadActiveTabContent();
 	}

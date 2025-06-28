@@ -71,7 +71,7 @@ export function UserList(props: UserListProps): HTMLElement {
             <div class="flex-grow">
                 <div class="flex items-center mb-1">
                     <span class="inline-block w-3 h-3 ${statusIndicatorClass} rounded-full mr-2" title="${statusText}"></span>
-                    <strong class="text-lg text-gray-100">${displayName}</strong>
+                    <strong class="text-lg text-gray-300 font-roar">${displayName}</strong>
                 </div>
                 <div class="text-xs text-gray-400">
                     <span>${t('user.wins')}: ${wins}</span> | <span>${t('user.losses')}: ${losses}</span>
@@ -85,7 +85,6 @@ export function UserList(props: UserListProps): HTMLElement {
 
 
 		const friendshipStatus = document.createElement('span');
-		// friendshipStatus.className = 'text-xs italic text-gray-500 mb-1';
 		friendshipStatus.className = 'text-xs italic text-gray-400 mb-1';
 
 		let actionButton: HTMLButtonElement | null = null;

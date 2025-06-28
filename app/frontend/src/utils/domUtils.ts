@@ -86,18 +86,11 @@ export function createActionButton(props: ActionButtonProps): HTMLButtonElement 
 		type: 'button'
 	});
 
-	// let colorClasses = 'bg-gray-500 hover:bg-gray-600';
-	let colorClasses = 'bg-gray-500 hover:bg-gray-600 text-white';
+	let colorClasses = 'bg-gray-500 hover:bg-gray-600 text-white font-fever';
 	if (props.baseClass) {
 		colorClasses = props.baseClass;
 	} else if (props.variant) {
 		switch (props.variant) {
-			// case 'primary': colorClasses = 'bg-blue-500 hover:bg-blue-600'; break;
-			// case 'secondary': colorClasses = 'bg-gray-200 hover:bg-gray-300 text-gray-800'; break;
-			// case 'danger': colorClasses = 'bg-red-500 hover:bg-red-600'; break;
-			// case 'warning': colorClasses = 'bg-yellow-500 hover:bg-yellow-600 text-black'; break;
-			// case 'success': colorClasses = 'bg-green-500 hover:bg-green-600'; break;
-			// case 'info': colorClasses = 'bg-teal-500 hover:bg-teal-600'; break;
 			case 'primary': 
 				colorClasses = 'bg-blue-500 hover:bg-blue-600 text-white border border-blue-400/50'; 
 				break;

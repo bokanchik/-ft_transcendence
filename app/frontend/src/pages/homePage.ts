@@ -19,17 +19,17 @@ export function HomePage(): HTMLElement {
 	mainContent.className = 'relative z-10 flex flex-col items-center text-center';
 
 	const title = document.createElement('h2');
-	title.className = 'text-4xl sm:text-6xl md:text-7xl font-extrabold mb-4 text-shadow-lg';
+	title.className = 'text-4xl sm:text-6xl md:text-7xl font-extrabold mb-4 text-shadow-lg font-beach';
 	title.textContent = t('app.subtitle');
 
 	const subtitle = document.createElement('p');
-	subtitle.className = 'text-lg sm:text-xl text-gray-200 mb-12 max-w-2xl text-shadow';
+	subtitle.className = 'text-lg sm:text-xl text-gray-200 mb-12 max-w-2xl text-shadow font-beach';
 	subtitle.textContent = t('app.catchPhrase');
 
 	const playButton = document.createElement('a');
 	playButton.href = '/local-game';
 	playButton.setAttribute('data-link', '');
-	playButton.className = 'bg-red-600 hover:bg-red-500 text-white font-black text-2xl sm:text-4xl py-4 sm:py-6 px-10 sm:px-16 rounded-full shadow-2xl uppercase tracking-widest transition-all duration-300 ease-in-out transform hover:scale-110 hover:shadow-red-500/50';
+	playButton.className = 'bg-red-600 hover:bg-red-500 text-white font-black text-2xl sm:text-4xl py-4 sm:py-6 px-10 sm:px-16 rounded-full shadow-2xl uppercase tracking-widest transition-all duration-300 ease-in-out transform hover:scale-110 hover:shadow-red-500/50 font-beach';
 	playButton.textContent = t('app.button');
 
 	mainContent.appendChild(title);
