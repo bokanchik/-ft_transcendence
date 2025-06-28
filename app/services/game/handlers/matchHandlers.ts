@@ -113,7 +113,7 @@ export async function getMatchByUserHandler(req: AuthenticatedRequest, reply: Fa
         if (!matches) {
             return reply.code(404).send({ error: 'Matches not found' });
         }
-
+        console.log("BACKEND - Sending matches data:", JSON.stringify(matches, null, 2));
         return reply.code(200).send(matches);
 
     } catch (err: unknown) {
