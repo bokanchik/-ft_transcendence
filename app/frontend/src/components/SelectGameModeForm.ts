@@ -3,20 +3,36 @@ import { initLocalGame } from "../services/initLocalGame.js";
 import { showToast } from "./toast.js";
 import { t } from "../services/i18nService.js";
 // import { createInputField, createInputField } from "../utils/domUtils.js";
+import { HeaderComponent } from "./headerComponent.js";
+import { getUserDataFromStorage } from "../services/authService.js";
 
 export function promptAliasForm(): HTMLDivElement {
+	const currentUser = getUserDataFromStorage();
+
+	const pageWrapper = document.createElement('div');
+	pageWrapper.className = 'flex flex-col min-h-screen bg-cover bg-center bg-fixed';
+	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
+
+	// --- Header ---
+	const headerElement = HeaderComponent({ currentUser });
+	pageWrapper.appendChild(headerElement);
 
 	// --- Main Container ---
 	const container: HTMLDivElement = document.createElement('div');
-	container.className = 'bg-white flex justify-center items-center min-h-screen p-8';
+	// container.className = 'bg-white flex justify-center items-center min-h-screen p-8';
+	container.className = 'flex-grow flex items-center justify-center p-4 sm:p-8';
+	pageWrapper.appendChild(container);
+
 
 	const formContainer: HTMLDivElement = document.createElement('div');
-	formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';
+	// formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';
+	formContainer.className = 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-2xl shadow-2xl p-8 max-w-md w-full';
 
 	// --- Title ---
 	const title: HTMLHeadingElement = document.createElement('h2');
 	title.textContent = t('game.settings.gameMode');
-	title.className = 'text-3xl font-bold mb-6 text-center text-gray-800';
+	// title.className = 'text-3xl font-bold mb-6 text-center text-gray-800';
+	title.className = 'text-3xl font-bold mb-6 text-center text-white';
 
 	// --- Input form ---
 	const form: HTMLFormElement = document.createElement('form');
@@ -24,22 +40,26 @@ export function promptAliasForm(): HTMLDivElement {
 
 	const gameModeField = createSelectField('gameMode', t('game.settings.gameMode'), [t('game.settings.duel'), t('game.settings.tournament')]);
 	const dynamicInputs = document.createElement('div');
+	dynamicInputs.className = 'space-y-4';
 
 	// --- Buttons ---
 	const buttonsContainer: HTMLDivElement = document.createElement('div');
 	buttonsContainer.id = 'buttons-container';
-	buttonsContainer.className = 'flex justify-end space-x-4';
+	// buttonsContainer.className = 'flex justify-end space-x-4';
+	buttonsContainer.className = 'flex justify-end space-x-4 pt-4 border-t border-gray-500/30';
 
 	const cancelButton: HTMLButtonElement = document.createElement('button');
 	cancelButton.type = 'button';
 	cancelButton.id = 'cancel-button';
 	cancelButton.textContent = t('general.cancel');
-	cancelButton.className = 'bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded transition duration-200';
+	// cancelButton.className = 'bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded transition duration-200';
+	cancelButton.className = 'px-4 py-2 rounded-md text-sm font-medium text-gray-200 bg-white/10 hover:bg-white/20 border border-white/20 transition-colors duration-200';
 
 	const submitButton: HTMLButtonElement = document.createElement('button');
 	submitButton.id = 'submit-button';
 	submitButton.textContent = t('game.button');
-	submitButton.className = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200';
+	// submitButton.className = 'bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200';
+	submitButton.className = 'px-4 py-2 rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700 border border-green-500/50 transition-colors duration-200';
 
 	buttonsContainer.append(cancelButton, submitButton);
 
@@ -51,7 +71,8 @@ export function promptAliasForm(): HTMLDivElement {
 	homeLink.href = '/'; // lien vers la page d'accueil
 	homeLink.textContent = t('link.home');
 	homeLink.setAttribute('data-link', ''); // intercepte par le router dans le main.ts
-	homeLink.className = 'text-blue-600 hover:text-blue-800 text-sm';
+	// homeLink.className = 'text-blue-600 hover:text-blue-800 text-sm';
+	homeLink.className = 'text-blue-400 hover:text-blue-300 text-sm transition-colors';
 
 	// --- Ajout des éléments au conteneur principal ---
 	footer.appendChild(homeLink);
@@ -118,7 +139,8 @@ export function promptAliasForm(): HTMLDivElement {
 		await initLocalGame(form);
 	});
 
-	return container;
+	// return container;
+	return pageWrapper;
 }
 
 
@@ -129,14 +151,16 @@ function createInputField(id: string, labelText: string): HTMLDivElement {
 	const label = document.createElement('label');
 	label.htmlFor = id;
 	label.textContent = labelText;
-	label.className = 'block text-sm font-medium text-gray-700 mb-1';
+	// label.className = 'block text-sm font-medium text-gray-700 mb-1';
+	label.className = 'block text-sm font-medium text-gray-300 mb-1';
 
 	const input = document.createElement('input');
 	input.type = 'text';
 	input.id = id;
 	input.name = id;
 	input.required = true;
-	input.className = 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500';
+	// input.className = 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500';
+	input.className = 'w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400';
 
 	fieldDiv.append(label, input);
 
@@ -155,7 +179,8 @@ function createSelectField(id: string, labelText: string, options: string[]): HT
 	const select = document.createElement('select');
 	select.id = id;
 	select.required = true;
-	select.className = 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500';
+	// select.className = 'w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500';
+	select.className = 'w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400';
 
 	for (const optionValue of options) {
 		const option = document.createElement('option');

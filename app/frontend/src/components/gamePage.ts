@@ -39,7 +39,9 @@ export function GamePage(): HTMLElement {
 
 	// --- Main Container ---
 	const pageWrapper = document.createElement('div');
-	pageWrapper.className = 'flex flex-col min-h-screen'; // Assure que la page prend toute la hauteur
+	// pageWrapper.className = 'flex flex-col min-h-screen'; // Assure que la page prend toute la hauteur
+	pageWrapper.className = 'flex flex-col min-h-screen bg-cover bg-center bg-fixed';
+	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
 
 	// --- Header ---
 	const headerElement = HeaderComponent({ currentUser });
@@ -47,15 +49,18 @@ export function GamePage(): HTMLElement {
 
 	// --- Game Page Content ---
 	const gameContentContainer: HTMLDivElement = document.createElement('div');
-	gameContentContainer.className = 'bg-white flex justify-center items-center min-h-screen p-8';
+	// gameContentContainer.className = 'bg-white flex justify-center items-center min-h-screen p-8';
+	gameContentContainer.className = 'flex-grow flex justify-center items-center p-4 sm:p-8';
 
 	const formContainer: HTMLDivElement = document.createElement('div');
-	formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';
+	// formContainer.className = 'bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl p-8 max-w-md w-full';
+	formContainer.className = 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-2xl shadow-2xl p-8 max-w-md w-full';
 
 	// --- Title ---
 	const title: HTMLHeadElement = document.createElement('h2');
 	title.textContent = t('game.welcome');
-	title.className = 'text-3xl font-bold mb-6 text-center text-gray-800';
+	// title.className = 'text-3xl font-bold mb-6 text-center text-gray-800';
+	title.className = 'text-3xl font-bold mb-6 text-center text-white';
 
 	// --- Buttons ---
 	const buttonsContainer: HTMLDivElement = document.createElement('div');
@@ -65,7 +70,8 @@ export function GamePage(): HTMLElement {
 	const onlineGameButton: HTMLButtonElement = document.createElement('button');
 	onlineGameButton.id = 'online-button';
 
-	onlineGameButton.className = 'bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mb-4 transition duration-300 ease-in-out';
+	// onlineGameButton.className = 'bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mb-4 transition duration-300 ease-in-out';
+	onlineGameButton.className = 'bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline w-full transition duration-300 ease-in-out border border-green-500/50 text-lg';
 	onlineGameButton.textContent = t('game.start');
 
 	buttonsContainer.appendChild(onlineGameButton);
@@ -77,7 +83,8 @@ export function GamePage(): HTMLElement {
 	homeLink.href = '/'; // lien vers la page d'accueil
 	homeLink.textContent = t('link.home');
 	homeLink.setAttribute('data-link', ''); // intercepte par le router dans le main.ts
-	homeLink.className = 'text-blue-600 hover:text-blue-800 text-sm';
+	// homeLink.className = 'text-blue-600 hover:text-blue-800 text-sm';
+	homeLink.className = 'text-blue-400 hover:text-blue-300 text-sm transition-colors';
 
 	footer.appendChild(homeLink);
 
