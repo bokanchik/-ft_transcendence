@@ -72,7 +72,7 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		displayNameEl.textContent = user.display_name;
 
 		profileHeader.appendChild(avatarImg);
-		profileHeader.appendChild(displayNameEl);
+		// profileHeader.appendChild(displayNameEl);
 		sidebar.appendChild(profileHeader);
 
 		sidebar.appendChild(createSidebarItem(t('user.username'), user.username));
@@ -132,14 +132,11 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		const tabButton = document.createElement('button');
 		tabButton.dataset.tabId = tabInfo.id;
 		tabButton.textContent = tabInfo.label;
-		// tabButton.className = `py-2 px-4 text-sm font-medium focus:outline-none transition-colors font-roar`;
 		const baseClasses = 'py-2 px-4 text-lg font-roar focus:outline-none transition-colors';
 		let stateClasses = '';
 		if (tabInfo.id === activeTabId) {
-			// tabButton.className = 'py-2 px-4 text-sm font-medium focus:outline-none transition-colors border-b-2 border-blue-400 text-white font-roar';
 			stateClasses = 'border-b-2 border-blue-400 text-white';
 		} else {
-			// tabButton.className = 'py-2 px-4 text-sm font-medium focus:outline-none transition-colors text-gray-300 hover:text-white hover:border-gray-300/70 font-roar';
 			stateClasses = 'text-gray-300 hover:text-white hover:border-gray-300/70';
 		}
 		tabButton.className = `${baseClasses} ${stateClasses}`;
@@ -188,10 +185,8 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		const button = btn as HTMLButtonElement;
         let stateClasses = '';
 			if (btn.dataset.tabId === tabId) {
-				// btn.className = 'py-2 px-4 text-sm font-medium focus:outline-none transition-colors border-b-2 border-blue-400 text-white';
 				stateClasses = 'border-b-2 border-blue-400 text-white';
 			} else {
-				// btn.className = 'py-2 px-4 text-sm font-medium focus:outline-none transition-colors text-gray-300 hover:text-white hover:border-gray-300/70';
 				stateClasses = 'text-gray-300 hover:text-white hover:border-gray-300/70';
 			}
 			button.className = `${baseClasses} ${stateClasses}`;
