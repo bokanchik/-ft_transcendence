@@ -51,6 +51,23 @@
 			"2faTokenInvalid": "Invalid verification code. Please try again."
 		}
 	},
+	"time": {
+		"ago": {
+			"now": "just now",
+			"minute": "1 minute ago",
+			"minutes": "{count} minutes ago",
+			"hour": "1 hour ago",
+			"hours": "{count} hours ago",
+			"day": "1 day ago",
+			"days": "{count} days ago",
+			"week": "1 week ago",
+			"weeks": "{count} weeks ago",
+			"month": "1 month ago",
+			"months": "{count} months ago",
+			"year": "1 year ago",
+			"years": "{count} years ago"
+		}
+	},
 	"game": {
 		"title": "Game",
 		"welcome": "Welcome to the Game",
@@ -175,6 +192,7 @@
 			"loading": "Loading match history...",
 			"noMatches": "No matches found for this user.",
 			"unknownOpponent": "Unknown Opponent",
+			"vs": "VS",
 			"victory": "Victory",
 			"defeat": "Defeat",
 			"draw": "Draw/Cancel",

@@ -51,6 +51,21 @@
 			"2faTokenInvalid": "Code de vérification invalide. Veuillez réessayer."
 		}
 	},
+	"time": {
+		"ago": {
+            "now": "à l'instant",
+            "minute": "il y a 1 minute",
+            "minutes": "il y a {count} minutes",
+            "hour": "il y a 1 heure",
+            "hours": "il y a {count} heures",
+            "day": "il y a 1 jour",
+            "days": "il y a {count} jours",
+            "month": "il y a 1 mois",
+            "months": "il y a {count} mois",
+            "year": "il y a 1 an",
+            "years": "il y a {count} ans"
+        }
+    },
 	"game": {
 		"title": "Jeu",
 		"welcome": "Bienvenue dans le jeu",
@@ -175,6 +190,7 @@
 			"loading": "Chargement de l'historique des matchs...",
 			"noMatches": "Aucun match trouvé.",
 			"unknownOpponent": "Adversaire inconnu",
+			"vs": "VS",
 			"victory": "Victoire",
 			"defeat": "Défaite",
 			"draw": "Match nul/Annulé",

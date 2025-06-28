@@ -1,3 +1,102 @@
+// import { fetchUserDetails } from '../services/authService.js';
+// import { fetchMatchHistoryForUser } from '../services/authService.js';
+// import { t } from '../services/i18nService.js';
+
+// export interface MatchHistoryComponentProps {
+// 	userId: number;
+// }
+
+// export async function MatchHistoryComponent(props: MatchHistoryComponentProps): Promise<HTMLElement> {
+// 	const { userId: profiledUserId } = props;
+
+// 	const el = document.createElement('div');
+// 	el.className = 'p-4';
+// 	el.innerHTML = `<h3 class="text-xl font-semibold mb-4 text-white">${t('match.history.title')}</h3>`;
+
+// 	const loadingMessage = document.createElement('p');
+// 	loadingMessage.className = 'text-gray-300 italic';
+
+// 	loadingMessage.textContent = t('match.history.loading');
+// 	el.appendChild(loadingMessage);
+
+// 	try {
+// 		const matches = await fetchMatchHistoryForUser(profiledUserId);
+// 		loadingMessage.remove();
+
+// 		if (!matches || matches.length === 0) {
+// 			el.innerHTML += `<p class="text-gray-300">${t('match.history.noMatches')}</p>`;
+
+// 			return el;
+// 		}
+
+// 		const opponentsDetailsCache: { [key: number]: { display_name: string } } = {};
+// 		const list = document.createElement('ul');
+// 		list.className = 'space-y-3';
+
+// 		for (const match of matches) {
+// 			let opponentId: number;
+// 			let profiledUserScore: number;
+// 			let opponentScore: number;
+// 			let opponentDisplayName = t('match.history.unknownOpponent');
+
+// 			if (match.player1_id === profiledUserId) {
+// 				opponentId = match.player2_id;
+// 				profiledUserScore = match.player1_score;
+// 				opponentScore = match.player2_score;
+// 			} else if (match.player2_id === profiledUserId) {
+// 				opponentId = match.player1_id;
+// 				profiledUserScore = match.player2_score;
+// 				opponentScore = match.player1_score;
+// 			} else {
+// 				console.warn("Error while searching opponent:", match);
+// 				continue;
+// 			}
+
+// 			if (!opponentsDetailsCache[opponentId]) {
+// 				try {
+// 					const opponentUser = await fetchUserDetails(opponentId);
+// 					opponentsDetailsCache[opponentId] = { display_name: opponentUser?.display_name || `${t('match.details.player')} ${opponentId}` };
+// 				} catch (e) {
+// 					console.error(`${t('match.details.detailsError')} ${opponentId}`, e);
+// 					opponentsDetailsCache[opponentId] = { display_name: `${t('match.details.player')} ${opponentId}` };
+// 				}
+// 			}
+// 			opponentDisplayName = opponentsDetailsCache[opponentId].display_name;
+
+// 			const resultText = match.winner_id === profiledUserId ? t('match.history.victory') : (match.winner_id ? t('match.history.defeat') : t('match.history.draw'));
+// 			const resultColor = match.winner_id === profiledUserId ? 'text-green-400' : (match.winner_id ? 'text-red-400' : 'text-gray-300');
+
+
+// 			const item = document.createElement('li');
+// 			item.className = 'p-3 bg-black/20 border border-gray-500/30 rounded-lg hover:bg-black/30 transition-colors duration-200';
+// 			item.innerHTML = `
+// 			    <div class="flex justify-between items-center mb-1">
+//                     <span class="font-medium text-gray-100">${t('match.history.opponent')} : ${opponentDisplayName}</span>
+//                     <span class="font-semibold ${resultColor}">${resultText}</span>
+//                 </div>
+//                 <div class="text-sm text-gray-400">
+//                     ${t('match.details.score')} : ${profiledUserScore} - ${opponentScore}
+//                     <span class="mx-1">|</span>
+//                     ${t('match.details.type')} : ${match.win_type}
+//                     <span class="mx-1">|</span>
+//                     ${t('match.details.date')} : ${new Date(match.created_at).toLocaleDateString()}
+//                 </div>
+//             `;
+// 			list.appendChild(item);
+// 		}
+// 		el.appendChild(list);
+
+// 	} catch (error) {
+// 		console.error("Error while loading Match history.", error);
+// 		loadingMessage.textContent = `${t('match.history.error')}: ${(error as Error).message}`;
+// 		loadingMessage.classList.remove('text-gray-300', 'italic');
+// 		loadingMessage.classList.add('text-red-400');
+// 	}
+
+// 	return el;
+// }
+// app/frontend/src/components/matchHistoryComponent.ts
+
 import { fetchUserDetails } from '../services/authService.js';
 import { fetchMatchHistoryForUser } from '../services/authService.js';
 import { t } from '../services/i18nService.js';
@@ -5,6 +104,9 @@ import { t } from '../services/i18nService.js';
 export interface MatchHistoryComponentProps {
 	userId: number;
 }
+
+// Cache pour les détails des adversaires
+const opponentsDetailsCache: { [key: number]: { display_name: string; avatar_url: string | null } } = {};
 
 export async function MatchHistoryComponent(props: MatchHistoryComponentProps): Promise<HTMLElement> {
 	const { userId: profiledUserId } = props;
@@ -15,7 +117,6 @@ export async function MatchHistoryComponent(props: MatchHistoryComponentProps): 
 
 	const loadingMessage = document.createElement('p');
 	loadingMessage.className = 'text-gray-300 italic';
-
 	loadingMessage.textContent = t('match.history.loading');
 	el.appendChild(loadingMessage);
 
@@ -25,11 +126,9 @@ export async function MatchHistoryComponent(props: MatchHistoryComponentProps): 
 
 		if (!matches || matches.length === 0) {
 			el.innerHTML += `<p class="text-gray-300">${t('match.history.noMatches')}</p>`;
-
 			return el;
 		}
 
-		const opponentsDetailsCache: { [key: number]: { display_name: string } } = {};
 		const list = document.createElement('ul');
 		list.className = 'space-y-3';
 
@@ -37,7 +136,6 @@ export async function MatchHistoryComponent(props: MatchHistoryComponentProps): 
 			let opponentId: number;
 			let profiledUserScore: number;
 			let opponentScore: number;
-			let opponentDisplayName = t('match.history.unknownOpponent');
 
 			if (match.player1_id === profiledUserId) {
 				opponentId = match.player2_id;
@@ -48,38 +146,68 @@ export async function MatchHistoryComponent(props: MatchHistoryComponentProps): 
 				profiledUserScore = match.player2_score;
 				opponentScore = match.player1_score;
 			} else {
-				console.warn("Error while searching opponent:", match);
 				continue;
 			}
 
 			if (!opponentsDetailsCache[opponentId]) {
 				try {
 					const opponentUser = await fetchUserDetails(opponentId);
-					opponentsDetailsCache[opponentId] = { display_name: opponentUser?.display_name || `${t('match.details.player')} ${opponentId}` };
+					opponentsDetailsCache[opponentId] = { 
+						display_name: opponentUser?.display_name || `${t('match.details.player')} ${opponentId}`,
+						avatar_url: opponentUser?.avatar_url || null
+					};
 				} catch (e) {
-					console.error(`${t('match.details.detailsError')} ${opponentId}`, e);
-					opponentsDetailsCache[opponentId] = { display_name: `${t('match.details.player')} ${opponentId}` };
+					opponentsDetailsCache[opponentId] = { 
+						display_name: `${t('match.details.player')} ${opponentId}`,
+						avatar_url: null 
+					};
 				}
 			}
-			opponentDisplayName = opponentsDetailsCache[opponentId].display_name;
+			const { display_name: opponentDisplayName, avatar_url: opponentAvatarUrl } = opponentsDetailsCache[opponentId];
+			const initials = opponentDisplayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+			const avatarSrc = opponentAvatarUrl || `https://ui-avatars.com/api/?name=${initials}&background=e2e8f0&color=111827&size=96&bold=true`;
 
-			const resultText = match.winner_id === profiledUserId ? t('match.history.victory') : (match.winner_id ? t('match.history.defeat') : t('match.history.draw'));
-			const resultColor = match.winner_id === profiledUserId ? 'text-green-400' : (match.winner_id ? 'text-red-400' : 'text-gray-300');
-
-
+			const isWin = match.winner_id === profiledUserId;
+			const isDraw = !match.winner_id;
+			const resultText = isWin ? t('match.history.victory') : (isDraw ? t('match.history.draw') : t('match.history.defeat'));
+			const resultColorClass = isWin ? 'text-green-400' : (isDraw ? 'text-gray-400' : 'text-red-500');
+			
 			const item = document.createElement('li');
-			item.className = 'p-3 bg-black/20 border border-gray-500/30 rounded-lg hover:bg-black/30 transition-colors duration-200';
+			item.className = 'h-24 bg-[#111827] border border-gray-700/50 rounded-lg flex items-center p-4 gap-4';
+			
+			const formattedTime = formatTimeAgo(new Date(match.created_at));
+			
 			item.innerHTML = `
-			    <div class="flex justify-between items-center mb-1">
-                    <span class="font-medium text-gray-100">${t('match.history.opponent')} : ${opponentDisplayName}</span>
-                    <span class="font-semibold ${resultColor}">${resultText}</span>
+                <!-- 1. VS + Avatar -->
+                <div class="flex items-center gap-5 flex-shrink-0">
+                    <span class="text-4xl font-display ${resultColorClass}">VS</span>
+                    <img src="${avatarSrc}" alt="${opponentDisplayName}" class="h-16 w-16 rounded-full object-cover">
                 </div>
-                <div class="text-sm text-gray-400">
-                    ${t('match.details.score')} : ${profiledUserScore} - ${opponentScore}
-                    <span class="mx-1">|</span>
-                    ${t('match.details.type')} : ${match.win_type}
-                    <span class="mx-1">|</span>
-                    ${t('match.details.date')} : ${new Date(match.created_at).toLocaleDateString()}
+
+                <!-- 2. Bloc central avec espacement égal -->
+                <div class="flex-grow flex justify-between items-center px-4">
+                    <!-- Nom de l'adversaire (aligné à gauche) -->
+                    <div class="text-left">
+                        <span class="text-lg text-gray-300">${opponentDisplayName}</span>
+                    </div>
+
+                    <!-- Résultat (centré) avec la nouvelle police -->
+                    <div class="text-center">
+                        <span class="text-5xl font-display tracking-wide ${resultColorClass}">${resultText.toUpperCase()}</span>
+                    </div>
+
+                    <!-- Score (aligné à droite) -->
+                    <div class="flex justify-end items-baseline text-3xl font-light">
+                        <span class="${isWin ? 'font-semibold text-white' : 'text-gray-400'}">${profiledUserScore}</span>
+                        <span class="mx-3 text-gray-600">/</span>
+                        <span class="${!isWin && !isDraw ? 'font-semibold text-white' : 'text-gray-400'}">${opponentScore}</span>
+                    </div>
+                </div>
+
+                <!-- 3. Date / Type (à l'extrémité droite) -->
+                <div class="flex flex-col justify-center items-end text-right w-28 flex-shrink-0">
+                    <span class="text-sm text-gray-400">${formattedTime}</span>
+                    <span class="text-xs text-gray-500">${match.win_type || 'Score'}</span>
                 </div>
             `;
 			list.appendChild(item);
@@ -94,4 +222,26 @@ export async function MatchHistoryComponent(props: MatchHistoryComponentProps): 
 	}
 
 	return el;
+}
+
+function formatTimeAgo(date: Date): string {
+    const now = new Date();
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+	const years = Math.floor(seconds / 31536000);
+	if (years > 0) return t(years === 1 ? 'time.ago.year' : 'time.ago.years', { count: years.toString() });
+    
+	const months = Math.floor(seconds / 2592000);
+	if (months > 0) return t(months === 1 ? 'time.ago.month' : 'time.ago.months', { count: months.toString() });
+
+	const days = Math.floor(seconds / 86400);
+	if (days > 0) return t(days === 1 ? 'time.ago.day' : 'time.ago.days', { count: days.toString() });
+
+	const hours = Math.floor(seconds / 3600);
+	if (hours > 0) return t(hours === 1 ? 'time.ago.hour' : 'time.ago.hours', { count: hours.toString() });
+
+	const minutes = Math.floor(seconds / 60);
+	if (minutes > 0) return t(minutes === 1 ? 'time.ago.minute' : 'time.ago.minutes', { count: minutes.toString() });
+
+    return t('time.ago.now');
 }
