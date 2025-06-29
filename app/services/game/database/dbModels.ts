@@ -22,12 +22,23 @@ const matchTable: string = `
 const neSupprimePasStpCommente: string = `
 	INSERT INTO matches( matchId, player1_id, player2_id, player1_socket, player2_socket, player1_score, player2_score, winner_id, status)
 	VALUES
-	('match1', 1, 2, 'socket1', 'socket2', 10, 0, 1, 'finished'),
-	('match2', 1, 3, 'socket3', 'socket4', 10, 0, 1, 'finished'),
+	('match1', 1, 2, 'socket1', 'socket2', 10, 8, 1, 'finished'),
+	('match2', 1, 3, 'socket3', 'socket4', 10, 9, 1, 'finished'),
 	('match3', 1, 4, 'socket5', 'socket6', 8, 10, 4, 'finished'),
-	('match4', 2, 3, 'socket7', 'socket8', 5, 10, 3, 'finished'),
-	('match5', 2, 4, 'socket9', 'socket10', 10, 0, 2, 'finished'),
-	('match6', 3, 4, 'socket11', 'socket12', 10, 0, 3, 'finished');`;
+	('match4', 1, 5, 'socket13', 'socket14', 10, 0, 1, 'finished'),
+	('match5', 1, 6, 'socket15', 'socket16', 6, 10, 6, 'finished'),
+	('match6', 1, 7, 'socket17', 'socket18', 8, 10, 7, 'finished'),
+	('match7', 1, 8, 'socket19', 'socket20', 5, 10, 8, 'finished'),
+	('match8', 2, 3, 'socket7', 'socket8', 5, 10, 3, 'finished'),
+	('match9', 2, 4, 'socket9', 'socket10', 10, 0, 2, 'finished'),
+	('match10', 2, 5, 'socket11', 'socket12', 10, 0, 2, 'finished'),
+	('match11', 2, 6, 'socket21', 'socket22', 0, 10, 6, 'finished'),
+	('match12', 5, 6, 'socket23', 'socket24', 0, 10, 6, 'finished'),
+	('match13', 5, 7, 'socket25', 'socket26', 0, 10, 7, 'finished'),
+	('match14', 5, 8, 'socket27', 'socket28', 0, 10, 8, 'finished'),
+	('match15', 6, 7, 'socket29', 'socket30', 0, 10, 7, 'finished'),
+	('match16', 6, 8, 'socket31', 'socket32', 0, 10, 8, 'finished'),
+	('match17', 7, 8, 'socket33', 'socket34', 0, 10, 8, 'finished');`;
 
 // --- HELPER FUNCTIONS FOR GENERAL DB ACTIONS (all(), get(), run(), exec() etc.)
 export async function createMatchTable() {
