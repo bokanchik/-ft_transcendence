@@ -43,12 +43,12 @@
 
 ## Etienne
 
-- [ ] Feuille quand on scroll
-- [ ] la fenetre bouge avec les fleches directionnelles
-- [ ] fix dashboard (cadvisor) 
+- [x] Feuille quand on scroll
+- [x] la fenetre bouge avec les fleches directionnelles
 
 - [x] grafana
 - [ ] grafana/dashboards
+- [ ] fix dashboard (cadvisor) 
 
 ## 📌 Tâches initiales
 
