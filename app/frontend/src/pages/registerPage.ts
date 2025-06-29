@@ -10,15 +10,18 @@ export async function RegisterPage(): Promise<HTMLElement> {
 	const currentUser = getUserDataFromStorage();
 
 	const pageWrapper = document.createElement('div');
-	pageWrapper.className = 'flex flex-col min-h-screen bg-cover bg-center bg-fixed';
-	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
+	// pageWrapper.className = 'flex flex-col min-h-screen bg-cover bg-center bg-fixed';
+	// pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
+	pageWrapper.className = 'flex flex-col h-screen';
 
 	const headerElement = HeaderComponent({ currentUser });
 	pageWrapper.appendChild(headerElement);
 
 
 	const container = document.createElement('div');
-	container.className = 'flex-grow flex justify-center items-center p-4 sm:p-8';
+	// container.className = 'flex-grow flex justify-center items-center p-4 sm:p-8';
+	container.className = 'flex-grow overflow-y-auto flex justify-center items-center p-4 sm:p-8';
+	pageWrapper.appendChild(container);
 
 	const formContainer = document.createElement('div');
 	formContainer.className = 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-2xl shadow-2xl p-8 max-w-md w-full';
@@ -78,7 +81,7 @@ export async function RegisterPage(): Promise<HTMLElement> {
     `;
 
 	container.appendChild(formContainer);
-	pageWrapper.appendChild(container);
+	// pageWrapper.appendChild(container);
 
 	const form = formContainer.querySelector('#register-form') as HTMLFormElement;
 	const usernameInput = formContainer.querySelector('#username') as HTMLInputElement;

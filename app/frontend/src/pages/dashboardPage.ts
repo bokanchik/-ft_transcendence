@@ -43,18 +43,22 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	}
 
 	const pageContainer = document.createElement('div');
-	pageContainer.className = 'min-h-screen p-4 sm:p-8 flex flex-col items-center bg-cover bg-center bg-fixed';
-	pageContainer.style.backgroundImage = "url('/assets/background.jpg')";
+	// pageContainer.className = 'min-h-screen p-4 sm:p-8 flex flex-col items-center bg-cover bg-center bg-fixed';
+	// pageContainer.style.backgroundImage = "url('/assets/background.jpg')";
+	pageContainer.className = 'flex flex-col h-screen';
 
 	const dashboardWrapper = document.createElement('div');
-	dashboardWrapper.className = `bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-2xl shadow-2xl w-full max-w-6xl flex flex-col overflow-hidden`;
+	// dashboardWrapper.className = `bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-2xl shadow-2xl w-full max-w-6xl flex flex-col overflow-hidden`;
+	dashboardWrapper.className = `bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 w-full max-w-6xl mx-auto my-8 rounded-2xl shadow-2xl flex flex-col flex-1 min-h-0`;
 
 	const headerElement = HeaderComponent({ currentUser: currentUser! });
 
 	const mainSection = document.createElement('div');
-	mainSection.className = 'flex flex-1 min-h-[calc(100vh-150px)]';
+	// mainSection.className = 'flex flex-1 min-h-[calc(100vh-150px)]';
+	mainSection.className = 'flex flex-1 min-h-0';
 
 	const sidebar = document.createElement('div');
+	// sidebar.className = 'w-1/4 p-6 border-r border-gray-400/30 space-y-3 overflow-y-auto';
 	sidebar.className = 'w-1/4 p-6 border-r border-gray-400/30 space-y-3 overflow-y-auto';
 
 	function populateSidebar(user: User) {
@@ -111,8 +115,9 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	populateSidebar(currentUser);
 
 	const tabContentWrapper = document.createElement('div');
+	// tabContentWrapper.className = 'w-3/4 p-6 flex flex-col overflow-y-auto';
 	tabContentWrapper.className = 'w-3/4 p-6 flex flex-col overflow-y-auto';
-
+	
 	const tabNavigation = document.createElement('div');
 	tabNavigation.className = 'flex space-x-1 border-b border-gray-400/30 mb-6';
 

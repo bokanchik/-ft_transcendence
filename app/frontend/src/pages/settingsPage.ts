@@ -11,14 +11,16 @@ export async function SettingsPage(): Promise<HTMLElement> {
 	const user: User | null = getUserDataFromStorage();
 
 	const pageWrapper = document.createElement('div');
-	pageWrapper.className = 'flex flex-col min-h-screen bg-cover bg-center bg-fixed';
-	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
+	// pageWrapper.className = 'flex flex-col min-h-screen bg-cover bg-center bg-fixed';
+	// pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
+	pageWrapper.className = 'flex flex-col h-screen';
 
 	const headerElement = HeaderComponent({ currentUser: user });
 	pageWrapper.appendChild(headerElement);
 
 	const contentContainer = document.createElement('div');
-	contentContainer.className = 'flex-grow flex items-center justify-center p-4 md:p-8';
+	// contentContainer.className = 'flex-grow flex items-center justify-center p-4 md:p-8';
+	contentContainer.className = 'flex-grow overflow-y-auto flex items-center justify-center p-4 md:p-8';
 	pageWrapper.appendChild(contentContainer);
 
 	if (!user) {
