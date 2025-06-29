@@ -31,6 +31,9 @@
 - [x] Page home bouton settings et logout inaccessible quand logedin
 
 - [x] tout traduire
+- [x] 3e langue (fr, en, es) -> ajouter dans le front
+- [x] changer header component pour qu'il prenne en compte la langue
+- [ ] mettre en place db et settings pour garder la langue de l'utilisateur
 - [ ] certain check avec des value de string donc faire attention comme par ex: game.quitButton (anciennement Quit)
 - [ ] Vérifier les traductions
 

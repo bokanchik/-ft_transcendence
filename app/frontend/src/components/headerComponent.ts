@@ -13,40 +13,80 @@ interface NavLink {
 	textKey: string;
 }
 
+// Objet de configuration pour les langues
+const languages: Record<string, { flag: string; name: string }> = {
+    fr: { flag: '/assets/flagFr.svg', name: 'Français' },
+    en: { flag: '/assets/flagEn.svg', name: 'English' },
+    es: { flag: '/assets/flagEs.svg', name: 'Español' }
+};
+
 export function HeaderComponent(props: HeaderProps): HTMLElement {
 	const { currentUser } = props;
 
 	const headerContainer = document.createElement('div');
 	headerContainer.className = 'relative z-50 flex justify-between items-center px-6 py-2 bg-gray-900/60 backdrop-blur-lg border-b border-gray-400/30 shadow-lg';
 
-	// --- Left side: Language Button ---
+	// --- Left side: Language Dropdown ---
 	const leftSection = document.createElement('div');
+	leftSection.className = 'relative';
+
+	const currentLanguage = getLanguage();
+	const currentLangData = languages[currentLanguage] || languages['en'];
+
 	const langButton = document.createElement('button');
-
 	langButton.className = 'flex items-center justify-center p-1.5 rounded-full transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75';
-
+	
 	const flagImg = document.createElement('img');
 	flagImg.className = 'h-8 w-auto object-contain rounded-md shadow-sm';
-
-	const updateFlag = () => {
-		const currentLang = getLanguage();
-		if (currentLang === 'fr') {
-			flagImg.src = '/assets/flagEn.svg';
-			flagImg.alt = 'Switch to English';
-		} else {
-			flagImg.src = '/assets/flagFr.svg';
-			flagImg.alt = 'Passer en Français';
-		}
-	};
-	updateFlag();
+	flagImg.src = currentLangData.flag;
+	flagImg.alt = `Current language: ${currentLangData.name}`;
 	langButton.appendChild(flagImg);
 
-	langButton.addEventListener('click', () => {
-		const newLang = getLanguage() === 'fr' ? 'en' : 'fr';
-		setLanguage(newLang);
-		updateFlag();
+	const langMenu = document.createElement('div');
+	langMenu.className = 'absolute left-0 mt-2 w-40 bg-gray-800 rounded-lg shadow-xl border border-gray-600/50 z-50 hidden flex-col origin-top-left';
+
+	Object.entries(languages).forEach(([langCode, langData]) => {
+		if (langCode !== currentLanguage) {
+			const menuItem = document.createElement('button');
+			menuItem.className = 'w-full flex items-center px-4 py-2 text-left text-gray-200 hover:bg-gray-700 transition-colors rounded-md';
+			menuItem.dataset.lang = langCode;
+
+			const menuItemFlag = document.createElement('img');
+			menuItemFlag.src = langData.flag;
+			menuItemFlag.className = 'h-6 w-6 mr-3 rounded-sm';
+			menuItemFlag.alt = langData.name;
+
+			menuItem.appendChild(menuItemFlag);
+			menuItem.appendChild(document.createTextNode(langData.name));
+			langMenu.appendChild(menuItem);
+		}
 	});
+
+	let langMenuOpen = false;
+	const toggleLangMenu = (show: boolean) => {
+		langMenuOpen = show;
+		langMenu.classList.toggle('hidden', !langMenuOpen);
+		langMenu.classList.toggle('flex', langMenuOpen);
+	};
+
+	langButton.addEventListener('click', (e) => {
+		e.stopPropagation();
+		toggleLangMenu(!langMenuOpen);
+	});
+
+	langMenu.addEventListener('click', (e) => {
+		const targetButton = (e.target as HTMLElement).closest('button[data-lang]');
+		if (targetButton instanceof HTMLButtonElement) {
+			const newLang = targetButton.dataset.lang;
+			if (newLang) {
+				setLanguage(newLang);
+				toggleLangMenu(false);
+			}
+		}
+	});
+
 	leftSection.appendChild(langButton);
+	leftSection.appendChild(langMenu);
 
 	// --- Center: Navigation Links ---
 	const centerSection = document.createElement('div');
@@ -73,9 +113,8 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 
 	// --- Right side: User Menu OR Auth Buttons ---
 	const rightSection = document.createElement('div');
-	rightSection.className = 'flex items-center space-x-4 relative';
+	rightSection.className = 'flex items-center space-x-4';
 
-	// --- LOGGED-IN STATE ---
 	if (currentUser) {
 		const userHeader = document.createElement('div');
 		userHeader.className = 'flex items-center space-x-4 relative';
@@ -126,26 +165,28 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		userHeader.appendChild(miniMenu);
 		rightSection.appendChild(userHeader);
 
-		let menuOpen = false;
-		const toggleMenu = (show: boolean) => {
-			menuOpen = show;
-			miniMenu.classList.toggle('hidden', !menuOpen);
-			miniMenu.classList.toggle('flex', menuOpen);
+		let userMenuOpen = false;
+		const toggleUserMenu = (show: boolean) => {
+			userMenuOpen = show;
+			miniMenu.classList.toggle('hidden', !userMenuOpen);
+			miniMenu.classList.toggle('flex', userMenuOpen);
 		};
 
 		avatarDisplayWrapper.addEventListener('click', (e) => {
 			e.stopPropagation();
-			toggleMenu(!menuOpen);
+			toggleUserMenu(!userMenuOpen);
 		});
 
 		document.addEventListener('click', (event: MouseEvent) => {
-			if (menuOpen && !userHeader.contains(event.target as Node)) {
-				toggleMenu(false);
+			if (userMenuOpen && !userHeader.contains(event.target as Node)) {
+				toggleUserMenu(false);
+			}
+			if (langMenuOpen && !leftSection.contains(event.target as Node)) {
+				toggleLangMenu(false);
 			}
 		});
-
-		// --- LOGGED-OUT STATE ---
 	} else {
+		// --- LOGGED-OUT STATE ---
 		const authLinks = document.createElement('div');
 		authLinks.className = 'flex items-center space-x-2 sm:space-x-4';
 
@@ -164,6 +205,12 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		authLinks.appendChild(loginLink);
 		authLinks.appendChild(registerLink);
 		rightSection.appendChild(authLinks);
+
+        document.addEventListener('click', (event: MouseEvent) => {
+			if (langMenuOpen && !leftSection.contains(event.target as Node)) {
+				toggleLangMenu(false);
+			}
+		});
 	}
 
 	headerContainer.appendChild(leftSection);

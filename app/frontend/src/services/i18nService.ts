@@ -2,7 +2,9 @@ import { router } from '../main.js';
 
 let currentLanguage: string = 'en';
 let translations: Record<string, any> = {};
-const supportedLanguages = ['fr', 'en'];
+// const supportedLanguages = ['fr', 'en'];
+const supportedLanguages = ['fr', 'en', 'es'];
+
 
 async function loadTranslations(lang: string): Promise<void> {
     try {
