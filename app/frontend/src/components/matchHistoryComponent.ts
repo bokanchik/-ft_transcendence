@@ -73,17 +73,16 @@ export async function MatchHistoryComponent(props: MatchHistoryComponentProps): 
 			const resultText = isWin ? t('match.history.victory') : (isDraw ? t('match.history.draw') : t('match.history.defeat'));
 			const resultColorClass = isWin ? 'text-green-400' : (isDraw ? 'text-gray-400' : 'text-red-500');
 
-			let backgroundClass = 'bg-[#111827]'; // Fond par défaut
+			let backgroundClass = 'bg-[#111827]';
             if (isWin) {
-                backgroundClass = 'bg-green-900/30 hover:bg-green-800/40'; // Fond vert léger
+                backgroundClass = 'bg-green-900/30 hover:bg-green-800/40';
             } else if (!isDraw) {
-                backgroundClass = 'bg-red-900/30 hover:bg-red-800/40'; // Fond rouge léger
+                backgroundClass = 'bg-red-900/30 hover:bg-red-800/40';
             }
 
 			const item = document.createElement('li');
-			// item.className = 'h-24 bg-[#111827] border border-gray-700/50 rounded-lg flex items-center p-4 gap-4';
 			item.className = `h-24 border border-gray-700/50 rounded-lg flex items-center p-4 gap-4 transition-colors duration-200 ${backgroundClass}`;
-			const dateFromDb = new Date(match.created_at);
+			const dateFromDb = new Date(match.created_at + 'Z');
 			const formattedTime = formatTimeAgo(dateFromDb);
 			const fullDate = formatFullDate(dateFromDb); 
 
@@ -134,16 +133,14 @@ export async function MatchHistoryComponent(props: MatchHistoryComponentProps): 
 }
 
 function formatFullDate(date: Date): string {
-    const adjustedTimestamp = date.getTime() + (2 * 60 * 60 * 1000);
+	const adjustedTimestamp = date.getTime();
     const adjustedDate = new Date(adjustedTimestamp);
     return adjustedDate.toLocaleString();
 }
 
 function formatTimeAgo(date: Date): string {
 	const now = new Date();
-	const adjustedDateTimestamp = date.getTime() + (2 * 60 * 60 * 1000);
-    const adjustedDate = new Date(adjustedDateTimestamp);
-	const seconds = Math.floor((now.getTime() - adjustedDate.getTime()) / 1000);
+	const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
 	const years = Math.floor(seconds / 31536000);
 	if (years > 0) return t(years === 1 ? 'time.ago.year' : 'time.ago.years', { count: years.toString() });

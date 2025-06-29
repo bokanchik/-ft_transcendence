@@ -173,10 +173,21 @@ export async function updateUserProfile(userId: number, updates: UpdateUserPaylo
  * Updates the status of a user.
  * @param {number} userId - The ID of the user whose status to update.
  * @param {UserOnlineStatus} status - The new online status of the user.
- * @returns {Promise<void>}
+ * @returns {Promise<User>} The updated user object.
  */
-export async function updateUserStatus(userId: number, status: UserOnlineStatus): Promise<void> {
+export async function updateUserStatus(userId: number, status: UserOnlineStatus): Promise<User> {
+	const userExists = await userModel.getUserByIdFromDb(userId);
+    if (!userExists) {
+        throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND);
+    }
 	await userModel.updateStatusInDb(userId, status);
+	const updatedUser = await userModel.getUserByIdFromDb(userId);
+	if (!updatedUser) {
+		throw new AppError(ERROR_KEYS.DATABASE_ERROR, 500, { detail: `Could not re-fetch user ${userId} after status update.` });
+	}
+
+	console.log(`Status updated successfully for user ID: ${userId} to ${status}`);
+    return updatedUser;
 }
 
 /**

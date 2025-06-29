@@ -103,7 +103,7 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 	twoFaCheckbox.addEventListener('change', async () => {
 		if (twoFaCheckbox.checked) {
 			twoFaSetupContainer.classList.remove('hidden');
-			qrCodeContainer.innerHTML = `<span class="loader"></span>`; // Affiche un spinner
+			qrCodeContainer.innerHTML = `<span class="loader"></span>`;
 			try {
 				const { qrCodeDataURL } = await onGenerate2FA();
 				const qrCodeImg = document.createElement('img');

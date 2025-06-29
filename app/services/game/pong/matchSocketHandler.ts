@@ -8,6 +8,8 @@ import { RemoteGameSession, gameSessions, findRemoteGameSessionBySocketId } from
 import { cleanOnDisconnection, makeid } from "../utils/waitingRoomUtils.ts";
 // @ts-ignore
 import { GameState, FRAME_RATE } from "../shared/gameTypes.js";
+import { updateUserStatus } from "../utils/apiClient.ts";
+import { UserOnlineStatus } from "../shared/schemas/usersSchemas.js";
 
 export const timeouts: Map<string, NodeJS.Timeout> = new Map();
 
@@ -124,7 +126,7 @@ async function disconnectionHandler(socket: Socket)  {
     socket.on('disconnect', async () => {
        
         // waiting rooom cleanup
-        cleanOnDisconnection(socket.id)
+        await cleanOnDisconnection(socket.id)
 
         const gameSession = findRemoteGameSessionBySocketId(socket.id);
         if (gameSession) {
@@ -138,13 +140,15 @@ async function disconnectionHandler(socket: Socket)  {
             }
             // set game Result to DB
             const match = await getRowByMatchId(gameSession.matchId);
-            const looser = gameSession.getPlayerSide(socket.id);
+            const looserId = gameSession.getPlayerSide(socket.id) === 'left' ? match.player1_id : match.player2_id;
+            const winnerId = gameSession.getPlayerSide(socket.id) === 'left' ? match.player2_id : match.player1_id;
 
-            if (looser === 'left') {
-                setGameResult(gameSession.matchId, gameSession.state.score1, gameSession.state.score2, match.player2_id, 'forfeit');
-            } else if (looser === 'right') {
-                setGameResult(gameSession.matchId, gameSession.state.score1, gameSession.state.score2, match.player1_id, 'forfeit');
-            }
+            await setGameResult(gameSession.matchId, gameSession.state.score1, gameSession.state.score2, winnerId, 'forfeit');
+            
+            await Promise.all([
+                updateUserStatus(winnerId, UserOnlineStatus.ONLINE),
+                updateUserStatus(looserId, UserOnlineStatus.ONLINE)
+            ]);
 
             // clean up game session
             gameSession.clearGameInterval();

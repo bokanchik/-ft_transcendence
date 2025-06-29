@@ -1,6 +1,8 @@
 import  { timeouts } from "../pong/matchSocketHandler.ts";
-import { removePlayerFromWaitingList } from "./waitingListUtils.ts";
+import { waitingList, removePlayerFromWaitingList } from "./waitingListUtils.ts";
 import  { fastify } from "../server.ts";
+import { updateUserStatus } from "./apiClient.ts";
+import { UserOnlineStatus } from "../shared/schemas/usersSchemas.ts";
 
 // --- HELPER FUNCTIONS ---- //
 export function clearMatchmakingTimeout(socketId: string) {
@@ -11,10 +13,14 @@ export function clearMatchmakingTimeout(socketId: string) {
     }
 }
 
-export function cleanOnDisconnection(socketId: string) {
+export async function cleanOnDisconnection(socketId: string) {
     fastify.log.info(`Player disconnected: ${socketId}`);
-    removePlayerFromWaitingList(socketId);
+    const playerInfo = waitingList.get(socketId);
+    await removePlayerFromWaitingList(socketId);
     clearMatchmakingTimeout(socketId);
+    if (playerInfo) {
+        await updateUserStatus(playerInfo.userId, UserOnlineStatus.ONLINE);
+    }
 }
 
 export function makeid(length: number) {

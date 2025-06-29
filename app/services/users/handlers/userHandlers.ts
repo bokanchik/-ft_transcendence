@@ -1,7 +1,7 @@
 // Gère les requêtes Fastify (req, reply)
 import { FastifyRequest, FastifyReply } from 'fastify';
 import * as userService from '../services/userService.js';
-import { UserIdParams, UpdateUserPayload, JWTPayload, UpdateUserStatsBody } from '../shared/schemas/usersSchemas.js';
+import { UserIdParams, UpdateUserPayload, JWTPayload, UpdateUserStatsBody, UserOnlineStatus, UpdateUserStatusBody } from '../shared/schemas/usersSchemas.js';
 
 type AuthenticatedRequest = FastifyRequest & { user: JWTPayload };
 
@@ -44,9 +44,6 @@ export async function getUserInfoHandler(req: AuthenticatedRequest, reply: Fasti
 }
 
 export async function updateUserStatsHandler(req: FastifyRequest, reply: FastifyReply) {
-    // qui fait l'appel, il faudrait une authentification différente (ex: API key).
-    // Pour l'instant, on suppose que tout utilisateur authentifié peut appeler cette route.
-
     const userId = parseInt((req.params as UserIdParams).userId, 10);
     const statsUpdate = req.body as UpdateUserStatsBody;
 
@@ -55,6 +52,20 @@ export async function updateUserStatsHandler(req: FastifyRequest, reply: Fastify
 
     return reply.code(200).send({
         message: 'User stats updated successfully',
+        user: updatedUser
+    });
+}
+
+export async function updateUserStatusHandler(req: FastifyRequest, reply: FastifyReply) {
+    const userId = parseInt((req.params as UserIdParams).userId, 10);
+    const { status } = req.body as UpdateUserStatusBody;
+
+    req.log.info({ userId, status }, 'Internal service request to update user status');
+    
+    const updatedUser = await userService.updateUserStatus(userId, status);
+
+    return reply.code(200).send({
+        message: 'User status updated successfully',
         user: updatedUser
     });
 }

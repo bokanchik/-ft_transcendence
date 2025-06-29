@@ -3,6 +3,8 @@ import { gameLoop, createBallState, createGameState} from "./pongGame.ts";
 import { getRowByMatchId, setGameResult } from "../database/dbModels.ts";
 //@ts-ignore
 import { GameState, Velocity, FRAME_RATE } from "../shared/gameTypes.js";
+import { updateUserStatus } from "../utils/apiClient.ts";
+import { UserOnlineStatus } from "../shared/schemas/usersSchemas.js";
 
 export const gameSessions: Map<string, RemoteGameSession> = new Map();
 
@@ -56,12 +58,18 @@ export class RemoteGameSession {
 
                 const match = await getRowByMatchId(this.matchId);
                 const winnerId = winner === 1 ? match.player1_id : match.player2_id;
+                const loserId = winner === 1 ? match.player2_id : match.player1_id;
                 await setGameResult(this.matchId, this.state.score1, this.state.score2, winnerId, 'score');
                 // if (winner === 1) {
                 //     setGameResult(this.matchId, this.state.score1, this.state.score2, match.player1_id, 'score');
                 // } else if (winner === 2) {
                 //     setGameResult(this.matchId, this.state.score1, this.state.score2, match.player2_id, 'score');
                 // }
+                
+                await Promise.all([
+                    updateUserStatus(winnerId, UserOnlineStatus.ONLINE),
+                    updateUserStatus(loserId, UserOnlineStatus.ONLINE)
+                ]);
                 
                 this.clearGameInterval();
 

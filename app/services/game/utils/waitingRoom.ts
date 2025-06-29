@@ -6,11 +6,16 @@ import { firstInFirstOut, addPlayerToWaitingList, removePlayerFromWaitingList, g
 // @ts-ignore
 import { TIMEOUT_MS } from "../shared/gameTypes.ts";
 import { clearMatchmakingTimeout, cleanOnDisconnection } from "./waitingRoomUtils.ts";
+import { updateUserStatus } from "./apiClient.ts";
+import { UserOnlineStatus } from "../shared/schemas/usersSchemas.ts";
 
 export async function waitingRoomHandler(socket: Socket) {
     
     socket.on('authenticate', async ({ display_name, userId }) => {
         try {
+            // Ajout arthur : MAJ status utilisateur
+            await updateUserStatus(userId, UserOnlineStatus.IN_GAME);
+
             // store display_name and socket.id in waiting list if not already in        
             const newPlayer = await addPlayerToWaitingList(display_name, userId, socket);
             
@@ -28,6 +33,9 @@ export async function waitingRoomHandler(socket: Socket) {
             await tryMatchPlayers();
         } catch (err: unknown) {
             fastify.log.error(`Error during matchmaking process: ${err}`);
+            if(userId) {
+                await updateUserStatus(userId, UserOnlineStatus.ONLINE);
+            }
             throw err;
         }
     });
