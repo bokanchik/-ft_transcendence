@@ -24,7 +24,7 @@ function toAppUserWithSecrets(dbUser: any): UserWithSecrets {
  */
 export async function getAllUsersFromDb(): Promise<User[]> {
 	const db = getDb();
-	const users = await db.all<any[]>('SELECT id, username, email, display_name, avatar_url, wins, losses, status, created_at, updated_at, is_two_fa_enabled FROM users');
+	const users = await db.all<any[]>('SELECT id, username, email, display_name, avatar_url, wins, losses, status, language, created_at, updated_at, is_two_fa_enabled FROM users');
     return users.map(toAppUser);
 }
 
@@ -68,7 +68,7 @@ export async function getUserByEmailFromDb(email: string): Promise<UserWithSecre
  */
 export async function getUserByIdFromDb(userId: number): Promise<User | undefined> {
 	const db = getDb();
-	const user = await db.get<any>('SELECT id, username, email, display_name, avatar_url, wins, losses, status, created_at, updated_at, is_two_fa_enabled FROM users WHERE id = ?', [userId]);
+	const user = await db.get<any>('SELECT id, username, email, display_name, avatar_url, wins, losses, status, language, created_at, updated_at, is_two_fa_enabled FROM users WHERE id = ?', [userId]);
     return user ? toAppUser(user) : undefined;
 }
 
@@ -89,12 +89,12 @@ export async function getUserWithSecretsByIdFromDb(userId: number): Promise<User
  * @returns {Promise<void>} 
  */
 export async function createUser(
-	{ username, email, password_hash, display_name, avatar_url = null }: CreateUserPayload
+	{ username, email, password_hash, display_name, avatar_url = null, language = 'en' }: CreateUserPayload
 ): Promise<void> {
 	const db = getDb();
 	const result = await db.run(
-		`INSERT INTO users (username, email, password_hash, display_name, avatar_url) VALUES (?, ?, ?, ?, ?)`,
-		[username, email, password_hash, display_name, avatar_url]
+		`INSERT INTO users (username, email, password_hash, display_name, avatar_url, language) VALUES (?, ?, ?, ?, ?, ?)`,
+		[username, email, password_hash, display_name, avatar_url, language]
 	);
 	if (result.lastID === undefined) {
 		throw new AppError(ERROR_KEYS.DATABASE_ERROR, 500, { detail: "User creation failed, no lastID." });

@@ -37,6 +37,7 @@
 			"savingMsg2": "Saving...",
 			"success": "Changes saved successfully!",
 			"error": "Error saving changes.",
+			"noChanges": "No changes to save.",
 			"denied": "Access denied.",
 			"deniedMsg": "You must be logged in to access this page.",
 			"profileInfoTitle": "Identity",
@@ -118,7 +119,7 @@
 		"dashboard": "Dashboard",
 		"settings": "Settings",
 		"logout": "Logout",
-		"language": "FR",
+		"language": "Language Selection",
 		"logoutSuccess": "You have been logged out successfully.",
 		"logoutError": "Error while logging out."
 	},

@@ -37,6 +37,7 @@
 			"savingMsg2": "Sauvegarde...",
 			"success": "Modifications enregistrées avec succès !",
 			"error": "Erreur lors de l'enregistrement des modifications.",
+			"noChanges": "Aucun changement à enregistrer.",
 			"denied": "Accès refusé.",
 			"deniedMsg": "Vous devez être connecté pour accéder à cette page.",
 			"profileInfoTitle": "Identité",
@@ -116,7 +117,7 @@
 		"dashboard": "Tableau de Bord",
 		"settings": "Paramètres",
 		"logout": "Déconnexion",
-		"language": "ENG",
+		"language": "Selection de la langue",
 		"logoutSuccess": "Vous avez été déconnecté avec succès.",
 		"logoutError": "Erreur lors de la déconnexion."
 	},

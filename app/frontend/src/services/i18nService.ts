@@ -1,9 +1,10 @@
 import { router } from '../main.js';
+import { getUserDataFromStorage } from './authService.js';
 
 let currentLanguage: string = 'en';
 let translations: Record<string, any> = {};
 // const supportedLanguages = ['fr', 'en'];
-const supportedLanguages = ['fr', 'en', 'es'];
+const supportedLanguages = ['fr', 'en', 'es', 'ru'];
 
 
 async function loadTranslations(lang: string): Promise<void> {
@@ -25,9 +26,36 @@ async function loadTranslations(lang: string): Promise<void> {
 /**
  * Initialise le service i18n. Doit être appelé au démarrage de l'application.
  */
-export async function initI18n(): Promise<void> {
-    let lang = localStorage.getItem('language');
+// export async function initI18n(): Promise<void> {
+//     let lang = localStorage.getItem('language');
 
+//     if (!lang) {
+//         const browserLang = navigator.language.split('-')[0];
+//         if (supportedLanguages.includes(browserLang)) {
+//             lang = browserLang;
+//         }
+//     }
+
+//     currentLanguage = lang || 'en';
+//     localStorage.setItem('language', currentLanguage);
+
+//     await loadTranslations(currentLanguage);
+// }
+
+export async function initI18n(): Promise<void> {
+    const user = getUserDataFromStorage();
+    let lang: string | null = null;
+
+    // 1. Priorité à la langue de l'utilisateur connecté (depuis la DB via localStorage)
+    if (user && user.language) {
+        lang = user.language;
+    } 
+    // 2. Sinon, on regarde dans le localStorage (pour les non-connectés)
+    else {
+        lang = localStorage.getItem('language');
+    }
+    
+    // 3. Sinon, on prend la langue du navigateur
     if (!lang) {
         const browserLang = navigator.language.split('-')[0];
         if (supportedLanguages.includes(browserLang)) {
@@ -35,7 +63,10 @@ export async function initI18n(): Promise<void> {
         }
     }
 
+    // 4. Langue par défaut si rien n'est trouvé
     currentLanguage = lang || 'en';
+    
+    // On met toujours à jour le localStorage pour que ce soit cohérent
     localStorage.setItem('language', currentLanguage);
 
     await loadTranslations(currentLanguage);

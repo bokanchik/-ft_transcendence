@@ -4,7 +4,7 @@ import { User, UpdateUserPayload } from '../shared/schemas/usersSchemas.js';
 import { ApiResult, ApiUpdateUserSuccessData } from '../utils/types.js';
 import { SettingsForm } from '../components/settingsForm.js';
 import { fetchCsrfToken } from '../services/csrf.js';
-import { t } from '../services/i18nService.js';
+import { t, setLanguage, getLanguage } from '../services/i18nService.js';
 import { HeaderComponent } from '../components/headerComponent.js';
 
 export async function SettingsPage(): Promise<HTMLElement> {
@@ -59,9 +59,17 @@ export async function SettingsPage(): Promise<HTMLElement> {
 	contentWrapper.appendChild(title);
 
 	const handleProfileUpdate = async (payload: UpdateUserPayload): Promise<ApiResult<ApiUpdateUserSuccessData>> => {
+		// AJOUT : Vérifier si la langue a été modifiée
+		const currentLang = getLanguage();
+		const newLang = payload.language;
+
 		const result = await updateUserProfile(payload);
 		if (result.success) {
 			console.log('Profile updated in service, local storage should be updated too.');
+			// AJOUT : Mettre à jout la langue
+			if (newLang && newLang !== currentLang) {
+				await setLanguage(newLang); // Cela va re-router et re-render la page
+			}
 			setTimeout(() => { navigateTo('/dashboard'); }, 500);
 		}
 		return result;

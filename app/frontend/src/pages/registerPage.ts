@@ -2,9 +2,17 @@ import { attemptRegister } from '../services/authService.js';
 import { RegisterRequestBody } from '../shared/schemas/usersSchemas.js'
 import { ApiResult, ApiRegisterSuccessData } from '../utils/types.js'
 import { navigateTo } from '../services/router.js';
-import { t } from '../services/i18nService.js';
+import { t, getLanguage } from '../services/i18nService.js';
 import { HeaderComponent } from '../components/headerComponent.js';
 import { getUserDataFromStorage } from '../services/authService.js';
+
+// Configuration des langues pour le menu déroulant
+const supportedLanguages = {
+    'en': 'English',
+    'fr': 'Français',
+    'es': 'Español',
+    'ru': 'Русский'
+};
 
 export async function RegisterPage(): Promise<HTMLElement> {
 	const currentUser = getUserDataFromStorage();
@@ -22,6 +30,12 @@ export async function RegisterPage(): Promise<HTMLElement> {
 	// container.className = 'flex-grow flex justify-center items-center p-4 sm:p-8';
 	container.className = 'flex-grow overflow-y-auto flex justify-center items-center p-4 sm:p-8';
 	pageWrapper.appendChild(container);
+
+	// Générer les options pour le sélecteur de langue
+    const currentLang = getLanguage();
+    const languageOptions = Object.entries(supportedLanguages).map(([code, name]) => 
+        `<option value="${code}" ${currentLang === code ? 'selected' : ''}>${name}</option>`
+    ).join('');
 
 	const formContainer = document.createElement('div');
 	formContainer.className = 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-2xl shadow-2xl p-8 max-w-md w-full';
@@ -61,6 +75,15 @@ export async function RegisterPage(): Promise<HTMLElement> {
                 <input type="url" id="avatar_url" name="avatar_url" placeholder="https://example.com/avatar.jpg"
                        class="w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
             </div>
+
+			<!-- AJOUT DU SÉLECTEUR DE LANGUE -->
+            <div class="mb-6">
+                <label for="language" class="block text-sm font-medium text-gray-300 mb-1">${t('header.language')}</label>
+                <select id="language" name="language" class="w-full p-2 bg-black/20 border border-gray-500/50 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    ${languageOptions}
+                </select>
+            </div>
+
             <div class="flex items-center justify-between">
                 <button type="submit" id="register-button"
                         class="w-full font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300 ease-in-out bg-yellow-500 hover:bg-yellow-600 text-black border border-yellow-400/50">
@@ -90,6 +113,8 @@ export async function RegisterPage(): Promise<HTMLElement> {
 	const passwordInput = formContainer.querySelector('#password') as HTMLInputElement;
 	const confirmPasswordInput = formContainer.querySelector('#confirm_password') as HTMLInputElement;
 	const avatarUrlInput = formContainer.querySelector('#avatar_url') as HTMLInputElement;
+	// AJOUT : Récupérer le sélecteur
+    const languageSelect = formContainer.querySelector('#language') as HTMLSelectElement;
 	const messageDiv = formContainer.querySelector('#register-message') as HTMLDivElement;
 	const registerButton = formContainer.querySelector('#register-button') as HTMLButtonElement;
 
@@ -104,6 +129,8 @@ export async function RegisterPage(): Promise<HTMLElement> {
 		const password = passwordInput.value;
 		const confirmPassword = confirmPasswordInput.value;
 		const avatarUrl = avatarUrlInput.value.trim();
+		// AJOUT : Récupérer la valeur de la langue
+        const language = languageSelect.value;
 
 		if (!username || !email || !displayName || !password || !confirmPassword) {
 			messageDiv.textContent = t('register.fillAllFields');
@@ -145,6 +172,7 @@ export async function RegisterPage(): Promise<HTMLElement> {
 			email,
 			password,
 			display_name: displayName,
+			language: language, // AJOUT : Inclure la langue
 		};
 		if (avatarUrl) {
 			credentials.avatar_url = avatarUrl;

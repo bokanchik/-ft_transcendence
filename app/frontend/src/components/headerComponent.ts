@@ -17,7 +17,8 @@ interface NavLink {
 const languages: Record<string, { flag: string; name: string }> = {
     fr: { flag: '/assets/flagFr.svg', name: 'Français' },
     en: { flag: '/assets/flagEn.svg', name: 'English' },
-    es: { flag: '/assets/flagEs.svg', name: 'Español' }
+    es: { flag: '/assets/flagEs.svg', name: 'Español' },
+	ru: { flag: '/assets/flagRu.svg', name: 'Русский' },
 };
 
 export function HeaderComponent(props: HeaderProps): HTMLElement {

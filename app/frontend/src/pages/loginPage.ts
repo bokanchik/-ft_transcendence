@@ -3,7 +3,7 @@ import { navigateTo } from '../services/router.js';
 import { LoginForm } from '../components/loginForm.js';
 import { LoginRequestBody, User } from '../shared/schemas/usersSchemas.js';
 import { ApiResult, ApiLoginSuccessData } from '../utils/types.js';
-import { t } from '../services/i18nService.js';
+import { t, setLanguage, getLanguage } from '../services/i18nService.js';
 import { HeaderComponent } from '../components/headerComponent.js';
 
 export function LoginPage(): HTMLElement {
@@ -36,7 +36,13 @@ export function LoginPage(): HTMLElement {
 		return verifyTwoFactorLogin(token);
 	};
 
-	const handleLoginSuccess = (userData: User) => {
+	const handleLoginSuccess = async (userData: User) => {
+		const userLanguage = userData.language || 'en';
+        const currentInterfaceLanguage = getLanguage();
+
+		if (userLanguage !== currentInterfaceLanguage) {
+            await setLanguage(userLanguage);
+		}
 		setTimeout(() => { navigateTo('/dashboard'); }, 500);
 	};
 

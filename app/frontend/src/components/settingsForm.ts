@@ -1,6 +1,6 @@
 import { User, UpdateUserPayload, Generate2FAResponse } from '../shared/schemas/usersSchemas.js';
 import { ApiResult, ApiUpdateUserSuccessData } from '../utils/types.js';
-import { t } from '../services/i18nService.js';
+import { t, getLanguage } from '../services/i18nService.js';
 
 interface ProfileFormProps {
 	user: User;
@@ -10,9 +10,21 @@ interface ProfileFormProps {
 	onDisable2FA: () => Promise<{ message: string }>;
 }
 
+const supportedLanguages = {
+    'en': 'English',
+    'fr': 'Français',
+    'es': 'Español',
+    'ru': 'Русский'
+};
+
 export function SettingsForm(props: ProfileFormProps): HTMLElement {
 	const { user, onProfileUpdate, onGenerate2FA, onVerifyAndEnable2FA, onDisable2FA } = props;
 	let currentUserState = { ...user };
+
+	// Générer les options pour le sélecteur de langue
+	const languageOptions = Object.entries(supportedLanguages).map(([code, name]) => 
+        `<option value="${code}" ${getLanguage() === code ? 'selected' : ''}>${name}</option>`
+    ).join('');
 
 	const formElement = document.createElement('form');
 	formElement.id = 'profile-form-component';
@@ -56,6 +68,14 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
              <p class="text-xs text-gray-400 mt-1">${t('user.settings.avatarMsg')}</p>
         </div>
         
+		<!-- AJOUT DU SÉLECTEUR DE LANGUE -->
+        <div class="mb-6">
+            <label for="language" class="block text-sm font-medium text-gray-300 mb-1">${t('header.language')}</label>
+            <select id="language" name="language" class="w-full p-2 bg-black/20 border border-gray-500/50 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+                ${languageOptions}
+            </select>
+        </div>
+
         <!-- Section Sécurité / 2FA -->
         <div class="mt-8">
              <h3 class="text-lg font-semibold text-white mb-4 border-b border-gray-400/30 pb-2">${t('user.settings.securityTitle')}</h3>
@@ -90,6 +110,8 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 	const emailInput = formElement.querySelector('#email') as HTMLInputElement;
 	const displayNameInput = formElement.querySelector('#display_name') as HTMLInputElement;
 	const avatarUrlInput = formElement.querySelector('#avatar_url') as HTMLInputElement;
+	// AJOUT : Récupération du sélecteur de langue
+	const languageSelect = formElement.querySelector('#language') as HTMLSelectElement;
 	const messageDiv = formElement.querySelector('#profile-message') as HTMLDivElement;
 	const saveButton = formElement.querySelector('#save-profile-button') as HTMLButtonElement;
 
@@ -131,6 +153,8 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 		const updatedEmail = emailInput.value.trim();
 		const updatedDisplayName = displayNameInput.value.trim();
 		const updatedAvatarUrl = avatarUrlInput.value.trim();
+		// AJOUT : Récupération de la nouvelle langue
+		const updatedLanguage = languageSelect.value;
 		const newTwoFaState = twoFaCheckbox.checked;
 		const twoFaToken = twoFaTokenInput.value.trim();
 
@@ -151,11 +175,43 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 			}
 
 			const profilePayload: UpdateUserPayload = {};
-			if (updatedEmail !== currentUserState.email) profilePayload.email = updatedEmail;
-			if (updatedDisplayName !== currentUserState.display_name) profilePayload.display_name = updatedDisplayName;
-			if (updatedAvatarUrl !== (currentUserState.avatar_url || '')) profilePayload.avatar_url = updatedAvatarUrl;
+			// if (updatedEmail !== currentUserState.email) profilePayload.email = updatedEmail;
+			// if (updatedDisplayName !== currentUserState.display_name) profilePayload.display_name = updatedDisplayName;
+			// if (updatedAvatarUrl !== (currentUserState.avatar_url || '')) profilePayload.avatar_url = updatedAvatarUrl;
+			// // AJOUT : Ajout de la langue au payload si elle a changé
+			// if (updatedLanguage !== (currentUserState.language || getLanguage())) {
+            //      profilePayload.language = updatedLanguage;
+            // }
 
-			if (Object.keys(profilePayload).length > 0) {
+			// if (Object.keys(profilePayload).length > 0) {
+			// 	const result = await onProfileUpdate(profilePayload);
+			// 	if (!result.success) {
+			// 		throw new Error(result.error);
+			// 	}
+			// 	currentUserState = { ...currentUserState, ...result.data.user };
+			// 	profileUpdateSuccess = true;
+			// }
+
+			let hasChanges = false;
+            
+            if (updatedEmail !== currentUserState.email) {
+                profilePayload.email = updatedEmail;
+                hasChanges = true;
+            }
+            if (updatedDisplayName !== currentUserState.display_name) {
+                profilePayload.display_name = updatedDisplayName;
+                hasChanges = true;
+            }
+            if (updatedAvatarUrl !== (currentUserState.avatar_url || '')) {
+                profilePayload.avatar_url = updatedAvatarUrl;
+                hasChanges = true;
+            }
+            if (updatedLanguage !== currentUserState.language) {
+                profilePayload.language = updatedLanguage;
+                hasChanges = true;
+            }
+
+			if (hasChanges) {
 				const result = await onProfileUpdate(profilePayload);
 				if (!result.success) {
 					throw new Error(result.error);
@@ -163,6 +219,7 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 				currentUserState = { ...currentUserState, ...result.data.user };
 				profileUpdateSuccess = true;
 			}
+
 			if (profileUpdateSuccess || twoFaUpdateSuccess) {
 				currentUserState.is_two_fa_enabled = newTwoFaState;
 				messageDiv.textContent = t('user.settings.success');
@@ -171,6 +228,8 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 				emailInput.value = currentUserState.email;
 				displayNameInput.value = currentUserState.display_name;
 				avatarUrlInput.value = currentUserState.avatar_url || '';
+				// AJOUT : Mettre à jour la valeur du sélecteur
+				languageSelect.value = currentUserState.language || 'en';
 				twoFaTokenInput.value = '';
 				if (!newTwoFaState) {
 					twoFaSetupContainer.classList.add('hidden');

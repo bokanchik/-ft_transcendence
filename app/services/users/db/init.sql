@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
     wins INTEGER DEFAULT 0,
     losses INTEGER DEFAULT 0,
     status TEXT NOT NULL DEFAULT 'offline',
+    language VARCHAR(2) DEFAULT 'en',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_two_fa_enabled BOOLEAN DEFAULT FALSE,

@@ -37,6 +37,7 @@
 			"savingMsg2": "Guardando...",
 			"success": "¡Cambios guardados con éxito!",
 			"error": "Error al guardar los cambios.",
+			"noChanges": "No hay cambios que guardar.",
 			"denied": "Acceso denegado.",
 			"deniedMsg": "Debes iniciar sesión para acceder a esta página.",
 			"profileInfoTitle": "Identidad",
@@ -116,7 +117,7 @@
 		"dashboard": "Panel",
 		"settings": "Ajustes",
 		"logout": "Cerrar sesión",
-		"language": "FR",
+		"language": "Selección de idioma",
 		"logoutSuccess": "Has cerrado sesión correctamente.",
 		"logoutError": "Error al cerrar sesión."
 	},
