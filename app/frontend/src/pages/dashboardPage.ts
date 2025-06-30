@@ -9,11 +9,39 @@ import { UserList } from '../components/userList.js';
 import { HeaderComponent } from '../components/headerComponent.js';
 import { showToast } from '../components/toast.js';
 import { MatchHistoryComponent } from '../components/matchHistoryComponent.js';
-import { t } from '../services/i18nService.js';
+import { t, getLanguage } from '../services/i18nService.js';
 import { translateResultMessage } from '../services/responseService.js';
 import { createElement, clearElement } from '../utils/domUtils.js';
 
 const DASHBOARD_ACTIVE_TAB_KEY = 'dashboardActiveTab';
+
+function nextFrame(): Promise<void> {
+    return new Promise(resolve => requestAnimationFrame(() => resolve()));
+}
+
+export async function adjustFontSizeToFit(
+    element: HTMLElement,
+    fontSizes: string[] = ['text-2xl', 'text-xl', 'text-lg', 'text-base', 'text-sm', 'text-xs'],
+    truncateClass: string = 'truncate'
+) {
+    element.classList.add('whitespace-nowrap', 'overflow-hidden');
+
+    await nextFrame();
+
+    for (const sizeClass of fontSizes) {
+        fontSizes.forEach(s => element.classList.remove(s));
+        element.classList.add(sizeClass);
+
+        await nextFrame();
+
+        if (element.scrollWidth <= element.clientWidth) {
+            element.classList.remove(truncateClass);
+            return;
+        }
+    }
+
+    element.classList.add(truncateClass);
+}
 
 export async function DashboardPage(): Promise<HTMLElement> {
 	let currentUser: User | null = getUserDataFromStorage();
@@ -49,17 +77,44 @@ export async function DashboardPage(): Promise<HTMLElement> {
 
 	const pageContainer = createElement('div', { className: 'flex flex-col h-screen' }, [dashboardWrapper]);
 
-
 	function createSidebarItem(label: string, value: string | number | Date | undefined | null): HTMLElement {
-		const valueClass = label === t('user.email')
-			? 'text-base text-gray-300 font-semibold truncate font-roar'
-			: 'text-lg text-gray-300 font-semibold truncate font-roar';
+        const isEmailField = label === t('user.email');
+		const isDateField = value instanceof Date;
 
-		const valueText = (value instanceof Date) ? value.toLocaleDateString() : (value?.toString() || 'N/A');
+		const valueClass = 'font-roar text-2xl text-gray-300 overflow-hidden whitespace-nowrap';
+		
+		let valueText: string;
+        let titleText: string | undefined;
 
-		return createElement('div', { className: 'p-4 bg-black/20 border border-gray-400/20 rounded-lg' }, [
+        if (isDateField) {
+            const date = value as Date;
+			const currentAppLanguage = getLanguage();
+            valueText = new Intl.DateTimeFormat(currentAppLanguage, {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            }).format(date);
+
+			const datePart = date.toLocaleDateString(currentAppLanguage);
+            const timePart = date.toLocaleTimeString(currentAppLanguage);
+            titleText = `${t('general.on')} ${datePart} ${t('general.at')} ${timePart}`;
+		} else {
+            valueText = value?.toString() || 'N/A';
+            if (isEmailField) {
+                titleText = valueText;
+            }
+        }
+
+        const valueElement = createElement('p', { 
+            textContent: valueText, 
+            className: valueClass, 
+            title: titleText 
+        });
+		adjustFontSizeToFit(valueElement, ['text-2xl', 'text-xl', 'text-lg', 'text-base', 'text-sm', 'text-xs']);
+
+        return createElement('div', { className: 'p-4 bg-black/20 border border-gray-400/20 rounded-lg' }, [
 			createElement('span', { textContent: label, className: 'text-sm text-gray-300 block mb-1' }),
-			createElement('p', { textContent: valueText, className: valueClass })
+            valueElement
 		]);
 	}
 
@@ -104,7 +159,7 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		sessionStorage.setItem(DASHBOARD_ACTIVE_TAB_KEY, tabId);
 		tabNavigation.querySelectorAll('button').forEach(btn => {
 			const isActive = btn.dataset.tabId === tabId;
-			btn.className = `py-2 px-4 text-lg font-roar focus:outline-none transition-colors ${
+			btn.className = `py-2 px-4 text-2xl font-roar focus:outline-none transition-colors ${
 				isActive ? 'border-b-2 border-blue-400 text-white' : 'text-gray-300 hover:text-white hover:border-gray-300/70'
 			}`;
 		});
@@ -114,7 +169,7 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	TABS.forEach(tabInfo => {
 		const tabButton = createElement('button', {
 			textContent: tabInfo.label,
-			className: `py-2 px-4 text-lg font-roar focus:outline-none transition-colors ${
+			className: `py-2 px-4 text-2xl font-roar focus:outline-none transition-colors ${
 				tabInfo.id === activeTabId ? 'border-b-2 border-blue-400 text-white' : 'text-gray-300 hover:text-white hover:border-gray-300/70'
 			}`
 		});

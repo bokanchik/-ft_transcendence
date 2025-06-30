@@ -70,7 +70,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		const link = createElement('a', {
 			href: linkInfo.href,
 			textContent: t(linkInfo.textKey),
-			className: 'text-gray-200 hover:text-gray-200 hover:bg-white/10 font-medium px-4 py-2 rounded-lg transition-all duration-200 ease-in-out text-xl font-roar'
+			className: 'text-gray-200 hover:text-gray-200 hover:bg-white/10 font-medium px-4 py-2 rounded-lg transition-all duration-200 ease-in-out text-3xl font-roar'
 		});
 		link.setAttribute('data-link', '');
 		return link;

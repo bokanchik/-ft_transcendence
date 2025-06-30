@@ -222,6 +222,8 @@
 	"general": {
 		"yes": "Yes",
 		"no": "No",
+		"on": "On",
+		"at": "At",
 		"error": "Error",
 		"loading": "Loading...",
 		"cancel": "Cancel",

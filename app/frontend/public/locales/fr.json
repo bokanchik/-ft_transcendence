@@ -219,6 +219,8 @@
 	"general": {
 		"yes": "Oui",
 		"no": "Non",
+		"on": "Le",
+		"at": "à",
 		"error": "Erreur",
 		"loading": "Chargement...",
 		"cancel": "Annuler",
