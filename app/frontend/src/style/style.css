@@ -122,26 +122,44 @@
 }
 
 .titlePaddle{
-	stroke-dasharray: 330;
-	stroke-dashoffset: 330;
-	animation: titlePaddleAnimation 2s ease-in-out 1 forwards;
+	stroke-dasharray: 222;
+	stroke-dashoffset: 0;
+	/* animation: titlePaddleAnimation 2s ease-in-out 1 forwards; */
 }
 
 @keyframes titlePaddleAnimation {
 	0%{
 		fill-opacity: 0;
-		stroke-dashoffset: 100;
+		stroke-dasharray: 50;
 	}
 	70%{
 		fill-opacity: 0;
 	}
-	90%{
-		fill-opacity: 100;
-		stroke-dashoffset: 0;
+	80%{
+		fill-opacity: 1;
 	}
 }
 
+.titleHandle{
+	stroke-dasharray: 123.456;
+	stroke-dashoffset: 0;
+	/* animation: titleHandleAnimation 2s ease-in-out 1 forwards; */
+}
 
+@keyframes titleHandleAnimation {
+	0%{
+		stroke-dashoffset: 123.456;
+		fill-opacity: 0;
+	}
+	70%{
+		stroke-dashoffset: 0;
+		fill-opacity: 0;
+	}
+	80%{
+		stroke-dashoffset: 0;
+		fill-opacity: 1;
+	}
+}
 
 #Ball{
 	opacity: 0;
