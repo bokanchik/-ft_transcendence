@@ -100,7 +100,7 @@
 }
 
 /* --- Styles de Showcase --- */
-.king_pong{
+.titleText{
 	fill-opacity: 0;
 	stroke: #000;
 	stroke-width: 2px;
@@ -108,7 +108,6 @@
 	stroke-dashoffset: 330;
 	animation: titleAnimation 2s ease-in-out 1 forwards;
 }
-
 @keyframes titleAnimation {
 	0%{
 		stroke-dashoffset: 330;
@@ -122,6 +121,73 @@
 	}
 }
 
+.titlePaddle{
+	stroke-dasharray: 330;
+	stroke-dashoffset: 330;
+	animation: titlePaddleAnimation 2s ease-in-out 1 forwards;
+}
+
+@keyframes titlePaddleAnimation {
+	0%{
+		fill-opacity: 0;
+		stroke-dashoffset: 100;
+	}
+	70%{
+		fill-opacity: 0;
+	}
+	90%{
+		fill-opacity: 100;
+		stroke-dashoffset: 0;
+	}
+}
+
+
+
+#Ball{
+	opacity: 0;
+	animation: titleBallAnimation 2s ease-in-out 1 forwards;
+}
+@keyframes titleBallAnimation {
+	0%{
+		opacity: 0;
+		stroke-dashoffset: 50;
+		transform: translate(100px, -50px);
+	}
+	79%{
+		stroke-dashoffset: 50;
+		opacity: 0;
+		transform: translate(100px, -50px);
+	}
+	80%{
+		stroke-dashoffset: 0;
+		opacity: 1;
+		transform: translate(100px, -50px);
+	}
+	95%{
+		transform: translate(-2px, 1px);
+		opacity: 1;
+	}
+	100%{
+		opacity: 1;
+		transform: translate(0px, 0px);
+	}
+}
+
+.titleEffect{
+	opacity: 0;
+	animation: titleEffectAnimation 2s ease-in-out 1 forwards;
+}
+@keyframes titleEffectAnimation {
+	0%{
+		opacity: 0;
+	}
+	90%{
+		opacity: 0;
+	}
+	100%{
+		opacity: 1;
+	}
+}
 .button-53 {
   background-color: #13b02f;
   border: 0 solid #E5E7EB;
