@@ -1,6 +1,6 @@
 import { PendingFriendRequest } from '../shared/schemas/friendsSchemas.js';
 import { t } from '../services/i18nService.js';
-import { showToast } from '../components/toast.js';
+import { createActionButton, createElement } from '../utils/domUtils.js';
 
 interface FriendRequestsProps {
 	receivedRequests: PendingFriendRequest[];
@@ -13,91 +13,69 @@ interface FriendRequestsProps {
 export function FriendRequestsComponent(props: FriendRequestsProps): HTMLElement {
 	const { receivedRequests, sentRequests, onAcceptRequest, onDeclineRequest, onCancelRequest } = props;
 
-	const section = document.createElement('div');
-	section.id = 'friend-requests-section';
-	section.className = '';
-	section.innerHTML = `
-        <h2 class="text-xl font-semibold text-white mb-6">${t('friend.list.request.title')}</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <h3 class="text-lg font-medium text-gray-200 mb-3">${t('friend.list.request.received')} (<span id="received-requests-count">${receivedRequests.length}</span>)</h3>
-                <ul id="received-requests-list" class="space-y-3">
-                    ${renderReceivedItems(receivedRequests)}
-                </ul>
-            </div>
-            <div>
-                <h3 class="text-lg font-medium text-gray-200 mb-3">${t('friend.list.request.sent')} (<span id="sent-requests-count">${sentRequests.length}</span>)</h3>
-                <ul id="sent-requests-list" class="space-y-3">
-                    ${renderSentItems(sentRequests)}
-                </ul>
-            </div>
-        </div>
-    `;
+	const section = createElement('div', { id: 'friend-requests-section' });
 
-	section.addEventListener('click', async (event) => {
-		const target = event.target as HTMLElement;
-		if (target.tagName !== 'BUTTON' || !target.dataset.action) return;
+	const receivedCountSpan = createElement('span', { id: 'received-requests-count', textContent: receivedRequests.length.toString() });
+	const receivedTitle = createElement('h3', { className: 'text-lg font-medium text-gray-200 mb-3' }, [
+		`${t('friend.list.request.received')} (`,
+		receivedCountSpan,
+		`)`
+	]);
+	const receivedList = createElement('ul', { id: 'received-requests-list', className: 'space-y-3' }, renderReceivedItems(receivedRequests, onAcceptRequest, onDeclineRequest));
+	const receivedContainer = createElement('div', {}, [receivedTitle, receivedList]);
 
-		const button = target as HTMLButtonElement;
-		const listItem = target.closest('li[data-friendship-id]') as HTMLLIElement;
-		if (!listItem) return;
+	const sentCountSpan = createElement('span', { id: 'sent-requests-count', textContent: sentRequests.length.toString() });
+	const sentTitle = createElement('h3', { className: 'text-lg font-medium text-gray-200 mb-3' }, [
+		`${t('friend.list.request.sent')} (`,
+		sentCountSpan,
+		`)`
+	]);
+	const sentList = createElement('ul', { id: 'sent-requests-list', className: 'space-y-3' }, renderSentItems(sentRequests, onCancelRequest));
+	const sentContainer = createElement('div', {}, [sentTitle, sentList]);
 
-		const friendshipId = parseInt(listItem.dataset.friendshipId || '', 10);
-		if (isNaN(friendshipId)) return;
-
-		const action = target.dataset.action;
-		button.disabled = true;
-		button.textContent = '...';
-
-		try {
-			if (action === 'accept') {
-				await onAcceptRequest(friendshipId);
-			} else if (action === 'decline') {
-				await onDeclineRequest(friendshipId);
-			} else if (action === 'cancel') {
-				await onCancelRequest(friendshipId);
-			}
-		} catch (error: any) {
-			console.error(`Error while attempting '${action}':`, error);
-			alert(`Error: ${error.message || t('msg.error.any')}`);
-			showToast(`${t('general.error')}: ${error.message || t('msg.error.any')}`, 'error');
-			button.disabled = false;
-			button.textContent = action.charAt(0).toUpperCase() + action.slice(1);
-		}
-	});
+	section.append(
+		createElement('h2', { textContent: t('friend.list.request.title'), className: 'text-xl font-semibold text-white mb-6' }),
+		createElement('div', { className: 'grid grid-cols-1 md:grid-cols-2 gap-6' }, [
+			receivedContainer,
+			sentContainer
+		])
+	);
 
 	return section;
 }
 
-function renderReceivedItems(requests: PendingFriendRequest[]): string {
+function renderReceivedItems(requests: PendingFriendRequest[], onAccept: (id: number) => Promise<void>, onDecline: (id: number) => Promise<void>): (HTMLLIElement | Node)[] {
 	if (!requests.length) {
-		return `<li class="text-gray-300 italic">${t('friend.list.request.noRequests')}</li>`;
+		return [createElement('li', { textContent: t('friend.list.request.noRequests'), className: 'text-gray-300 italic' })];
 	}
-	return requests.map(req => `
-        <li data-friendship-id="${req.friendship_id}" class="p-3 bg-black/20 border border-gray-500/30 rounded-lg flex justify-between items-center">
-            <div>
-                <strong class="text-gray-100">${req.requester?.display_name || req.requester?.username}</strong>
-                <span class="text-xs text-gray-400 block">(${req.requester?.username})</span>
-            </div>
-            <div class="flex space-x-1">
-                <button data-action="accept" class="text-xs bg-green-500 hover:bg-green-600 text-white font-semibold py-1 px-2 rounded border border-green-400/50 transition-colors duration-200">${t('friend.accept')}</button>
-                <button data-action="decline" class="text-xs bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-2 rounded border border-red-400/50 transition-colors duration-200">${t('friend.decline')}</button>
-            </div>
-        </li>
-    `).join('');
+	return requests.map(req => {
+		const acceptBtn = createActionButton({ text: t('friend.accept'), variant: 'success', onClick: () => onAccept(req.friendship_id) });
+		const declineBtn = createActionButton({ text: t('friend.decline'), variant: 'danger', onClick: () => onDecline(req.friendship_id) });
+		const actionContainer = createElement('div', { className: 'flex space-x-1' }, [acceptBtn, declineBtn]);
+
+		return createElement('li', { className: 'p-3 bg-black/20 border border-gray-500/30 rounded-lg flex justify-between items-center' }, [
+			createElement('div', {}, [
+				createElement('strong', { textContent: req.requester?.display_name || req.requester?.username, className: 'text-gray-100' }),
+				createElement('span', { textContent: `(${req.requester?.username})`, className: 'text-xs text-gray-400 block' })
+			]),
+			actionContainer
+		]);
+	});
 }
 
-function renderSentItems(requests: PendingFriendRequest[]): string {
+function renderSentItems(requests: PendingFriendRequest[], onCancel: (id: number) => Promise<void>): (HTMLLIElement | Node)[] {
 	if (!requests.length) {
-		return `<li class="text-gray-300 italic">${t('friend.list.request.noSentRequests')}</li>`;
+		return [createElement('li', { textContent: t('friend.list.request.noSentRequests'), className: 'text-gray-300 italic' })];
 	}
-	return requests.map(req => `
-        <li data-friendship-id="${req.friendship_id}" class="p-3 bg-black/20 border border-gray-500/30 rounded-lg flex justify-between items-center">
-             <div>
-                <strong class="text-gray-100">${req.receiver?.display_name || req.receiver?.username}</strong>
-                 <span class="text-xs text-gray-400 block">(${req.receiver?.username})</span>
-            </div>
-            <button data-action="cancel" class="text-xs bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-1 px-2 rounded border border-yellow-400/50 transition-colors duration-200">${t('friend.cancel')}</button>
-        </li>
-    `).join('');
+	return requests.map(req => {
+		const cancelBtn = createActionButton({ text: t('friend.cancel'), variant: 'warning', onClick: () => onCancel(req.friendship_id) });
+		
+		return createElement('li', { className: 'p-3 bg-black/20 border border-gray-500/30 rounded-lg flex justify-between items-center' }, [
+			createElement('div', {}, [
+				createElement('strong', { textContent: req.receiver?.display_name || req.receiver?.username, className: 'text-gray-100' }),
+				createElement('span', { textContent: `(${req.receiver?.username})`, className: 'text-xs text-gray-400 block' })
+			]),
+			cancelBtn
+		]);
+	});
 }

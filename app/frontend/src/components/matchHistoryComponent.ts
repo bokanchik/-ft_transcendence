@@ -1,7 +1,7 @@
-
 import { fetchUserDetails } from '../services/authService.js';
 import { fetchMatchHistoryForUser } from '../services/authService.js';
 import { t } from '../services/i18nService.js';
+import { createElement } from '../utils/domUtils.js';
 
 export interface MatchHistoryComponentProps {
 	userId: number;
@@ -12,13 +12,11 @@ const opponentsDetailsCache: { [key: number]: { display_name: string; avatar_url
 export async function MatchHistoryComponent(props: MatchHistoryComponentProps): Promise<HTMLElement> {
 	const { userId: profiledUserId } = props;
 
-	const el = document.createElement('div');
-	el.className = 'p-4';
-	el.innerHTML = `<h3 class="text-xl font-semibold mb-4 text-white">${t('match.history.title')}</h3>`;
+	const el = createElement('div', { className: 'p-4' });
+	const title = createElement('h3', { textContent: t('match.history.title'), className: 'text-xl font-semibold mb-4 text-white' });
+	el.append(title);
 
-	const loadingMessage = document.createElement('p');
-	loadingMessage.className = 'text-gray-300 italic';
-	loadingMessage.textContent = t('match.history.loading');
+	const loadingMessage = createElement('p', { textContent: t('match.history.loading'), className: 'text-gray-300 italic' });
 	el.appendChild(loadingMessage);
 
 	try {
@@ -26,12 +24,12 @@ export async function MatchHistoryComponent(props: MatchHistoryComponentProps): 
 		loadingMessage.remove();
 
 		if (!matches || matches.length === 0) {
-			el.innerHTML += `<p class="text-gray-300">${t('match.history.noMatches')}</p>`;
+			const noMatchesMsg = createElement('p', { textContent: t('match.history.noMatches'), className: 'text-gray-300' });
+			el.appendChild(noMatchesMsg);
 			return el;
 		}
 
-		const list = document.createElement('ul');
-		list.className = 'space-y-3';
+		const list = createElement('ul', { className: 'space-y-3' });
 
 		for (const match of matches) {
 			let opponentId: number;
@@ -42,12 +40,10 @@ export async function MatchHistoryComponent(props: MatchHistoryComponentProps): 
 				opponentId = match.player2_id;
 				profiledUserScore = match.player1_score;
 				opponentScore = match.player2_score;
-			} else if (match.player2_id === profiledUserId) {
+			} else {
 				opponentId = match.player1_id;
 				profiledUserScore = match.player2_score;
 				opponentScore = match.player1_score;
-			} else {
-				continue;
 			}
 
 			if (!opponentsDetailsCache[opponentId]) {
@@ -66,58 +62,50 @@ export async function MatchHistoryComponent(props: MatchHistoryComponentProps): 
 			}
 			const { display_name: opponentDisplayName, avatar_url: opponentAvatarUrl } = opponentsDetailsCache[opponentId];
 			const initials = opponentDisplayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-			const avatarSrc = opponentAvatarUrl || `https://ui-avatars.com/api/?name=${initials}&background=e2e8f0&color=111827&size=96&bold=true`;
+			const avatarSrc = opponentAvatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(initials)}&background=e2e8f0&color=111827&size=96&bold=true`;
 
 			const isWin = match.winner_id === profiledUserId;
 			const isDraw = !match.winner_id;
 			const resultText = isWin ? t('match.history.victory') : (isDraw ? t('match.history.draw') : t('match.history.defeat'));
 			const resultColorClass = isWin ? 'text-green-400' : (isDraw ? 'text-gray-400' : 'text-red-500');
-
 			let backgroundClass = 'bg-[#111827]';
-            if (isWin) {
-                backgroundClass = 'bg-green-900/30 hover:bg-green-800/40';
-            } else if (!isDraw) {
-                backgroundClass = 'bg-red-900/30 hover:bg-red-800/40';
-            }
+            if (isWin) backgroundClass = 'bg-green-900/30 hover:bg-green-800/40';
+            else if (!isDraw) backgroundClass = 'bg-red-900/30 hover:bg-red-800/40';
 
-			const item = document.createElement('li');
-			item.className = `h-24 border border-gray-700/50 rounded-lg flex items-center p-4 gap-4 transition-colors duration-200 ${backgroundClass}`;
 			const dateFromDb = new Date(match.created_at + 'Z');
 			const formattedTime = formatTimeAgo(dateFromDb);
 			const fullDate = formatFullDate(dateFromDb); 
 
-			item.innerHTML = `
-                <!-- 1. VS + Avatar -->
-                <div class="flex items-center gap-5 flex-shrink-0">
-                    <span class="text-5xl font-jurassic ${resultColorClass}">VS</span>
-                    <img src="${avatarSrc}" alt="${opponentDisplayName}" class="h-16 w-16 rounded-full object-cover">
-                </div>
+			// 1. VS + Avatar
+			const vsSpan = createElement('span', { textContent: 'VS', className: `text-5xl font-jurassic ${resultColorClass}` });
+			const opponentAvatar = createElement('img', { src: avatarSrc, alt: opponentDisplayName, className: 'h-16 w-16 rounded-full object-cover' });
+			const leftBlock = createElement('div', { className: 'flex items-center gap-5 flex-shrink-0' }, [vsSpan, opponentAvatar]);
 
-                <!-- 2. Bloc central avec espacement égal -->
-                <div class="flex-grow flex justify-between items-center px-4">
-                    <!-- Nom de l'adversaire (aligné à gauche) -->
-                    <div class="text-left">
-                        <span class="text-lg text-gray-300 font-roar">${opponentDisplayName}</span>
-                    </div>
+			// 2. Bloc central
+			const opponentNameSpan = createElement('span', { textContent: opponentDisplayName, className: 'text-lg text-gray-300 font-roar' });
+			const opponentNameBlock = createElement('div', { className: 'text-left' }, [opponentNameSpan]);
 
-                    <div class="text-center">
-                        <span class="text-5xl font-jurassic tracking-wide ${resultColorClass}">${resultText.toUpperCase()}</span>
-                    </div>
+			const resultTextSpan = createElement('span', { textContent: resultText.toUpperCase(), className: `text-5xl font-jurassic tracking-wide ${resultColorClass}` });
+			const resultTextBlock = createElement('div', { className: 'text-center' }, [resultTextSpan]);
 
-                    <!-- Score (aligné à droite) -->
-                    <div class="flex justify-end items-baseline text-3xl font-light">
-                        <span class="${isWin ? 'font-semibold text-white font-roar' : 'text-gray-400 font-roar'}">${profiledUserScore}</span>
-                        <span class="mx-3 text-gray-600 font-roar">/</span>
-                        <span class="${!isWin && !isDraw ? 'font-semibold text-white font-roar' : 'text-gray-400 font-roar'}">${opponentScore}</span>
-                    </div>
-                </div>
+			const userScoreSpan = createElement('span', { textContent: profiledUserScore.toString(), className: `${isWin ? 'font-semibold text-white font-roar' : 'text-gray-400 font-roar'}`});
+			const separatorSpan = createElement('span', { textContent: '/', className: 'mx-3 text-gray-600 font-roar'});
+			const opponentScoreSpan = createElement('span', { textContent: opponentScore.toString(), className: `${!isWin && !isDraw ? 'font-semibold text-white font-roar' : 'text-gray-400 font-roar'}`});
+			const scoreBlock = createElement('div', { className: 'flex justify-end items-baseline text-3xl font-light' }, [userScoreSpan, separatorSpan, opponentScoreSpan]);
+			
+			const centerBlock = createElement('div', { className: 'flex-grow flex justify-between items-center px-4' }, [opponentNameBlock, resultTextBlock, scoreBlock]);
 
-                <!-- 3. Date / Type (à l'extrémité droite) -->
-                <div class="flex flex-col justify-center items-end text-right w-28 flex-shrink-0">
-                    <span class="text-sm text-gray-400" title="${fullDate}">${formattedTime}</span>
-                    <span class="text-xs text-gray-500">${match.win_type || 'Score'}</span>
-                </div>
-            `;
+			// 3. Date / Type
+			const timeAgoSpan = createElement('span', { textContent: formattedTime, title: fullDate, className: 'text-sm text-gray-400' });
+			const winTypeSpan = createElement('span', { textContent: match.win_type || 'Score', className: 'text-xs text-gray-500' });
+			const rightBlock = createElement('div', { className: 'flex flex-col justify-center items-end text-right w-28 flex-shrink-0' }, [timeAgoSpan, winTypeSpan]);
+
+			const item = createElement('li', { className: `h-24 border border-gray-700/50 rounded-lg flex items-center p-4 gap-4 transition-colors duration-200 ${backgroundClass}` }, [
+				leftBlock,
+				centerBlock,
+				rightBlock
+			]);
+			
 			list.appendChild(item);
 		}
 		el.appendChild(list);

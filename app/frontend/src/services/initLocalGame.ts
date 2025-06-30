@@ -18,64 +18,95 @@ import { t } from "./i18nService.js";
 *
 * @returns A promise that resolves after the initialization process or exits early if validation fails.
 */
-export async function initLocalGame(form: HTMLFormElement) {
-    const gameMode = form.querySelector<HTMLSelectElement>('#gameMode');
-    if (!gameMode) {
-        showToast(t('game.settings.gameMode'), 'error');
-        return;
-    }
+// export async function initLocalGame(form: HTMLFormElement) {
+//     const gameMode = form.querySelector<HTMLSelectElement>('#gameMode');
+//     if (!gameMode) {
+//         showToast(t('game.settings.gameMode'), 'error');
+//         return;
+//     }
 
-    const isValidAlias = (alias: string) => /^[a-zA-Z0-9_-]+$/.test(alias);
+//     const isValidAlias = (alias: string) => /^[a-zA-Z0-9_-]+$/.test(alias);
 
-    switch (gameMode.value) {
-        case t('game.settings.duel'):
-            const alias1 = form.querySelector<HTMLInputElement>('#alias1')?.value.trim();
-            const alias2 = form.querySelector<HTMLInputElement>('#alias2')?.value.trim();
+//     switch (gameMode.value) {
+//         // case t('game.settings.duel'):
+//         case 'duel':
+//             const alias1 = form.querySelector<HTMLInputElement>('#alias1')?.value.trim();
+//             const alias2 = form.querySelector<HTMLInputElement>('#alias2')?.value.trim();
             
-            if (!alias1 || !alias2 ) return;
+//             if (!alias1 || !alias2) {
+//                 showToast(t('register.fillAllFields'), 'error');
+//                 return;
+//             };
             
-            if (!isValidAlias(alias1) || !isValidAlias(alias2)) {
-                showToast('Aliases can only contain letters, numbers, dashes, and underscores.', 'error');
-                return;
-            }
+//             if (!isValidAlias(alias1) || !isValidAlias(alias2)) {
+//                 showToast('Aliases can only contain letters, numbers, dashes, and underscores.', 'error');
+//                 return;
+//             }
 
-            if (alias1 === alias2) {
-                showToast('Aliases should be unique', 'error');
-                return;
-            }
-            await createLocalMatch(alias1, alias2, false);
+//             if (alias1 === alias2) {
+//                 showToast('Aliases should be unique', 'error');
+//                 return;
+//             }
+//             await createLocalMatch(alias1, alias2, false);
+//             break;
+//         // case t('game.settings.tournament'):
+//         case 'tournament':
+//             const formData = new FormData(form);
+//             const players: string[] = [];
+
+//             formData.forEach((value, key) => {
+//                 if (key.startsWith('alias')) {
+//                     players.push(value.toString());
+//                 }
+//             });
+
+//             // Check for valid characters
+//             if (!players.every(isValidAlias)) {
+//                 showToast('Aliases can only contain letters, numbers, dashes, and underscores.', 'error');
+//                 return;
+//             }
+
+//             // Check for uniqueness
+//             const uniquePlayers = new Set(players);
+//             if (uniquePlayers.size !== players.length) {
+//                 showToast('All player aliases must be unique.', 'error');
+//                 return;
+//             }
+
+//             const { pairs } = await fetchTournamentPlayers(players);
+            
+//             console.log(pairs);
+            
+//             sessionStorage.setItem('tournamentData', JSON.stringify({ pairs }));
+            
+//             navigateTo('/tournament');
+//         default:
+//             break;
+//     }
+// }
+
+interface GameConfig {
+    mode: 'duel' | 'tournament';
+    players: string[];
+}
+
+export async function initLocalGame(config: GameConfig) {
+    const { mode, players } = config;
+
+    switch (mode) {
+        case 'duel':
+            await createLocalMatch(players[0], players[1], false);
             break;
-        case t('game.settings.tournament'):
-            const formData = new FormData(form);
-            const players: string[] = [];
 
-            formData.forEach((value, key) => {
-                if (key.startsWith('alias')) {
-                    players.push(value.toString());
-                }
-            });
-
-            // Check for valid characters
-            if (!players.every(isValidAlias)) {
-                showToast('Aliases can only contain letters, numbers, dashes, and underscores.', 'error');
-                return;
+        case 'tournament':
+            try {
+                const tournamentData = await fetchTournamentPlayers(players);
+                sessionStorage.setItem('tournamentData', JSON.stringify(tournamentData));
+                navigateTo('/tournament');
+            } catch (error) {
+                console.error("Failed to start tournament:", error);
+                showToast(t('msg.error.any'), 'error');
             }
-
-            // Check for uniqueness
-            const uniquePlayers = new Set(players);
-            if (uniquePlayers.size !== players.length) {
-                showToast('All player aliases must be unique.', 'error');
-                return;
-            }
-
-            const { pairs } = await fetchTournamentPlayers(players);
-            
-            console.log(pairs);
-            
-            sessionStorage.setItem('tournamentData', JSON.stringify({ pairs }));
-            
-            navigateTo('/tournament');
-        default:
             break;
     }
 }
@@ -124,10 +155,8 @@ export async function createLocalMatch(alias1: string, alias2: string, isTournam
         // + not erased after page refresh (but after closing the tab)
         sessionStorage.setItem('player1', data.player1);
         sessionStorage.setItem('player2', data.player2);
-        if (!isTournament)
-            sessionStorage.setItem('gameMode', 'local');
-        else
-            sessionStorage.setItem('gameMode', 'tournament');
+
+        sessionStorage.setItem('gameMode', isTournament ? 'tournament' : 'local');
         sessionStorage.setItem('matchId', matchId);
         if (isTournament) {
             sessionStorage.setItem('gameRegime', 'tournament');

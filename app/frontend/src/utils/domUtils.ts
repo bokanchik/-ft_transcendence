@@ -6,7 +6,7 @@ export function createElement<K extends keyof HTMLElementTagNameMap>(
 		id?: string;
 		className?: string;
 		textContent?: string;
-		innerHTML?: string;
+		title?: string;
 		name?: string;
 		href?: string;
 		src?: string;
@@ -20,16 +20,23 @@ export function createElement<K extends keyof HTMLElementTagNameMap>(
 		maxLength?: number;
 		min?: string;
 		max?: string;
+		noValidate?: boolean;
+        selected?: boolean;
+        htmlFor?: string;
 	},
-	children?: (HTMLElement | string | null | undefined)[]
+	children?: (HTMLElement | string | Node | null | undefined)[]
 ): HTMLElementTagNameMap[K] {
 	const el = document.createElement(tagName);
 
 	if (options?.id) el.id = options.id;
 	if (options?.className) el.className = options.className;
 	if (options?.textContent) el.textContent = options.textContent;
-	if (options?.innerHTML && !children?.length) el.innerHTML = options.innerHTML;
+	if (options?.title) el.title = options.title;
 	if (options?.name) el.setAttribute('name', options.name);
+
+	if (options?.noValidate && el instanceof HTMLFormElement) el.noValidate = options.noValidate;
+    if (options?.selected && el instanceof HTMLOptionElement) el.selected = options.selected;
+    if (options?.htmlFor && el instanceof HTMLLabelElement) el.htmlFor = options.htmlFor;
 
 	if (options?.href && el instanceof HTMLAnchorElement) el.href = options.href;
 	if (options?.src && el instanceof HTMLImageElement) el.src = options.src;
@@ -56,14 +63,8 @@ export function createElement<K extends keyof HTMLElementTagNameMap>(
 	if (options?.max && el instanceof HTMLInputElement) el.max = options.max;
 
 	if (children) {
-		children.forEach(child => {
-			if (child === null || child === undefined) return;
-			if (typeof child === 'string') {
-				el.appendChild(document.createTextNode(child));
-			} else {
-				el.appendChild(child);
-			}
-		});
+		const validChildren = children.filter(child => child !== null && child !== undefined) as (HTMLElement | string | Node)[];
+		el.append(...validChildren);
 	}
 	return el;
 }
@@ -101,7 +102,6 @@ export function createActionButton(props: ActionButtonProps): HTMLButtonElement 
 				colorClasses = 'bg-red-500 hover:bg-red-600 text-white border border-red-400/50'; 
 				break;
 			case 'warning': 
-				// Important: texte noir pour la lisibilité sur fond jaune
 				colorClasses = 'bg-yellow-500 hover:bg-yellow-600 text-black border border-yellow-400/50'; 
 				break;
 			case 'success': 
@@ -113,7 +113,6 @@ export function createActionButton(props: ActionButtonProps): HTMLButtonElement 
 		}
 	}
 
-	// button.className = `${colorClasses} text-white text-xs font-semibold py-1 px-2.5 rounded hover:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed`;
 	button.className = `${colorClasses} text-xs font-semibold py-1 px-2.5 rounded transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed`;
 	if (props.disabled) {
 		button.disabled = true;
@@ -168,7 +167,6 @@ export function createInputField(id: string, labelText: string, options: InputFi
 	const label = createElement('label', {
 		textContent: labelText,
 		className: options.labelClass || 'block text-sm font-medium text-gray-300 mb-1'
-		// className: options.labelClass || 'block text-sm font-medium text-gray-700 mb-1'
 	});
 	label.htmlFor = id;
 
@@ -184,7 +182,6 @@ export function createInputField(id: string, labelText: string, options: InputFi
 		min: options.min,
 		max: options.max,
 		readonly: options.readonly,
-		// className: options.inputClass || 'w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500'
 		className: options.inputClass || 'w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400'	
 	});
 	if (options.pattern) input.pattern = options.pattern;
@@ -197,10 +194,26 @@ export function createInputField(id: string, labelText: string, options: InputFi
 		const helpTextEl = createElement('p', {
 			textContent: options.helpText,
 			className: 'text-xs text-gray-400 mt-1'
-			// className: 'text-xs text-gray-500 mt-1'
 		});
 		fieldDiv.appendChild(helpTextEl);
 	}
 
 	return fieldDiv;
+}
+
+export function createSelectField(id: string, labelText: string, options: string[]): HTMLDivElement {
+	const label = createElement('label', {
+		htmlFor: id,
+		textContent: labelText,
+		className: 'block text-sm font-medium text-gray-300 mb-1'
+	});
+
+	const select = createElement('select', {
+		id: id,
+		name: id,
+		required: true,
+		className: 'w-full p-2 bg-black/20 border border-gray-500/50 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400'
+	}, options.map(value => createElement('option', { value: value, textContent: value })));
+	
+	return createElement('div', {}, [label, select]);
 }

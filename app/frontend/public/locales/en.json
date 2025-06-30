@@ -20,6 +20,7 @@
 		"wins": "Wins",
 		"losses": "Losses",
 		"loading": "Loading user data...",
+		"noUser": "No other user found.",
 		"status": {
 			"title": "Status",
 			"online": "Online",

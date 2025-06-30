@@ -13,7 +13,7 @@ export interface UserListProps {
 	onCancelRequest: (friendshipId: number) => Promise<void>;
 	onAcceptRequest: (friendshipId: number) => Promise<void>;
 	onDeclineRequest: (friendshipId: number) => Promise<void>;
-	onRemoveFriend?: (targetUserId: number) => Promise<void>; // Rendu optionnel
+	onRemoveFriend?: (targetUserId: number) => Promise<void>;
 }
 
 export function UserList(props: UserListProps): HTMLElement {
@@ -35,7 +35,10 @@ export function UserList(props: UserListProps): HTMLElement {
 	const otherUsers = users.filter(user => user.id !== currentUserId);
 
 	if (otherUsers.length === 0) {
-		ul.innerHTML = '<li class="text-center text-gray-300 py-4">Aucun autre utilisateur à afficher.</li>';
+		const li = document.createElement('li');
+		li.className = 'text-center text-gray-300 py-4';
+		li.textContent = t('user.noUser');
+		ul.appendChild(li);
 		return ul;
 	}
 
@@ -66,18 +69,39 @@ export function UserList(props: UserListProps): HTMLElement {
 			statusIndicatorClass = 'bg-yellow-500';
 			statusText = t('user.status.inGame');
 		}
-		userPrimaryInfoContainer.innerHTML = `
-            <img src="${avatarSrc}" alt="${displayName}" class="w-12 h-12 rounded-full mr-4 object-cover">
-            <div class="flex-grow">
-                <div class="flex items-center mb-1">
-                    <span class="inline-block w-3 h-3 ${statusIndicatorClass} rounded-full mr-2" title="${statusText}"></span>
-                    <strong class="text-lg text-gray-300 font-roar">${displayName}</strong>
-                </div>
-                <div class="text-xs text-gray-400">
-                    <span>${t('user.wins')}: ${wins}</span> | <span>${t('user.losses')}: ${losses}</span>
-                </div>
-            </div>
-        `;
+		const avatarImg = document.createElement('img');
+		avatarImg.src = avatarSrc;
+		avatarImg.alt = displayName;
+		avatarImg.className = 'w-12 h-12 rounded-full mr-4 object-cover';
+
+		const infoDiv = document.createElement('div');
+		infoDiv.className = 'flex-grow';
+
+		const nameContainer = document.createElement('div');
+		nameContainer.className = 'flex items-center mb-1';
+
+		const statusIndicator = document.createElement('span');
+		statusIndicator.className = `inline-block w-3 h-3 ${statusIndicatorClass} rounded-full mr-2`;
+		statusIndicator.title = statusText;
+
+		const nameStrong = document.createElement('strong');
+		nameStrong.className = 'text-lg text-gray-300 font-roar';
+		nameStrong.textContent = displayName;
+
+		nameContainer.append(statusIndicator, nameStrong);
+
+		const statsDiv = document.createElement('div');
+		statsDiv.className = 'text-xs text-gray-400';
+
+		const winsSpan = document.createElement('span');
+		winsSpan.textContent = `${t('user.wins')}: ${wins}`;
+
+		const lossesSpan = document.createElement('span');
+		lossesSpan.textContent = `${t('user.losses')}: ${losses}`;
+
+		statsDiv.append(winsSpan, ' | ', lossesSpan);
+		infoDiv.append(nameContainer, statsDiv);
+		userPrimaryInfoContainer.append(avatarImg, infoDiv);
 		li.appendChild(userPrimaryInfoContainer);
 
 		const actionContainer = document.createElement('div');
@@ -147,3 +171,4 @@ export function UserList(props: UserListProps): HTMLElement {
 
 	return ul;
 }
+

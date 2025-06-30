@@ -1,6 +1,7 @@
 import { LoginRequestBody, User } from '../shared/schemas/usersSchemas.js';
 import { ApiResult, ApiLoginSuccessData } from '../utils/types.js';
 import { t } from '../services/i18nService.js';
+import { createElement, createInputField } from '../utils/domUtils.js';
 
 interface LoginFormProps {
 	onLoginAttempt: (credentials: LoginRequestBody) => Promise<ApiResult<ApiLoginSuccessData>>;
@@ -10,54 +11,76 @@ interface LoginFormProps {
 
 export function LoginForm(props: LoginFormProps): HTMLElement {
 	const { onLoginAttempt, on2FAAttempt, onLoginSuccess } = props;
-	const wrapper = document.createElement('div');
+	const wrapper = createElement('div');
 
 	const renderPasswordStep = () => {
-		wrapper.innerHTML = `
-            <form id="login-form-component" class="space-y-6">
-                <div>
-                    <label for="identifier" class="block text-sm font-medium text-gray-300 mb-1">${t('login.identifierLabel')}</label>
-                    <input type="text" id="identifier" name="identifier" required placeholder="${t('login.identifierPlaceholder')}" 
-                           class="w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
-                </div>
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-300 mb-1">${t('login.passwordLabel')}</label>
-                    <input type="password" id="password" name="password" required 
-                           class="w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
-                </div>
-                <div>
-                    <button type="submit" id="login-button" 
-                            class="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium disabled:opacity-50 transition-colors duration-200 bg-green-500 hover:bg-green-600 text-white border border-green-400/50">
-                        ${t('login.button')}
-                    </button>
-                </div>
-            </form>
-            <div id="login-message-component" class="mt-4 text-center text-sm min-h-[20px]"></div>
-        `;
+		wrapper.innerHTML = '';
 
-		wrapper.querySelector('#login-form-component')?.addEventListener('submit', handlePasswordSubmit);
+		const identifierField = createInputField('identifier', t('login.identifierLabel'), {
+			type: 'text',
+			required: true,
+			placeholder: t('login.identifierPlaceholder'),
+		});
+		const passwordField = createInputField('password', t('login.passwordLabel'), {
+			type: 'password',
+			required: true,
+		});
+
+		const loginButton = createElement('button', {
+			type: 'submit',
+			id: 'login-button',
+			textContent: t('login.button'),
+			className: 'w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium disabled:opacity-50 transition-colors duration-200 bg-green-500 hover:bg-green-600 text-white border border-green-400/50'
+		});
+
+		const form = createElement('form', { id: 'login-form-component', className: 'space-y-6' }, [
+			identifierField,
+			passwordField,
+			createElement('div', {}, [loginButton])
+		]);
+
+		const messageDiv = createElement('div', { id: 'login-message-component', className: 'mt-4 text-center text-sm min-h-[20px]' });
+
+		wrapper.append(form, messageDiv);
+		
+		form.addEventListener('submit', handlePasswordSubmit);
 	};
 
 	const renderTwoFactorStep = () => {
-		wrapper.innerHTML = `
-            <form id="two-fa-form-component" class="space-y-6">
-                <h3 class="text-xl font-semibold text-center text-white">${t('login.2fa.title')}</h3>
-                <div>
-                    <label for="two-fa-token" class="block text-sm font-medium text-gray-300 mb-1">${t('login.2fa.instruction')}</label>
-                    <input type="text" id="two-fa-token" name="two-fa-token" required autocomplete="one-time-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6"
-                           class="w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-center tracking-[1em]">
-                </div>
-                <div>
-                    <button type="submit" id="two-fa-button" class="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium disabled:opacity-50 transition-colors duration-200 bg-green-500 hover:bg-green-600 text-white border border-green-400/50">
-                        ${t('login.2fa.button')}
-                    </button>
-                </div>
-            </form>
-            <div id="login-message-component" class="mt-4 text-center text-sm min-h-[20px]"></div>
-        `;
+		wrapper.innerHTML = '';
 
-		wrapper.querySelector('#two-fa-form-component')?.addEventListener('submit', handleTwoFactorSubmit);
-		(wrapper.querySelector('#two-fa-token') as HTMLInputElement)?.focus();
+		const title = createElement('h3', { textContent: t('login.2fa.title'), className: 'text-xl font-semibold text-center text-white' });
+		
+		const twoFaTokenField = createInputField('two-fa-token', t('login.2fa.instruction'), {
+			required: true,
+			inputClass: 'w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-center tracking-[1em]'
+		});
+		const tokenInput = twoFaTokenField.querySelector('input') as HTMLInputElement;
+		tokenInput.autocomplete = 'one-time-code';
+		tokenInput.inputMode = 'numeric';
+		tokenInput.pattern = '[0-9]{6}';
+		tokenInput.maxLength = 6;
+
+
+		const twoFaButton = createElement('button', {
+			type: 'submit',
+			id: 'two-fa-button',
+			textContent: t('login.2fa.button'),
+			className: 'w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium disabled:opacity-50 transition-colors duration-200 bg-green-500 hover:bg-green-600 text-white border border-green-400/50'
+		});
+
+		const form = createElement('form', { id: 'two-fa-form-component', className: 'space-y-6' }, [
+			title,
+			twoFaTokenField,
+			createElement('div', {}, [twoFaButton])
+		]);
+
+		const messageDiv = createElement('div', { id: 'login-message-component', className: 'mt-4 text-center text-sm min-h-[20px]' });
+		
+		wrapper.append(form, messageDiv);
+
+		form.addEventListener('submit', handleTwoFactorSubmit);
+		tokenInput.focus();
 	};
 
 	const handlePasswordSubmit = async (event: Event) => {

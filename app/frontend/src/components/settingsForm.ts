@@ -1,13 +1,14 @@
 import { User, UpdateUserPayload, Generate2FAResponse } from '../shared/schemas/usersSchemas.js';
 import { ApiResult, ApiUpdateUserSuccessData } from '../utils/types.js';
 import { t, getLanguage } from '../services/i18nService.js';
+import { createElement, createInputField } from '../utils/domUtils.js';
 
 interface ProfileFormProps {
-	user: User;
-	onProfileUpdate: (payload: UpdateUserPayload) => Promise<ApiResult<ApiUpdateUserSuccessData>>;
-	onGenerate2FA: () => Promise<Generate2FAResponse>;
-	onVerifyAndEnable2FA: (token: string) => Promise<{ message: string }>;
-	onDisable2FA: () => Promise<{ message: string }>;
+    user: User;
+    onProfileUpdate: (payload: UpdateUserPayload) => Promise<ApiResult<ApiUpdateUserSuccessData>>;
+    onGenerate2FA: () => Promise<Generate2FAResponse>;
+    onVerifyAndEnable2FA: (token: string) => Promise<{ message: string }>;
+    onDisable2FA: () => Promise<{ message: string }>;
 }
 
 const supportedLanguages = {
@@ -18,241 +19,195 @@ const supportedLanguages = {
 };
 
 export function SettingsForm(props: ProfileFormProps): HTMLElement {
-	const { user, onProfileUpdate, onGenerate2FA, onVerifyAndEnable2FA, onDisable2FA } = props;
-	let currentUserState = { ...user };
+    const { user, onProfileUpdate, onGenerate2FA, onVerifyAndEnable2FA, onDisable2FA } = props;
+    let currentUserState = { ...user };
 
-	// Générer les options pour le sélecteur de langue
-	const languageOptions = Object.entries(supportedLanguages).map(([code, name]) => 
-        `<option value="${code}" ${getLanguage() === code ? 'selected' : ''}>${name}</option>`
-    ).join('');
+    let emailInput: HTMLInputElement;
+    let displayNameInput: HTMLInputElement;
+    let avatarUrlInput: HTMLInputElement;
+    let languageSelect: HTMLSelectElement;
+    let twoFaCheckbox: HTMLInputElement;
+    let twoFaTokenInput: HTMLInputElement;
+    let qrCodeContainer: HTMLDivElement;
+    let twoFaSetupContainer: HTMLDivElement;
 
-	const formElement = document.createElement('form');
-	formElement.id = 'profile-form-component';
-	formElement.noValidate = true;
-	formElement.innerHTML = `
-        <div id="profile-message" class="mb-4 text-center text-sm min-h-[1.25rem]"></div>
+    const formElement = createElement('form', { id: 'profile-form-component', noValidate: true });
+    const messageDiv = createElement('div', { id: 'profile-message', className: 'mb-4 text-center text-sm min-h-[1.25rem]' });
 
-        <!-- Section Informations du profil -->
-        <h3 class="text-lg font-semibold text-white mb-4 border-b border-gray-400/30 pb-2">${t('user.settings.profileInfoTitle')}</h3>
-        
-        <div class="mb-4">
-            <label for="username" class="block text-sm font-medium text-gray-300 mb-1">${t('user.username')}</label>
-            <input type="text" id="username" name="username" readonly
-                   value="${currentUserState.username}"
-                   class="w-full p-2 bg-black/30 border border-gray-500/50 text-gray-400 cursor-not-allowed rounded-md">
-            <p class="text-xs text-gray-400 mt-1">${t('user.settings.usernameMsg')}</p>
-        </div>
+    // --- Section Informations du profil ---
+    const profileInfoTitle = createElement('h3', { textContent: t('user.settings.profileInfoTitle'), className: 'text-lg font-semibold text-white mb-4 border-b border-gray-400/30 pb-2' });
+    
+    const usernameField = createInputField('username', t('user.username'), { value: currentUserState.username, readonly: true, helpText: t('user.settings.usernameMsg'), inputClass: 'w-full p-2 bg-black/30 border border-gray-500/50 text-gray-400 cursor-not-allowed rounded-md'});
+    const emailField = createInputField('email', t('user.email'), { type: 'email', required: true, value: currentUserState.email || '', placeholder: t('user.settings.emailPlaceholder') });
+    emailInput = emailField.querySelector('input')!;
 
-        <div class="mb-4">
-            <label for="email" class="block text-sm font-medium text-gray-300 mb-1">${t('user.email')}</label>
-            <input type="email" id="email" name="email" required
-                   value="${currentUserState.email || ''}"
-                   placeholder="${t('user.settings.emailPlaceholder')}"
-                   class="w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
-        </div>
+    const displayNameField = createInputField('display_name', t('user.displayName'), { required: true, value: currentUserState.display_name || '', placeholder: t('user.settings.displayNamePlaceholder') });
+    displayNameInput = displayNameField.querySelector('input')!;
 
-        <div class="mb-4">
-            <label for="display_name" class="block text-sm font-medium text-gray-300 mb-1">${t('user.displayName')}</label>
-            <input type="text" id="display_name" name="display_name" required
-                   value="${currentUserState.display_name || ''}"
-                   placeholder="${t('user.settings.displayNamePlaceholder')}"
-                   class="w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
-        </div>
+    const avatarUrlField = createInputField('avatar_url', t('register.avatarUrl'), { type: 'url', value: currentUserState.avatar_url || '', placeholder: 'https://example.com/avatar.png', helpText: t('user.settings.avatarMsg')});
+    avatarUrlInput = avatarUrlField.querySelector('input')!;
 
-        <div class="mb-6">
-            <label for="avatar_url" class="block text-sm font-medium text-gray-300 mb-1">${t('register.avatarUrl')}</label>
-            <input type="url" id="avatar_url" name="avatar_url"
-                   value="${currentUserState.avatar_url || ''}"
-                   placeholder="https://example.com/avatar.png"
-                   class="w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
-             <p class="text-xs text-gray-400 mt-1">${t('user.settings.avatarMsg')}</p>
-        </div>
-        
-		<!-- AJOUT DU SÉLECTEUR DE LANGUE -->
-        <div class="mb-6">
-            <label for="language" class="block text-sm font-medium text-gray-300 mb-1">${t('header.language')}</label>
-            <select id="language" name="language" class="w-full p-2 bg-black/20 border border-gray-500/50 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
-                ${languageOptions}
-            </select>
-        </div>
-
-        <!-- Section Sécurité / 2FA -->
-        <div class="mt-8">
-             <h3 class="text-lg font-semibold text-white mb-4 border-b border-gray-400/30 pb-2">${t('user.settings.securityTitle')}</h3>
-             <div class="flex items-center mb-4">
-                <input type="checkbox" id="is_two_fa_enabled" name="is_two_fa_enabled" class="h-4 w-4 text-blue-400 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-offset-gray-800">
-                <label for="is_two_fa_enabled" class="ml-2 block text-sm text-gray-200">${t('user.settings.enable2FA')}</label>
-             </div>
-             <div id="two-fa-setup-container" class="hidden pl-6 border-l-2 border-gray-500/50">
-                <p class="text-sm text-gray-300 mb-4">${t('user.settings.2faSetupInstructions')}</p>
-                <div id="qr-code-container" class="mb-4 p-4 rounded text-center flex justify-center items-center bg-white/90 min-h-[14rem] min-w-[14rem]">
-                </div>
-                <div>
-                    <label for="two_fa_token" class="block text-sm font-medium text-gray-300 mb-1">${t('user.settings.verificationCode')}</label>
-                    <input type="text" id="two_fa_token" name="two_fa_token"
-                           placeholder="123456"
-                           maxlength="6"
-                           autocomplete="one-time-code"
-                           class="w-full max-w-xs p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
-                    <p class="text-xs text-gray-400 mt-1">${t('user.settings.2faTokenHelp')}</p>
-                </div>
-             </div>
-        </div>
-
-        <div class="flex items-center justify-center mt-8 border-t border-gray-400/30 pt-6">
-            <button type="submit" id="save-profile-button"
-                    class="w-full sm:w-auto font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed bg-blue-500 hover:bg-blue-600 text-white border border-blue-400/50">
-                ${t('user.settings.button')}
-            </button>
-        </div>
-    `;
-
-	const emailInput = formElement.querySelector('#email') as HTMLInputElement;
-	const displayNameInput = formElement.querySelector('#display_name') as HTMLInputElement;
-	const avatarUrlInput = formElement.querySelector('#avatar_url') as HTMLInputElement;
-	// AJOUT : Récupération du sélecteur de langue
-	const languageSelect = formElement.querySelector('#language') as HTMLSelectElement;
-	const messageDiv = formElement.querySelector('#profile-message') as HTMLDivElement;
-	const saveButton = formElement.querySelector('#save-profile-button') as HTMLButtonElement;
-
-	const twoFaCheckbox = formElement.querySelector('#is_two_fa_enabled') as HTMLInputElement;
-	const twoFaSetupContainer = formElement.querySelector('#two-fa-setup-container') as HTMLDivElement;
-	const twoFaTokenInput = formElement.querySelector('#two_fa_token') as HTMLInputElement;
-	const qrCodeContainer = formElement.querySelector('#qr-code-container') as HTMLDivElement;
-
-	twoFaCheckbox.checked = currentUserState.is_two_fa_enabled;
-
-	twoFaCheckbox.addEventListener('change', async () => {
-		if (twoFaCheckbox.checked) {
-			twoFaSetupContainer.classList.remove('hidden');
-			qrCodeContainer.innerHTML = `<span class="loader"></span>`;
-			try {
-				const { qrCodeDataURL } = await onGenerate2FA();
-				const qrCodeImg = document.createElement('img');
-				qrCodeImg.src = qrCodeDataURL;
-				qrCodeImg.alt = t('user.settings.qrCodeAlt');
-				qrCodeImg.classList.add('mx-auto');
-				qrCodeContainer.innerHTML = '';
-				qrCodeContainer.appendChild(qrCodeImg);
-			} catch (error) {
-				console.error("Failed to generate QR code:", error);
-				qrCodeContainer.innerHTML = `<p class="text-red-500">${t('user.settings.qrCodeError')}</p>`;
-			}
-		} else {
-			twoFaSetupContainer.classList.add('hidden');
-			qrCodeContainer.innerHTML = '';
-		}
+    // --- Sélecteur de langue ---
+	languageSelect = createElement('select', {
+    id: 'language',
+    name: 'language',
+    className: 'w-full p-2 bg-black/20 border border-gray-500/50 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400'
 	});
+	Object.entries(supportedLanguages).forEach(([code, name]) => {
+		const option = document.createElement('option');
+		option.value = code;
+		option.textContent = name;
+		if (getLanguage() === code) {
+			option.selected = true;
+		}
+		languageSelect.appendChild(option);
+	});
+	const languageField = createElement('div', { className: 'mb-6' }, [
+		createElement('label', { htmlFor: 'language', textContent: t('header.language'), className: 'block text-sm font-medium text-gray-300 mb-1' }),
+		languageSelect
+	]);
 
-	formElement.addEventListener('submit', async (event) => {
-		event.preventDefault();
-		messageDiv.textContent = '';
-		saveButton.disabled = true;
-		saveButton.textContent = t('user.settings.savingMsg2');
+    // --- Section Sécurité / 2FA ---
+    const securityTitle = createElement('h3', { textContent: t('user.settings.securityTitle'), className: 'mt-8 text-lg font-semibold text-white mb-4 border-b border-gray-400/30 pb-2'});
+    
+    twoFaCheckbox = createElement('input', { type: 'checkbox', id: 'is_two_fa_enabled', name: 'is_two_fa_enabled', className: 'h-4 w-4 text-blue-400 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-offset-gray-800' });
+    const twoFaLabel = createElement('label', { htmlFor: 'is_two_fa_enabled', textContent: t('user.settings.enable2FA'), className: 'ml-2 block text-sm text-gray-200' });
+    const twoFaToggleContainer = createElement('div', { className: 'flex items-center mb-4' }, [twoFaCheckbox, twoFaLabel]);
+    
+    qrCodeContainer = createElement('div', { id: 'qr-code-container', className: 'mb-4 p-4 rounded text-center flex justify-center items-center bg-white/90 min-h-[14rem] min-w-[14rem]' });
+    
+    const twoFaTokenField = createInputField('two_fa_token', t('user.settings.verificationCode'), { placeholder: '123456', maxLength: 6, helpText: t('user.settings.2faTokenHelp'), inputClass: 'w-full max-w-xs p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400' });
+    twoFaTokenInput = twoFaTokenField.querySelector('input')!;
+    twoFaTokenInput.autocomplete = 'one-time-code';
+    
+    twoFaSetupContainer = createElement('div', { id: 'two-fa-setup-container', className: 'hidden pl-6 border-l-2 border-gray-500/50' }, [
+        createElement('p', { textContent: t('user.settings.2faSetupInstructions'), className: 'text-sm text-gray-300 mb-4'}),
+        qrCodeContainer,
+        twoFaTokenField
+    ]);
+    
+    const saveButton = createElement('button', { type: 'submit', id: 'save-profile-button', textContent: t('user.settings.button'), className: 'w-full sm:w-auto font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed bg-blue-500 hover:bg-blue-600 text-white border border-blue-400/50' });
+    const submitContainer = createElement('div', { className: 'flex items-center justify-center mt-8 border-t border-gray-400/30 pt-6'}, [saveButton]);
+    
+    formElement.append(
+        messageDiv, profileInfoTitle, usernameField, emailField, displayNameField,
+        avatarUrlField, languageField, securityTitle, twoFaToggleContainer,
+        twoFaSetupContainer, submitContainer
+    );
 
-		const updatedEmail = emailInput.value.trim();
-		const updatedDisplayName = displayNameInput.value.trim();
-		const updatedAvatarUrl = avatarUrlInput.value.trim();
-		// AJOUT : Récupération de la nouvelle langue
-		const updatedLanguage = languageSelect.value;
-		const newTwoFaState = twoFaCheckbox.checked;
-		const twoFaToken = twoFaTokenInput.value.trim();
+    // --- Logique d'événements ---
+    twoFaCheckbox.checked = currentUserState.is_two_fa_enabled;
 
-		let profileUpdateSuccess = false;
-		let twoFaUpdateSuccess = false;
+    twoFaCheckbox.addEventListener('change', async () => {
+        qrCodeContainer.innerHTML = '';
+        if (twoFaCheckbox.checked) {
+            twoFaSetupContainer.classList.remove('hidden');
+            qrCodeContainer.append(createElement('span', { className: 'loader' }));
+            try {
+                const { qrCodeDataURL } = await onGenerate2FA();
+                const qrCodeImg = createElement('img', { src: qrCodeDataURL, alt: t('user.settings.qrCodeAlt'), className: 'mx-auto' });
+                qrCodeContainer.innerHTML = '';
+                qrCodeContainer.appendChild(qrCodeImg);
+            } catch (error) {
+                console.error("Failed to generate QR code:", error);
+                qrCodeContainer.innerHTML = '';
+                qrCodeContainer.append(createElement('p', { textContent: t('user.settings.qrCodeError'), className: 'text-red-500' }));
+            }
+        } else {
+            twoFaSetupContainer.classList.add('hidden');
+        }
+    });
 
-		try {
-			if (newTwoFaState !== currentUserState.is_two_fa_enabled) {
-				if (newTwoFaState) {
-					if (!twoFaToken || !/^\d{6}$/.test(twoFaToken)) {
-						throw new Error(t('user.settings.2faTokenInvalid'));
-					}
-					await onVerifyAndEnable2FA(twoFaToken);
-				} else {
-					await onDisable2FA();
-				}
-				twoFaUpdateSuccess = true;
-			}
+    formElement.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        messageDiv.textContent = '';
+        saveButton.disabled = true;
+        saveButton.textContent = t('user.settings.savingMsg2');
 
-			const profilePayload: UpdateUserPayload = {};
-			// if (updatedEmail !== currentUserState.email) profilePayload.email = updatedEmail;
-			// if (updatedDisplayName !== currentUserState.display_name) profilePayload.display_name = updatedDisplayName;
-			// if (updatedAvatarUrl !== (currentUserState.avatar_url || '')) profilePayload.avatar_url = updatedAvatarUrl;
-			// // AJOUT : Ajout de la langue au payload si elle a changé
-			// if (updatedLanguage !== (currentUserState.language || getLanguage())) {
-            //      profilePayload.language = updatedLanguage;
-            // }
+        const updatedEmail = emailInput.value.trim();
+        const updatedDisplayName = displayNameInput.value.trim();
+        const updatedAvatarUrl = avatarUrlInput.value.trim();
+        const updatedLanguage = languageSelect.value;
+        const newTwoFaState = twoFaCheckbox.checked;
+        const twoFaToken = twoFaTokenInput.value.trim();
 
-			// if (Object.keys(profilePayload).length > 0) {
-			// 	const result = await onProfileUpdate(profilePayload);
-			// 	if (!result.success) {
-			// 		throw new Error(result.error);
-			// 	}
-			// 	currentUserState = { ...currentUserState, ...result.data.user };
-			// 	profileUpdateSuccess = true;
-			// }
+        let profileUpdateSuccess = false;
+        let twoFaUpdateSuccess = false;
 
-			let hasChanges = false;
+        try {
+            if (newTwoFaState !== currentUserState.is_two_fa_enabled) {
+                if (newTwoFaState) {
+                    if (!twoFaToken || !/^\d{6}$/.test(twoFaToken)) {
+                        throw new Error(t('user.settings.2faTokenInvalid'));
+                    }
+                    await onVerifyAndEnable2FA(twoFaToken);
+                } else {
+                    await onDisable2FA();
+                }
+                twoFaUpdateSuccess = true;
+            }
             
-            if (updatedEmail !== currentUserState.email) {
+            const profilePayload: UpdateUserPayload = {};
+            let hasChanges = false;
+            
+            if (updatedEmail !== (currentUserState.email || '')) {
                 profilePayload.email = updatedEmail;
                 hasChanges = true;
             }
-            if (updatedDisplayName !== currentUserState.display_name) {
+            if (updatedDisplayName !== (currentUserState.display_name || '')) {
                 profilePayload.display_name = updatedDisplayName;
                 hasChanges = true;
             }
             if (updatedAvatarUrl !== (currentUserState.avatar_url || '')) {
-                profilePayload.avatar_url = updatedAvatarUrl;
+                profilePayload.avatar_url = updatedAvatarUrl === '' ? null : updatedAvatarUrl;
                 hasChanges = true;
             }
-            if (updatedLanguage !== currentUserState.language) {
+            if (updatedLanguage !== (currentUserState.language || 'en')) {
                 profilePayload.language = updatedLanguage;
                 hasChanges = true;
             }
 
-			if (hasChanges) {
-				const result = await onProfileUpdate(profilePayload);
-				if (!result.success) {
-					throw new Error(result.error);
-				}
-				currentUserState = { ...currentUserState, ...result.data.user };
-				profileUpdateSuccess = true;
-			}
+            if (hasChanges) {
+                const result = await onProfileUpdate(profilePayload);
+                if (!result.success) {
+                    throw new Error(result.error);
+                }
+                currentUserState = { ...currentUserState, ...result.data.user };
+                profileUpdateSuccess = true;
+            }
+            
+            if (profileUpdateSuccess || twoFaUpdateSuccess) {
+                currentUserState.is_two_fa_enabled = newTwoFaState;
+                messageDiv.textContent = t('user.settings.success');
+                messageDiv.className = 'mb-4 text-center text-sm text-green-600 font-semibold min-h-[1.25rem]';
 
-			if (profileUpdateSuccess || twoFaUpdateSuccess) {
-				currentUserState.is_two_fa_enabled = newTwoFaState;
-				messageDiv.textContent = t('user.settings.success');
-				messageDiv.className = 'mb-4 text-center text-sm text-green-600 font-semibold min-h-[1.25rem]';
+                emailInput.value = currentUserState.email || '';
+                displayNameInput.value = currentUserState.display_name || '';
+                avatarUrlInput.value = currentUserState.avatar_url || '';
+                languageSelect.value = currentUserState.language || 'en';
+                twoFaTokenInput.value = '';
+                if (!newTwoFaState) {
+                    twoFaSetupContainer.classList.add('hidden');
+                }
 
-				emailInput.value = currentUserState.email;
-				displayNameInput.value = currentUserState.display_name;
-				avatarUrlInput.value = currentUserState.avatar_url || '';
-				// AJOUT : Mettre à jour la valeur du sélecteur
-				languageSelect.value = currentUserState.language || 'en';
-				twoFaTokenInput.value = '';
-				if (!newTwoFaState) {
-					twoFaSetupContainer.classList.add('hidden');
-				}
+                setTimeout(() => {
+                    if (messageDiv.textContent === t('user.settings.success')) {
+                        messageDiv.textContent = '';
+                    }
+                }, 3000);
+            } else {
+                messageDiv.textContent = t('user.settings.noChanges');
+                messageDiv.className = 'mb-4 text-center text-sm text-blue-400 min-h-[1.25rem]';
+            }
 
-				setTimeout(() => {
-					if (messageDiv.textContent === t('user.settings.success')) {
-						messageDiv.textContent = '';
-					}
-				}, 3000);
-			} else {
-				messageDiv.textContent = t('user.settings.noChanges');
-				messageDiv.className = 'mb-4 text-center text-sm text-blue-600 min-h-[1.25rem]';
-			}
+        } catch (error: any) {
+            messageDiv.textContent = `${t('general.error')}: ${error.message || t('user.settings.error')}`;
+            messageDiv.className = 'mb-4 text-center text-sm text-red-600 font-semibold min-h-[1.25rem]';
+        } finally {
+            saveButton.disabled = false;
+            saveButton.textContent = t('user.settings.button');
+        }
+    });
 
-		} catch (error: any) {
-			messageDiv.textContent = `${t('general.error')}: ${error.message || t('user.settings.error')}`;
-			messageDiv.className = 'mb-4 text-center text-sm text-red-600 font-semibold min-h-[1.25rem]';
-		} finally {
-			saveButton.disabled = false;
-			saveButton.textContent = t('user.settings.button');
-		}
-	});
-
-	return formElement;
+    return formElement;
 }

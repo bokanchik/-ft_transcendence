@@ -3,6 +3,7 @@ import { UserOnlineStatus } from '../shared/schemas/usersSchemas.js';
 import { navigateTo } from '../services/router.js';
 import { showCustomConfirm, showToast } from './toast.js';
 import { t } from '../services/i18nService.js';
+import { createElement, createActionButton } from '../utils/domUtils.js';
 
 interface FriendsListProps {
 	friends: Friend[];
@@ -12,104 +13,79 @@ interface FriendsListProps {
 export function FriendsListComponent(props: FriendsListProps): HTMLElement {
 	const { friends, onRemoveFriend } = props;
 
-	const section = document.createElement('div');
-	section.id = 'friends-list-section';
-	section.className = '';
+	const section = createElement('div', { id: 'friends-list-section' });
 
-	const title = document.createElement('h2');
-	title.className = 'text-xl font-semibold text-white mb-4';
-	title.innerHTML = `${t('friend.list.accepted.title')} (<span id="friends-count">${friends.length}</span>)`;
+	const friendCountSpan = createElement('span', { id: 'friends-count', textContent: friends.length.toString() });
+	
+	const title = createElement('h2', {
+		className: 'text-xl font-semibold text-white mb-4',
+	}, [
+        `${t('friend.list.accepted.title')} (`,
+        friendCountSpan,
+        `)`
+    ]);
 
-	const ul = document.createElement('ul');
-	ul.id = 'friends-list';
-	ul.className = 'space-y-4';
+	const ul = createElement('ul', { id: 'friends-list', className: 'space-y-4' });
 
 	if (!friends.length) {
-		ul.innerHTML = `<li class="text-gray-300 italic p-4 text-center">${t('friend.list.accepted.noFriends')}</li>`;
+		const li = createElement('li', {
+			className: 'text-gray-300 italic p-4 text-center',
+			textContent: t('friend.list.accepted.noFriends')
+		});
+		ul.append(li)
 	} else {
-		friends.forEach(friend => {
+	friends.forEach(friend => {
 			const displayName = friend.friend_display_name;
-			const avatarUrl = friend.friend_avatar_url;
-			const friendId = friend.friend_id;
-			const friendshipId = friend.friendship_id;
-			const status = friend.friend_online_status;
-			const wins = friend.friend_wins ?? 0;
-			const losses = friend.friend_losses ?? 0;
-
-			const avatar = avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random&color=fff&size=40`;
-
-			let statusIndicatorClass = 'bg-gray-400';
-			let statusText = t('user.status.offline');
-
-			if (status === UserOnlineStatus.ONLINE) {
-				statusIndicatorClass = 'bg-green-500';
-				statusText = t('user.status.online');
-			} else if (status === UserOnlineStatus.IN_GAME) {
-				statusIndicatorClass = 'bg-yellow-500';
-				statusText = t('user.status.inGame');
+			const avatar = friend.friend_avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random&color=fff&size=40`;
+			
+			let statusIndicatorClass = 'bg-gray-400', statusText = t('user.status.offline');
+			if (friend.friend_online_status === UserOnlineStatus.ONLINE) {
+				statusIndicatorClass = 'bg-green-500'; statusText = t('user.status.online');
+			} else if (friend.friend_online_status === UserOnlineStatus.IN_GAME) {
+				statusIndicatorClass = 'bg-yellow-500'; statusText = t('user.status.inGame');
 			}
 
-			const li = document.createElement('li');
-			li.dataset.friendId = friendId.toString();
-			li.dataset.friendshipId = friendshipId.toString();
-			li.className = 'p-4 bg-black/20 border border-gray-500/30 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0 hover:bg-black/30 transition-colors duration-200';
-			li.innerHTML = `
-                <div class="flex items-center w-full sm:w-auto">
-                    <img src="${avatar}" alt="${displayName}" class="w-12 h-12 rounded-full mr-4 object-cover">
-                    <div class="flex-grow">
-                        <div class="flex items-center mb-1">
-                            <span class="inline-block w-3 h-3 ${statusIndicatorClass} rounded-full mr-2" title="${statusText}"></span>
-                            <strong class="text-lg text-gray-100">${displayName}</strong>
-                        </div>
-                        <div class="text-xs text-gray-400">
-                            <span>${t('user.wins')}: ${wins}</span> | <span>${t('user.losses')}: ${losses}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex space-x-2 self-end sm:self-center pt-2 sm:pt-0">
-                    <button data-action="view-profile" data-user-id="${friendId}" class="text-xs bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1.5 px-3 rounded-md border border-blue-400/50 transition-colors duration-200">${t('friend.list.accepted.viewProfile')}</button>
-                    <button data-action="remove-friend" data-friendship-id="${friendshipId}" class="text-xs bg-red-500 hover:bg-red-600 text-white font-semibold py-1.5 px-3 rounded-md border border-red-400/50 transition-colors duration-200">${t('friend.remove')}</button>
-                </div>
-            `;
-			ul.appendChild(li);
+			const avatarImg = createElement('img', { src: avatar, alt: displayName, className: 'w-12 h-12 rounded-full mr-4 object-cover' });
+			const statusIndicator = createElement('span', { className: `inline-block w-3 h-3 ${statusIndicatorClass} rounded-full mr-2`, title: statusText });
+			const nameStrong = createElement('strong', { textContent: displayName, className: 'text-lg text-gray-100' });
+			const nameContainer = createElement('div', { className: 'flex items-center mb-1' }, [statusIndicator, nameStrong]);
+			const winsSpan = createElement('span', { textContent: `${t('user.wins')}: ${friend.friend_wins ?? 0}` });
+            const lossesSpan = createElement('span', { textContent: `${t('user.losses')}: ${friend.friend_losses ?? 0}` });
+			const statsDiv = createElement('div', { className: 'text-xs text-gray-400' }, [winsSpan, ' | ', lossesSpan]);
+
+			const infoDiv = createElement('div', { className: 'flex-grow' }, [nameContainer, statsDiv]);
+			const userPrimaryInfoContainer = createElement('div', { className: 'flex items-center w-full sm:w-auto' }, [avatarImg, infoDiv]);
+			
+			const viewProfileBtn = createActionButton({
+				text: t('friend.list.accepted.viewProfile'),
+				variant: 'primary',
+				onClick: () => navigateTo(`/profile/${friend.friend_id}`)
+			});
+
+			const removeFriendBtn = createActionButton({
+				text: t('friend.remove'),
+				variant: 'danger',
+				onClick: async () => {
+					const confirmed = await showCustomConfirm(t('friend.list.accepted.removeMsg'), t('friend.list.accepted.removeMsgTitle'));
+					if (confirmed) {
+						await onRemoveFriend(friend.friendship_id);
+						showToast(t('friend.list.accepted.removeSuccess'), 'success');
+					}
+				}
+			});
+			
+			const actionContainer = createElement('div', { className: 'flex space-x-2 self-end sm:self-center pt-2 sm:pt-0' }, [viewProfileBtn, removeFriendBtn]);
+
+			const li = createElement('li', {
+				className: 'p-4 bg-black/20 border border-gray-500/30 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0 hover:bg-black/30 transition-colors duration-200'
+			}, [userPrimaryInfoContainer, actionContainer]);
+			
+			li.dataset.friendId = friend.friend_id.toString();
+			li.dataset.friendshipId = friend.friendship_id.toString();
+			ul.append(li);
 		});
 	}
 
-	section.appendChild(title);
-	section.appendChild(ul);
-
-	ul.addEventListener('click', async (event) => {
-		const target = event.target as HTMLElement;
-		const button = target.closest('button[data-action]') as HTMLButtonElement | null;
-		if (!button) return;
-
-		const action = button.dataset.action;
-		if (action === 'view-profile') {
-			const userIdToView = button.dataset.userId; // Get userId from button
-			if (userIdToView) {
-				navigateTo(`/profile/${userIdToView}`);
-			}
-		} else if (action === 'remove-friend') {
-			const friendshipIdToRemove = button.dataset.friendshipId; // Get friendshipId from button
-			if (friendshipIdToRemove) {
-				const confirmed = await showCustomConfirm(t('friend.list.accepted.removeMsg'), t('friend.list.accepted.removeMsgTitle'));
-
-				if (confirmed) {
-					button.disabled = true;
-					button.textContent = '...';
-					try {
-						await onRemoveFriend(parseInt(friendshipIdToRemove, 10));
-						showToast(t('friend.list.accepted.removeSuccess'), 'success');
-					} catch (error: any) {
-						console.error('Error while removing friend: ', error);
-						showToast(`${t('general.error')}: ${error.message || t('friend.list.accepted.removeError')}`, 'error');
-						button.disabled = false;
-						button.textContent = t('friend.remove');
-					}
-				}
-			}
-		}
-	});
-
+	section.append(title, ul);
 	return section;
 }

@@ -2,48 +2,29 @@ import { attemptLogin, verifyTwoFactorLogin, getUserDataFromStorage } from '../s
 import { navigateTo } from '../services/router.js';
 import { LoginForm } from '../components/loginForm.js';
 import { LoginRequestBody, User } from '../shared/schemas/usersSchemas.js';
-import { ApiResult, ApiLoginSuccessData } from '../utils/types.js';
 import { t, setLanguage, getLanguage } from '../services/i18nService.js';
 import { HeaderComponent } from '../components/headerComponent.js';
+import { createElement } from '../utils/domUtils.js';
 
 export function LoginPage(): HTMLElement {
 	const currentUser = getUserDataFromStorage();
 
-	const pageWrapper = document.createElement('div');
-	pageWrapper.className = 'flex flex-col min-h-screen bg-cover bg-center bg-fixed';
-	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
-
 	const headerElement = HeaderComponent({ currentUser });
-	pageWrapper.appendChild(headerElement);
 
-	const container = document.createElement('div');
-	container.className = 'flex-grow flex justify-center items-center p-4 sm:p-8';
+	const title = createElement('h2', {
+		textContent: t('login.title'),
+		className: 'text-3xl font-bold mb-6 text-center text-white'
+	});
 
-	const formContainer = document.createElement('div');
-	formContainer.className = 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-2xl shadow-2xl p-8 max-w-md w-full';
-
-	const title = document.createElement('h2');
-	title.className = 'text-3xl font-bold mb-6 text-center text-white';
-	title.textContent = t('login.title');
-
-	formContainer.appendChild(title);
-
-	const handleLoginAttempt = async (credentials: LoginRequestBody): Promise<ApiResult<ApiLoginSuccessData>> => {
-		return attemptLogin(credentials);
-	};
-
-	const handle2FAAttempt = async (token: string): Promise<ApiResult<ApiLoginSuccessData>> => {
-		return verifyTwoFactorLogin(token);
-	};
-
+	const handleLoginAttempt = (credentials: LoginRequestBody) => attemptLogin(credentials);
+	const handle2FAAttempt = (token: string) => verifyTwoFactorLogin(token);
 	const handleLoginSuccess = async (userData: User) => {
 		const userLanguage = userData.language || 'en';
         const currentInterfaceLanguage = getLanguage();
-
 		if (userLanguage !== currentInterfaceLanguage) {
             await setLanguage(userLanguage);
 		}
-		setTimeout(() => { navigateTo('/dashboard'); }, 500);
+        setTimeout(() => { navigateTo('/dashboard'); }, 500);
 	};
 
 	const loginFormComponent = LoginForm({
@@ -51,19 +32,36 @@ export function LoginPage(): HTMLElement {
 		on2FAAttempt: handle2FAAttempt,
 		onLoginSuccess: handleLoginSuccess,
 	});
-	formContainer.appendChild(loginFormComponent);
 
-	const linksDiv = document.createElement('div');
-	linksDiv.className = 'mt-6 text-center';
-	linksDiv.innerHTML = `
-        <a href="/" data-link class="text-blue-400 hover:text-blue-300 text-sm transition-colors">${t('link.home')}</a>
-        <span class="mx-2 text-gray-400">|</span>
-        <a href="/register" data-link class="text-blue-400 hover:text-blue-300 text-sm transition-colors">${t('login.registerLink')}</a>
-    `;
-	formContainer.appendChild(linksDiv);
+	const homeLink = createElement('a', { href: '/', textContent: t('link.home'), className: 'text-blue-400 hover:text-blue-300 text-sm transition-colors' });
+	homeLink.setAttribute('data-link', '');
+	
+	const registerLink = createElement('a', { href: '/register', textContent: t('login.registerLink'), className: 'text-blue-400 hover:text-blue-300 text-sm transition-colors' });
+	registerLink.setAttribute('data-link', '');
 
-	container.appendChild(formContainer);
-	pageWrapper.appendChild(container);
+	const linksDiv = createElement('div', { className: 'mt-6 text-center' }, [
+		homeLink,
+		createElement('span', { textContent: '|', className: 'mx-2 text-gray-400' }),
+		registerLink
+	]);
+
+	const formContainer = createElement('div', {
+		className: 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-2xl shadow-2xl p-8 max-w-md w-full'
+	}, [
+		title,
+		loginFormComponent,
+		linksDiv
+	]);
+
+	const container = createElement('div', {
+		className: 'flex-grow flex justify-center items-center p-4 sm:p-8'
+	}, [formContainer]);
+
+	const pageWrapper = createElement('div', {
+		className: 'flex flex-col min-h-screen bg-cover bg-center bg-fixed'
+	}, [headerElement, container]);
+	
+	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
 
 	return pageWrapper;
 }

@@ -3,7 +3,6 @@ import { getUserDataFromStorage } from './authService.js';
 
 let currentLanguage: string = 'en';
 let translations: Record<string, any> = {};
-// const supportedLanguages = ['fr', 'en'];
 const supportedLanguages = ['fr', 'en', 'es', 'ru'];
 
 
@@ -22,25 +21,6 @@ async function loadTranslations(lang: string): Promise<void> {
         }
     }
 }
-
-/**
- * Initialise le service i18n. Doit être appelé au démarrage de l'application.
- */
-// export async function initI18n(): Promise<void> {
-//     let lang = localStorage.getItem('language');
-
-//     if (!lang) {
-//         const browserLang = navigator.language.split('-')[0];
-//         if (supportedLanguages.includes(browserLang)) {
-//             lang = browserLang;
-//         }
-//     }
-
-//     currentLanguage = lang || 'en';
-//     localStorage.setItem('language', currentLanguage);
-
-//     await loadTranslations(currentLanguage);
-// }
 
 export async function initI18n(): Promise<void> {
     const user = getUserDataFromStorage();
@@ -66,16 +46,11 @@ export async function initI18n(): Promise<void> {
     // 4. Langue par défaut si rien n'est trouvé
     currentLanguage = lang || 'en';
     
-    // On met toujours à jour le localStorage pour que ce soit cohérent
     localStorage.setItem('language', currentLanguage);
 
     await loadTranslations(currentLanguage);
 }
 
-/**
- * Change la langue de l'application, recharge les traductions et rafraîchit l'interface.
- * @param lang La nouvelle langue ('fr', 'en', etc.)
- */
 export async function setLanguage(lang: string): Promise<void> {
     if (!supportedLanguages.includes(lang)) {
         console.warn(`Language '${lang}' is not supported.`);
@@ -87,9 +62,6 @@ export async function setLanguage(lang: string): Promise<void> {
     router();
 }
 
-/**
- * Récupère la langue actuellement configurée.
- */
 export function getLanguage(): string {
     return currentLanguage;
 }
