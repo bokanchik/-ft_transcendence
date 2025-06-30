@@ -1,7 +1,7 @@
 import { LoginRequestBody, User } from '../shared/schemas/usersSchemas.js';
 import { ApiResult, ApiLoginSuccessData } from '../utils/types.js';
 import { t } from '../services/i18nService.js';
-import { createElement, createInputField } from '../utils/domUtils.js';
+import { createElement, createInputField, clearElement } from '../utils/domUtils.js';
 
 interface LoginFormProps {
 	onLoginAttempt: (credentials: LoginRequestBody) => Promise<ApiResult<ApiLoginSuccessData>>;
@@ -14,7 +14,7 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 	const wrapper = createElement('div');
 
 	const renderPasswordStep = () => {
-		wrapper.innerHTML = '';
+		clearElement(wrapper);
 
 		const identifierField = createInputField('identifier', t('login.identifierLabel'), {
 			type: 'text',
@@ -47,7 +47,7 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 	};
 
 	const renderTwoFactorStep = () => {
-		wrapper.innerHTML = '';
+		clearElement(wrapper);
 
 		const title = createElement('h3', { textContent: t('login.2fa.title'), className: 'text-xl font-semibold text-center text-white' });
 		

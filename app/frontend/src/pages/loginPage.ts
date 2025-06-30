@@ -24,7 +24,7 @@ export function LoginPage(): HTMLElement {
 		if (userLanguage !== currentInterfaceLanguage) {
             await setLanguage(userLanguage);
 		}
-        setTimeout(() => { navigateTo('/dashboard'); }, 500);
+        setTimeout(() => { navigateTo('/dashboard'); }, 300);
 	};
 
 	const loginFormComponent = LoginForm({

@@ -13,7 +13,7 @@ import { promptAliasForm } from './components/SelectGameModeForm.js';
 import { navigateTo } from './services/router.js';
 import { initI18n, t } from './services/i18nService.js';
 import { showcase } from './components/showcase.js';
-import { createElement } from './utils/domUtils.js';
+import { createElement, clearElement } from './utils/domUtils.js';
 
 const appContainer = document.getElementById('main');
 
@@ -88,7 +88,7 @@ export async function router() {
 	}
 
 	if (!routeCfg) {
-		appContainer.innerHTML = '';
+		clearElement(appContainer);
 		appContainer.appendChild(renderNotFoundPage());
 		return;
 	}
@@ -102,7 +102,7 @@ export async function router() {
 	}
 
 	const renderFunction = routeCfg.component;
-	appContainer.innerHTML = '';
+	clearElement(appContainer);
 	try {
 		const pageContent = await renderFunction(params);
 		appContainer.appendChild(pageContent);

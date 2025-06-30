@@ -238,6 +238,7 @@
 			"unknown": "Une erreur inconnue est survenue.",
 			"malformedResponse": "La réponse du serveur est mal formée.",
 			"networkError": "Erreur de réseau ou impossible de joindre le serveur.",
+			"loadingContent": "Erreur lors du chargement du contenu. Veuillez réessayer plus tard.",
 			"login": {
 				"invalidCredentials": "Identifiant ou mot de passe invalide.",
 				"accountBanned": "Ce compte a été banni."

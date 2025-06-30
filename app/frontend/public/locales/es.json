@@ -238,6 +238,7 @@
 			"unknown": "Ocurrió un error desconocido.",
 			"malformedResponse": "La respuesta del servidor está mal formada.",
 			"networkError": "Error de red o no se pudo contactar al servidor.",
+			"loadingContent": "Error al cargar el contenido. Por favor, inténtalo de nuevo más tarde.",
 			"login": {
 				"invalidCredentials": "Identificador o contraseña no válidos.",
 				"accountBanned": "Esta cuenta ha sido bloqueada."

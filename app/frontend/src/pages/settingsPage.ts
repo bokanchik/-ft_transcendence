@@ -51,9 +51,12 @@ export async function SettingsPage(): Promise<HTMLElement> {
 	const handleProfileUpdate = async (payload: UpdateUserPayload): Promise<ApiResult<ApiUpdateUserSuccessData>> => {
 		const currentLang = getLanguage();
 		const result = await updateUserProfile(payload);
-		if (result.success && payload.language && payload.language !== currentLang) {
-			await setLanguage(payload.language);
-		}
+		// if (result.success && payload.language && payload.language !== currentLang) {
+		// 	await setLanguage(payload.language);
+		// }
+		if (result.success && payload.language) {
+            await setLanguage(payload.language);
+        }
 		return result;
 	};
 

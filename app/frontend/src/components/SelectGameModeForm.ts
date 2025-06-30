@@ -200,7 +200,7 @@ import { showToast } from "./toast.js";
 import { t } from "../services/i18nService.js";
 import { HeaderComponent } from "./headerComponent.js";
 import { getUserDataFromStorage } from "../services/authService.js";
-import { createElement, createInputField, createActionButton, createSelectField } from "../utils/domUtils.js";
+import { createElement, createInputField, createActionButton, createSelectField, clearElement } from "../utils/domUtils.js";
 
 export function promptAliasForm(): HTMLElement {
     const currentUser = getUserDataFromStorage();
@@ -273,8 +273,8 @@ export function promptAliasForm(): HTMLElement {
     
     selectElement.addEventListener('change', () => {
         const value = selectElement.value;
-        dynamicInputs.innerHTML = '';
-        aliasFields.innerHTML = '';
+		clearElement(dynamicInputs);
+		clearElement(aliasFields);
 
         if (value === t('game.settings.duel')) {
             dynamicInputs.append(
@@ -293,7 +293,7 @@ export function promptAliasForm(): HTMLElement {
             dynamicInputs.append(countField, aliasFields);
 
             inputElement.addEventListener('input', () => {
-                aliasFields.innerHTML = '';
+                clearElement(aliasFields);
                 const count = parseInt(inputElement.value);
                 const validCounts = [2, 4, 8];
 

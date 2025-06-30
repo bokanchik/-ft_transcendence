@@ -217,3 +217,9 @@ export function createSelectField(id: string, labelText: string, options: string
 	
 	return createElement('div', {}, [label, select]);
 }
+
+export function clearElement(element: HTMLElement): void {
+    while (element.firstChild) {
+        element.removeChild(element.firstChild);
+    }
+}

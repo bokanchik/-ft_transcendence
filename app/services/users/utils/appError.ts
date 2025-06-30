@@ -10,19 +10,6 @@ export const ERROR_KEYS = {
 	INVALID_REFRESH_TOKEN: 'msg.error.refreshToken.invalid', // Invalid or expired refresh token.
 	REFRESH_TOKEN_MISSING: 'msg.error.refreshToken.missing', // Refresh token missing.
 
-	// a virer
-	INVALID_FRIENDSHIP_ID: 'error.friendship.invalidId', // Invalid friendship ID format
-
-    // Erreurs d'amis
-    FRIEND_SELF_REQUEST: 'error.friend.selfRequest',
-    FRIEND_ALREADY_EXISTS: 'error.friend.alreadyExists',
-    FRIEND_REQUEST_ALREADY_PENDING: 'error.friend.requestAlreadyPending',
-    FRIEND_TARGET_HAS_PENDING: 'error.friend.targetHasPending',
-    FRIEND_NOT_FOUND: 'error.friend.notFound',
-    FRIEND_REQUEST_NOT_FOUND: 'error.friend.requestNotFound',
-    FRIEND_CANNOT_ACCEPT_OWN_REQUEST: 'error.friend.cannotAcceptOwn',
-    FRIEND_NOT_PART_OF_REQUEST: 'error.friend.notPartOfRequest',
-
     // Erreurs générales
     USER_NOT_FOUND: 'msg.error.user.notFound', //
     UNAUTHORIZED: 'msg.error.unauthorized',

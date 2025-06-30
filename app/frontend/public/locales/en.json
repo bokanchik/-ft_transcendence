@@ -241,6 +241,7 @@
 			"unknown": "An unknown error occurred.",
 			"malformedResponse": "The server's error response was malformed.",
 			"networkError": "Network error or could not reach the server.",
+			"loadingContent": "Error loading content. Please try again later.",
 			"login": {
 				"invalidCredentials": "Invalid identifier or password.",
 				"accountBanned": "This account has been banned."

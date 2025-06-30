@@ -1,7 +1,8 @@
 import { User, UpdateUserPayload, Generate2FAResponse } from '../shared/schemas/usersSchemas.js';
 import { ApiResult, ApiUpdateUserSuccessData } from '../utils/types.js';
-import { t, getLanguage } from '../services/i18nService.js';
-import { createElement, createInputField } from '../utils/domUtils.js';
+import { t, getLanguage , setLanguage } from '../services/i18nService.js';
+import { createElement, createInputField, clearElement } from '../utils/domUtils.js';
+import {  navigateTo } from '../services/router.js';
 
 interface ProfileFormProps {
     user: User;
@@ -99,18 +100,18 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
     twoFaCheckbox.checked = currentUserState.is_two_fa_enabled;
 
     twoFaCheckbox.addEventListener('change', async () => {
-        qrCodeContainer.innerHTML = '';
+        clearElement(qrCodeContainer);
         if (twoFaCheckbox.checked) {
             twoFaSetupContainer.classList.remove('hidden');
             qrCodeContainer.append(createElement('span', { className: 'loader' }));
             try {
                 const { qrCodeDataURL } = await onGenerate2FA();
                 const qrCodeImg = createElement('img', { src: qrCodeDataURL, alt: t('user.settings.qrCodeAlt'), className: 'mx-auto' });
-                qrCodeContainer.innerHTML = '';
+                clearElement(qrCodeContainer);
                 qrCodeContainer.appendChild(qrCodeImg);
             } catch (error) {
                 console.error("Failed to generate QR code:", error);
-                qrCodeContainer.innerHTML = '';
+                clearElement(qrCodeContainer);
                 qrCodeContainer.append(createElement('p', { textContent: t('user.settings.qrCodeError'), className: 'text-red-500' }));
             }
         } else {
@@ -124,77 +125,60 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
         saveButton.disabled = true;
         saveButton.textContent = t('user.settings.savingMsg2');
 
-        const updatedEmail = emailInput.value.trim();
-        const updatedDisplayName = displayNameInput.value.trim();
-        const updatedAvatarUrl = avatarUrlInput.value.trim();
-        const updatedLanguage = languageSelect.value;
-        const newTwoFaState = twoFaCheckbox.checked;
-        const twoFaToken = twoFaTokenInput.value.trim();
-
-        let profileUpdateSuccess = false;
-        let twoFaUpdateSuccess = false;
+        let shouldRedirect = false;
+        let somethingWasSaved = false;
 
         try {
+            const newTwoFaState = twoFaCheckbox.checked;
             if (newTwoFaState !== currentUserState.is_two_fa_enabled) {
+                const twoFaToken = twoFaTokenInput.value.trim();
                 if (newTwoFaState) {
-                    if (!twoFaToken || !/^\d{6}$/.test(twoFaToken)) {
-                        throw new Error(t('user.settings.2faTokenInvalid'));
-                    }
+                    if (!twoFaToken || !/^\d{6}$/.test(twoFaToken)) throw new Error(t('user.settings.2faTokenInvalid'));
                     await onVerifyAndEnable2FA(twoFaToken);
                 } else {
                     await onDisable2FA();
                 }
-                twoFaUpdateSuccess = true;
-            }
-            
-            const profilePayload: UpdateUserPayload = {};
-            let hasChanges = false;
-            
-            if (updatedEmail !== (currentUserState.email || '')) {
-                profilePayload.email = updatedEmail;
-                hasChanges = true;
-            }
-            if (updatedDisplayName !== (currentUserState.display_name || '')) {
-                profilePayload.display_name = updatedDisplayName;
-                hasChanges = true;
-            }
-            if (updatedAvatarUrl !== (currentUserState.avatar_url || '')) {
-                profilePayload.avatar_url = updatedAvatarUrl === '' ? null : updatedAvatarUrl;
-                hasChanges = true;
-            }
-            if (updatedLanguage !== (currentUserState.language || 'en')) {
-                profilePayload.language = updatedLanguage;
-                hasChanges = true;
+                shouldRedirect = true;
+                somethingWasSaved = true;
             }
 
-            if (hasChanges) {
-                const result = await onProfileUpdate(profilePayload);
-                if (!result.success) {
-                    throw new Error(result.error);
-                }
-                currentUserState = { ...currentUserState, ...result.data.user };
-                profileUpdateSuccess = true;
-            }
+            const profilePayload: UpdateUserPayload = {};
+            const updatedEmail = emailInput.value.trim();
+            const updatedDisplayName = displayNameInput.value.trim();
+            const updatedAvatarUrl = avatarUrlInput.value.trim();
+            const updatedLanguage = languageSelect.value;
+            const languageChanged = updatedLanguage !== getLanguage();
             
-            if (profileUpdateSuccess || twoFaUpdateSuccess) {
-                currentUserState.is_two_fa_enabled = newTwoFaState;
+            if (updatedEmail !== (currentUserState.email || '')) { profilePayload.email = updatedEmail; }
+            if (updatedDisplayName !== (currentUserState.display_name || '')) { profilePayload.display_name = updatedDisplayName; }
+            if (updatedAvatarUrl !== (currentUserState.avatar_url || '')) { profilePayload.avatar_url = updatedAvatarUrl === '' ? null : updatedAvatarUrl; }
+            if (languageChanged) { profilePayload.language = updatedLanguage; }
+
+            const otherProfileChanges = profilePayload.email || profilePayload.display_name || profilePayload.avatar_url;
+
+            if (Object.keys(profilePayload).length > 0) {
+                const result = await onProfileUpdate(profilePayload);
+                if (!result.success) throw new Error(result.error);
+                
+                somethingWasSaved = true;
+
+                if (otherProfileChanges) {
+                    shouldRedirect = true;
+                }
+
+                if (languageChanged) {
+                    await setLanguage(updatedLanguage);
+                    return; 
+                }
+            }
+
+            if (shouldRedirect) {
+                messageDiv.textContent = t('user.settings.successAndRedirect');
+                messageDiv.className = 'mb-4 text-center text-sm text-green-600 font-semibold min-h-[1.25rem]';
+                setTimeout(() => navigateTo('/dashboard'), 1500);
+            } else if (somethingWasSaved) {
                 messageDiv.textContent = t('user.settings.success');
                 messageDiv.className = 'mb-4 text-center text-sm text-green-600 font-semibold min-h-[1.25rem]';
-
-                emailInput.value = currentUserState.email || '';
-                displayNameInput.value = currentUserState.display_name || '';
-                avatarUrlInput.value = currentUserState.avatar_url || '';
-                languageSelect.value = currentUserState.language || 'en';
-                twoFaTokenInput.value = '';
-                if (!newTwoFaState) {
-                    twoFaSetupContainer.classList.add('hidden');
-                }
-
-                setTimeout(() => {
-                    if (messageDiv.textContent === t('user.settings.success')) {
-                        messageDiv.textContent = '';
-                    }
-                }, 3000);
             } else {
                 messageDiv.textContent = t('user.settings.noChanges');
                 messageDiv.className = 'mb-4 text-center text-sm text-blue-400 min-h-[1.25rem]';
@@ -204,8 +188,10 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
             messageDiv.textContent = `${t('general.error')}: ${error.message || t('user.settings.error')}`;
             messageDiv.className = 'mb-4 text-center text-sm text-red-600 font-semibold min-h-[1.25rem]';
         } finally {
-            saveButton.disabled = false;
-            saveButton.textContent = t('user.settings.button');
+            if (!shouldRedirect) {
+                saveButton.disabled = false;
+                saveButton.textContent = t('user.settings.button');
+            }
         }
     });
 

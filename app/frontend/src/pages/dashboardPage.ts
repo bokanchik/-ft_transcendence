@@ -11,7 +11,9 @@ import { showToast } from '../components/toast.js';
 import { MatchHistoryComponent } from '../components/matchHistoryComponent.js';
 import { t } from '../services/i18nService.js';
 import { translateResultMessage } from '../services/responseService.js';
-import { createElement } from '../utils/domUtils.js';
+import { createElement, clearElement } from '../utils/domUtils.js';
+
+const DASHBOARD_ACTIVE_TAB_KEY = 'dashboardActiveTab';
 
 export async function DashboardPage(): Promise<HTMLElement> {
 	let currentUser: User | null = getUserDataFromStorage();
@@ -39,7 +41,7 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	
 	const mainSection = createElement('div', { className: 'flex flex-1 min-h-0' }, [sidebar, tabContentWrapper]);
 	
-	const headerElement = HeaderComponent({ currentUser: currentUser! });
+	let headerElement = HeaderComponent({ currentUser: currentUser! });
 	
 	const dashboardWrapper = createElement('div', {
 		className: 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 w-full max-w-6xl mx-auto my-8 rounded-2xl shadow-2xl flex flex-col flex-1 min-h-0'
@@ -62,9 +64,7 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	}
 
 	function populateSidebar(user: User) {
-		while (sidebar.firstChild) {
-			sidebar.removeChild(sidebar.firstChild);
-		}
+		clearElement(sidebar);
 
 		const avatarImg = createElement('img', {
 			src: user.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.display_name)}&background=random&color=fff&size=128`,
@@ -95,10 +95,13 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		{ id: 'pending', label: t('dashboard.tabs.pending'), componentLoader: loadPendingRequestsContent },
 		{ id: 'history', label: t('dashboard.tabs.history'), componentLoader: loadMatchHistoryContent },
 	];
-	let activeTabId = TABS[0].id;
+
+	const savedTabId = sessionStorage.getItem(DASHBOARD_ACTIVE_TAB_KEY);
+	let activeTabId = (savedTabId && TABS.some(t => t.id === savedTabId)) ? savedTabId : TABS[0].id;
 
 	function switchTab(tabId: string) {
 		activeTabId = tabId;
+		sessionStorage.setItem(DASHBOARD_ACTIVE_TAB_KEY, tabId);
 		tabNavigation.querySelectorAll('button').forEach(btn => {
 			const isActive = btn.dataset.tabId === tabId;
 			btn.className = `py-2 px-4 text-lg font-roar focus:outline-none transition-colors ${
@@ -121,16 +124,18 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	});
 
 	async function loadActiveTabContent() {
-		activeTabContentContainer.innerHTML = `<p class="text-center text-gray-200 py-10">Loading...</p>`;
+		clearElement(activeTabContentContainer);
+		activeTabContentContainer.appendChild(createElement('p', { textContent: t('general.loading'), className: 'text-center text-gray-200 py-10' }));
 		const currentTab = TABS.find(t => t.id === activeTabId);
 		if (currentTab) {
 			try {
 				const contentElement = await currentTab.componentLoader();
-				activeTabContentContainer.innerHTML = '';
+				clearElement(activeTabContentContainer);
 				activeTabContentContainer.appendChild(contentElement);
 			} catch (error) {
 				console.error(`Error loading content for tab ${activeTabId}:`, error);
-				activeTabContentContainer.innerHTML = `<p class="text-center text-red-400 py-10">${t('msg.error.loadingContent')}</p>`;
+				clearElement(activeTabContentContainer);
+				activeTabContentContainer.appendChild(createElement('p', { textContent: t('msg.error.loadingContent'), className: 'text-center text-red-400 py-10' }));
 			}
 		}
 	}
@@ -205,6 +210,7 @@ export async function DashboardPage(): Promise<HTMLElement> {
 			populateSidebar(freshUser);
 			const newHeader = HeaderComponent({ currentUser: freshUser });
 			dashboardWrapper.replaceChild(newHeader, headerElement);
+			headerElement = newHeader;
 		}
 	}).catch(err => {
 		console.error("Could not refresh user data in the background:", err);
