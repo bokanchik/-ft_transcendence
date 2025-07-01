@@ -48,7 +48,9 @@
 - [ ] ajouter sms (twilio) et emails (sendGrid)
 
 - [x] style que dans background
-- [ ] signe @ pas jojo
+- [ ] signe @ du font-beach pas jojo
+
+- [ ] !!! NAVIGATION A LA MAIN DANS LA BARRE D'ADRESSE !!!
 
 - [x] score pas affichés dans gameResult
 - [x] score après local game
