@@ -9,6 +9,7 @@
 	"link": {
 		"home": "Volver al inicio",
 		"dashboard": "Volver al panel",
+		"newGame": "Volver a la sala de juego",
 		"lobby": "Volver a la sala"
 	},
 	"user": {

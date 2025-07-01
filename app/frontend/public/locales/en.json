@@ -9,6 +9,7 @@
 	"link": {
 		"home": "Back to Home",
 		"dashboard": "Back to Dashboard",
+		"newGame": "Back to Game Room",
 		"lobby": "Back to Lobby"
 	},
 	"user": {

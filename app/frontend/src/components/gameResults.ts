@@ -3,7 +3,9 @@ import { navigateTo } from "../services/router.js";
 import socket from '../services/socket.js';
 import { t } from '../services/i18nService.js';
 
-export function showGameResult(player1: string, player2: string, score1: number, score2: number, url1: string, url2: string) {
+// export function showGameResult(player1: string, player2: string, score1: number, score2: number, url1: string, url2: string) {
+export function showGameResult(player1: string, player2: string, score1: number, score2: number, url1: string, url2: string, destinationUrl: string, destinationText: string) {
+
 	const modal = document.createElement('div');
 	// modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm';
 	modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md';
@@ -92,7 +94,8 @@ export function showGameResult(player1: string, player2: string, score1: number,
 	closeButton.id = 'close-modal';
 	// closeButton.className = 'mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl shadow transition';
 	closeButton.className = 'mt-8 px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg border border-blue-500/50 transition-all duration-200 hover:scale-105';
-	closeButton.textContent = t('link.lobby');
+	// closeButton.textContent = t('link.lobby');
+	closeButton.textContent = destinationText;
 
 	// Assemble tout
 	playersContainer.appendChild(player1Container);
@@ -110,6 +113,7 @@ export function showGameResult(player1: string, player2: string, score1: number,
 		modal.remove();
 		cleanupSocket(socket);
 		sessionStorage.clear();
-		navigateTo('/game');
+		// navigateTo('/game');
+		navigateTo(destinationUrl);
 	});
 }

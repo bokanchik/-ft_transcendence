@@ -54,7 +54,7 @@ export class RemoteGameSession {
                 if (this.isFinished) return; // Prevent multiple emissions if already finished
                 this.isFinished = true;
                 
-                fastify.io.to(this.roomName).emit('gameOver');
+                // fastify.io.to(this.roomName).emit('gameOver');
 
                 const match = await getRowByMatchId(this.matchId);
                 const winnerId = winner === 1 ? match.player1_id : match.player2_id;
@@ -70,6 +70,8 @@ export class RemoteGameSession {
                     updateUserStatus(winnerId, UserOnlineStatus.ONLINE),
                     updateUserStatus(loserId, UserOnlineStatus.ONLINE)
                 ]);
+                
+                fastify.io.to(this.roomName).emit('gameOver');
                 
                 this.clearGameInterval();
 
