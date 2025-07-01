@@ -109,7 +109,7 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 		} else {
 			if (messageDiv) {
 				messageDiv.textContent = result.error;
-				messageDiv.className = 'mt-4 text-center text-sm min-h-[20px] text-red-400 font-semibold';
+				messageDiv.className = 'mt-4 text-center text-sm min-h-[20px] text-red-400 font-medium';
             }
             if (button) button.disabled = false;
 		}

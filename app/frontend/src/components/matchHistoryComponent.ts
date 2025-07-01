@@ -12,9 +12,10 @@ const opponentsDetailsCache: { [key: number]: { display_name: string; avatar_url
 export async function MatchHistoryComponent(props: MatchHistoryComponentProps): Promise<HTMLElement> {
 	const { userId: profiledUserId } = props;
 
-	const el = createElement('div', { className: 'p-4' });
-	const title = createElement('h3', { textContent: t('match.history.title'), className: 'text-xl font-semibold mb-4 text-white' });
-	el.append(title);
+	// const el = createElement('div', { className: 'p-4' });
+	const el = createElement('div');
+	// const title = createElement('h3', { textContent: t('match.history.title'), className: 'text-xl font-semibold mb-4 text-center text-white' });
+	// el.append(title);
 
 	const loadingMessage = createElement('p', { textContent: t('match.history.loading'), className: 'text-gray-300 italic' });
 	el.appendChild(loadingMessage);

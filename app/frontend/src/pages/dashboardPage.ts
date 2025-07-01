@@ -59,13 +59,16 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	}
 
 	const sidebar = createElement('div', { className: 'w-1/4 p-6 border-r border-gray-400/30 space-y-3 overflow-y-auto' });
-	const activeTabContentContainer = createElement('div', { id: 'active-tab-content', className: 'flex-1' });
-	const tabNavigation = createElement('div', { className: 'flex space-x-1 border-b border-gray-400/30 mb-6' });
+	// const activeTabContentContainer = createElement('div', { id: 'active-tab-content', className: 'flex-1' });
+	const activeTabContentContainer = createElement('div', { id: 'active-tab-content', className: 'flex-grow overflow-y-auto min-h-0' });
 
-	const tabContentWrapper = createElement('div', { className: 'w-3/4 p-6 flex flex-col overflow-y-auto' }, [
-		tabNavigation,
-		activeTabContentContainer
-	]);
+	// const tabNavigation = createElement('div', { className: 'flex space-x-1 border-b border-gray-400/30 mb-6' });
+	const tabNavigation = createElement('div', { className: 'flex-shrink-0 flex space-x-1 border-b border-gray-400/30 mb-6' });
+
+
+	// const tabContentWrapper = createElement('div', { className: 'w-3/4 p-6 flex flex-col overflow-y-auto' }, [ tabNavigation, activeTabContentContainer ]);
+	const tabContentWrapper = createElement('div', { className: 'w-3/4 p-6 flex flex-col' }, [ tabNavigation, activeTabContentContainer ]);
+
 	
 	const mainSection = createElement('div', { className: 'flex flex-1 min-h-0' }, [sidebar, tabContentWrapper]);
 	
@@ -81,7 +84,7 @@ export async function DashboardPage(): Promise<HTMLElement> {
         const isEmailField = label === t('user.email');
 		const isDateField = value instanceof Date;
 
-		const valueClass = 'font-roar text-2xl text-gray-300 overflow-hidden whitespace-nowrap';
+		const valueClass = 'font-roar font-medium text-2xl text-gray-200 overflow-hidden whitespace-nowrap';
 		
 		let valueText: string;
         let titleText: string | undefined;

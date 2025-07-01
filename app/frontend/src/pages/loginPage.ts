@@ -20,11 +20,11 @@ export function LoginPage(): HTMLElement {
 	const handle2FAAttempt = (token: string) => verifyTwoFactorLogin(token);
 	const handleLoginSuccess = async (userData: User) => {
 		const userLanguage = userData.language || 'en';
-        const currentInterfaceLanguage = getLanguage();
+		const currentInterfaceLanguage = getLanguage();
 		if (userLanguage !== currentInterfaceLanguage) {
-            await setLanguage(userLanguage);
+			await setLanguage(userLanguage);
 		}
-        setTimeout(() => { navigateTo('/dashboard'); }, 300);
+		navigateTo('/dashboard');
 	};
 
 	const loginFormComponent = LoginForm({
@@ -35,7 +35,7 @@ export function LoginPage(): HTMLElement {
 
 	const homeLink = createElement('a', { href: '/', textContent: t('link.home'), className: 'text-blue-400 hover:text-blue-300 text-sm transition-colors' });
 	homeLink.setAttribute('data-link', '');
-	
+
 	const registerLink = createElement('a', { href: '/register', textContent: t('login.registerLink'), className: 'text-blue-400 hover:text-blue-300 text-sm transition-colors' });
 	registerLink.setAttribute('data-link', '');
 
@@ -60,7 +60,7 @@ export function LoginPage(): HTMLElement {
 	const pageWrapper = createElement('div', {
 		className: 'flex flex-col min-h-screen bg-cover bg-center bg-fixed'
 	}, [headerElement, container]);
-	
+
 	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
 
 	return pageWrapper;

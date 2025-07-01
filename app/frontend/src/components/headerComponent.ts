@@ -92,7 +92,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		});
 		const displayNameHeader = createElement('span', {
 			textContent: currentUser.display_name || currentUser.username,
-			className: 'text-gray-300 font-semibold text-xl pr-1 font-roar'
+			className: 'text-gray-200 font-medium text-xl pr-1 font-roar'
 		});
 		const avatarDisplayWrapper = createElement('div', {
 			className: 'bg-teal-600/20 hover:bg-teal-500/30 border border-teal-500/30 p-1.5 rounded-lg flex items-center space-x-3 cursor-pointer select-none transition-all duration-200 hover:scale-105'

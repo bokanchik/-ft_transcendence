@@ -85,7 +85,7 @@ export function UserList(props: UserListProps): HTMLElement {
 		statusIndicator.title = statusText;
 
 		const nameStrong = document.createElement('strong');
-		nameStrong.className = 'text-lg text-gray-300 font-roar';
+		nameStrong.className = 'text-lg text-gray-200 font-medium font-roar';
 		nameStrong.textContent = displayName;
 
 		nameContainer.append(statusIndicator, nameStrong);
