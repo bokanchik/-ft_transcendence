@@ -49,14 +49,7 @@ export async function SettingsPage(): Promise<HTMLElement> {
 	}
 
 	const handleProfileUpdate = async (payload: UpdateUserPayload): Promise<ApiResult<ApiUpdateUserSuccessData>> => {
-		const currentLang = getLanguage();
 		const result = await updateUserProfile(payload);
-		// if (result.success && payload.language && payload.language !== currentLang) {
-		// 	await setLanguage(payload.language);
-		// }
-		if (result.success && payload.language) {
-            await setLanguage(payload.language);
-        }
 		return result;
 	};
 
@@ -84,7 +77,7 @@ export async function SettingsPage(): Promise<HTMLElement> {
 	});
 
 	const scrollableContent = createElement('div', {
-		className: 'flex-grow overflow-y-auto min-h-0 pr-4 -mr-4' // Classes pour le scroll
+		className: 'flex-grow overflow-y-auto min-h-0 pr-4 -mr-4'
 	}, [
 		settingsFormComponent
 	]);

@@ -59,19 +59,10 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	}
 
 	const sidebar = createElement('div', { className: 'w-1/4 p-6 border-r border-gray-400/30 space-y-3 overflow-y-auto' });
-	// const activeTabContentContainer = createElement('div', { id: 'active-tab-content', className: 'flex-1' });
 	const activeTabContentContainer = createElement('div', { id: 'active-tab-content', className: 'flex-grow overflow-y-auto min-h-0' });
-
-	// const tabNavigation = createElement('div', { className: 'flex space-x-1 border-b border-gray-400/30 mb-6' });
 	const tabNavigation = createElement('div', { className: 'flex-shrink-0 flex space-x-1 border-b border-gray-400/30 mb-6' });
-
-
-	// const tabContentWrapper = createElement('div', { className: 'w-3/4 p-6 flex flex-col overflow-y-auto' }, [ tabNavigation, activeTabContentContainer ]);
 	const tabContentWrapper = createElement('div', { className: 'w-3/4 p-6 flex flex-col' }, [ tabNavigation, activeTabContentContainer ]);
-
-	
 	const mainSection = createElement('div', { className: 'flex flex-1 min-h-0' }, [sidebar, tabContentWrapper]);
-	
 	let headerElement = HeaderComponent({ currentUser: currentUser! });
 	
 	const dashboardWrapper = createElement('div', {
@@ -84,7 +75,7 @@ export async function DashboardPage(): Promise<HTMLElement> {
         const isEmailField = label === t('user.email');
 		const isDateField = value instanceof Date;
 
-		const valueClass = 'font-roar font-medium text-2xl text-gray-200 overflow-hidden whitespace-nowrap';
+		const valueClass = 'font-beach font-medium text-2xl text-gray-200 overflow-hidden whitespace-nowrap';
 		
 		let valueText: string;
         let titleText: string | undefined;
@@ -162,7 +153,7 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		sessionStorage.setItem(DASHBOARD_ACTIVE_TAB_KEY, tabId);
 		tabNavigation.querySelectorAll('button').forEach(btn => {
 			const isActive = btn.dataset.tabId === tabId;
-			btn.className = `py-2 px-4 text-2xl font-roar focus:outline-none transition-colors ${
+			btn.className = `py-2 px-4 text-2xl font-beach focus:outline-none transition-colors ${
 				isActive ? 'border-b-2 border-blue-400 text-white' : 'text-gray-300 hover:text-white hover:border-gray-300/70'
 			}`;
 		});
@@ -172,7 +163,7 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	TABS.forEach(tabInfo => {
 		const tabButton = createElement('button', {
 			textContent: tabInfo.label,
-			className: `py-2 px-4 text-2xl font-roar focus:outline-none transition-colors ${
+			className: `py-2 px-4 text-2xl font-beach focus:outline-none transition-colors ${
 				tabInfo.id === activeTabId ? 'border-b-2 border-blue-400 text-white' : 'text-gray-300 hover:text-white hover:border-gray-300/70'
 			}`
 		});

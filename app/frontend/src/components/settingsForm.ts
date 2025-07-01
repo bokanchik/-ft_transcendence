@@ -3,6 +3,7 @@ import { ApiResult, ApiUpdateUserSuccessData } from '../utils/types.js';
 import { t, getLanguage, setLanguage } from '../services/i18nService.js';
 import { createElement, createInputField, clearElement } from '../utils/domUtils.js';
 import { navigateTo } from '../services/router.js';
+import { showToast } from './toast.js';
 
 interface ProfileFormProps {
 	user: User;
@@ -33,11 +34,8 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 	let twoFaSetupContainer: HTMLDivElement;
 
 	const formElement = createElement('form', { id: 'profile-form-component', noValidate: true });
-	const messageDiv = createElement('div', { id: 'profile-message', className: 'mb-4 text-center text-sm min-h-[1.25rem]' });
 
 	// --- Section Informations du profil ---
-	// const profileInfoTitle = createElement('h3', { textContent: t('user.settings.profileInfoTitle'), className: 'text-lg font-semibold text-white mb-4 border-b border-gray-400/30 pb-2' });
-
 	const usernameField = createInputField('username', t('user.username'), { value: currentUserState.username, readonly: true, helpText: t('user.settings.usernameMsg'), inputClass: 'w-full p-2 bg-black/30 border border-gray-500/50 text-gray-400 cursor-not-allowed rounded-md' });
 	const emailField = createInputField('email', t('user.email'), { type: 'email', required: true, value: currentUserState.email || '', placeholder: t('user.settings.emailPlaceholder') });
 	emailInput = emailField.querySelector('input')!;
@@ -91,8 +89,7 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 	const submitContainer = createElement('div', { className: 'flex items-center justify-center mt-8 border-t border-gray-400/30 pt-6' }, [saveButton]);
 
 	formElement.append(
-		// messageDiv, profileInfoTitle, usernameField, emailField, displayNameField,
-		messageDiv, usernameField, emailField, displayNameField,
+		usernameField, emailField, displayNameField,
 		avatarUrlField, languageField, securityTitle, twoFaToggleContainer,
 		twoFaSetupContainer, submitContainer
 	);
@@ -122,12 +119,10 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 
 	formElement.addEventListener('submit', async (event) => {
 		event.preventDefault();
-		messageDiv.textContent = '';
 		saveButton.disabled = true;
 		saveButton.textContent = t('user.settings.savingMsg2');
 
-		let shouldRedirect = false;
-		let somethingWasSaved = false;
+		let changesMade = false;
 
 		try {
 			const newTwoFaState = twoFaCheckbox.checked;
@@ -139,8 +134,6 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 				} else {
 					await onDisable2FA();
 				}
-				shouldRedirect = true;
-				somethingWasSaved = true;
 			}
 
 			const profilePayload: UpdateUserPayload = {};
@@ -148,51 +141,32 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 			const updatedDisplayName = displayNameInput.value.trim();
 			const updatedAvatarUrl = avatarUrlInput.value.trim();
 			const updatedLanguage = languageSelect.value;
-			const languageChanged = updatedLanguage !== getLanguage();
 
 			if (updatedEmail !== (currentUserState.email || '')) { profilePayload.email = updatedEmail; }
 			if (updatedDisplayName !== (currentUserState.display_name || '')) { profilePayload.display_name = updatedDisplayName; }
 			if (updatedAvatarUrl !== (currentUserState.avatar_url || '')) { profilePayload.avatar_url = updatedAvatarUrl === '' ? null : updatedAvatarUrl; }
-			if (languageChanged) { profilePayload.language = updatedLanguage; }
+            if (updatedLanguage !== (currentUserState.language || '')) { profilePayload.language = updatedLanguage; }
 
-			const otherProfileChanges = profilePayload.email || profilePayload.display_name || profilePayload.avatar_url;
-
-			if (Object.keys(profilePayload).length > 0) {
+            if (Object.keys(profilePayload).length > 0) {
+				changesMade = true;
 				const result = await onProfileUpdate(profilePayload);
 				if (!result.success) throw new Error(result.error);
-
-				somethingWasSaved = true;
-
-				if (otherProfileChanges) {
-					shouldRedirect = true;
-				}
-
-				if (languageChanged) {
-					await setLanguage(updatedLanguage);
-					return;
-				}
 			}
 
-			if (shouldRedirect) {
-				messageDiv.textContent = t('user.settings.success');
-				messageDiv.className = 'mb-4 text-center text-sm text-green-600 font-semibold min-h-[1.25rem]';
-				setTimeout(() => navigateTo('/dashboard'), 1500);
-			} else if (somethingWasSaved) {
-				messageDiv.textContent = t('user.settings.success');
-				messageDiv.className = 'mb-4 text-center text-sm text-green-600 font-semibold min-h-[1.25rem]';
+            if (updatedLanguage !== getLanguage()) {
+                await setLanguage(updatedLanguage, { reloadRoute: false });
+            }
+			if (changesMade) {
+				showToast(t('user.settings.success'), 'success');
 			} else {
-				messageDiv.textContent = t('user.settings.noChanges');
-				messageDiv.className = 'mb-4 text-center text-sm text-blue-400 min-h-[1.25rem]';
+				showToast(t('user.settings.noChanges'), 'info');
 			}
+			navigateTo('/dashboard');
 
 		} catch (error: any) {
-			messageDiv.textContent = `${t('general.error')}: ${error.message || t('user.settings.error')}`;
-			messageDiv.className = 'mb-4 text-center text-sm text-red-600 font-semibold min-h-[1.25rem]';
-		} finally {
-			if (!shouldRedirect) {
-				saveButton.disabled = false;
-				saveButton.textContent = t('user.settings.button');
-			}
+			showToast(`${t('general.error')}: ${error.message || t('user.settings.error')}`, 'error');
+			saveButton.disabled = false;
+			saveButton.textContent = t('user.settings.button');
 		}
 	});
 

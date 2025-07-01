@@ -36,7 +36,7 @@ export function FriendsListComponent(props: FriendsListProps): HTMLElement {
 
 			const avatarImg = createElement('img', { src: avatar, alt: displayName, className: 'w-12 h-12 rounded-full mr-4 object-cover' });
 			const statusIndicator = createElement('span', { className: `inline-block w-3 h-3 ${statusIndicatorClass} rounded-full mr-2`, title: statusText });
-			const nameStrong = createElement('strong', { textContent: displayName, className: 'text-lg text-gray-100 font-medium font-roar' });
+			const nameStrong = createElement('strong', { textContent: displayName, className: 'text-lg text-gray-100 font-medium font-beach' });
 			const nameContainer = createElement('div', { className: 'flex items-center mb-1' }, [statusIndicator, nameStrong]);
 			const winsSpan = createElement('span', { textContent: `${t('user.wins')}: ${friend.friend_wins ?? 0}` });
 			const lossesSpan = createElement('span', { textContent: `${t('user.losses')}: ${friend.friend_losses ?? 0}` });
@@ -54,11 +54,16 @@ export function FriendsListComponent(props: FriendsListProps): HTMLElement {
 			const removeFriendBtn = createActionButton({
 				text: t('friend.remove'),
 				variant: 'danger',
-				onClick: async () => {
+				onClick: async (e) => {
+					const button = e.currentTarget as HTMLButtonElement;
+					const originalText = t('friend.remove');
 					const confirmed = await showCustomConfirm(t('friend.list.accepted.removeMsg'), t('friend.list.accepted.removeMsgTitle'));
 					if (confirmed) {
 						await onRemoveFriend(friend.friendship_id);
 						showToast(t('friend.list.accepted.removeSuccess'), 'success');
+					} else {
+						button.disabled = false;
+						button.textContent = originalText;
 					}
 				}
 			});

@@ -150,13 +150,13 @@ export function GamePage(): HTMLElement {
 	// --- Éléments ---
 	const title = createElement('h2', {
 		textContent: t('game.welcome'),
-		className: 'text-3xl font-bold mb-6 text-center text-white'
+		className: 'text-4xl font-medium mb-6 text-center text-white font-beach'
 	});
 
 	const onlineGameButton = createElement('button', {
 		id: 'online-button',
 		textContent: t('game.start'),
-		className: 'bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline w-full transition duration-300 ease-in-out border border-green-500/50 text-lg'
+		className: 'bg-teal-800 hover:bg-green-600 text-gray-200 text-2xl font-beach font-medium py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline w-full transition duration-300 ease-in-out border border-green-500/50'
 	});
 
 	const buttonsContainer = createElement('div', {

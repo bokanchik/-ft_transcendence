@@ -112,7 +112,7 @@ function createProfileSidebar(profiledUser: User, loggedInUser: User): HTMLEleme
 		createSidebarItem(t('user.wins'), profiledUser.wins ?? 0),
 		createSidebarItem(t('user.losses'), profiledUser.losses ?? 0),
 		createSidebarItem(t('user.status.title'), profiledUser.status),
-	].filter(item => item !== null) as HTMLElement[]; // Filtre les éléments nuls (champs sensibles)
+	].filter(item => item !== null) as HTMLElement[];
 
 	return createElement('aside', {
 		className: 'w-1/4 p-6 border-r border-gray-400/30 space-y-4 overflow-y-auto flex flex-col'

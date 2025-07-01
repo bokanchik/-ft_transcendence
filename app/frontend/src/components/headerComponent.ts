@@ -41,7 +41,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		.filter(([langCode]) => langCode !== currentLanguage)
 		.map(([langCode, langData]) => {
 			const menuItem = createElement('button', {
-				className: 'w-full flex items-center px-4 py-2 text-left text-gray-200 hover:bg-gray-700 transition-colors rounded-md'
+				className: 'w-full flex items-center px-4 py-2 text-left text-gray-200 hover:bg-white/10 transition-colors rounded-md'
 			}, [
 				createElement('img', { src: langData.flag, alt: langData.name, className: 'h-6 w-6 mr-3 rounded-sm' }),
 				document.createTextNode(langData.name)
@@ -51,7 +51,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		});
 
 	const langMenu = createElement('div', {
-		className: 'absolute left-0 mt-2 w-40 bg-gray-800 rounded-lg shadow-xl border border-gray-600/50 z-50 hidden flex-col origin-top-left'
+		className: 'absolute left-0 mt-2 w-48 bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-lg shadow-xl z-50 hidden flex-col origin-top-left p-2'
 	}, langMenuItems);
 
 	const leftSection = createElement('div', { className: 'relative' }, [langButton, langMenu]);
@@ -70,7 +70,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		const link = createElement('a', {
 			href: linkInfo.href,
 			textContent: t(linkInfo.textKey),
-			className: 'text-gray-200 hover:text-gray-200 hover:bg-white/10 font-medium px-4 py-2 rounded-lg transition-all duration-200 ease-in-out text-3xl font-roar'
+			className: 'text-gray-200 hover:text-gray-200 hover:bg-white/10 font-medium px-4 py-2 rounded-lg transition-all duration-200 ease-in-out text-3xl font-beach'
 		});
 		link.setAttribute('data-link', '');
 		return link;
@@ -92,7 +92,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		});
 		const displayNameHeader = createElement('span', {
 			textContent: currentUser.display_name || currentUser.username,
-			className: 'text-gray-200 font-medium text-xl pr-1 font-roar'
+			className: 'text-gray-200 font-medium text-xl pr-1 font-beach'
 		});
 		const avatarDisplayWrapper = createElement('div', {
 			className: 'bg-teal-600/20 hover:bg-teal-500/30 border border-teal-500/30 p-1.5 rounded-lg flex items-center space-x-3 cursor-pointer select-none transition-all duration-200 hover:scale-105'
@@ -104,7 +104,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		const logoutButtonEl = createElement('button', { textContent: t('header.logout'), className: 'block w-full text-left px-4 py-2 text-gray-200 hover:bg-gray-700 rounded-b-lg transition-colors' });
 		
 		userMenu = createElement('div', {
-			className: 'absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-xl border border-gray-600/50 z-50 hidden flex-col origin-top-right'
+			className: 'absolute right-0 mt-2 w-48 bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-lg shadow-xl z-50 hidden flex-col origin-top-right p-2 space-y-1'
 		}, [settingsButton, logoutButtonEl]);
 		userMenu.style.top = '110%';
 

@@ -12,10 +12,7 @@ const opponentsDetailsCache: { [key: number]: { display_name: string; avatar_url
 export async function MatchHistoryComponent(props: MatchHistoryComponentProps): Promise<HTMLElement> {
 	const { userId: profiledUserId } = props;
 
-	// const el = createElement('div', { className: 'p-4' });
 	const el = createElement('div');
-	// const title = createElement('h3', { textContent: t('match.history.title'), className: 'text-xl font-semibold mb-4 text-center text-white' });
-	// el.append(title);
 
 	const loadingMessage = createElement('p', { textContent: t('match.history.loading'), className: 'text-gray-300 italic' });
 	el.appendChild(loadingMessage);
@@ -70,12 +67,12 @@ export async function MatchHistoryComponent(props: MatchHistoryComponentProps): 
 			const resultText = isWin ? t('match.history.victory') : (isDraw ? t('match.history.draw') : t('match.history.defeat'));
 			const resultColorClass = isWin ? 'text-green-400' : (isDraw ? 'text-gray-400' : 'text-red-500');
 			let backgroundClass = 'bg-[#111827]';
-            if (isWin) backgroundClass = 'bg-green-900/30 hover:bg-green-800/40';
-            else if (!isDraw) backgroundClass = 'bg-red-900/30 hover:bg-red-800/40';
+			if (isWin) backgroundClass = 'bg-green-900/30 hover:bg-green-800/40';
+			else if (!isDraw) backgroundClass = 'bg-red-900/30 hover:bg-red-800/40';
 
 			const dateFromDb = new Date(match.created_at + 'Z');
 			const formattedTime = formatTimeAgo(dateFromDb);
-			const fullDate = formatFullDate(dateFromDb); 
+			const fullDate = formatFullDate(dateFromDb);
 
 			// 1. VS + Avatar
 			const vsSpan = createElement('span', { textContent: 'VS', className: `text-5xl font-jurassic ${resultColorClass}` });
@@ -83,17 +80,17 @@ export async function MatchHistoryComponent(props: MatchHistoryComponentProps): 
 			const leftBlock = createElement('div', { className: 'flex items-center gap-5 flex-shrink-0' }, [vsSpan, opponentAvatar]);
 
 			// 2. Bloc central
-			const opponentNameSpan = createElement('span', { textContent: opponentDisplayName, className: 'text-lg text-gray-300 font-roar' });
+			const opponentNameSpan = createElement('span', { textContent: opponentDisplayName, className: 'text-lg text-gray-300 font-beach' });
 			const opponentNameBlock = createElement('div', { className: 'text-left' }, [opponentNameSpan]);
 
 			const resultTextSpan = createElement('span', { textContent: resultText.toUpperCase(), className: `text-5xl font-jurassic tracking-wide ${resultColorClass}` });
 			const resultTextBlock = createElement('div', { className: 'text-center' }, [resultTextSpan]);
 
-			const userScoreSpan = createElement('span', { textContent: profiledUserScore.toString(), className: `${isWin ? 'font-semibold text-white font-roar' : 'text-gray-400 font-roar'}`});
-			const separatorSpan = createElement('span', { textContent: '/', className: 'mx-3 text-gray-600 font-roar'});
-			const opponentScoreSpan = createElement('span', { textContent: opponentScore.toString(), className: `${!isWin && !isDraw ? 'font-semibold text-white font-roar' : 'text-gray-400 font-roar'}`});
-			const scoreBlock = createElement('div', { className: 'flex justify-end items-baseline text-3xl font-light' }, [userScoreSpan, separatorSpan, opponentScoreSpan]);
-			
+			const userScoreSpan = createElement('span', { textContent: profiledUserScore.toString(), className: `${isWin ? 'text-white' : 'text-gray-400'}` });
+			const separatorSpan = createElement('span', { textContent: '/', className: 'mx-3 text-gray-600' });
+			const opponentScoreSpan = createElement('span', { textContent: opponentScore.toString(), className: `${!isWin && !isDraw ? 'text-white' : 'text-gray-400'}` });
+			const scoreBlock = createElement('div', { className: 'flex justify-end items-baseline text-3xl font-roar font-light' }, [userScoreSpan, separatorSpan, opponentScoreSpan]);
+
 			const centerBlock = createElement('div', { className: 'flex-grow flex justify-between items-center px-4' }, [opponentNameBlock, resultTextBlock, scoreBlock]);
 
 			// 3. Date / Type
@@ -106,7 +103,7 @@ export async function MatchHistoryComponent(props: MatchHistoryComponentProps): 
 				centerBlock,
 				rightBlock
 			]);
-			
+
 			list.appendChild(item);
 		}
 		el.appendChild(list);
@@ -123,8 +120,8 @@ export async function MatchHistoryComponent(props: MatchHistoryComponentProps): 
 
 function formatFullDate(date: Date): string {
 	const adjustedTimestamp = date.getTime();
-    const adjustedDate = new Date(adjustedTimestamp);
-    return adjustedDate.toLocaleString();
+	const adjustedDate = new Date(adjustedTimestamp);
+	return adjustedDate.toLocaleString();
 }
 
 function formatTimeAgo(date: Date): string {

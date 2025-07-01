@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { User, UserBaseSchema } from '../shared/schemas/usersSchemas.js';
+import { UserBaseSchema } from '../shared/schemas/usersSchemas.js';
 
 export const ApiLoginSuccessDataSchema = z.object({
 	message: z.string(),

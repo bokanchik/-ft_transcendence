@@ -22,7 +22,7 @@ function createRequestListItem(user: FriendRequestUserData | undefined, actionsE
 
 	const nameSpan = createElement('span', {
 		textContent: displayName,
-		className: 'text-gray-100 text-lg font-medium font-roar'
+		className: 'text-gray-100 text-lg font-medium font-beach'
 	});
 
 	const userInfoContainer = createElement('div', {
@@ -62,7 +62,6 @@ export function FriendRequestsComponent(props: FriendRequestsProps): HTMLElement
 	const sentContainer = createElement('div', {}, [sentTitle, sentList]);
 
 	section.append(
-		// createElement('h2', { textContent: t('friend.list.request.title'), className: 'text-xl font-semibold text-white mb-6' }),
 		createElement('div', { className: 'grid grid-cols-1 md:grid-cols-2 gap-6' }, [
 			receivedContainer,
 			sentContainer

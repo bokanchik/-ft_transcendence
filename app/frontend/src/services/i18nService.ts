@@ -51,7 +51,7 @@ export async function initI18n(): Promise<void> {
     await loadTranslations(currentLanguage);
 }
 
-export async function setLanguage(lang: string): Promise<void> {
+export async function setLanguage(lang: string, options: { reloadRoute?: boolean } = { reloadRoute: true }): Promise<void> {
     if (!supportedLanguages.includes(lang)) {
         console.warn(`Language '${lang}' is not supported.`);
         return;
@@ -59,7 +59,10 @@ export async function setLanguage(lang: string): Promise<void> {
     currentLanguage = lang;
     localStorage.setItem('language', currentLanguage);
     await loadTranslations(currentLanguage);
-    router();
+    
+    if (options.reloadRoute) {
+        router();
+    }
 }
 
 export function getLanguage(): string {

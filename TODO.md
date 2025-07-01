@@ -23,9 +23,9 @@
 
 - [x] message login pas bonne couleur
 - [x] sidebar cases trop petites
-- [ ] mails tronqués dans sidebar si trop longs
-- [ ] affiche email et date en survolant dans sidebar
-- [ ] pas de username dans l'onglet request + refonte
+- [x] mails tronqués dans sidebar si trop longs -> on réduit et sinon on truncate
+- [x] affiche email et date en survolant dans sidebar
+- [x] pas de username dans l'onglet request + refonte
 
 - [ ] SESSION PLUTOT QUE LOCAL STORAGE
 

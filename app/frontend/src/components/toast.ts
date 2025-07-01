@@ -86,33 +86,44 @@
 import { t } from '../services/i18nService.js';
 import { createElement } from '../utils/domUtils.js';
 
-export function showToast(message: string, type: 'success' | 'error' = 'success') {
+export function showToast(message: string, type: 'success' | 'error' | 'info' = 'success') {
 	const existingToast = document.querySelector('.custom-toast');
 	if (existingToast) {
 		existingToast.remove();
 	}
 
-	const successClasses = 'bg-green-600/80 border-green-400/50';
-	const errorClasses = 'bg-red-600/80 border-red-500/50';
+	let toastClasses = '';
+	switch (type) {
+		case 'error':
+			toastClasses = 'bg-red-900/80 border-red-700/50';
+			break;
+		case 'info':
+			toastClasses = 'bg-blue-700/80 border-blue-500/50';
+			break;
+		case 'success':
+		default:
+			toastClasses = 'bg-teal-800/80 border-teal-600/50';
+			break;
+	}
 	
 	const toast = createElement('div', {
 		textContent: message,
-		className: `custom-toast fixed top-5 left-1/2 -translate-x-1/2 transform z-[1000] px-6 py-3 rounded-xl shadow-2xl text-white font-semibold transition-all duration-300 ease-in-out backdrop-blur-md border ${type === 'success' ? successClasses : errorClasses}`
+		className: `custom-toast fixed top-5 left-5 transform z-[1000] px-6 py-3 rounded-xl shadow-2xl text-white font-semibold transition-all duration-300 ease-in-out backdrop-blur-md border ${toastClasses}`
 	});
 
 	toast.style.opacity = '0';
-	toast.style.transform = 'translateY(-20px)';
+	toast.style.transform = 'translateX(-20px)';
 
 	document.body.appendChild(toast);
 
 	setTimeout(() => {
 		toast.style.opacity = '1';
-		toast.style.transform = 'translateY(0)';
+		toast.style.transform = 'translateX(0)';
 	}, 10);
 
 	setTimeout(() => {
 		toast.style.opacity = '0';
-		toast.style.transform = 'translateY(-20px)';
+		toast.style.transform = 'translateX(-20px)';
 		setTimeout(() => toast.remove(), 300);
 	}, 3000);
 }
@@ -127,7 +138,7 @@ export function showCustomConfirm(message: string, title: string = "Confirmation
 
 		const confirmButton = createElement('button', {
 			textContent: t('general.yes'),
-			className: 'px-4 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 border border-red-500/50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors'
+			className: 'px-4 py-2 rounded-md text-sm font-medium text-white bg-red-800 hover:bg-red-600 border border-red-700/50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-colors'
 		});
 
 		const cancelButton = createElement('button', {

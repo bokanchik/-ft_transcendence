@@ -19,24 +19,13 @@ export function HomePage(): HTMLElement {
 	const playButton = createElement('a', {
 		href: '/local-game',
 		textContent: t('app.button'),
-		className: 'bg-red-600 hover:bg-red-500 text-white font-black text-2xl sm:text-4xl py-4 sm:py-6 px-10 sm:px-16 rounded-full shadow-2xl uppercase tracking-widest transition-all duration-300 ease-in-out transform hover:scale-110 hover:shadow-red-500/50 font-beach'
+		className: 'bg-red-800 hover:bg-red-600 text-white font-black text-2xl sm:text-4xl py-4 sm:py-6 px-10 sm:px-16 rounded-full shadow-2xl uppercase tracking-widest transition-all duration-300 ease-in-out transform hover:scale-110 hover:shadow-red-600/50 font-beach'
 	});
 	playButton.setAttribute('data-link', '');
 
 	const mainContent = createElement('main', {
 		className: 'relative z-10 flex flex-col items-center text-center'
 	}, [title, subtitle, playButton]);
-
-	const apiLink = createElement('a', {
-		href: '/game',
-		textContent: t('app.gameApi'),
-		className: 'text-xs text-gray-400 hover:text-white hover:underline transition-colors duration-300'
-	});
-	apiLink.setAttribute('data-link', '');
-
-	const footer = createElement('footer', {
-		className: 'relative z-10 w-full text-center py-2 bg-gray-900 bg-opacity-70'
-	}, [apiLink]);
 
 	const styleElement = createElement('style', {
 		textContent: `
@@ -53,8 +42,7 @@ export function HomePage(): HTMLElement {
 		className: 'flex flex-col min-h-screen bg-cover bg-center'
 	}, [
 		HeaderComponent({ currentUser }),
-		container,
-		footer
+		container
 	]);
 	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
 

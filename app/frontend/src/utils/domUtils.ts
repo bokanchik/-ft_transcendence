@@ -93,19 +93,19 @@ export function createActionButton(props: ActionButtonProps): HTMLButtonElement 
 	} else if (props.variant) {
 		switch (props.variant) {
 			case 'primary': 
-				colorClasses = 'bg-blue-500 hover:bg-blue-600 text-white border border-blue-400/50'; 
+				colorClasses = 'bg-blue-700 hover:bg-blue-500 text-white border border-blue-600/50';
 				break;
 			case 'secondary': 
-				colorClasses = 'bg-white/10 hover:bg-white/20 text-gray-200 border border-white/20'; 
+				colorClasses = 'bg-white/10 hover:bg-white/20 text-gray-200 border border-white/20';
 				break;
 			case 'danger': 
-				colorClasses = 'bg-red-500 hover:bg-red-600 text-white border border-red-400/50'; 
+				colorClasses = 'bg-red-900 hover:bg-red-700 text-white border border-red-800/50';
 				break;
 			case 'warning': 
-				colorClasses = 'bg-yellow-500 hover:bg-yellow-600 text-black border border-yellow-400/50'; 
+				colorClasses = 'bg-yellow-600 hover:bg-yellow-400 text-black border border-yellow-500/50';
 				break;
 			case 'success': 
-				colorClasses = 'bg-green-500 hover:bg-green-600 text-white border border-green-400/50'; 
+				colorClasses = 'bg-teal-800 hover:bg-teal-600 text-white border border-teal-700/50';
 				break;
 			case 'info': 
 				colorClasses = 'bg-teal-500 hover:bg-teal-600 text-white border border-teal-400/50'; 
