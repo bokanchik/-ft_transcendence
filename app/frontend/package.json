@@ -14,7 +14,9 @@
     "build": "npm run build:clean && npm run prepare:dist && npm run build:html && npm run build:ts && npm run build:css && npm run build:public",
     "watch:ts": "tsc --watch > ./logs/tsc.log 2>&1",
     "watch:css": "./node_modules/.bin/tailwindcss -i ./src/style/style.css -o ./dist/css/style.css --postcss --watch > ./logs/tailwind.log 2>&1",
-    "dev": "npm run build && mkdir -p ./logs && concurrently \"npm run watch:ts\" \"npm run watch:css\""
+    "dev": "npm run build && mkdir -p ./logs && concurrently \"npm run watch:ts\" \"npm run watch:css\"",
+    "test": "vitest --reporter verbose",
+    "test:watch": "vitest --reporter verbose watch"
   },
   "keywords": [],
   "author": "",
@@ -28,6 +30,10 @@
     "concurrently": "^9.1.2",
     "http-server": "^14.1.1",
     "postcss": "^8.5.4",
+    "vitest": "^3.2.4",
+    "jsdom": "26.1.0",
+    "@testing-library/dom": "^10.4.0",
+    "msw": "^2.10.2",
     "tailwindcss": "^4.1.8"
   },
   "dependencies": {
