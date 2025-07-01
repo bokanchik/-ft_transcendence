@@ -44,6 +44,11 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 		wrapper.append(form, messageDiv);
 		
 		form.addEventListener('submit', handlePasswordSubmit);
+		
+		setTimeout(() => {
+            const identifierInput = identifierField.querySelector('input');
+            identifierInput?.focus();
+        }, 0);
 	};
 
 	const renderTwoFactorStep = () => {
