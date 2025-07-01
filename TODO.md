@@ -50,8 +50,8 @@
 - [x] style que dans background
 - [ ] signe @ pas jojo
 
-- [ ] score pas affichés dans gameResult
-- [ ] score après local game
+- [x] score pas affichés dans gameResult
+- [x] score après local game
 
 ## Etienne
 
