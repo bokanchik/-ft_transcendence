@@ -23,6 +23,7 @@ export function createElement<K extends keyof HTMLElementTagNameMap>(
 		noValidate?: boolean;
         selected?: boolean;
         htmlFor?: string;
+		role?: string;
 	},
 	children?: (HTMLElement | string | Node | null | undefined)[]
 ): HTMLElementTagNameMap[K] {
@@ -33,6 +34,7 @@ export function createElement<K extends keyof HTMLElementTagNameMap>(
 	if (options?.textContent) el.textContent = options.textContent;
 	if (options?.title) el.title = options.title;
 	if (options?.name) el.setAttribute('name', options.name);
+	if (options?.role) el.setAttribute('role', options.role);
 
 	if (options?.noValidate && el instanceof HTMLFormElement) el.noValidate = options.noValidate;
     if (options?.selected && el instanceof HTMLOptionElement) el.selected = options.selected;

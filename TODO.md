@@ -48,6 +48,10 @@
 - [ ] ajouter sms (twilio) et emails (sendGrid)
 
 - [x] style que dans background
+- [ ] signe @ pas jojo
+
+- [ ] score pas affichés dans gameResult
+- [ ] score après local game
 
 ## Etienne
 

@@ -31,6 +31,20 @@ import { config } from '../utils/config.js';
 const USER_DATA_KEY = 'userDataKey';
 const USER_DATA_EXPIRATION_KEY = 'userDataExpiration';
 
+export function setUserDataInStorage(user: User): void {
+	const ttl = 60 * 60 * 1000; // 1 heure en millisecondes
+	const expiration = new Date().getTime() + ttl;
+	localStorage.setItem(USER_DATA_KEY, JSON.stringify(user));
+	localStorage.setItem(USER_DATA_EXPIRATION_KEY, expiration.toString());
+	console.log("User data stored in localStorage with expiration:", expiration);
+}
+
+export function clearUserDataFromStorage(): void {
+	localStorage.removeItem(USER_DATA_KEY);
+	localStorage.removeItem(USER_DATA_EXPIRATION_KEY);
+	console.log("User data cleared from localStorage.");
+}
+
 /**
  * Récupère les données utilisateur depuis le localStorage, en vérifiant leur expiration.
  * @returns {User | null} L'utilisateur si disponible et non expiré, sinon null.

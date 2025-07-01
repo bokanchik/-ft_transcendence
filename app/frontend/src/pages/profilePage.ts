@@ -78,7 +78,6 @@ export async function ProfilePage(params: { userId?: string }): Promise<HTMLElem
 }
 
 
-// --- Helper pour créer la sidebar, pour plus de clarté ---
 function createProfileSidebar(profiledUser: User, loggedInUser: User): HTMLElement {
 	const createSidebarItem = (label: string, value: string | number | Date | undefined | null, isSensitive: boolean = false): HTMLElement | null => {
 		if (isSensitive && loggedInUser.id !== profiledUser.id) {
@@ -114,7 +113,12 @@ function createProfileSidebar(profiledUser: User, loggedInUser: User): HTMLEleme
 		createSidebarItem(t('user.status.title'), profiledUser.status),
 	].filter(item => item !== null) as HTMLElement[];
 
+	// return createElement('aside', {
+	// 	className: 'w-1/4 p-6 border-r border-gray-400/30 space-y-4 overflow-y-auto flex flex-col'
+	// }, [avatarContainer, ...infoItems]);
+
 	return createElement('aside', {
-		className: 'w-1/4 p-6 border-r border-gray-400/30 space-y-4 overflow-y-auto flex flex-col'
+		className: 'w-1/4 p-6 border-r border-gray-400/30 space-y-4 overflow-y-auto flex flex-col',
+        role: 'complementary' // Ajout du rôle pour le test
 	}, [avatarContainer, ...infoItems]);
 }

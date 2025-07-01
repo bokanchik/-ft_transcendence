@@ -59,6 +59,8 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	}
 
 	const sidebar = createElement('div', { className: 'w-1/4 p-6 border-r border-gray-400/30 space-y-3 overflow-y-auto' });
+	// ajout pour test
+	sidebar.dataset.testid = 'sidebar';
 	const activeTabContentContainer = createElement('div', { id: 'active-tab-content', className: 'flex-grow overflow-y-auto min-h-0' });
 	const tabNavigation = createElement('div', { className: 'flex-shrink-0 flex space-x-1 border-b border-gray-400/30 mb-6' });
 	const tabContentWrapper = createElement('div', { className: 'w-3/4 p-6 flex flex-col' }, [ tabNavigation, activeTabContentContainer ]);

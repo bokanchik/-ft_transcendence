@@ -16,7 +16,7 @@
     "watch:css": "./node_modules/.bin/tailwindcss -i ./src/style/style.css -o ./dist/css/style.css --postcss --watch > ./logs/tailwind.log 2>&1",
     "dev": "npm run build && mkdir -p ./logs && concurrently \"npm run watch:ts\" \"npm run watch:css\"",
     "test": "vitest --reporter verbose",
-    "test:watch": "vitest --reporter verbose watch"
+    "test:watch": "TL_DEBUG_PRINT_LIMIT=0 vitest --reporter verbose watch"
   },
   "keywords": [],
   "author": "",
@@ -33,6 +33,8 @@
     "vitest": "^3.2.4",
     "jsdom": "26.1.0",
     "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/user-event": "^13.1.5",
     "msw": "^2.10.2",
     "tailwindcss": "^4.1.8"
   },

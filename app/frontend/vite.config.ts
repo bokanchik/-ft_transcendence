@@ -6,6 +6,8 @@
 
 import { defineConfig } from 'vitest/config'
 
+process.env.TL_DEBUG_PRINT_LIMIT = '0';
+
 export default defineConfig({
   test: {
     // Active les API globales comme describe, it, expect

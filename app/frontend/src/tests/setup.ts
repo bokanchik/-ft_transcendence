@@ -1,6 +1,7 @@
 // src/tests/setup.ts
 import { beforeAll, afterEach, afterAll, vi } from 'vitest'; // Ajoutez 'vi'
 import { server } from './mocks/server.js';
+import '@testing-library/jest-dom/vitest';
 
 vi.mock('socket.io-client', () => {
     const mockSocket = {

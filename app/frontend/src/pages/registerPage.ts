@@ -6,6 +6,7 @@ import { t, getLanguage } from '../services/i18nService.js';
 import { HeaderComponent } from '../components/headerComponent.js';
 import { getUserDataFromStorage } from '../services/authService.js';
 import { createElement, createInputField } from '../utils/domUtils.js';
+import { showToast } from '../components/toast.js';
 
 const supportedLanguages = {
     'en': 'English',
@@ -177,10 +178,12 @@ export async function RegisterPage(): Promise<HTMLElement> {
 		registerButton.textContent = t('register.button');
 
 		if (registrationResult.success) {
-			messageDiv.textContent = t('register.success');
-			messageDiv.className = 'mt-4 text-center text-sm text-green-500';
-			form.reset();
-			setTimeout(() => { navigateTo('/login'); }, 1500);
+            showToast(t('register.success'), 'success');
+			// messageDiv.textContent = t('register.success');
+			// messageDiv.className = 'mt-4 text-center text-sm text-green-500';
+			// form.reset();
+			// setTimeout(() => { navigateTo('/login'); }, 1500);
+            navigateTo('/login');
 		} else {
 			messageDiv.textContent = registrationResult.error || t('register.failure');
 			messageDiv.className = 'mt-4 text-center text-sm text-red-500';

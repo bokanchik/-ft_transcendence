@@ -102,6 +102,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		settingsButton.setAttribute('data-link', '');
 
 		const logoutButtonEl = createElement('button', { textContent: t('header.logout'), className: 'block w-full text-left px-4 py-2 text-gray-200 hover:bg-gray-700 rounded-b-lg transition-colors' });
+		logoutButtonEl.dataset.testid = 'logout-button';
 		
 		userMenu = createElement('div', {
 			className: 'absolute right-0 mt-2 w-48 bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-lg shadow-xl z-50 hidden flex-col origin-top-right p-2 space-y-1'
