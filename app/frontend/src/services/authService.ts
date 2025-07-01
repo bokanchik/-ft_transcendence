@@ -117,17 +117,14 @@ export async function checkAuthStatus(): Promise<User | null> {
 	try {
 		const response = await fetch(config.api.users.me, { credentials: 'include' });
 		const user = await handleApiResponse(response, GetMeRouteSchema.response);
-		const ttl = 60 * 60 * 1000; // 1 heure en ms
-		localStorage.setItem(USER_DATA_KEY, JSON.stringify(user));
-		localStorage.setItem(USER_DATA_EXPIRATION_KEY, (new Date().getTime() + ttl).toString());
+		setUserDataInStorage(user);
 
 		return user;
 	} catch (error) {
 		if (!(error instanceof ClientApiError && error.httpStatus === 401)) {
 			console.error("Error verifying authentication status:", error);
 		}
-		localStorage.removeItem(USER_DATA_KEY);
-		localStorage.removeItem(USER_DATA_EXPIRATION_KEY);
+		clearUserDataFromStorage();
 		return null;
 	}
 }
@@ -150,9 +147,7 @@ export async function attemptLogin(credentials: LoginRequestBody): Promise<ApiRe
 
 		const data = await handleApiResponse(response, LoginRouteSchema.response);
 		if (data.user) {
-			localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.user));
-			const ttl = 60 * 60 * 1000;
-			localStorage.setItem(USER_DATA_EXPIRATION_KEY, (new Date().getTime() + ttl).toString());
+			setUserDataInStorage(data.user);
 			await fetchCsrfToken();
 		}
 		return { success: true, data };
@@ -180,9 +175,7 @@ export async function verifyTwoFactorLogin(token: string): Promise<ApiResult<Api
         const data = await handleApiResponse(response, LoginRouteSchema.response);
         
         if (data.user) {
-            localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.user));
-            const ttl = 60 * 60 * 1000;
-            localStorage.setItem(USER_DATA_EXPIRATION_KEY, (new Date().getTime() + ttl).toString());
+			setUserDataInStorage(data.user);
             await fetchCsrfToken();
 			return { success: true, data };
         }
@@ -229,7 +222,6 @@ export async function attemptRegister(credentials: RegisterRequestBody): Promise
 		});
 
 		const data = await handleApiResponse(response, RegisterRouteSchema.response);
-		// return { success: true, data: { message: data.message, user: {} as User } };
 		return { success: true, data: { message: data.message } };
 
 	} catch (error) {
@@ -257,10 +249,7 @@ export async function updateUserProfile(payload: UpdateUserPayload): Promise<Api
 		});
 
 		const data = await handleApiResponse(response, UpdateUserRouteSchema.response);
-
-		localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.user));
-		console.log("User data updated in localStorage.");
-
+		setUserDataInStorage(data.user);
 		return { success: true, data };
 
 	} catch (error) {
@@ -295,7 +284,7 @@ export async function verify2FASetup(token: string): Promise<{ message: string }
     const user = getUserDataFromStorage();
     if (user) {
         user.is_two_fa_enabled = true;
-        localStorage.setItem(USER_DATA_KEY, JSON.stringify(user));
+        setUserDataInStorage(user);
     }
 
     return result;
@@ -312,7 +301,8 @@ export async function disable2FA(): Promise<{ message: string }> {
     const user = getUserDataFromStorage();
     if (user) {
         user.is_two_fa_enabled = false;
-        localStorage.setItem(USER_DATA_KEY, JSON.stringify(user));
+		clearUserDataFromStorage();
+		setUserDataInStorage(user);
     }
 
     return result;
