@@ -1,28 +1,6 @@
 import { fetchWithCsrf, fetchCsrfToken } from './csrf.js';
-import { 
-    ApiResult, 
-    ApiLoginSuccessData, 
-    ApiRegisterSuccessData,
-    ApiUpdateUserSuccessData
-} from '../utils/types.js';
-import {
-	User,
-	UserBaseSchema,
-	LoginRequestBody,
-	RegisterRequestBody,
-	UpdateUserPayload,
-	GetUsersListRouteSchema,
-	GetMeRouteSchema,
-	LoginRouteSchema,
-	RegisterRouteSchema,
-	UpdateUserRouteSchema,
-	LogoutRouteSchema,
-	Generate2FARouteSchema,
-	Verify2FABodySchema,
-	Verify2FARouteSchema,
-	Disable2FARouteSchema,
-	Generate2FAResponse
-} from '../shared/schemas/usersSchemas.js';
+import * as type from '../utils/types.js';
+import * as us from '../shared/schemas/usersSchemas.js';
 import { Match, GetMatchByUserIdRouteSchema } from '../shared/schemas/matchesSchemas.js';
 import { handleApiResponse, ClientApiError } from './responseService.js';
 import { config } from '../utils/config.js';
@@ -31,7 +9,7 @@ import { config } from '../utils/config.js';
 const USER_DATA_KEY = 'userDataKey';
 const USER_DATA_EXPIRATION_KEY = 'userDataExpiration';
 
-export function setUserDataInStorage(user: User): void {
+export function setUserDataInStorage(user: us.User): void {
 	const ttl = 60 * 60 * 1000; // 1 heure en millisecondes
 	const expiration = new Date().getTime() + ttl;
 	localStorage.setItem(USER_DATA_KEY, JSON.stringify(user));
@@ -49,7 +27,7 @@ export function clearUserDataFromStorage(): void {
  * Récupère les données utilisateur depuis le localStorage, en vérifiant leur expiration.
  * @returns {User | null} L'utilisateur si disponible et non expiré, sinon null.
  */
-export function getUserDataFromStorage(): User | null {
+export function getUserDataFromStorage(): us.User | null {
 	const expiration = localStorage.getItem(USER_DATA_EXPIRATION_KEY);
 	if (expiration && new Date().getTime() > parseInt(expiration, 10)) {
 		localStorage.removeItem(USER_DATA_KEY);
@@ -61,7 +39,7 @@ export function getUserDataFromStorage(): User | null {
 	if (!data) return null;
 
 	try {
-		const parsedData = UserBaseSchema.parse(JSON.parse(data));
+		const parsedData = us.UserBaseSchema.parse(JSON.parse(data));
 		return parsedData;
 	} catch (e) {
 		console.error("Error parsing user data from localStorage:", e);
@@ -74,10 +52,10 @@ export function getUserDataFromStorage(): User | null {
  * Récupère la liste de tous les utilisateurs.
  * @returns {Promise<User[]>} Un tableau d'utilisateurs.
  */
-export async function fetchUsers(): Promise<User[]> {
+export async function fetchUsers(): Promise<us.User[]> {
 	try {
 		const response = await fetch(config.api.users.all);
-		const data = await handleApiResponse(response, GetUsersListRouteSchema.response);
+		const data = await handleApiResponse(response, us.GetUsersListRouteSchema.response);
 		return data;
 	} catch (error) {
 		console.error("Failed to fetch users:", error);
@@ -90,11 +68,11 @@ export async function fetchUsers(): Promise<User[]> {
  * @param {number} userId - L'ID de l'utilisateur.
  * @returns {Promise<User>} L'objet utilisateur.
  */
-export async function fetchUserDetails(userId: number): Promise<User> {
+export async function fetchUserDetails(userId: number): Promise<us.User> {
 	const response = await fetch(config.api.users.byId(userId), {
 		credentials: 'include',
 	});
-	return handleApiResponse(response, GetMeRouteSchema.response);
+	return handleApiResponse(response, us.GetMeRouteSchema.response);
 }
 
 /**
@@ -113,10 +91,10 @@ export async function fetchMatchHistoryForUser(userId: number): Promise<Match[]>
  * Vérifie le statut d'authentification en appelant une route protégée.
  * @returns {Promise<User | null>} L'utilisateur si authentifié, sinon null.
  */
-export async function checkAuthStatus(): Promise<User | null> {
+export async function checkAuthStatus(): Promise<us.User | null> {
 	try {
 		const response = await fetch(config.api.users.me, { credentials: 'include' });
-		const user = await handleApiResponse(response, GetMeRouteSchema.response);
+		const user = await handleApiResponse(response, us.GetMeRouteSchema.response);
 		setUserDataInStorage(user);
 
 		return user;
@@ -136,7 +114,7 @@ export async function checkAuthStatus(): Promise<User | null> {
  * @returns {Promise<ApiLoginSuccessResponse>} Un objet indiquant le succès ou l'échec.
  *
  */
-export async function attemptLogin(credentials: LoginRequestBody): Promise<ApiResult<ApiLoginSuccessData>> {
+export async function attemptLogin(credentials: us.LoginRequestBody): Promise<type.ApiResult<type.ApiLoginSuccessData>> {
 	try {
 		const response = await fetch(config.api.auth.login, {
 			method: 'POST',
@@ -145,7 +123,7 @@ export async function attemptLogin(credentials: LoginRequestBody): Promise<ApiRe
 			credentials: 'include',
 		});
 
-		const data = await handleApiResponse(response, LoginRouteSchema.response);
+		const data = await handleApiResponse(response, us.LoginRouteSchema.response);
 		if (data.user) {
 			setUserDataInStorage(data.user);
 			await fetchCsrfToken();
@@ -163,7 +141,7 @@ export async function attemptLogin(credentials: LoginRequestBody): Promise<ApiRe
  * @param token Le code 2FA à 6 chiffres.
  * @returns {Promise<ApiResult<ApiLoginSuccessResponse>>} Un objet avec les données utilisateur en cas de succès.
  */
-export async function verifyTwoFactorLogin(token: string): Promise<ApiResult<ApiLoginSuccessData>> {
+export async function verifyTwoFactorLogin(token: string): Promise<type.ApiResult<type.ApiLoginSuccessData>> {
     try {
 		const response = await fetch(config.api.users.twoFa.login, {
 
@@ -172,7 +150,7 @@ export async function verifyTwoFactorLogin(token: string): Promise<ApiResult<Api
             body: JSON.stringify({ token }),
 			credentials: 'include',
         });
-        const data = await handleApiResponse(response, LoginRouteSchema.response);
+        const data = await handleApiResponse(response, us.LoginRouteSchema.response);
         
         if (data.user) {
 			setUserDataInStorage(data.user);
@@ -197,7 +175,7 @@ export async function logout(): Promise<void> {
 
 	try {
 		const response = await fetchWithCsrf(config.api.auth.logout, { method: 'POST' });
-		await handleApiResponse(response, LogoutRouteSchema.response);
+		await handleApiResponse(response, us.LogoutRouteSchema.response);
 		console.log("Server-side logout successful.");
 	} catch (error) {
 		console.error("Error attempting server logout:", error);
@@ -209,7 +187,7 @@ export async function logout(): Promise<void> {
  * @param {RegisterRequestBody} credentials - Les informations d'inscription.
  * @returns {Promise<ApiResult>} Un objet indiquant le succès ou l'échec.
  */
-export async function attemptRegister(credentials: RegisterRequestBody): Promise<ApiResult<ApiRegisterSuccessData>> {	try {
+export async function attemptRegister(credentials: us.RegisterRequestBody): Promise<type.ApiResult<type.ApiRegisterSuccessData>> {	try {
 		const payload = { ...credentials };
 		if (!payload.avatar_url) {
 			delete payload.avatar_url;
@@ -221,7 +199,7 @@ export async function attemptRegister(credentials: RegisterRequestBody): Promise
 			body: JSON.stringify(payload),
 		});
 
-		const data = await handleApiResponse(response, RegisterRouteSchema.response);
+		const data = await handleApiResponse(response, us.RegisterRouteSchema.response);
 		return { success: true, data: { message: data.message } };
 
 	} catch (error) {
@@ -235,8 +213,8 @@ export async function attemptRegister(credentials: RegisterRequestBody): Promise
  * @param {UpdateUserPayload} payload - Les données à mettre à jour.
  * @returns {Promise<ApiResult>} Un objet indiquant le succès ou l'échec.
  */
-export async function updateUserProfile(payload: UpdateUserPayload): Promise<ApiResult<ApiUpdateUserSuccessData>> {
-	const cleanPayload: Partial<UpdateUserPayload> = { ...payload };
+export async function updateUserProfile(payload: us.UpdateUserPayload): Promise<type.ApiResult<type.ApiUpdateUserSuccessData>> {
+	const cleanPayload: Partial<us.UpdateUserPayload> = { ...payload };
 	if (cleanPayload.avatar_url === '') {
 		cleanPayload.avatar_url = null; // Envoyer null pour effacer l'avatar
 	}
@@ -248,7 +226,7 @@ export async function updateUserProfile(payload: UpdateUserPayload): Promise<Api
 			body: JSON.stringify(cleanPayload),
 		});
 
-		const data = await handleApiResponse(response, UpdateUserRouteSchema.response);
+		const data = await handleApiResponse(response, us.UpdateUserRouteSchema.response);
 		setUserDataInStorage(data.user);
 		return { success: true, data };
 
@@ -262,9 +240,9 @@ export async function updateUserProfile(payload: UpdateUserPayload): Promise<Api
  * Demande au backend de générer un secret 2FA et un QR code.
  * @returns {Promise<Generate2FAResponse>} Les données pour la configuration.
  */
-export async function generate2FASetup(): Promise<Generate2FAResponse> {
+export async function generate2FASetup(): Promise<us.Generate2FAResponse> {
     const response = await fetchWithCsrf(config.api.users.twoFa.generate, { method: 'POST' });
-    return handleApiResponse(response, Generate2FARouteSchema.response);
+    return handleApiResponse(response, us.Generate2FARouteSchema.response);
 }
 
 /**
@@ -273,13 +251,13 @@ export async function generate2FASetup(): Promise<Generate2FAResponse> {
  * @returns {Promise<{ message: string }>} Un message de succès.
  */
 export async function verify2FASetup(token: string): Promise<{ message: string }> {
-    const payload: Verify2FABodySchema = { token };
+    const payload: us.Verify2FABodySchema = { token };
     const response = await fetchWithCsrf(config.api.users.twoFa.verify, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
     });
-    const result = await handleApiResponse(response, Verify2FARouteSchema.response);
+    const result = await handleApiResponse(response, us.Verify2FARouteSchema.response);
     
     const user = getUserDataFromStorage();
     if (user) {
@@ -296,7 +274,7 @@ export async function verify2FASetup(token: string): Promise<{ message: string }
  */
 export async function disable2FA(): Promise<{ message: string }> {
     const response = await fetchWithCsrf(config.api.users.twoFa.disable, { method: 'POST' });
-    const result = await handleApiResponse(response, Disable2FARouteSchema.response);
+    const result = await handleApiResponse(response, us.Disable2FARouteSchema.response);
 
     const user = getUserDataFromStorage();
     if (user) {
