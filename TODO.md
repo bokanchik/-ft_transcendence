@@ -19,7 +19,6 @@
 - [x] fichiers partagés
 - [x] La gestion d'erreurs 
 - [x] Remplacer error simple dans back
-- [ ] nettoyage
 
 - [x] message login pas bonne couleur
 - [x] sidebar cases trop petites
@@ -27,7 +26,7 @@
 - [x] affiche email et date en survolant dans sidebar
 - [x] pas de username dans l'onglet request + refonte
 
-- [ ] SESSION PLUTOT QUE LOCAL STORAGE
+- [x] SESSION PLUTOT QUE LOCAL STORAGE -> mix des 2 parfait
 
 - [x] Route pour update win loses / Permissions pour faire ca ? -> pour l'instant n'importe qui d'identifié -> /api/users/:userId/stats en envoyant result: win/lose
 - [x] Droit admin pour la route update win/lose -> authenticateService avec API_KEY
@@ -40,7 +39,6 @@
 - [x] mettre en place db et settings pour garder la langue de l'utilisateur
 - [x] certain check avec des value de string donc faire attention comme par ex: game.quitButton (anciennement Quit)
 - [ ] voir ci-desssus avec sasha la refonte des fichiers
-- [ ] Vérifier les traductions
 
 - [x] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde) -> cookie jwt_token
 - [x] 2FA
@@ -48,12 +46,15 @@
 - [ ] ajouter sms (twilio) et emails (sendGrid)
 
 - [x] style que dans background
-- [ ] signe @ du font-beach pas jojo
 
 - [x] !!! NAVIGATION A LA MAIN DANS LA BARRE D'ADRESSE !!! -> profile ok
 
 - [x] score pas affichés dans gameResult
 - [x] score après local game
+
+- [ ] signe @ du font-beach pas jojo
+- [ ] Vérifier les traductions
+- [ ] nettoyage
 
 ## Etienne
 
@@ -66,16 +67,16 @@
 
 ## 📌 Tâches initiales
 
-- [ ] update db user a chaque fin de match (score, win, lose, etc.)
-- [ ] jeu en local
+- [x] update db user a chaque fin de match (score, win, lose, etc.)
+- [x] jeu en local
 - [ ] redis pour les scores
 - [ ] Pages && components && services in frontend to clean !
 - [ ] Les touches sensibles au click + Enter plus les fleches (experience user agreable)
-- [ ] Create Data Models + put match to DB (how we're handling data for score, etc ? -> local variable sent with socket to front
+- [x] Create Data Models + put match to DB (how we're handling data for score, etc ? -> local variable sent with socket to front
 at the end of a match -> call to database if need matchhistory)
 - [ ] La gestion d'erreurs 
 - [x] POST a Artur avec les donnees du match -> route pour les recuperer
-- [ ] Uniformiser les module et mduleResolution dans tsconfig.json
+- [x] Uniformiser les module et mduleResolution dans tsconfig.json
 
 ---
 
@@ -88,6 +89,7 @@ at the end of a match -> call to database if need matchhistory)
 
 ## 🧪 Tests
 
+- [x] service de test pour le frontend (frontend-test)
 - [ ] Écrire des tests unitaires pour chaque microservice
 - [ ] Ajouter des tests d’intégration (communication entre services)
 
