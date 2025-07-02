@@ -50,7 +50,7 @@
 - [x] style que dans background
 - [ ] signe @ du font-beach pas jojo
 
-- [ ] !!! NAVIGATION A LA MAIN DANS LA BARRE D'ADRESSE !!!
+- [x] !!! NAVIGATION A LA MAIN DANS LA BARRE D'ADRESSE !!! -> profile ok
 
 - [x] score pas affichés dans gameResult
 - [x] score après local game
