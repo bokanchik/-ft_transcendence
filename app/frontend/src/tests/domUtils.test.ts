@@ -1,16 +1,14 @@
 // src/utils/domUtils.test.ts
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { createElement, createActionButton, createInputField, createSelectField, clearElement } from './domUtils';
-import { showToast } from '../components/toast'; // Importation directe pour le mock
+import { createElement, createActionButton, createInputField, createSelectField, clearElement } from '@/utils/domUtils';
+import { showToast } from '@/components/toast';
 
-// Mock des dépendances externes
-vi.mock('../components/toast.js', () => ({
+vi.mock('@/components/toast.js', () => ({
   showToast: vi.fn(),
 }));
 
 describe('domUtils', () => {
     
-  // Nettoyer le DOM après chaque test de composant
   afterEach(() => {
     document.body.innerHTML = '';
   });
@@ -65,13 +63,13 @@ describe('domUtils', () => {
       expect(btn.disabled).toBe(true);
       expect(btn.textContent).toBe('...');
       
-      // Attendre que la promesse du onClick se rÃ©solve
       await vi.waitFor(() => {
         expect(onClickMock).toHaveBeenCalledTimes(1);
       });
     });
 
     it('should handle errors in onClick and show a toast', async () => {
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
         const error = new Error('Action Failed');
         const onClickMock = vi.fn().mockRejectedValue(error);
         const btn = createActionButton({ text: 'Save', dataAction: 'save-data', onClick: onClickMock });
@@ -83,9 +81,9 @@ describe('domUtils', () => {
             expect(showToast).toHaveBeenCalledWith('Failed to save-data.', 'error');
         });
 
-        // Le bouton devrait Ãªtre rÃ©activÃ© et son texte restaurÃ©
         expect(btn.disabled).toBe(false);
         expect(btn.textContent).toBe('Save');
+        consoleErrorSpy.mockRestore();
       });
   });
 

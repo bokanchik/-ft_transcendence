@@ -1,9 +1,9 @@
 // app/frontend/src/pages/dashboardPage.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { screen, waitFor, fireEvent, within } from '@testing-library/dom';
-import { DashboardPage } from './dashboardPage';
-import { getUserDataFromStorage, checkAuthStatus, fetchUsers } from '../services/authService';
-import * as FriendService from '../services/friendService';
+import { DashboardPage } from '@/pages/dashboardPage';
+import { getUserDataFromStorage, checkAuthStatus, fetchUsers } from '@/services/authService';
+import * as FriendService from '@/services/friendService';
 
 // Mocks
 vi.mock('../services/router', () => ({ navigateTo: vi.fn() }));
@@ -67,7 +67,6 @@ describe('DashboardPage', () => {
         
         const sidebar = await screen.findByTestId('sidebar');
         
-        // Utilisation de within pour chercher uniquement dans la sidebar
         expect(await within(sidebar).findByText('testuser')).toBeInTheDocument();
         expect(await within(sidebar).findByText('Test User')).toBeInTheDocument();
     });

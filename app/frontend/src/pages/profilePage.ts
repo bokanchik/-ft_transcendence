@@ -55,7 +55,7 @@ export async function ProfilePage(params: { userId?: string }): Promise<HTMLElem
 
 	try {
 		const profiledUser = await fetchUserDetails(userIdToView);
-		loadingProfileMsg.remove(); // Enlève le message de chargement
+		loadingProfileMsg.remove();
 
 		// --- Création de la Sidebar ---
 		const sidebar = createProfileSidebar(profiledUser, loggedInUser);
@@ -113,12 +113,8 @@ function createProfileSidebar(profiledUser: User, loggedInUser: User): HTMLEleme
 		createSidebarItem(t('user.status.title'), profiledUser.status),
 	].filter(item => item !== null) as HTMLElement[];
 
-	// return createElement('aside', {
-	// 	className: 'w-1/4 p-6 border-r border-gray-400/30 space-y-4 overflow-y-auto flex flex-col'
-	// }, [avatarContainer, ...infoItems]);
-
 	return createElement('aside', {
 		className: 'w-1/4 p-6 border-r border-gray-400/30 space-y-4 overflow-y-auto flex flex-col',
-        role: 'complementary' // Ajout du rôle pour le test
+        role: 'complementary' // Ajout du role pour le test
 	}, [avatarContainer, ...infoItems]);
 }

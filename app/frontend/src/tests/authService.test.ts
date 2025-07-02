@@ -1,17 +1,17 @@
 // src/services/authService.test.ts
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { http, HttpResponse } from 'msw';
-import { server } from '../tests/mocks/server';
+import { server } from '@/tests/mocks/server';
 import { 
     getUserDataFromStorage, 
     attemptLogin,
     attemptRegister,
     checkAuthStatus,
-    setUserDataInStorage, // Assurez-vous d'exporter cette fonction pour les tests
-    clearUserDataFromStorage // et celle-ci aussi
-} from './authService';
-import { User, UserOnlineStatus } from '../shared/schemas/usersSchemas';
-import { config } from '../utils/config';
+    setUserDataInStorage,
+    clearUserDataFromStorage
+} from '@/services/authService';
+import { User, UserOnlineStatus } from '@/shared/schemas/usersSchemas';
+import { config } from '@/utils/config';
 
 const USER_DATA_KEY = 'userDataKey';
 const USER_DATA_EXPIRATION_KEY = 'userDataExpiration';
@@ -59,7 +59,6 @@ describe('authService', () => {
         it('getUserDataFromStorage should return null if expired', () => {
             setUserDataInStorage(mockUser);
             
-            // Avancer le temps pour que le token expire
             vi.advanceTimersByTime(2 * 60 * 60 * 1000); // 2 heures
 
             expect(getUserDataFromStorage()).toBeNull();

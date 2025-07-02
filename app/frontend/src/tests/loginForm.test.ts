@@ -1,11 +1,11 @@
 // src/components/loginForm.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { screen, fireEvent } from '@testing-library/dom'; // On importe fireEvent
+import { screen, fireEvent } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
-import { LoginForm } from './loginForm';
-import { User, UserOnlineStatus } from '../shared/schemas/usersSchemas';
+import { LoginForm } from '@/components/loginForm';
+import { User, UserOnlineStatus } from '@/shared/schemas/usersSchemas';
 
-vi.mock('../services/i18nService.js', () => ({
+vi.mock('@/services/i18nService.js', () => ({
     t: (key: string) => key,
 }));
 
@@ -42,18 +42,13 @@ describe('LoginForm', () => {
         expect(screen.getByLabelText('login.passwordLabel')).toBeInTheDocument();
     });
 
-    // --- On va modifier tous les tests qui soumettent le formulaire ---
-
     it('should call onLoginSuccess when login is successful without 2FA', async () => {
         onLoginAttemptMock.mockResolvedValue({ success: true, data: { user: mockUser } });
         const formComponent = LoginForm({ onLoginAttempt: onLoginAttemptMock, on2FAAttempt: on2FAAttemptMock, onLoginSuccess: onLoginSuccessMock });
         document.body.appendChild(formComponent);
         const formElement = formComponent.querySelector('form')!;
 
-        // On utilise fireEvent.submit directement sur l'élément du formulaire
         await fireEvent.submit(formElement);
-
-        // On attend que les promesses soient résolues
         await vi.dynamicImportSettled();
 
         expect(onLoginAttemptMock).toHaveBeenCalled();
@@ -87,7 +82,6 @@ describe('LoginForm', () => {
         expect(onLoginSuccessMock).not.toHaveBeenCalled();
     });
 
-    // On garde un test avec userEvent pour la saisie de texte, car c'est important.
     it('should call onLoginAttempt with correct credentials', async () => {
         onLoginAttemptMock.mockResolvedValue({ success: true, data: { user: mockUser } });
         const formComponent = LoginForm({ onLoginAttempt: onLoginAttemptMock, on2FAAttempt: on2FAAttemptMock, onLoginSuccess: onLoginSuccessMock });

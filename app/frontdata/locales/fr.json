@@ -1,0 +1,267 @@
+{
+	"app": {
+		"title": "King-Pong",
+		"subtitle": "Un jeu de Pong multijoueur",
+		"catchPhrase": "Dominez la table. Devenez le Roi du Pong !",
+		"button": "JOUER",
+		"gameApi": "Consulter l'API du jeu"
+	},
+	"link": {
+		"home": "Retour à l'accueil",
+		"dashboard": "Retour au tableau de bord",
+		"newGame": "Retour à la salle de jeu",
+		"tournament": "Retour au tournoi",
+		"lobby": "Retour au salon"
+	},
+	"user": {
+		"username": "Nom d'utilisateur",
+		"displayName": "Nom d'affichage",
+		"email": "Email",
+		"password": "Mot de passe",
+		"createdAt": "Créé le",
+		"wins": "Victoires",
+		"losses": "Défaites",
+		"loading": "Chargement des données utilisateur...",
+		"status": {
+			"title": "Statut",
+			"online": "En ligne",
+			"offline": "Hors ligne",
+			"inGame": "En jeu"
+		},
+		"settings": {
+			"title": "Paramètres utilisateur",
+			"usernameMsg": "Le nom d'utilisateur ne peut pas être modifié.",
+			"emailPlaceholder": "Votre adresse email",
+			"displayNamePlaceholder": "Votre nom d'affichage",
+			"avatarMsg": "Laissez vide si vous n'avez pas d'avatar.",
+			"button": "Enregistrer les modifications",
+			"savingMsg1": "Sauvegarde en cours...",
+			"savingMsg2": "Sauvegarde...",
+			"success": "Modifications enregistrées avec succès !",
+			"error": "Erreur lors de l'enregistrement des modifications.",
+			"noChanges": "Aucun changement à enregistrer.",
+			"denied": "Accès refusé.",
+			"deniedMsg": "Vous devez être connecté pour accéder à cette page.",
+			"profileInfoTitle": "Identité",
+			"securityTitle": "Paramètres de sécurité",
+			"enable2FA": "Activer l'authentification à deux facteurs",
+			"disable2FA": "Désactiver l'authentification à deux facteurs",
+			"2faSetupInstructions": "Pour activer l'authentification à deux facteurs, scannez le code QR avec votre application d'authentification et entrez le code à 6 chiffres ci-dessous.",
+			"verificationCode": "Code de vérification",
+			"2faTokenHelp": "Entrez le code à 6 chiffres de votre application d'authentification.",
+			"qrCodeAlt": "Scannez ce code QR avec votre application d'authentification pour configurer l'authentification à deux facteurs.",
+			"qrCodeError": "Erreur lors de la génération du code QR. Veuillez réessayer plus tard.",
+			"2faTokenInvalid": "Code de vérification invalide. Veuillez réessayer."
+		}
+	},
+	"time": {
+		"ago": {
+            "now": "à l'instant",
+            "minute": "il y a 1 minute",
+            "minutes": "il y a {count} minutes",
+            "hour": "il y a 1 heure",
+            "hours": "il y a {count} heures",
+            "day": "il y a 1 jour",
+            "days": "il y a {count} jours",
+            "month": "il y a 1 mois",
+            "months": "il y a {count} mois",
+            "year": "il y a 1 an",
+            "years": "il y a {count} ans"
+        }
+    },
+	"game": {
+		"title": "Jeu",
+		"welcome": "Bienvenue dans le jeu",
+		"loading": "Chargement du jeu...",
+		"start": "Démarrer le jeu",
+		"quitButton": "Quitter",
+		"startIn": "Démarrage dans",
+		"waitOpponent": "En attente de l'adversaire...",
+		"vs": "VS",
+		"player": "Joueur",
+		"deniedMsg": "Vous devez être connecté pour jouer en ligne.",
+		"button": "Jouer",
+		"result": {
+			"title": "Résultat du jeu",
+			"finished": "🏓 Match terminé"
+		},
+		"settings": {
+			"title": "Paramètres du jeu",
+			"gameMode": "Mode de jeu",
+			"duel": "1 contre 1",
+			"tournament": "Tournoi",
+			"nbPlayers": "Combien de joueurs ?",
+			"nbPlayersPlaceholder": "Enter 2, 4, or 8",
+			"nbPlayersSpec": "Le nombre de joueurs doit être une puissance de 2 (2, 4, 8)."
+		}
+	},
+	"register": {
+		"title": "Inscription",
+		"nameSpec": "3 à 20 caractères.",
+		"passwordSpec": "Au moins 8 caractères, max 20.",
+		"confirmPassword": "Confirmer le mot de passe",
+		"avatarUrl": "URL de l'avatar (Optionnel)",
+		"emailInvalid": "Email invalide.",
+		"button": "S'inscrire",
+		"loginLink": "Vous avez déjà un compte ? Se connecter",
+		"fieldsRequired": "Veuillez remplir tous les champs requis.",
+		"passwordMismatch": "Les mots de passe ne correspondent pas.",
+		"passwordLength": "Le mot de passe doit contenir au moins 8 caractères.",
+		"avatarSpec": "Doit être une URL d'image valide.",
+		"attemptingRegistration": "Tentative d'inscription...",
+		"registering": "Inscription en cours...",
+		"success": "Inscription réussie ! Redirection vers la page de connexion...",
+		"failure": "Échec de l'inscription :"
+	},
+	"header": {
+		"home": "Accueil",
+		"game": "Jeu",
+		"dashboard": "Tableau de Bord",
+		"settings": "Paramètres",
+		"logout": "Déconnexion",
+		"language": "Selection de la langue",
+		"logoutSuccess": "Vous avez été déconnecté avec succès.",
+		"logoutError": "Erreur lors de la déconnexion."
+	},
+	"login": {
+		"title": "Connexion",
+		"identifierLabel": "Nom d'utilisateur ou Email",
+		"identifierPlaceholder": "Entrez votre nom d'utilisateur ou e-mail",
+		"passwordLabel": "Mot de passe",
+		"button": "Se connecter",
+		"registerLink": "Pas de compte ? S'inscrire",
+		"attemptingLogin": "Tentative de connexion...",
+		"success": "Connexion réussie ! Bienvenue",
+		"invalidCredentials": "Identifiants invalides. Veuillez réessayer.",
+		"missingCredentials": "Entrer votre nom d'utilisateur/email et mot de passe.",
+		"2fa": {
+			"title": "Authentification à deux facteurs",
+			"instruction": "Entrez le code à 6 chiffres de votre application d'authentification.",
+			"button": "Vérifier",
+			"verifying": "Vérification en cours..."
+		}
+	},
+	"friend": {
+		"list": {
+			"request": {
+				"title": "Demandes d'amis",
+				"received": "Demandes d'amis reçues",
+				"sent": "Demandes d'amis envoyées",
+				"noRequests": "Aucune demande recue",
+				"noSentRequests": "Aucune demande envoyée"
+			},
+			"accepted": {
+				"title": "Mes Amis",
+				"noFriends": "Aucun ami trouvé.",
+				"viewProfile": "Voir le Profil",
+				"removeMsg": "Êtes-vous sûr de vouloir supprimer cet ami de votre liste ? Cette action est irréversible.",
+				"removeMsgTitle": "Supprimer l'ami",
+				"removeSuccess": "Ami supprimé avec succès",
+				"removeError": "Erreur lors de la suppression de l'ami"
+			}
+		},
+		"request": "Inviter",
+		"accept": "Accepter",
+		"decline": "Refuser",
+		"cancel": "Annuler",
+		"remove": "Supprimer",
+		"block": "Bloquer",
+		"unblock": "Débloquer",
+		"blockSuccess": "Utilisateur bloqué avec succès",
+		"unblockSuccess": "Utilisateur débloqué avec succès",
+		"requestSent": "Demande d'ami envoyée",
+		"requestReceived": "Demande d'ami reçue",
+		"requestAccepted": "Demande d'ami acceptée",
+		"requestDeclined": "Demande d'ami refusée",
+		"requestCanceled": "Demande d'ami annulée",
+		"requestRemoved": "Ami supprimé",
+		"alreadyFriends": "Vous êtes déjà amis",
+		"notFriends": "Vous n'êtes pas amis",
+		"status": {
+			"friend": "Ami",
+			"pending": "En attente",
+			"blocked": "Bloqué",
+			"notFriend": "Pas ami"
+		},
+		"pendingRequest": "Demande d'ami en attente",
+		"noFriends": "Aucun ami trouvé",
+		"noPendingRequests": "Aucune demande d'ami en attente"
+	},
+	"match": {
+		"history": {
+			"title": "Historique des matchs",
+			"loading": "Chargement de l'historique des matchs...",
+			"noMatches": "Aucun match trouvé.",
+			"unknownOpponent": "Adversaire inconnu",
+			"vs": "VS",
+			"victory": "Victoire",
+			"defeat": "Defaite",
+			"draw": "Match nul/Annulé",
+			"opponent": "Adversaire",
+			"error": "Erreur lors du chargement de l'historique des matchs."
+		},
+		"details": {
+			"player": "Joueur",
+			"players": "Joueurs",
+			"detailsError": "Impossible de charger les détails du match.",
+			"score": "Score",
+			"type": "Type de match",
+			"date": "Date",
+			"winner": "Gagnant"
+		}
+	},
+	"dashboard": {
+		"tabs": {
+			"users": "Tous les utilisateurs",
+			"friends": "Amis",
+			"pending": "En attente",
+			"history": "Historique des matchs"
+		}
+	},
+	"general": {
+		"yes": "Oui",
+		"no": "Non",
+		"on": "Le",
+		"at": "à",
+		"error": "Erreur",
+		"loading": "Chargement...",
+		"cancel": "Annuler",
+		"confirm": "Confirmer"
+	},
+	"msg": {
+		"redirect": {
+			"login": "Redirection vers la page de connexion...",
+			"dashboard": "Redirection vers le tableau de bord...",
+			"game": "Redirection vers le jeu..."
+		},
+		"error": {
+			"any": "Une erreur est survenue.",
+			"initializing": "Erreur lors de l'initialisation de la page. Veuillez essayer de rafraîchir la page.",
+			"unauthorized": "Non autorisé. Veuillez vous connecter.",
+			"forbidden": "Accès interdit. Vous n'avez pas les permissions nécessaires.",
+			"unknown": "Une erreur inconnue est survenue.",
+			"malformedResponse": "La réponse du serveur est mal formée.",
+			"networkError": "Erreur de réseau ou impossible de joindre le serveur.",
+			"loadingContent": "Erreur lors du chargement du contenu. Veuillez réessayer plus tard.",
+			"login": {
+				"invalidCredentials": "Identifiant ou mot de passe invalide.",
+				"accountBanned": "Ce compte a été banni."
+			},
+			"register": {
+				"usernameExists": "Le nom d'utilisateur '{username}' est déjà pris.",
+				"emailExists": "L'email '{email}' est déjà utilisé.",
+				"displayNameExists": "Le nom d'affichage '{display_name}' est déjà utilisé."
+			},
+			"refreshToken": {
+				"invalid": "Jeton de rafraîchissement invalide ou expiré.",
+				"missing": "Jeton de rafraîchissement manquant."
+			},
+			"user": {
+				"invalidId": "Identifiant utilisateur invalide.",
+				"errorCsrf": "Erreur de securité: jeton CSRF invalide. Rafraîchissez la page et essayez à nouveau.",
+				"loadingProfile": "Une erreur est survenue lors du chargement du profil utilisateur.",
+				"notFound": "Utilisateur non trouvé."
+			}
+		}
+	}
+}

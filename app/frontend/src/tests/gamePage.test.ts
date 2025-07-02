@@ -1,21 +1,21 @@
 // src/components/gamePage.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { screen, fireEvent, waitFor } from '@testing-library/dom';
-import { GamePage } from './gamePage';
-import { handleOnlineGame } from '../services/initOnlineGame';
-import { checkAuthStatus, getUserDataFromStorage } from '../services/authService';
-import { User, UserOnlineStatus } from '../shared/schemas/usersSchemas';
-import { navigateTo } from '../services/router';
+import { GamePage } from '@/components/gamePage';
+import { handleOnlineGame } from '@/services/initOnlineGame';
+import { checkAuthStatus, getUserDataFromStorage } from '@/services/authService';
+import { User, UserOnlineStatus } from '@/shared/schemas/usersSchemas';
+import { navigateTo } from '@/services/router';
 
-vi.mock('../services/initOnlineGame.js', () => ({
+vi.mock('@/services/initOnlineGame.js', () => ({
     handleOnlineGame: vi.fn(),
 }));
-vi.mock('../services/router.js');
-vi.mock('../services/authService.js');
-vi.mock('../components/toast.js', () => ({
+vi.mock('@/services/router.js');
+vi.mock('@/services/authService.js');
+vi.mock('@/components/toast.js', () => ({
     showToast: vi.fn(),
 }));
-vi.mock('../services/i18nService.js', () => ({
+vi.mock('@/services/i18nService.js', () => ({
     t: (key: string) => key,
     getLanguage: vi.fn(() => 'en'),
 }));
@@ -29,7 +29,7 @@ const mockUser: User = {
 describe('GamePage', () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        document.body.innerHTML = ''; // Assure que le DOM est propre
+        document.body.innerHTML = '';
         (getUserDataFromStorage as vi.Mock).mockReturnValue(mockUser);
         (checkAuthStatus as vi.Mock).mockResolvedValue(mockUser);
     });

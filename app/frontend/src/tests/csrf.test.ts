@@ -1,9 +1,9 @@
 // src/services/csrf.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { setCsrfToken, getCsrfTokenOrThrow, fetchWithCsrf, fetchCsrfToken } from './csrf';
-import { config } from '../utils/config';
+import { setCsrfToken, getCsrfTokenOrThrow, fetchWithCsrf, fetchCsrfToken } from '@/services/csrf';
+import { config } from '@/utils/config';
 import { http, HttpResponse } from 'msw';
-import { server } from '../tests/mocks/server';
+import { server } from '@/tests/mocks/server';
 
 describe('csrfService', () => {
     const FAKE_CSRF_TOKEN = 'my-secret-csrf-token';

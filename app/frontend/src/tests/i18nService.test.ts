@@ -1,11 +1,11 @@
 // src/services/i18nService.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { initI18n, setLanguage, getLanguage, t } from './i18nService';
-import { getUserDataFromStorage } from './authService';
+import { initI18n, setLanguage, getLanguage, t } from '@/services/i18nService';
+import { getUserDataFromStorage } from '@/services/authService';
 import { http, HttpResponse } from 'msw';
-import { server } from '../tests/mocks/server';
+import { server } from '@/tests/mocks/server';
 
-vi.mock('./authService.js', () => ({
+vi.mock('@/services/authService.js', () => ({
     getUserDataFromStorage: vi.fn()
 }));
 
@@ -40,10 +40,9 @@ describe('i18nService', () => {
     describe('initI18n', () => {
         it('should initialize with browser language if nothing else is set', async () => {
             (getUserDataFromStorage as vi.Mock).mockReturnValue(null);
-            // On configure le mock du navigateur AVANT d'appeler la fonction
             Object.defineProperty(navigator, 'language', { value: 'fr-FR', configurable: true });
             
-            await initI18n(); // On appelle la fonction Ã  tester
+            await initI18n();
             
             expect(getLanguage()).toBe('fr');
             expect(t('header.home')).toBe('Accueil');

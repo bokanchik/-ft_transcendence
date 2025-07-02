@@ -1,18 +1,18 @@
 // src/components/headerComponent.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { HeaderComponent } from './headerComponent';
-import { User, UserOnlineStatus } from '../shared/schemas/usersSchemas';
-import { logout } from '../services/authService';
-import { navigateTo } from '../services/router';
-import { setLanguage } from '../services/i18nService';
+import { HeaderComponent } from '@/components/headerComponent';
+import { User, UserOnlineStatus } from '@/shared/schemas/usersSchemas';
+import { logout } from '@/services/authService';
+import { navigateTo } from '@/services/router';
+import { setLanguage } from '@/services/i18nService';
 
-vi.mock('../services/authService.js', () => ({
+vi.mock('@/services/authService.js', () => ({
     logout: vi.fn(),
 }));
-vi.mock('../services/router.js', () => ({
+vi.mock('@/services/router.js', () => ({
     navigateTo: vi.fn(),
 }));
-vi.mock('../services/i18nService.js', () => ({
+vi.mock('@/services/i18nService.js', () => ({
     t: (key: string) => key,
     getLanguage: () => 'en',
     setLanguage: vi.fn(),
@@ -79,7 +79,7 @@ describe('HeaderComponent', () => {
         userMenuTrigger.click();
         
         const logoutButton = header.querySelector('[data-testid="logout-button"]') as HTMLElement;
-        expect(logoutButton).not.toBeNull(); // VÃ©rifie que le bouton est trouvÃ©
+        expect(logoutButton).not.toBeNull();
 
         logoutButton.click();
 

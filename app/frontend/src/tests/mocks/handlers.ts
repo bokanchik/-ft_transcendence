@@ -1,9 +1,7 @@
-// src/tests/mocks/handlers.ts
 import { http, HttpResponse } from 'msw';
 import { config } from '../../utils/config';
 import { UserOnlineStatus } from '../../shared/schemas/usersSchemas';
 
-// Données de mock que nous allons réutiliser
 const mockUser = {
   id: 1,
   username: 'testuser',
@@ -19,14 +17,11 @@ const mockUser = {
   is_two_fa_enabled: false,
 };
 
-// Liste des "handlers" qui décrivent comment répondre à chaque appel API
 export const handlers = [
-  // Mock pour l'authentification
   http.get(config.api.users.me, () => {
     return HttpResponse.json(mockUser);
   }),
 
-  // Mock pour la liste d'amis
   http.get(config.api.friends.list, () => {
     return HttpResponse.json([
       {
@@ -43,17 +38,14 @@ export const handlers = [
     ]);
   }),
 
-  // Mock pour les demandes reçues
   http.get(config.api.friends.receivedRequests, () => {
-      return HttpResponse.json([]); // Par défaut, aucune demande
+      return HttpResponse.json([]);
   }),
 
-  // Mock pour les demandes envoyées
   http.get(config.api.friends.sentRequests, () => {
-    return HttpResponse.json([]); // Par défaut, aucune demande
+    return HttpResponse.json([]);
   }),
   
-  // Mock pour la liste de tous les utilisateurs
   http.get(config.api.users.all, () => {
     return HttpResponse.json([
       mockUser,
@@ -62,7 +54,6 @@ export const handlers = [
     ]);
   }),
 
-  // Mock pour le token CSRF
   http.get(config.api.auth.csrf, () => {
     return HttpResponse.json({ csrfToken: 'fake-csrf-token' });
   }),

@@ -23,6 +23,11 @@ networks:
 volumes:
   frontdata:
     name: frontdata
+    driver: local
+    driver_opts:
+      type: none
+      device: ./frontdata
+      o: bind
 
 services:
   gateaway: # entrypoint for services
@@ -45,11 +50,19 @@ services:
   frontend:
     container_name: frontend
     build: ./frontend
+    command: npm run dev
     restart: always
     ports:
       - "5000:5000" # for development (live-server)
     volumes:
       - frontdata:/app/dist
+    networks:
+      - tranet
+
+  frontend-tests: # <--- NOUVEAU SERVICE POUR LES TESTS
+    container_name: frontend-tests
+    build: ./frontend
+    command: npm run test:watch
     networks:
       - tranet
 
@@ -181,10 +194,3 @@ services:
   #   restart: unless-stopped
   #   depends_on:
   #     - gateaway
-
-#openapi:
-#build: ./services/openapi
-#ports:
-#   - "8080:8080" # for internal use
-#  networks:
-#  - tranet

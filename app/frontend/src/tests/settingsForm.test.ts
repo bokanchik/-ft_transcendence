@@ -1,14 +1,14 @@
 // src/components/settingsForm.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { screen, fireEvent, waitFor } from '@testing-library/dom';
-import { SettingsForm } from './settingsForm';
-import { User, UserOnlineStatus } from '../shared/schemas/usersSchemas';
-import { showToast } from './toast';
-import { navigateTo } from '../services/router';
+import { SettingsForm } from '@/components/settingsForm';
+import { User, UserOnlineStatus } from '@/shared/schemas/usersSchemas';
+import { showToast } from '@/components/toast';
+import { navigateTo } from '@/services/router';
 
-vi.mock('./toast.js', () => ({ showToast: vi.fn() }));
-vi.mock('../services/router.js', () => ({ navigateTo: vi.fn() }));
-vi.mock('../services/i18nService.js', () => ({
+vi.mock('@/components/toast.js', () => ({ showToast: vi.fn() }));
+vi.mock('@/services/router.js', () => ({ navigateTo: vi.fn() }));
+vi.mock('@/services/i18nService.js', () => ({
     t: (key: string) => key,
     getLanguage: () => 'en',
     setLanguage: vi.fn().mockResolvedValue(undefined),

@@ -4,7 +4,7 @@ import { User, UpdateUserPayload } from '../shared/schemas/usersSchemas.js';
 import { ApiResult, ApiUpdateUserSuccessData } from '../utils/types.js';
 import { SettingsForm } from '../components/settingsForm.js';
 import { fetchCsrfToken } from '../services/csrf.js';
-import { t, setLanguage, getLanguage } from '../services/i18nService.js';
+import { t } from '../services/i18nService.js';
 import { HeaderComponent } from '../components/headerComponent.js';
 import { createElement } from '../utils/domUtils.js';
 

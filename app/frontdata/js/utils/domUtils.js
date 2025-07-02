@@ -1,0 +1,174 @@
+import { showToast } from "../components/toast.js";
+export function createElement(tagName, options, children) {
+    const el = document.createElement(tagName);
+    if (options?.id)
+        el.id = options.id;
+    if (options?.className)
+        el.className = options.className;
+    if (options?.textContent)
+        el.textContent = options.textContent;
+    if (options?.title)
+        el.title = options.title;
+    if (options?.name)
+        el.setAttribute('name', options.name);
+    if (options?.role)
+        el.setAttribute('role', options.role);
+    if (options?.noValidate && el instanceof HTMLFormElement)
+        el.noValidate = options.noValidate;
+    if (options?.selected && el instanceof HTMLOptionElement)
+        el.selected = options.selected;
+    if (options?.htmlFor && el instanceof HTMLLabelElement)
+        el.htmlFor = options.htmlFor;
+    if (options?.href && el instanceof HTMLAnchorElement)
+        el.href = options.href;
+    if (options?.src && el instanceof HTMLImageElement)
+        el.src = options.src;
+    if (options?.alt && el instanceof HTMLImageElement)
+        el.alt = options.alt;
+    if (options?.type) {
+        if (el instanceof HTMLInputElement) {
+            el.type = options.type;
+        }
+        else if (el instanceof HTMLButtonElement) {
+            const validType = options.type;
+            if (["submit", "reset", "button"].includes(validType)) {
+                el.type = validType;
+            }
+        }
+    }
+    if (options?.value && (el instanceof HTMLInputElement || el instanceof HTMLSelectElement || el instanceof HTMLTextAreaElement))
+        el.value = options.value;
+    if (options?.placeholder && (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement))
+        el.placeholder = options.placeholder;
+    if (options?.readonly && el instanceof HTMLInputElement)
+        el.readOnly = options.readonly;
+    if (options?.required && (el instanceof HTMLInputElement || el instanceof HTMLSelectElement || el instanceof HTMLTextAreaElement))
+        el.required = options.required;
+    if (options?.minLength && (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement))
+        el.minLength = options.minLength;
+    if (options?.maxLength && (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement))
+        el.maxLength = options.maxLength;
+    if (options?.min && el instanceof HTMLInputElement)
+        el.min = options.min;
+    if (options?.max && el instanceof HTMLInputElement)
+        el.max = options.max;
+    if (children) {
+        const validChildren = children.filter(child => child !== null && child !== undefined);
+        el.append(...validChildren);
+    }
+    return el;
+}
+export function createActionButton(props) {
+    const button = createElement('button', {
+        textContent: props.text,
+        type: 'button'
+    });
+    let colorClasses = 'bg-gray-500 hover:bg-gray-600 text-white font-fever';
+    if (props.baseClass) {
+        colorClasses = props.baseClass;
+    }
+    else if (props.variant) {
+        switch (props.variant) {
+            case 'primary':
+                colorClasses = 'bg-blue-700 hover:bg-blue-500 text-white border border-blue-600/50';
+                break;
+            case 'secondary':
+                colorClasses = 'bg-white/10 hover:bg-white/20 text-gray-200 border border-white/20';
+                break;
+            case 'danger':
+                colorClasses = 'bg-red-900 hover:bg-red-700 text-white border border-red-800/50';
+                break;
+            case 'warning':
+                colorClasses = 'bg-yellow-600 hover:bg-yellow-400 text-black border border-yellow-500/50';
+                break;
+            case 'success':
+                colorClasses = 'bg-teal-800 hover:bg-teal-600 text-white border border-teal-700/50';
+                break;
+            case 'info':
+                colorClasses = 'bg-teal-500 hover:bg-teal-600 text-white border border-teal-400/50';
+                break;
+        }
+    }
+    button.className = `${colorClasses} text-xs font-semibold py-1 px-2.5 rounded transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed`;
+    if (props.disabled) {
+        button.disabled = true;
+    }
+    if (props.dataAction)
+        button.dataset.action = props.dataAction;
+    if (props.dataId !== undefined)
+        button.dataset.id = props.dataId.toString();
+    button.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        if (button.disabled)
+            return;
+        button.disabled = true;
+        const originalText = button.textContent;
+        button.textContent = '...';
+        try {
+            await props.onClick(e);
+        }
+        catch (error) {
+            const actionText = props.dataAction || originalText || 'action';
+            console.error(`Error performing action "${actionText}":`, error);
+            showToast(`Failed to ${actionText.toLowerCase()}.`, 'error');
+            button.textContent = originalText;
+            button.disabled = false;
+        }
+    });
+    return button;
+}
+export function createInputField(id, labelText, options = {}) {
+    const fieldDiv = createElement('div', {
+        className: options.wrapperClass || 'mb-4'
+    });
+    const label = createElement('label', {
+        textContent: labelText,
+        className: options.labelClass || 'block text-sm font-medium text-gray-300 mb-1'
+    });
+    label.htmlFor = id;
+    const input = createElement('input', {
+        type: options.type || 'text',
+        id: id,
+        name: id,
+        required: options.required,
+        value: options.value || '',
+        placeholder: options.placeholder,
+        minLength: options.minLength,
+        maxLength: options.maxLength,
+        min: options.min,
+        max: options.max,
+        readonly: options.readonly,
+        className: options.inputClass || 'w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400'
+    });
+    if (options.pattern)
+        input.pattern = options.pattern;
+    fieldDiv.appendChild(label);
+    fieldDiv.appendChild(input);
+    if (options.helpText) {
+        const helpTextEl = createElement('p', {
+            textContent: options.helpText,
+            className: 'text-xs text-gray-400 mt-1'
+        });
+        fieldDiv.appendChild(helpTextEl);
+    }
+    return fieldDiv;
+}
+export function createSelectField(id, labelText, options) {
+    const label = createElement('label', {
+        htmlFor: id,
+        textContent: labelText,
+        className: 'block text-sm font-medium text-gray-300 mb-1'
+    });
+    const select = createElement('select', {
+        id: id,
+        name: id,
+        required: true,
+        className: 'w-full p-2 bg-black/20 border border-gray-500/50 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400'
+    }, options.map(value => createElement('option', { value: value, textContent: value })));
+    return createElement('div', {}, [label, select]);
+}
+export function clearElement(element) {
+    while (element.firstChild) {
+        element.removeChild(element.firstChild);
+    }
+}

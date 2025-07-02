@@ -1,11 +1,11 @@
 // src/components/userList.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { screen } from '@testing-library/dom';
-import { UserList, UserListProps } from './userList';
-import { User, UserOnlineStatus } from '../shared/schemas/usersSchemas';
-import { Friend, PendingFriendRequest } from '../shared/schemas/friendsSchemas';
+import { UserList, UserListProps } from '@/components/userList';
+import { User, UserOnlineStatus } from '@/shared/schemas/usersSchemas';
+import { Friend, PendingFriendRequest } from '@/shared/schemas/friendsSchemas';
 
-vi.mock('../services/i18nService.js', () => ({
+vi.mock('@/services/i18nService.js', () => ({
     t: (key: string) => key,
 }));
 

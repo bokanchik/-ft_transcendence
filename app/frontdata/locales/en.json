@@ -1,0 +1,270 @@
+{
+	"app": {
+		"title": "King-Pong",
+		"subtitle": "A Multiplayer Pong Game",
+		"catchPhrase": "Dominate the table. Become the King of Pong!",
+		"button": "PLAY",
+		"gameApi": "Check Game API"
+	},
+	"link": {
+		"home": "Back to Home",
+		"dashboard": "Back to Dashboard",
+		"newGame": "Back to Game Room",
+		"tournament": "Back to Tournament",
+		"lobby": "Back to Lobby"
+	},
+	"user": {
+		"username": "Username",
+		"displayName": "Display Name",
+		"email": "Email",
+		"password": "Password",
+		"createdAt": "Created At",
+		"wins": "Wins",
+		"losses": "Losses",
+		"loading": "Loading user data...",
+		"noUser": "No other user found.",
+		"status": {
+			"title": "Status",
+			"online": "Online",
+			"offline": "Offline",
+			"inGame": "In Game"
+		},
+		"settings": {
+			"title": "User Settings",
+			"usernameMsg": "Username cannot be changed.",
+			"emailPlaceholder": "Your email address",
+			"displayNamePlaceholder": "Your display name",
+			"avatarMsg": "Leave empty if you don't have an avatar.",
+			"button": "Save Changes",
+			"savingMsg1": "Saving changes...",
+			"savingMsg2": "Saving...",
+			"success": "Changes saved successfully!",
+			"error": "Error saving changes.",
+			"noChanges": "No changes to save.",
+			"denied": "Access denied.",
+			"deniedMsg": "You must be logged in to access this page.",
+			"profileInfoTitle": "Identity",
+			"securityTitle": "Security Settings",
+			"enable2FA": "Enable Two-Factor Authentication",
+			"disable2FA": "Disable Two-Factor Authentication",
+			"2faSetupInstructions": "To enable Two-Factor Authentication, scan the QR code with your authenticator app and enter the 6-digit code below.",
+			"verificationCode": "Verification Code",
+			"2faTokenHelp": "Enter the 6-digit code from your authenticator app.",
+			"qrCodeAlt": "Scan this QR code with your authenticator app to set up Two-Factor Authentication.",
+			"qrCodeError": "Error generating QR code. Please try again later.",
+			"2faTokenInvalid": "Invalid verification code. Please try again."
+		}
+	},
+	"time": {
+		"ago": {
+			"now": "just now",
+			"minute": "1 minute ago",
+			"minutes": "{count} minutes ago",
+			"hour": "1 hour ago",
+			"hours": "{count} hours ago",
+			"day": "1 day ago",
+			"days": "{count} days ago",
+			"week": "1 week ago",
+			"weeks": "{count} weeks ago",
+			"month": "1 month ago",
+			"months": "{count} months ago",
+			"year": "1 year ago",
+			"years": "{count} years ago"
+		}
+	},
+	"game": {
+		"title": "Game",
+		"welcome": "Welcome to the Game",
+		"loading": "Loading game...",
+		"start": "Start Game",
+		"quitButton": "Quit",
+		"startIn": "Starting in",
+		"waitOpponent": "Waiting for opponent...",
+		"vs": "VS",
+		"player": "Player",
+		"deniedMsg": "You must be logged in to play online.",
+		"button": "start",
+		"result": {
+			"title": "Game Result",
+			"finished": "🏓 Match Finished"
+		},
+		"settings": {
+			"title": "Game Settings",
+			"gameMode": "Select Game Mode",
+			"duel": "1 vs 1",
+			"tournament": "Tournament",
+			"nbPlayers": "How many players?",
+			"nbPlayersPlaceholder": "Enter 2, 4, or 8",
+			"nbPlayersSpec": "Number of players must be a power of 2 (2, 4, 8)."
+		}
+	},
+	"register": {
+		"title": "Register",
+		"nameSpec": "3 to 20 characters.",
+		"passwordSpec": "At least 8 characters, max 20.",
+		"confirmPassword": "Confirm Password",
+		"avatarUrl": "Avatar URL (Optional)",
+		"emailInvalid": "Email is invalid.",
+		"button": "Register",
+		"loginLink": "Already have an account? Login",
+		"fieldsRequired": "Please fill in all required fields.",
+		"passwordMismatch": "Passwords do not match.",
+		"passwordLength": "Password must contain at least 8 characters.",
+		"avatarSpec": "Must be a valid image URL.",
+		"attemptingRegistration": "Attempting registration...",
+		"registering": "Registering...",
+		"success": "Registration successful! Redirecting to login page...",
+		"failure": "Registration failed:"
+	},
+	"header": {
+		"home": "Home",
+		"game": "Game",
+		"dashboard": "Dashboard",
+		"settings": "Settings",
+		"logout": "Logout",
+		"language": "Language Selection",
+		"logoutSuccess": "You have been logged out successfully.",
+		"logoutError": "Error while logging out."
+	},
+	"login": {
+		"title": "Login",
+		"identifierLabel": "Username or Email",
+		"identifierPlaceholder": "Enter your username or email",
+		"passwordLabel": "Password",
+		"button": "Sign In",
+		"registerLink": "Don't have an account? Register",
+		"attemptingLogin": "Attempting to Login...",
+		"success": "Login successful! Welcome",
+		"invalidCredentials": "Invalid credentials. Please try again.",
+		"missingCredentials": "Please enter your username/email and password.",
+		"2fa": {
+			"title": "Two-Factor Authentication",
+			"instruction": "Enter the 6-digit code from your authenticator app.",
+			"button": "Verify",
+			"verifying": "Verifying..."
+		}
+	},
+	"friend": {
+		"list": {
+			"request": {
+				"title": "Friend Requests",
+				"received": "Received Friend Requests",
+				"sent": "Sent Friend Requests",
+				"noRequests": "No friend requests found.",
+				"noSentRequests": "No sent friend requests found."
+			},
+			"accepted": {
+				"title": "My Friends",
+				"noFriends": "No friends found.",
+				"viewProfile": "View Profile",
+				"removeMsg": "Are you sure you want to remove this friend from your list ? This action cannot be undone.",
+				"removeMsgTitle": "Remove Friend",
+				"removeSuccess": "Friend removed successfully",
+				"removeError": "Error while removing friend"
+			}
+		},
+		"request": "Invite",
+		"accept": "Accept",
+		"decline": "Decline",
+		"cancel": "Cancel",
+		"remove": "Remove",
+		"block": "Block",
+		"unblock": "Unblock",
+		"blockSuccess": "User blocked successfully",
+		"unblockSuccess": "User unblocked successfully",
+		"requestSent": "Friend request sent",
+		"requestReceived": "Friend request received",
+		"requestAccepted": "Friend request accepted",
+		"requestDeclined": "Friend request declined",
+		"requestCanceled": "Friend request canceled",
+		"requestRemoved": "Friend removed",
+		"alreadyFriends": "You are already friends",
+		"notFriends": "You are not friends",
+		"status": {
+			"friend": "Friends",
+			"pending": "Pending",
+			"blocked": "Blocked",
+			"notFriend": "Not a friend"
+		},
+		"pendingRequest": "Pending friend request",
+		"noFriends": "No friends found",
+		"noPendingRequests": "No pending friend requests"
+	},
+	"match": {
+		"history": {
+			"title": "Match History",
+			"loading": "Loading match history...",
+			"noMatches": "No matches found for this user.",
+			"unknownOpponent": "Unknown Opponent",
+			"vs": "VS",
+			"victory": "Victory",
+			"defeat": "Defeat",
+			"draw": "Draw/Cancel",
+			"opponent": "Opponent",
+			"error": "Error while loading match history."
+		},
+		"details": {
+			"player": "Player",
+			"players": "Players",
+			"detailsError": "Unable to load match details.",
+			"score": "Score",
+			"type": "Type",
+			"date": "Date",
+			"winner": "Winner"
+		}
+	},
+	"dashboard": {
+		"tabs": {
+			"users": "All Users",
+			"friends": "Friends",
+			"pending": "Pending",
+			"history": "Match History"
+		}
+	},
+	"general": {
+		"yes": "Yes",
+		"no": "No",
+		"on": "On",
+		"at": "At",
+		"error": "Error",
+		"loading": "Loading...",
+		"cancel": "Cancel",
+		"confirm": "Confirm"
+	},
+	"msg": {
+		"redirect": {
+			"login": "Redirecting to login page...",
+			"dashboard": "Redirecting to dashboard...",
+			"game": "Redirecting to game..."
+		},
+		"error": {
+			"any": "An error occurred.",
+			"initializing": "Error initializing Page. Please try refreshing the page.",
+			"unauthorized": "Unauthorized. Please log in.",
+			"forbidden": "Forbidden. You do not have the necessary permissions.",
+			"unknown": "An unknown error occurred.",
+			"malformedResponse": "The server's error response was malformed.",
+			"networkError": "Network error or could not reach the server.",
+			"loadingContent": "Error loading content. Please try again later.",
+			"login": {
+				"invalidCredentials": "Invalid identifier or password.",
+				"accountBanned": "This account has been banned."
+			},
+			"register": {
+				"usernameExists": "Username '{username}' is already taken.",
+				"emailExists": "Email '{email}' is already in use.",
+				"displayNameExists": "Display name '{display_name}' is already taken."
+			},
+			"refreshToken": {
+				"invalid": "Invalid or expired refresh token.",
+				"missing": "Missing refresh token."
+			},
+			"user": {
+				"invalidId": "Invalid User ID",
+				"errorCsrf": "Security Error: CSRF token mismatch. Please refresh the page and try again.",
+				"loadingProfile": "An Error occurred while loading the user profile.",
+				"notFound": "User not found."
+			}
+		}
+	}
+}
