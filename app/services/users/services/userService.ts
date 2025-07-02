@@ -79,21 +79,6 @@ export async function getAllUsers(): Promise<User[]> {
 	return userModel.getAllUsersFromDb();
 }
 
-// /**
-//  * Retrieves a user by their ID.
-//  * @param {number} userId - The ID of the user to retrieve.
-//  * @throws {NotFoundError} If the user does not exist.
-//  * @returns {Promise<User>} The user object.
-//  */
-// export async function getUserById(userId: number): Promise<User> {
-// 	console.log('Fetching user by ID from the database');
-// 	const user = await userModel.getUserByIdFromDb(userId);
-// 	if (!user) {
-// 		throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND);
-// 	}
-// 	return user;
-// }
-
 /**
  * Retrieves a user by their ID, checking for permissions.
  * @param {number} targetUserId - The ID of the user to retrieve.

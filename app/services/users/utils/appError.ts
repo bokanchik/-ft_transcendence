@@ -1,16 +1,14 @@
 import { FastifyInstance, FastifyRequest, FastifyReply, FastifyError } from 'fastify';
 
 export const ERROR_KEYS = {
-    // Erreurs de Login/Register
     LOGIN_INVALID_CREDENTIALS: 'msg.error.login.invalidCredentials',
     LOGIN_ACCOUNT_BANNED: 'msg.error.login.accountBanned',
     REGISTER_USERNAME_EXISTS: 'msg.error.register.usernameExists',
     REGISTER_EMAIL_EXISTS: 'msg.error.register.emailExists',
     REGISTER_DISPLAYNAME_EXISTS: 'msg.error.register.displayNameExists',
-	INVALID_REFRESH_TOKEN: 'msg.error.refreshToken.invalid', // Invalid or expired refresh token.
-	REFRESH_TOKEN_MISSING: 'msg.error.refreshToken.missing', // Refresh token missing.
+	INVALID_REFRESH_TOKEN: 'msg.error.refreshToken.invalid',
+	REFRESH_TOKEN_MISSING: 'msg.error.refreshToken.missing',
 
-    // Erreurs générales
     USER_NOT_FOUND: 'msg.error.user.notFound', //
     UNAUTHORIZED: 'msg.error.unauthorized',
     FORBIDDEN: 'msg.error.forbidden',

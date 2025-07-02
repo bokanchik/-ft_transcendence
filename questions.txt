@@ -1,5 +1,4 @@
-- quels sont les wins types et a quoi ils peuvent nous servir ? 
-
 - environnement dev / prod ? on rend le projet deja compiler en prod ? fichiers persistants
 
-- road map
+
+- Reste à faire et roadmap

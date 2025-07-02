@@ -2,7 +2,7 @@
 	- [x] OK
 
 ## Pages
-	- [ ]
+	- [x]
 
 ## Services
 	- [ ]
