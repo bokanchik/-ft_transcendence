@@ -23,11 +23,11 @@ networks:
 volumes:
   frontdata:
     name: frontdata
-    driver: local
-    driver_opts:
-      type: none
-      device: ./frontdata
-      o: bind
+    # driver: local
+    # driver_opts:
+    #   type: none
+    #   device: ./frontdata
+    #   o: bind
 
 services:
   gateaway: # entrypoint for services

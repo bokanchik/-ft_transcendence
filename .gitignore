@@ -1,5 +1,7 @@
 # Environment variables
 .env # A ENLEVER !!!
+# ./secrets
+# ./app/frontdata
 
 # Node modules (can be installed with npm install)
 node_modules/
