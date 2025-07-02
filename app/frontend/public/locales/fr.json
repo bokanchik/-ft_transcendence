@@ -3,6 +3,7 @@
 		"title": "King-Pong",
 		"subtitle": "Un jeu de Pong multijoueur",
 		"catchPhrase": "Dominez la table. Devenez le Roi du Pong !",
+		"enter": "Entrez dans la jungle",
 		"button": "JOUER",
 		"gameApi": "Consulter l'API du jeu"
 	},
