@@ -91,7 +91,7 @@ export function TournamentPage(): HTMLElement {
                 startButton.className = 'mt-10 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition';
 
                 startButton.addEventListener('click', () => {
-                    createLocalMatch(match.player1, match.player2, true);
+                    createLocalMatch(match.player2, match.player1, true);
                 });
                 buttonsDiv.appendChild(startButton);
 
@@ -113,24 +113,38 @@ export function TournamentPage(): HTMLElement {
 
                 // buttonsDiv.appendChild(btn1);
                 // buttonsDiv.appendChild(btn2);
-                
+                const searchParams = new URLSearchParams(window.location.search);
+                const score = searchParams.get("score");
                 //need to add the recever for the winner
-                const score1 = sessionStorage.getItem('score1');
-		        const score2 = sessionStorage.getItem('score2');
-                if (score1 && score2) {
-                    const scoreSpan = document.createElement('span');
-                    scoreSpan.className = 'text-gray-500 ml-4';
-                    scoreSpan.textContent = `${match.player1} ${score1} - ${match.player2} ${score2}`;
-                    li.append(player1Span, vsSpan, player2Span, scoreSpan);
-                     if (score1 < score2) {
-                        match.winner = match.player2;
-                    } else if (score1 > score2) {
-                        match.winner = match.player1;
+                console.log(searchParams.get("score"));
+                const scoreSpan = document.createElement('span');
+                if (score) {
+                    const [score1, score2] = score.split('-').map(Number);
+                    const score1Span = document.createElement('span');
+                    score1Span.textContent = `${match.player1} ${score1}`;
+                    score1Span.className = 'text-gray-500';
+                    const score2Span = document.createElement('span');
+                    score2Span.textContent = `${match.player2} ${score2}`;
+                    score2Span.className = 'text-gray-500';
+                    li.append(player1Span, vsSpan, player2Span, score1Span, score2Span);
+                    console.log(`Match: ${match.player1} vs ${match.player2}, Score: ${score1}-${score2}`);
+                    // scoreSpan.className = 'text-gray-500 ml-4';
+                    // scoreSpan.textContent = `${match.player1} ${score1} - ${match.player2} ${score2}`;
+                    // li.append(player1Span, vsSpan, player2Span, scoreSpan);
+                    if (match.player1 == sessionStorage.getItem('player1') && match.player2 == sessionStorage.getItem('player2')) {
+                        if (score1 > score2) {
+                            match.winner = match.player2;
+                        } else if (score1 < score2) {
+                            match.winner = match.player1;
+                        }
+                        else {
+                            li.append(player1Span, vsSpan, player2Span);
+                        }
+                    console.log(`Match: ${match.player1} vs ${match.player2}, Winner: ${match.winner}`);
                     }
                 } else {
                     li.append(player1Span, vsSpan, player2Span);
                 }
-               
                 if (match.winner) {
                     li.classList.add('bg-green-100');
                     const winnerSpan = document.createElement('span');

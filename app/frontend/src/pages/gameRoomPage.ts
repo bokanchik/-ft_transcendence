@@ -287,10 +287,13 @@ function handleLocalEvents(ctx: CanvasRenderingContext2D, scoreDisplay: HTMLDivE
 		isGameOver = true;
 		cleanupSocket(socket);
 		cleanupListeners();
+		console.log('Game over received from server');
 		if (sessionStorage.getItem('gameMode') === 'tournament') {
-			navigateTo('/tournament');
+			navigateTo(`/tournament?score=${scoreDisplay.innerHTML}&player1=${sessionStorage.getItem('player1')}&player2=${sessionStorage.getItem('player2')}`);
 		}
-		navigateTo('/local-game');
+		else {
+			navigateTo('/local-game');
+		}
 		sessionStorage.clear();
 		isGameOver = false;
 	});
