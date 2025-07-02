@@ -203,132 +203,132 @@ import { getUserDataFromStorage } from "../services/authService.js";
 import { createElement, createInputField, createActionButton, createSelectField, clearElement } from "../utils/domUtils.js";
 
 export function promptAliasForm(): HTMLElement {
-    const currentUser = getUserDataFromStorage();
+	const currentUser = getUserDataFromStorage();
 
-    const dynamicInputs = createElement('div', { className: 'space-y-4' });
-    const aliasFields = createElement('div', { className: 'space-y-4' });
+	const dynamicInputs = createElement('div', { className: 'space-y-4' });
+	const aliasFields = createElement('div', { className: 'space-y-4' });
 
 	const scrollableContent = createElement('div', {
-        className: 'flex-grow overflow-y-auto space-y-6 pr-4',
-    }, [
-        createSelectField('gameMode', t('game.settings.gameMode'), [t('game.settings.duel'), t('game.settings.tournament')]),
-        dynamicInputs
-    ]);
+		className: 'flex-grow overflow-y-auto space-y-6 pr-4',
+	}, [
+		createSelectField('gameMode', t('game.settings.gameMode'), [t('game.settings.duel'), t('game.settings.tournament')]),
+		dynamicInputs
+	]);
 
-    const cancelButton = createActionButton({
-        text: t('general.cancel'),
-        variant: 'secondary',
-        onClick: () => {
-            sessionStorage.clear();
-            navigateTo('/');
-        }
-    });
-    const submitButton = createElement('button', {
-        type: 'submit',
-        textContent: t('game.button'),
-        className: 'px-4 py-2 rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700 border border-green-500/50 transition-colors duration-200'
-    });
-   
-	const buttonContainer = createElement('div', { 
-        className: 'flex-shrink-0 flex justify-end space-x-4 pt-4 mt-auto border-t border-gray-500/30' // mt-auto pousse les boutons vers le bas
-    }, [cancelButton, submitButton]);
+	const cancelButton = createActionButton({
+		text: t('general.cancel'),
+		variant: 'secondary',
+		onClick: () => {
+			sessionStorage.clear();
+			navigateTo('/');
+		}
+	});
+	const submitButton = createElement('button', {
+		type: 'submit',
+		textContent: t('game.button'),
+		className: 'px-4 py-2 rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700 border border-green-500/50 transition-colors duration-200'
+	});
 
-    const form = createElement('form', { 
-        className: 'flex flex-col flex-grow min-h-0'
-    }, [
-        scrollableContent,
-        buttonContainer
-    ]);
+	const buttonContainer = createElement('div', {
+		className: 'flex-shrink-0 flex justify-end space-x-4 pt-4 mt-auto border-t border-gray-500/30'
+	}, [cancelButton, submitButton]);
 
-	const formContainer = createElement('div', { 
-        className: 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-2xl shadow-2xl p-8 max-w-md w-full flex flex-col max-h-[90vh]' // CHANGEMENTS CLÉS ICI
-    }, [
-        createElement('h2', { 
-            textContent: t('game.settings.gameMode'), 
-            className: 'flex-shrink-0 text-3xl font-bold mb-6 text-center text-white' // flex-shrink-0 pour empêcher le titre de rétrécir
-        }),
-        form,
-        createElement('div', { className: 'flex-shrink-0 mt-6 text-center' }, [
-            createElement('a', {
-                href: '/',
-                textContent: t('link.home'),
-                className: 'text-blue-400 hover:text-blue-300 text-sm transition-colors'
-            }, [])
-        ])
-    ]);
+	const form = createElement('form', {
+		className: 'flex flex-col flex-grow min-h-0'
+	}, [
+		scrollableContent,
+		buttonContainer
+	]);
 
-    const pageWrapper = createElement('div', {
-        className: 'flex flex-col h-screen bg-cover bg-center bg-fixed' // h-screen au lieu de min-h-screen
-    }, [
-        HeaderComponent({ currentUser }),
-        createElement('div', { 
-            className: 'flex-grow flex items-center justify-center p-4 sm:p-8' 
-        }, [
-            formContainer
-        ])
-    ]);
-    pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
+	const formContainer = createElement('div', {
+		className: 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-2xl shadow-2xl p-8 max-w-md w-full flex flex-col max-h-[90vh]'
+	}, [
+		createElement('h2', {
+			textContent: t('game.settings.gameMode'),
+			className: 'flex-shrink-0 text-3xl font-bold mb-6 text-center text-white'
+		}),
+		form,
+		createElement('div', { className: 'flex-shrink-0 mt-6 text-center' }, [
+			createElement('a', {
+				href: '/',
+				textContent: t('link.home'),
+				className: 'text-blue-400 hover:text-blue-300 text-sm transition-colors'
+			}, [])
+		])
+	]);
 
-    const selectElement = form.querySelector('#gameMode') as HTMLSelectElement;
-    
-    selectElement.addEventListener('change', () => {
-        const value = selectElement.value;
+	const pageWrapper = createElement('div', {
+		className: 'flex flex-col h-screen bg-cover bg-center bg-fixed'
+	}, [
+		HeaderComponent({ currentUser }),
+		createElement('div', {
+			className: 'flex-grow flex items-center justify-center p-4 sm:p-8'
+		}, [
+			formContainer
+		])
+	]);
+	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
+
+	const selectElement = form.querySelector('#gameMode') as HTMLSelectElement;
+
+	selectElement.addEventListener('change', () => {
+		const value = selectElement.value;
 		clearElement(dynamicInputs);
 		clearElement(aliasFields);
 
-        if (value === t('game.settings.duel')) {
-            dynamicInputs.append(
-                createInputField('alias1', `${t('game.player')} 1`),
-                createInputField('alias2', `${t('game.player')} 2`)
-            );
-        } else if (value === t('game.settings.tournament')) {
-            const countField = createInputField('playerCount', t('game.settings.nbPlayers'), {
-                type: 'number',
-                min: '2',
-                max: '8',
-                placeholder: t('game.settings.nbPlayersPlaceholder'),
-            });
-            const inputElement = countField.querySelector('input')!;
-            
-            dynamicInputs.append(countField, aliasFields);
+		if (value === t('game.settings.duel')) {
+			dynamicInputs.append(
+				createInputField('alias1', `${t('game.player')} 1`),
+				createInputField('alias2', `${t('game.player')} 2`)
+			);
+		} else if (value === t('game.settings.tournament')) {
+			const countField = createInputField('playerCount', t('game.settings.nbPlayers'), {
+				type: 'number',
+				min: '2',
+				max: '8',
+				placeholder: t('game.settings.nbPlayersPlaceholder'),
+			});
+			const inputElement = countField.querySelector('input')!;
 
-            inputElement.addEventListener('input', () => {
-                clearElement(aliasFields);
-                const count = parseInt(inputElement.value);
-                const validCounts = [2, 4, 8];
+			dynamicInputs.append(countField, aliasFields);
 
-                if (isNaN(count) || !validCounts.includes(count)) {
-                    if (inputElement.value) showToast(t('game.settings.nbPlayersSpec'), 'error');
-                    return;
-                }
-                for (let i = 1; i <= count; i++) {
-                    const field = createInputField(`alias${i}`, `${t('game.player')} ${i}`);
-                    field.classList.add('animate-fade-in');
-                    aliasFields.appendChild(field);
-                }
-            });
-        }
-    });
+			inputElement.addEventListener('input', () => {
+				clearElement(aliasFields);
+				const count = parseInt(inputElement.value);
+				const validCounts = [2, 4, 8];
 
-    selectElement.dispatchEvent(new Event('change'));
+				if (isNaN(count) || !validCounts.includes(count)) {
+					if (inputElement.value) showToast(t('game.settings.nbPlayersSpec'), 'error');
+					return;
+				}
+				for (let i = 1; i <= count; i++) {
+					const field = createInputField(`alias${i}`, `${t('game.player')} ${i}`);
+					field.classList.add('animate-fade-in');
+					aliasFields.appendChild(field);
+				}
+			});
+		}
+	});
 
-    form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        
-        const gameModeValue = selectElement.value;
-        const mode = gameModeValue === t('game.settings.duel') ? 'duel' : 'tournament';
-        
-        const players = Array.from(form.querySelectorAll<HTMLInputElement>('input[name^="alias"]'))
-                             .map(input => input.value.trim());
-        
-        if (players.some(p => p === '')) {
-            showToast(t('game.settings.allAliases'), 'error');
-            return;
-        }
+	selectElement.dispatchEvent(new Event('change'));
 
-        sessionStorage.clear();
-        await initLocalGame({ mode, players });
-    });
+	form.addEventListener('submit', async (event) => {
+		event.preventDefault();
 
-    return pageWrapper;
+		const gameModeValue = selectElement.value;
+		const mode = gameModeValue === t('game.settings.duel') ? 'duel' : 'tournament';
+
+		const players = Array.from(form.querySelectorAll<HTMLInputElement>('input[name^="alias"]'))
+			.map(input => input.value.trim());
+
+		if (players.some(p => p === '')) {
+			showToast(t('game.settings.allAliases'), 'error');
+			return;
+		}
+
+		sessionStorage.clear();
+		await initLocalGame({ mode, players });
+	});
+
+	return pageWrapper;
 }

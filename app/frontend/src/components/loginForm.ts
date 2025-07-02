@@ -42,20 +42,20 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 		const messageDiv = createElement('div', { id: 'login-message-component', className: 'mt-4 text-center text-sm min-h-[20px]' });
 
 		wrapper.append(form, messageDiv);
-		
+
 		form.addEventListener('submit', handlePasswordSubmit);
-		
+
 		setTimeout(() => {
-            const identifierInput = identifierField.querySelector('input');
-            identifierInput?.focus();
-        }, 0);
+			const identifierInput = identifierField.querySelector('input');
+			identifierInput?.focus();
+		}, 0);
 	};
 
 	const renderTwoFactorStep = () => {
 		clearElement(wrapper);
 
 		const title = createElement('h3', { textContent: t('login.2fa.title'), className: 'text-xl font-semibold text-center text-white' });
-		
+
 		const twoFaTokenField = createInputField('two-fa-token', t('login.2fa.instruction'), {
 			required: true,
 			inputClass: 'w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-center tracking-[1em]'
@@ -81,7 +81,7 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 		]);
 
 		const messageDiv = createElement('div', { id: 'login-message-component', className: 'mt-4 text-center text-sm min-h-[20px]' });
-		
+
 		wrapper.append(form, messageDiv);
 
 		form.addEventListener('submit', handleTwoFactorSubmit);
@@ -115,8 +115,8 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 			if (messageDiv) {
 				messageDiv.textContent = result.error;
 				messageDiv.className = 'mt-4 text-center text-sm min-h-[20px] text-red-400 font-medium';
-            }
-            if (button) button.disabled = false;
+			}
+			if (button) button.disabled = false;
 		}
 	};
 

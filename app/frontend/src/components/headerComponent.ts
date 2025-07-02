@@ -15,16 +15,16 @@ interface NavLink {
 }
 
 const languages: Record<string, { flag: string; name: string }> = {
-    fr: { flag: '/assets/flagFr.svg', name: 'Français' },
-    en: { flag: '/assets/flagEn.svg', name: 'English' },
-    es: { flag: '/assets/flagEs.svg', name: 'Español' },
+	fr: { flag: '/assets/flagFr.svg', name: 'Français' },
+	en: { flag: '/assets/flagEn.svg', name: 'English' },
+	es: { flag: '/assets/flagEs.svg', name: 'Español' },
 	ru: { flag: '/assets/flagRu.svg', name: 'Русский' },
 };
 
 export function HeaderComponent(props: HeaderProps): HTMLElement {
 	const { currentUser } = props;
 
-	// --- Left Side: Language Dropdown ---
+	// --- Left Side: Language ---
 	const currentLanguage = getLanguage();
 	const currentLangData = languages[currentLanguage] || languages['en'];
 
@@ -55,7 +55,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 	}, langMenuItems);
 
 	const leftSection = createElement('div', { className: 'relative' }, [langButton, langMenu]);
-	
+
 	// --- Center: Navigation Links ---
 	const navLinks: NavLink[] = [
 		{ href: '/', textKey: 'header.home' },
@@ -84,6 +84,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 
 	let userMenu: HTMLElement | null = null;
 	if (currentUser) {
+		// -- LOGGED-IN STATE ---
 		const avatarFallbackName = currentUser.display_name || currentUser.username;
 		const avatarHeader = createElement('img', {
 			src: currentUser.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(avatarFallbackName)}&background=0D8ABC&color=fff&size=128`,
@@ -103,7 +104,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 
 		const logoutButtonEl = createElement('button', { textContent: t('header.logout'), className: 'block w-full text-left px-4 py-2 text-gray-200 hover:bg-gray-700 rounded-b-lg transition-colors' });
 		logoutButtonEl.dataset.testid = 'logout-button';
-		
+
 		userMenu = createElement('div', {
 			className: 'absolute right-0 mt-2 w-48 bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-lg shadow-xl z-50 hidden flex-col origin-top-right p-2 space-y-1'
 		}, [settingsButton, logoutButtonEl]);
@@ -111,7 +112,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 
 		const userHeader = createElement('div', { className: 'flex items-center space-x-4 relative' }, [avatarDisplayWrapper, userMenu]);
 		rightSection.append(userHeader);
-		
+
 		logoutButtonEl.addEventListener('click', async (e) => {
 			e.stopPropagation();
 			try {
@@ -141,7 +142,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 
 		const registerLink = createElement('a', { href: "/register", textContent: t('register.title'), className: "text-sm sm:text-base bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105" });
 		registerLink.setAttribute('data-link', '');
-		
+
 		const authLinks = createElement('div', { className: 'flex items-center space-x-2 sm:space-x-4' }, [loginLink, registerLink]);
 		rightSection.append(authLinks);
 	}
@@ -151,7 +152,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		className: 'relative z-50 flex justify-between items-center px-6 py-2 bg-gray-900/60 backdrop-blur-lg border-b border-gray-400/30 shadow-lg'
 	}, [leftSection, centerSection, rightSection]);
 
-	// --- Logique des menus (dropdowns) ---
+	// --- Logique des menus ---
 	let langMenuOpen = false;
 	const toggleLangMenu = (show: boolean) => {
 		langMenuOpen = show;

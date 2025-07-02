@@ -94,7 +94,6 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 		twoFaSetupContainer, submitContainer
 	);
 
-	// --- Logique d'événements ---
 	twoFaCheckbox.checked = currentUserState.is_two_fa_enabled;
 
 	twoFaCheckbox.addEventListener('change', async () => {
@@ -145,17 +144,17 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 			if (updatedEmail !== (currentUserState.email || '')) { profilePayload.email = updatedEmail; }
 			if (updatedDisplayName !== (currentUserState.display_name || '')) { profilePayload.display_name = updatedDisplayName; }
 			if (updatedAvatarUrl !== (currentUserState.avatar_url || '')) { profilePayload.avatar_url = updatedAvatarUrl === '' ? null : updatedAvatarUrl; }
-            if (updatedLanguage !== (currentUserState.language || '')) { profilePayload.language = updatedLanguage; }
+			if (updatedLanguage !== (currentUserState.language || '')) { profilePayload.language = updatedLanguage; }
 
-            if (Object.keys(profilePayload).length > 0) {
+			if (Object.keys(profilePayload).length > 0) {
 				changesMade = true;
 				const result = await onProfileUpdate(profilePayload);
 				if (!result.success) throw new Error(result.error);
 			}
 
-            if (updatedLanguage !== getLanguage()) {
-                await setLanguage(updatedLanguage, { reloadRoute: false });
-            }
+			if (updatedLanguage !== getLanguage()) {
+				await setLanguage(updatedLanguage, { reloadRoute: false });
+			}
 			if (changesMade) {
 				showToast(t('user.settings.success'), 'success');
 			} else {

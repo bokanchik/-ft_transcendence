@@ -105,7 +105,7 @@ export function showToast(message: string, type: 'success' | 'error' | 'info' = 
 			toastClasses = 'bg-teal-800/80 border-teal-600/50';
 			break;
 	}
-	
+
 	const toast = createElement('div', {
 		textContent: message,
 		className: `custom-toast fixed top-5 left-5 transform z-[1000] px-6 py-3 rounded-xl shadow-2xl text-white font-semibold transition-all duration-300 ease-in-out backdrop-blur-md border ${toastClasses}`
@@ -158,7 +158,7 @@ export function showCustomConfirm(message: string, title: string = "Confirmation
 		]);
 		dialog.style.opacity = '0';
 		dialog.style.transform = 'scale(0.95)';
-		
+
 		const overlay = createElement('div', {
 			className: 'custom-confirm-overlay fixed inset-0 flex items-center justify-center z-[999] p-4 bg-black/50 transition-opacity duration-200 ease-out'
 		}, [dialog]);
@@ -184,7 +184,7 @@ export function showCustomConfirm(message: string, title: string = "Confirmation
 			}
 		};
 		window.addEventListener('keydown', handleEscKey);
-		
+
 		document.body.appendChild(overlay);
 
 		requestAnimationFrame(() => {
@@ -205,7 +205,7 @@ export function showWaitingToast(socket: SocketIOClient.Socket, controller: Abor
 		textContent: formatTime(timeLeft),
 		className: 'absolute inset-0 flex items-center justify-center text-lg font-bold text-green-300'
 	});
-	
+
 	const spinnerContainer = createElement('div', { className: 'relative w-16 h-16' }, [
 		createElement('div', { className: 'absolute inset-0 rounded-full border-4 border-green-400 border-t-transparent animate-spin' }),
 		timer

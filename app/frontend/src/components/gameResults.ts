@@ -13,7 +13,7 @@ export function showGameResult(player1: string, player2: string, score1: number,
 	const content = document.createElement('div');
 	// content.className = 'bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-6 w-[90%] max-w-lg text-center border border-gray-300';
 	content.className = 'bg-gray-900/70 backdrop-blur-lg border border-gray-400/30 rounded-2xl shadow-2xl p-6 sm:p-8 w-[90%] max-w-lg text-center';
-	
+
 	// Titre
 	const title = document.createElement('h2');
 	// title.className = 'text-3xl font-bold text-gray-800 mb-6';
@@ -82,12 +82,12 @@ export function showGameResult(player1: string, player2: string, score1: number,
 
 	// Mettre en évidence le gagnant
 	if (score1 > score2) {
-        player1Container.classList.add('opacity-100', 'scale-105');
-        player2Container.classList.add('opacity-60', 'scale-95');
-    } else if (score2 > score1) {
-        player2Container.classList.add('opacity-100', 'scale-105');
-        player1Container.classList.add('opacity-60', 'scale-95');
-    }
+		player1Container.classList.add('opacity-100', 'scale-105');
+		player2Container.classList.add('opacity-60', 'scale-95');
+	} else if (score2 > score1) {
+		player2Container.classList.add('opacity-100', 'scale-105');
+		player1Container.classList.add('opacity-60', 'scale-95');
+	}
 
 	// Bouton retour au lobby
 	const closeButton = document.createElement('button');
