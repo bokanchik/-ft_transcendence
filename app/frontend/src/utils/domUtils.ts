@@ -1,4 +1,5 @@
 import { showToast } from "../components/toast.js";
+import { t } from "../services/i18nService.js";
 
 export function createElement<K extends keyof HTMLElementTagNameMap>(
 	tagName: K,
@@ -21,8 +22,8 @@ export function createElement<K extends keyof HTMLElementTagNameMap>(
 		min?: string;
 		max?: string;
 		noValidate?: boolean;
-        selected?: boolean;
-        htmlFor?: string;
+		selected?: boolean;
+		htmlFor?: string;
 		role?: string;
 	},
 	children?: (HTMLElement | string | Node | null | undefined)[]
@@ -37,8 +38,8 @@ export function createElement<K extends keyof HTMLElementTagNameMap>(
 	if (options?.role) el.setAttribute('role', options.role);
 
 	if (options?.noValidate && el instanceof HTMLFormElement) el.noValidate = options.noValidate;
-    if (options?.selected && el instanceof HTMLOptionElement) el.selected = options.selected;
-    if (options?.htmlFor && el instanceof HTMLLabelElement) el.htmlFor = options.htmlFor;
+	if (options?.selected && el instanceof HTMLOptionElement) el.selected = options.selected;
+	if (options?.htmlFor && el instanceof HTMLLabelElement) el.htmlFor = options.htmlFor;
 
 	if (options?.href && el instanceof HTMLAnchorElement) el.href = options.href;
 	if (options?.src && el instanceof HTMLImageElement) el.src = options.src;
@@ -75,7 +76,7 @@ export function createElement<K extends keyof HTMLElementTagNameMap>(
 interface ActionButtonProps {
 	text: string;
 	baseClass?: string;
-	variant?: 'primary' | 'secondary' | 'danger' | 'warning' | 'success' | 'info'; // For predefined styles
+	variant?: 'primary' | 'secondary' | 'danger' | 'warning' | 'success' | 'info';
 	onClick: (event: MouseEvent) => Promise<void> | void;
 	icon?: string;
 	dataAction?: string;
@@ -94,23 +95,23 @@ export function createActionButton(props: ActionButtonProps): HTMLButtonElement 
 		colorClasses = props.baseClass;
 	} else if (props.variant) {
 		switch (props.variant) {
-			case 'primary': 
+			case 'primary':
 				colorClasses = 'bg-blue-700 hover:bg-blue-500 text-white border border-blue-600/50';
 				break;
-			case 'secondary': 
+			case 'secondary':
 				colorClasses = 'bg-white/10 hover:bg-white/20 text-gray-200 border border-white/20';
 				break;
-			case 'danger': 
+			case 'danger':
 				colorClasses = 'bg-red-900 hover:bg-red-700 text-white border border-red-800/50';
 				break;
-			case 'warning': 
+			case 'warning':
 				colorClasses = 'bg-yellow-600 hover:bg-yellow-400 text-black border border-yellow-500/50';
 				break;
-			case 'success': 
+			case 'success':
 				colorClasses = 'bg-teal-800 hover:bg-teal-600 text-white border border-teal-700/50';
 				break;
-			case 'info': 
-				colorClasses = 'bg-teal-500 hover:bg-teal-600 text-white border border-teal-400/50'; 
+			case 'info':
+				colorClasses = 'bg-teal-500 hover:bg-teal-600 text-white border border-teal-400/50';
 				break;
 		}
 	}
@@ -137,7 +138,7 @@ export function createActionButton(props: ActionButtonProps): HTMLButtonElement 
 		} catch (error) {
 			const actionText = props.dataAction || originalText || 'action';
 			console.error(`Error performing action "${actionText}":`, error);
-			showToast(`Failed to ${actionText.toLowerCase()}.`, 'error');
+			showToast(`${t('msg.error.fail')} ${actionText.toLowerCase()}.`, 'error');
 			button.textContent = originalText;
 			button.disabled = false;
 		}
@@ -184,7 +185,7 @@ export function createInputField(id: string, labelText: string, options: InputFi
 		min: options.min,
 		max: options.max,
 		readonly: options.readonly,
-		className: options.inputClass || 'w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400'	
+		className: options.inputClass || 'w-full p-2 bg-black/20 border border-gray-500/50 text-white placeholder-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400'
 	});
 	if (options.pattern) input.pattern = options.pattern;
 
@@ -216,12 +217,12 @@ export function createSelectField(id: string, labelText: string, options: string
 		required: true,
 		className: 'w-full p-2 bg-black/20 border border-gray-500/50 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400'
 	}, options.map(value => createElement('option', { value: value, textContent: value })));
-	
+
 	return createElement('div', {}, [label, select]);
 }
 
 export function clearElement(element: HTMLElement): void {
-    while (element.firstChild) {
-        element.removeChild(element.firstChild);
-    }
+	while (element.firstChild) {
+		element.removeChild(element.firstChild);
+	}
 }

@@ -1,17 +1,18 @@
 import { config } from '../utils/config.js';
+import { t } from '../services/i18nService.js';
 
 export let csrfToken: string | null = null;
 
 export function setCsrfToken(token: string) {
 	csrfToken = token;
-	localStorage.setItem('csrfToken', token);
+	localStorage.setItem(config.storage.user.csrfToken, token);
 }
 
 export function getCsrfTokenOrThrow(): string {
 	if (!csrfToken) {
-		csrfToken = localStorage.getItem('csrfToken');
+		csrfToken = localStorage.getItem(config.storage.user.csrfToken);
 	}
-	if (!csrfToken) throw new Error('CSRF token missing. Please refresh the page.');
+	if (!csrfToken) throw new Error(t('msg.error.user.missCsrf'));
 	return csrfToken;
 }
 
@@ -29,10 +30,9 @@ export async function fetchWithCsrf(url: string, options: RequestInit = {}): Pro
 export async function fetchCsrfToken() {
 	try {
 		const response = await fetch(config.api.auth.csrf, { credentials: 'include' });
-		if (!response.ok) throw new Error('Failed to fetch CSRF token');
+		if (!response.ok) throw new Error(t('msg.error.user.fetchCsrf'));
 		const data = await response.json();
 		setCsrfToken(data.csrfToken);
-		console.log('CSRF Token fetched and stored:', csrfToken);
 	} catch (error) {
 		console.error('Error fetching CSRF token:', error);
 	}

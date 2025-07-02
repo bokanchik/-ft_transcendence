@@ -1,4 +1,4 @@
-import { fetchUserDetails } from '../services/authService.js';
+import { fetchUserPublicDetails } from '../services/authService.js';
 import { fetchMatchHistoryForUser } from '../services/authService.js';
 import { t } from '../services/i18nService.js';
 import { createElement } from '../utils/domUtils.js';
@@ -46,7 +46,7 @@ export async function MatchHistoryComponent(props: MatchHistoryComponentProps): 
 
 			if (!opponentsDetailsCache[opponentId]) {
 				try {
-					const opponentUser = await fetchUserDetails(opponentId);
+					const opponentUser = await fetchUserPublicDetails(opponentId);
 					opponentsDetailsCache[opponentId] = {
 						display_name: opponentUser?.display_name || `${t('match.details.player')} ${opponentId}`,
 						avatar_url: opponentUser?.avatar_url || null

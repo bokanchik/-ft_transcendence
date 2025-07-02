@@ -236,6 +236,7 @@
 			"game": "Redirigiendo al juego..."
 		},
 		"error": {
+			"fail": "Error al",
 			"any": "Ocurrió un error.",
 			"initializing": "Error al inicializar la página. Por favor, intenta refrescar la página.",
 			"unauthorized": "No autorizado. Por favor, inicia sesión.",
@@ -262,6 +263,8 @@
 			"user": {
 				"invalidId": "ID de usuario no válido.",
 				"errorCsrf": "Error de seguridad: el token CSRF no coincide. Por favor, refresca la página e inténtalo de nuevo.",
+				"missCsrf": "Falta el token CSRF. Por favor, refresca la página e inténtalo de nuevo.",
+				"fetchCsrf": "Fallo al obtener el token CSRF. Por favor, refresca la página e inténtalo de nuevo.",
 				"loadingProfile": "Ocurrió un error al cargar el perfil del usuario.",
 				"notFound": "Usuario no encontrado."
 			}

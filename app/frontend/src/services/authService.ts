@@ -6,20 +6,18 @@ import { handleApiResponse, ClientApiError } from './responseService.js';
 import { config } from '../utils/config.js';
 import { t } from './i18nService.js';
 
-const USER_DATA_KEY = 'userDataKey';
-const USER_DATA_EXPIRATION_KEY = 'userDataExpiration';
 
 export function setUserDataInStorage(user: us.User): void {
-	const ttl = 60 * 60 * 1000; // 1 heure en millisecondes
-	const expiration = new Date().getTime() + ttl;
-	localStorage.setItem(USER_DATA_KEY, JSON.stringify(user));
-	localStorage.setItem(USER_DATA_EXPIRATION_KEY, expiration.toString());
+	const ttl = 24 * 60 * 60 * 1000; // 1 heure en millisecondes
+	const expiration = new Date().getTime() + config.storage.user.ttl || ttl;
+	localStorage.setItem(config.storage.user.dataKey, JSON.stringify(user));
+	localStorage.setItem(config.storage.user.expirationKey, expiration.toString());
 	console.log("User data stored in localStorage with expiration:", expiration);
 }
 
 export function clearUserDataFromStorage(): void {
-	localStorage.removeItem(USER_DATA_KEY);
-	localStorage.removeItem(USER_DATA_EXPIRATION_KEY);
+	localStorage.removeItem(config.storage.user.dataKey);
+	localStorage.removeItem(config.storage.user.expirationKey);
 	console.log("User data cleared from localStorage.");
 }
 
@@ -28,14 +26,14 @@ export function clearUserDataFromStorage(): void {
  * @returns {User | null} L'utilisateur si disponible et non expiré, sinon null.
  */
 export function getUserDataFromStorage(): us.User | null {
-	const expiration = localStorage.getItem(USER_DATA_EXPIRATION_KEY);
+	const expiration = localStorage.getItem(config.storage.user.expirationKey);
 	if (expiration && new Date().getTime() > parseInt(expiration, 10)) {
-		localStorage.removeItem(USER_DATA_KEY);
-		localStorage.removeItem(USER_DATA_EXPIRATION_KEY);
+		localStorage.removeItem(config.storage.user.dataKey);
+		localStorage.removeItem(config.storage.user.expirationKey);
 		return null;
 	}
 
-	const data = localStorage.getItem(USER_DATA_KEY);
+	const data = localStorage.getItem(config.storage.user.dataKey);
 	if (!data) return null;
 
 	try {
@@ -43,7 +41,7 @@ export function getUserDataFromStorage(): us.User | null {
 		return parsedData;
 	} catch (e) {
 		console.error("Error parsing user data from localStorage:", e);
-		localStorage.removeItem(USER_DATA_KEY);
+		localStorage.removeItem(config.storage.user.dataKey);
 		return null;
 	}
 }
@@ -73,6 +71,17 @@ export async function fetchUserDetails(userId: number): Promise<us.User> {
 		credentials: 'include',
 	});
 	return handleApiResponse(response, us.GetMeRouteSchema.response);
+}
+
+/**
+ * @param {number} userId - User ID to fetch public details for.
+ * @returns {Promise<UserPublic>} - Public user details.
+ */
+export async function fetchUserPublicDetails(userId: number): Promise<us.UserPublic> {
+	const response = await fetch(config.api.users.public(userId), {
+		credentials: 'include',
+	});
+	return handleApiResponse(response, us.GetUserPublicRouteSchema.response);
 }
 
 /**
@@ -112,7 +121,6 @@ export async function checkAuthStatus(): Promise<us.User | null> {
  * @param {LoginRequestBody} credentials - Les identifiants de connexion.
  * @returns {Promise<ApiResult>} Un objet indiquant le succès ou l'échec.
  * @returns {Promise<ApiLoginSuccessResponse>} Un objet indiquant le succès ou l'échec.
- *
  */
 export async function attemptLogin(credentials: us.LoginRequestBody): Promise<type.ApiResult<type.ApiLoginSuccessData>> {
 	try {
@@ -165,12 +173,9 @@ export async function verifyTwoFactorLogin(token: string): Promise<type.ApiResul
 	}
 }
 
-/**
- * Déconnecte l'utilisateur.
- */
 export async function logout(): Promise<void> {
-	localStorage.removeItem(USER_DATA_KEY);
-	localStorage.removeItem(USER_DATA_EXPIRATION_KEY);
+	localStorage.removeItem(config.storage.user.dataKey);
+	localStorage.removeItem(config.storage.user.expirationKey);
 	console.log("User data removed from localStorage.");
 
 	try {

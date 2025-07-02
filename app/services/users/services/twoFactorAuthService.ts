@@ -14,7 +14,6 @@ export async function generateTwoFactorSecret(user: User): Promise<{ secret: str
     const secret = authenticator.generateSecret();
     const otpauth = authenticator.keyuri(user.email, 'KingPong', secret);
 
-    // CHIFFRER le secret avant de le stocker
     const encryptedSecret = encrypt(secret);
     await userModel.updateUserInDb(user.id, { two_fa_secret: encryptedSecret });
 

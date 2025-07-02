@@ -239,6 +239,7 @@
 			"game": "Redirecting to game..."
 		},
 		"error": {
+			"fail": "Failed to",
 			"any": "An error occurred.",
 			"initializing": "Error initializing Page. Please try refreshing the page.",
 			"unauthorized": "Unauthorized. Please log in.",
@@ -265,6 +266,8 @@
 			"user": {
 				"invalidId": "Invalid User ID",
 				"errorCsrf": "Security Error: CSRF token mismatch. Please refresh the page and try again.",
+				"missCsrf": "CSRF token is missing. Please refresh the page and try again.",
+				"fetchCsrf¨": "Failed to fetch CSRF token. Please refresh the page and try again.",
 				"loadingProfile": "An Error occurred while loading the user profile.",
 				"notFound": "User not found."
 			}

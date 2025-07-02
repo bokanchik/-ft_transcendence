@@ -236,6 +236,7 @@
 			"game": "Redirection vers le jeu..."
 		},
 		"error": {
+			"fail": "Echec de",
 			"any": "Une erreur est survenue.",
 			"initializing": "Erreur lors de l'initialisation de la page. Veuillez essayer de rafraîchir la page.",
 			"unauthorized": "Non autorisé. Veuillez vous connecter.",
@@ -262,6 +263,8 @@
 			"user": {
 				"invalidId": "Identifiant utilisateur invalide.",
 				"errorCsrf": "Erreur de securité: jeton CSRF invalide. Rafraîchissez la page et essayez à nouveau.",
+				"missCsrf": "Jeton CSRF manquant. Veuillez rafraîchir la page et réessayer.",
+				"fetchCsrf": "Echec de la récupération du jeton CSRF. Veuillez rafraîchir la page et réessayer.",
 				"loadingProfile": "Une erreur est survenue lors du chargement du profil utilisateur.",
 				"notFound": "Utilisateur non trouvé."
 			}
