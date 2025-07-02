@@ -28,8 +28,8 @@ export function clearUserDataFromStorage(): void {
 export function getUserDataFromStorage(): us.User | null {
 	const expiration = localStorage.getItem(config.storage.user.expirationKey);
 	if (expiration && new Date().getTime() > parseInt(expiration, 10)) {
-		localStorage.removeItem(config.storage.user.dataKey);
-		localStorage.removeItem(config.storage.user.expirationKey);
+		console.log("User data expired, clearing storage.");
+		clearUserDataFromStorage();
 		return null;
 	}
 
@@ -105,7 +105,6 @@ export async function checkAuthStatus(): Promise<us.User | null> {
 		const response = await fetch(config.api.users.me, { credentials: 'include' });
 		const user = await handleApiResponse(response, us.GetMeRouteSchema.response);
 		setUserDataInStorage(user);
-
 		return user;
 	} catch (error) {
 		if (!(error instanceof ClientApiError && error.httpStatus === 401)) {
@@ -138,7 +137,7 @@ export async function attemptLogin(credentials: us.LoginRequestBody): Promise<ty
 		}
 		return { success: true, data };
 	} catch (error) {
-		const errorMessage = error instanceof Error ? error.message : "Unknown error during login";
+		const errorMessage = error instanceof Error ? error.message : t('error.login.unknown');
 		const statusCode = error instanceof ClientApiError ? error.httpStatus : undefined;
 		return { success: false, error: errorMessage, statusCode };
 	}
@@ -222,7 +221,7 @@ export async function attemptRegister(credentials: us.RegisterRequestBody): Prom
 export async function updateUserProfile(payload: us.UpdateUserPayload): Promise<type.ApiResult<type.ApiUpdateUserSuccessData>> {
 	const cleanPayload: Partial<us.UpdateUserPayload> = { ...payload };
 	if (cleanPayload.avatar_url === '') {
-		cleanPayload.avatar_url = null; // Envoyer null pour effacer l'avatar
+		cleanPayload.avatar_url = null;
 	}
 
 	try {

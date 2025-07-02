@@ -249,6 +249,7 @@
 			"loadingContent": "Error al cargar el contenido. Por favor, inténtalo de nuevo más tarde.",
 			"login": {
 				"invalidCredentials": "Identificador o contraseña no válidos.",
+				"unknown": "error desconocido al iniciar sesión.",
 				"accountBanned": "Esta cuenta ha sido bloqueada."
 			},
 			"register": {

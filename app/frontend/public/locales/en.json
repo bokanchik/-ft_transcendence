@@ -252,6 +252,7 @@
 			"loadingContent": "Error loading content. Please try again later.",
 			"login": {
 				"invalidCredentials": "Invalid identifier or password.",
+				"unknown": "Unknown error occurred during login.",
 				"accountBanned": "This account has been banned."
 			},
 			"register": {

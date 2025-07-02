@@ -249,6 +249,7 @@
 			"loadingContent": "Erreur lors du chargement du contenu. Veuillez réessayer plus tard.",
 			"login": {
 				"invalidCredentials": "Identifiant ou mot de passe invalide.",
+				"unknown": "Erreur inconnue lors de la connexion.",
 				"accountBanned": "Ce compte a été banni."
 			},
 			"register": {
