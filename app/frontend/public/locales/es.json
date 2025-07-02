@@ -240,6 +240,8 @@
 			"unauthorized": "No autorizado. Por favor, inicia sesión.",
 			"forbidden": "Acceso prohibido. No tienes los permisos necesarios.",
 			"unknown": "Ocurrió un error desconocido.",
+			"notFound": "404 - Página no encontrada.",
+			"notFoundMsg": "oops! La página que estás buscando no existe.",
 			"malformedResponse": "La respuesta del servidor está mal formada.",
 			"networkError": "Error de red o no se pudo contactar al servidor.",
 			"loadingContent": "Error al cargar el contenido. Por favor, inténtalo de nuevo más tarde.",

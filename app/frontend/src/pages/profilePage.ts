@@ -70,7 +70,7 @@ export async function ProfilePage(params: { userId?: string }): Promise<HTMLElem
 
 	} catch (error) {
 		console.error("An error occurred when loading profile page:", error);
-		loadingProfileMsg.textContent = `${t('msg.error.user.loadingProfile')} : ${(error as Error).message}.`;
+		loadingProfileMsg.textContent = `${t('msg.error.user.loadingProfile')} : ${t((error as Error).message)}.`;
 		loadingProfileMsg.classList.replace('text-gray-200', 'text-red-400');
 	}
 

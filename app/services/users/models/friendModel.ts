@@ -206,3 +206,22 @@ export async function getFriends(userId: number, limit: number = 10, offset: num
     `;
 	return db.all<Friendship[]>(query, userId, userId, limit, offset);
 }
+
+/**
+ * Checks if a friendship with 'accepted' status exists between two users.
+ * @param {number} userId1 - ID of the first user.
+ * @param {number} userId2 - ID of the second user.
+ * @returns {Promise<boolean>} True if they are friends, false otherwise.
+ */
+export async function areUsersFriendsInDb(userId1: number, userId2: number): Promise<boolean> {
+	if (userId1 === userId2) return false;
+	const db = getDb();
+	const [id1, id2] = userId1 < userId2 ? [userId1, userId2] : [userId2, userId1];
+
+	const friendship = await db.get< { status: FriendshipStatus } >(
+		`SELECT status FROM friendships WHERE user1_id = ? AND user2_id = ? AND status = 'accepted'`,
+		[id1, id2]
+	);
+	
+	return !!friendship;
+}

@@ -25,14 +25,14 @@ interface RouteConfig {
 function renderNotFoundPage(): HTMLElement {
 	const backLink = createElement('a', {
 		href: '/',
-		textContent: 'Back to Home',
+		textContent: t('link.home'),
 		className: 'text-blue-500 hover:underline'
 	});
 	backLink.setAttribute('data-link', '');
 
 	return createElement('div', {}, [
-		createElement('h1', { textContent: '404 - Page Not Found', className: 'text-3xl font-bold text-red-500 text-center p-8' }),
-		createElement('p', { textContent: 'Oops! This page does not exist.', className: 'text-center' }),
+		createElement('h1', { textContent: t('msg.error.notFound'), className: 'text-3xl font-bold text-red-500 text-center p-8' }),
+		createElement('p', { textContent: t('msg.error.notFoundMsg'), className: 'text-center' }),
 		createElement('div', { className: 'text-center mt-4' }, [backLink])
 	]);
 }
@@ -109,7 +109,7 @@ export async function router() {
 	} catch (error) {
 		console.error(`Error while rendering route "${path}":`, error);
 		const errorElement = createElement('p', {
-			textContent: 'An error occurred while loading the page.',
+			textContent: t('msg.error.loadingContent'),
 			className: 'text-red-500 text-center p-8'
 		});
 		appContainer.appendChild(errorElement);

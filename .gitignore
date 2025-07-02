@@ -1,5 +1,6 @@
 # Environment variables
-.env # A ENLEVER !!!
+./app/.env
+# ./app/env
 # ./secrets
 # ./app/frontdata
 

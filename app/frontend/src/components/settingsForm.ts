@@ -164,7 +164,7 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 			navigateTo('/dashboard');
 
 		} catch (error: any) {
-			showToast(`${t('general.error')}: ${error.message || t('user.settings.error')}`, 'error');
+			showToast(`${t('general.error')}: ${t(error.message) || t('user.settings.error')}`, 'error');
 			saveButton.disabled = false;
 			saveButton.textContent = t('user.settings.button');
 		}

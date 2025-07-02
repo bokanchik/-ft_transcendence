@@ -1,6 +1,7 @@
 import * as userModel from '../models/userModel.js';
+import { areUsersFriendsInDb } from '../models/friendModel.js';
 import * as passwordUtils from '../utils/pswdUtils.js';
-import { ERROR_KEYS, AppError, ConflictError, UnauthorizedError, NotFoundError } from '../utils/appError.js';
+import { ERROR_KEYS, AppError, ConflictError, UnauthorizedError, NotFoundError, ForbiddenError } from '../utils/appError.js';
 import { User, UserWithSecrets, LoginRequestBody, RegisterRequestBody, UpdateUserPayload, CreateUserPayload, UserOnlineStatus, UpdateUserStatsBody } from '../shared/schemas/usersSchemas.js';
 
 /**
@@ -78,17 +79,43 @@ export async function getAllUsers(): Promise<User[]> {
 	return userModel.getAllUsersFromDb();
 }
 
+// /**
+//  * Retrieves a user by their ID.
+//  * @param {number} userId - The ID of the user to retrieve.
+//  * @throws {NotFoundError} If the user does not exist.
+//  * @returns {Promise<User>} The user object.
+//  */
+// export async function getUserById(userId: number): Promise<User> {
+// 	console.log('Fetching user by ID from the database');
+// 	const user = await userModel.getUserByIdFromDb(userId);
+// 	if (!user) {
+// 		throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND);
+// 	}
+// 	return user;
+// }
+
 /**
- * Retrieves a user by their ID.
- * @param {number} userId - The ID of the user to retrieve.
+ * Retrieves a user by their ID, checking for permissions.
+ * @param {number} targetUserId - The ID of the user to retrieve.
+ * @param {number} requesterId - The ID of the user making the request.
  * @throws {NotFoundError} If the user does not exist.
+ * @throws {ForbiddenError} If the requester is not allowed to view the profile.
  * @returns {Promise<User>} The user object.
  */
-export async function getUserById(userId: number): Promise<User> {
-	console.log('Fetching user by ID from the database');
-	const user = await userModel.getUserByIdFromDb(userId);
+export async function getUserById(targetUserId: number, requesterId: number = targetUserId): Promise<User> {
+	console.log(`User ${requesterId} is attempting to fetch profile for user ID: ${targetUserId}`);
+	
+	const user = await userModel.getUserByIdFromDb(targetUserId);
 	if (!user) {
 		throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND);
+	}
+
+	if (targetUserId === requesterId) { return user; }
+
+	const areFriends = await areUsersFriendsInDb(targetUserId, requesterId);
+	
+	if (!areFriends) {
+		throw new ForbiddenError(ERROR_KEYS.FORBIDDEN, { detail: 'Access to this profile is restricted to friends only.' });
 	}
 	return user;
 }

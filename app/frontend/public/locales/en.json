@@ -243,6 +243,8 @@
 			"unauthorized": "Unauthorized. Please log in.",
 			"forbidden": "Forbidden. You do not have the necessary permissions.",
 			"unknown": "An unknown error occurred.",
+			"notFound": "404 - Page not found.",
+			"notFoundMsg": "Oops! The page you are looking for does not exist.",
 			"malformedResponse": "The server's error response was malformed.",
 			"networkError": "Network error or could not reach the server.",
 			"loadingContent": "Error loading content. Please try again later.",
