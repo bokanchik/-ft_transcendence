@@ -116,7 +116,7 @@ export function TournamentPage(): HTMLElement {
                 const searchParams = new URLSearchParams(window.location.search);
                 const score = searchParams.get("score");
                 //need to add the recever for the winner
-                console.log(searchParams.get("score"));
+                console.log(`score ${searchParams.get("score")}`);
                 const scoreSpan = document.createElement('span');
                 if (score) {
                     const [score1, score2] = score.split('-').map(Number);
@@ -131,16 +131,21 @@ export function TournamentPage(): HTMLElement {
                     // scoreSpan.className = 'text-gray-500 ml-4';
                     // scoreSpan.textContent = `${match.player1} ${score1} - ${match.player2} ${score2}`;
                     // li.append(player1Span, vsSpan, player2Span, scoreSpan);
-                    if (match.player1 == sessionStorage.getItem('player1') && match.player2 == sessionStorage.getItem('player2')) {
-                        if (score1 > score2) {
+                    const player1 = searchParams.get("player1");
+                    const player2 = searchParams.get("player2");
+                    console.log(`Player1: ${player1}, Player2: ${player2}`);
+                    if (match.player2 == player1 && match.player2 == player1) {
+                        if (score2 < score2) {
                             match.winner = match.player2;
+                            console.log(`Match: ${match.player1} vs ${match.player2}, Winner: ${match.winner}`);
                         } else if (score1 < score2) {
                             match.winner = match.player1;
+                            console.log(`Match: ${match.player1} vs ${match.player2}, Winner: ${match.winner}`);
                         }
                         else {
+                            console.log(`Match: ${match.player1} vs ${match.player2}, No winner`);
                             li.append(player1Span, vsSpan, player2Span);
                         }
-                    console.log(`Match: ${match.player1} vs ${match.player2}, Winner: ${match.winner}`);
                     }
                 } else {
                     li.append(player1Span, vsSpan, player2Span);
