@@ -294,7 +294,11 @@ function handleLocalEvents(ctx: CanvasRenderingContext2D, scoreDisplay: HTMLDivE
 		else {
 			navigateTo('/local-game');
 		}
+		const tmp = sessionStorage.getItem('tournamentData');
 		sessionStorage.clear();
+		if (tmp) {
+			sessionStorage.setItem('tournamentData', tmp);
+		}
 		isGameOver = false;
 	});
 	

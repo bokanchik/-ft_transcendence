@@ -135,10 +135,10 @@ export function TournamentPage(): HTMLElement {
                     const player2 = searchParams.get("player2");
                     console.log(`Player1: ${player1}, Player2: ${player2}`);
                     if (match.player2 == player1 && match.player2 == player1) {
-                        if (score1 > score2) {
+                        if (score1 < score2) {
                             match.winner = match.player2;
                             console.log(`Match: ${match.player1} vs ${match.player2}, Winner: ${match.winner}`);
-                        } else if (score1 < score2) {
+                        } else if (score1 > score2) {
                             match.winner = match.player1;
                             console.log(`Match: ${match.player1} vs ${match.player2}, Winner: ${match.winner}`);
                         }
