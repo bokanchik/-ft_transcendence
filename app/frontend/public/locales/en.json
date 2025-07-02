@@ -3,7 +3,7 @@
 		"title": "King-Pong",
 		"subtitle": "A Multiplayer Pong Game",
 		"catchPhrase": "Dominate the table. Become the King of Pong!",
-		"enter": "Enter the Jungle"
+		"enter": "Enter the Jungle",
 		"button": "PLAY",
 		"gameApi": "Check Game API"
 	},

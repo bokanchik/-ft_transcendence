@@ -5,7 +5,6 @@ let currentLanguage: string = 'en';
 let translations: Record<string, any> = {};
 const supportedLanguages = ['fr', 'en', 'es', 'ru'];
 
-
 async function loadTranslations(lang: string): Promise<void> {
     try {
         const response = await fetch(`/locales/${lang}.json`);

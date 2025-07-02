@@ -1,5 +1,5 @@
 import { getDb } from '../utils/dbConfig.js';
-import { User, UserWithSecrets, CreateUserPayload, UpdatedUserResult, UpdateUserPayload, UserOnlineStatus } from '../shared/schemas/usersSchemas.js'; // Importez vos types
+import { User, UserPublic, UserWithSecrets, CreateUserPayload, UpdatedUserResult, UpdateUserPayload, UserOnlineStatus } from '../shared/schemas/usersSchemas.js'; // Importez vos types
 import { AppError, NotFoundError, ERROR_KEYS } from '../utils/appError.js';
 
 function toAppUser(dbUser: any): User {
@@ -70,6 +70,12 @@ export async function getUserByIdFromDb(userId: number): Promise<User | undefine
 	const db = getDb();
 	const user = await db.get<any>('SELECT id, username, email, display_name, avatar_url, wins, losses, status, language, created_at, updated_at, is_two_fa_enabled FROM users WHERE id = ?', [userId]);
     return user ? toAppUser(user) : undefined;
+}
+
+export async function getUserPublicInfoFromDb(userId: number): Promise<UserPublic | undefined> {
+	const db = getDb();
+	const user = await db.get<any>('SELECT id, display_name, avatar_url, wins, losses, status, created_at, updated_at FROM users WHERE id = ?', [userId]);
+	return user;
 }
 
 /**

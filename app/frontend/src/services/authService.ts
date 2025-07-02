@@ -4,8 +4,8 @@ import * as us from '../shared/schemas/usersSchemas.js';
 import { Match, GetMatchByUserIdRouteSchema } from '../shared/schemas/matchesSchemas.js';
 import { handleApiResponse, ClientApiError } from './responseService.js';
 import { config } from '../utils/config.js';
+import { t } from './i18nService.js';
 
-// Clés pour le localStorage
 const USER_DATA_KEY = 'userDataKey';
 const USER_DATA_EXPIRATION_KEY = 'userDataExpiration';
 
@@ -142,27 +142,27 @@ export async function attemptLogin(credentials: us.LoginRequestBody): Promise<ty
  * @returns {Promise<ApiResult<ApiLoginSuccessResponse>>} Un objet avec les données utilisateur en cas de succès.
  */
 export async function verifyTwoFactorLogin(token: string): Promise<type.ApiResult<type.ApiLoginSuccessData>> {
-    try {
+	try {
 		const response = await fetch(config.api.users.twoFa.login, {
 
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token }),
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ token }),
 			credentials: 'include',
-        });
-        const data = await handleApiResponse(response, us.LoginRouteSchema.response);
-        
-        if (data.user) {
+		});
+		const data = await handleApiResponse(response, us.LoginRouteSchema.response);
+
+		if (data.user) {
 			setUserDataInStorage(data.user);
-            await fetchCsrfToken();
+			await fetchCsrfToken();
 			return { success: true, data };
-        }
-        throw new Error('2FA verification failed to return user data.');
-    } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "Unknown error during 2FA verification";
+		}
+		throw new Error('2FA verification failed to return user data.');
+	} catch (error) {
+		const errorMessage = error instanceof Error ? t('error.message') : "Unknown error during 2FA verification";
 		const statusCode = error instanceof ClientApiError ? error.httpStatus : undefined;
-        return { success: false, error: errorMessage, statusCode };
-    }
+		return { success: false, error: errorMessage, statusCode };
+	}
 }
 
 /**
@@ -187,7 +187,8 @@ export async function logout(): Promise<void> {
  * @param {RegisterRequestBody} credentials - Les informations d'inscription.
  * @returns {Promise<ApiResult>} Un objet indiquant le succès ou l'échec.
  */
-export async function attemptRegister(credentials: us.RegisterRequestBody): Promise<type.ApiResult<type.ApiRegisterSuccessData>> {	try {
+export async function attemptRegister(credentials: us.RegisterRequestBody): Promise<type.ApiResult<type.ApiRegisterSuccessData>> {
+	try {
 		const payload = { ...credentials };
 		if (!payload.avatar_url) {
 			delete payload.avatar_url;
@@ -241,8 +242,8 @@ export async function updateUserProfile(payload: us.UpdateUserPayload): Promise<
  * @returns {Promise<Generate2FAResponse>} Les données pour la configuration.
  */
 export async function generate2FASetup(): Promise<us.Generate2FAResponse> {
-    const response = await fetchWithCsrf(config.api.users.twoFa.generate, { method: 'POST' });
-    return handleApiResponse(response, us.Generate2FARouteSchema.response);
+	const response = await fetchWithCsrf(config.api.users.twoFa.generate, { method: 'POST' });
+	return handleApiResponse(response, us.Generate2FARouteSchema.response);
 }
 
 /**
@@ -251,21 +252,21 @@ export async function generate2FASetup(): Promise<us.Generate2FAResponse> {
  * @returns {Promise<{ message: string }>} Un message de succès.
  */
 export async function verify2FASetup(token: string): Promise<{ message: string }> {
-    const payload: us.Verify2FABodySchema = { token };
-    const response = await fetchWithCsrf(config.api.users.twoFa.verify, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-    });
-    const result = await handleApiResponse(response, us.Verify2FARouteSchema.response);
-    
-    const user = getUserDataFromStorage();
-    if (user) {
-        user.is_two_fa_enabled = true;
-        setUserDataInStorage(user);
-    }
+	const payload: us.Verify2FABodySchema = { token };
+	const response = await fetchWithCsrf(config.api.users.twoFa.verify, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(payload),
+	});
+	const result = await handleApiResponse(response, us.Verify2FARouteSchema.response);
 
-    return result;
+	const user = getUserDataFromStorage();
+	if (user) {
+		user.is_two_fa_enabled = true;
+		setUserDataInStorage(user);
+	}
+
+	return result;
 }
 
 /**
@@ -273,15 +274,15 @@ export async function verify2FASetup(token: string): Promise<{ message: string }
  * @returns {Promise<{ message: string }>} Un message de succès.
  */
 export async function disable2FA(): Promise<{ message: string }> {
-    const response = await fetchWithCsrf(config.api.users.twoFa.disable, { method: 'POST' });
-    const result = await handleApiResponse(response, us.Disable2FARouteSchema.response);
+	const response = await fetchWithCsrf(config.api.users.twoFa.disable, { method: 'POST' });
+	const result = await handleApiResponse(response, us.Disable2FARouteSchema.response);
 
-    const user = getUserDataFromStorage();
-    if (user) {
-        user.is_two_fa_enabled = false;
+	const user = getUserDataFromStorage();
+	if (user) {
+		user.is_two_fa_enabled = false;
 		clearUserDataFromStorage();
 		setUserDataInStorage(user);
-    }
+	}
 
-    return result;
+	return result;
 }

@@ -11,13 +11,13 @@ import { createElement } from '../utils/domUtils.js';
 export async function SettingsPage(): Promise<HTMLElement> {
 	const user: User | null = getUserDataFromStorage();
 	const headerElement = HeaderComponent({ currentUser: user });
-	
+
 	const pageContainer = createElement('div', {
 		className: 'flex-grow flex items-center justify-center p-4 md:p-8'
 	});
-	
-	const pageWrapper = createElement('div', { 
-		className: 'flex flex-col h-screen bg-cover bg-center bg-fixed' 
+
+	const pageWrapper = createElement('div', {
+		className: 'flex flex-col h-screen bg-cover bg-center bg-fixed'
 	}, [
 		headerElement,
 		pageContainer
@@ -89,7 +89,7 @@ export async function SettingsPage(): Promise<HTMLElement> {
 		scrollableContent,
 		backLink
 	]);
-	
+
 	pageContainer.append(cardContainer);
 
 	return pageWrapper;

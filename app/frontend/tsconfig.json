@@ -9,15 +9,6 @@
     "forceConsistentCasingInFileNames": true,
     "lib": ["ESNext", "DOM"],
     "outDir": "./dist/js",
-    "baseUrl": "./",
-    "paths": {
-      "@/*": ["src/*"],
-      "@components/*": ["src/components/*"],
-      "@pages/*": ["src/pages/*"],
-      "@services/*": ["src/services/*"],
-      "@utils/*": ["src/utils/*"],
-      "@shared/*": ["src/shared/*"]
-    }
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts"],
   "exclude": [

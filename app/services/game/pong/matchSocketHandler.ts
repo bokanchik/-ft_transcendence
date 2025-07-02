@@ -103,9 +103,11 @@ function handleClientInput(socket: Socket) {
         const gameSession = findRemoteGameSessionBySocketId(socket.id);
         if (gameSession) {
             const playerSide = gameSession.getPlayerSide(socket.id);
-            if (playerSide) handleKeydownRemote(parseInt(keyCode), playerSide);
+            // if (playerSide) handleKeydownRemote(parseInt(keyCode), playerSide);
+            if (playerSide) handleKeydownRemote(keyCode, playerSide);
         } else {
-             handleKeydownLocal(parseInt(keyCode))
+            //  handleKeydownLocal(parseInt(keyCode))
+            handleKeydownLocal(keyCode);
         }
     });
     
@@ -113,9 +115,11 @@ function handleClientInput(socket: Socket) {
            const gameSession = findRemoteGameSessionBySocketId(socket.id);
         if (gameSession) {
             const playerSide = gameSession.getPlayerSide(socket.id);
-            if (playerSide) handleKeyupRemote(parseInt(keyCode), playerSide);
+            // if (playerSide) handleKeyupRemote(parseInt(keyCode), playerSide);
+            if (playerSide) handleKeyupRemote(keyCode, playerSide);
         } else {
-             handleKeyupLocal(parseInt(keyCode))
+            //  handleKeyupLocal(parseInt(keyCode))
+            handleKeyupLocal(keyCode);
         }
     });
     

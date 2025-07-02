@@ -6,6 +6,7 @@ export const config = {
         users: {
             all: `${USER_API_PREFIX}/`, // URL_ALL_USERS
             byId: (userId: number | string) => `${USER_API_PREFIX}/${userId}`, // URL_USER
+            public: (userId: number | string) => `${USER_API_PREFIX}/${userId}/public`, // URL_USER_PUBLIC
             me: `${USER_API_PREFIX}/me`, // URL_USER_ME
             matchesByUserId: (userId: number | string) => `${USER_API_PREFIX}/${userId}/matches`, // URL_USER_MATCH
             twoFa: {

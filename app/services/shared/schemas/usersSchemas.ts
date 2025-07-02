@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+// --- Base Schemas ---
 export enum UserOnlineStatus {
 	ONLINE = 'online',
 	OFFLINE = 'offline',
@@ -7,21 +8,39 @@ export enum UserOnlineStatus {
 }
 export const UserOnlineStatusSchema = z.nativeEnum(UserOnlineStatus);
 
-// --- Base Schemas ---
-export const UserBaseSchema = z.object({
+export const UserPublicSchema = z.object({
     id: z.number().int(),
-    username: z.string().min(3).max(20),
-    email: z.string().email(),
     display_name: z.string().min(3).max(20),
     avatar_url: z.string().url().nullable(),
     wins: z.number().int().default(0),
     losses: z.number().int().default(0),
     status: UserOnlineStatusSchema.default(UserOnlineStatus.OFFLINE),
+    created_at: z.string(),
+    updated_at: z.string(),
+});
+export type UserPublic = z.infer<typeof UserPublicSchema>;
+
+export const UserBaseSchema = UserPublicSchema.extend({
+    username: z.string().min(3).max(20),
+    email: z.string().email(),
     language: z.string().length(2).default('en'),
-    created_at: z.string(), // Ou z.date()
-    updated_at: z.string(), // Ou z.date()
     is_two_fa_enabled: z.boolean().default(false),
 });
+
+// export const UserBaseSchema = z.object({
+//     id: z.number().int(),
+//     username: z.string().min(3).max(20),
+//     email: z.string().email(),
+//     display_name: z.string().min(3).max(20),
+//     avatar_url: z.string().url().nullable(),
+//     wins: z.number().int().default(0),
+//     losses: z.number().int().default(0),
+//     status: UserOnlineStatusSchema.default(UserOnlineStatus.OFFLINE),
+//     language: z.string().length(2).default('en'),
+//     created_at: z.string(), // Ou z.date()
+//     updated_at: z.string(), // Ou z.date()
+//     is_two_fa_enabled: z.boolean().default(false),
+// });
 export type User = z.infer<typeof UserBaseSchema>;
 
 export const UserWithPasswordHashSchema = UserBaseSchema.extend({
@@ -183,6 +202,16 @@ export const UserIdParamsSchema = z.object({
     userId: z.string().regex(/^\d+$/, "User ID must be a positive integer."),
 });
 export type UserIdParams = z.infer<typeof UserIdParamsSchema>;
+
+export const GetUserPublicRouteSchema = {
+    params: UserIdParamsSchema,
+    response: {
+        200: UserPublicSchema,
+        401: ErrorResponseSchema,
+        404: ErrorResponseSchema,
+        500: ErrorResponseSchema
+    }
+};
 
 export const GetUserByIdRouteSchema = {
     params: UserIdParamsSchema,

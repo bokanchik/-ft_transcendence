@@ -29,6 +29,14 @@ export default async function userRoutes(fastify: FastifyInstance, options: Fast
 			handler: uh.getUserInfoHandler
 		},
 	);
+	fastify.get(
+		config.URL_USER_PUBLIC,
+		{
+			onRequest: [fastify.authenticate],
+			schema: us.GetUserPublicRouteSchema,
+			handler: uh.getUserPublicHandler
+		},
+	);
 	fastify.patch(
 		config.URL_USER_ME,
 		{

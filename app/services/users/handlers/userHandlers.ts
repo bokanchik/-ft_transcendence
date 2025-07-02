@@ -40,6 +40,18 @@ export async function getUserInfoHandler(req: AuthenticatedRequest, reply: Fasti
 	return reply.code(200).send(user);
 }
 
+export async function getUserPublicHandler(req: FastifyRequest, reply: FastifyReply) {
+	const userId = parseInt((req.params as UserIdParams).userId, 10);
+
+	if (isNaN(userId)) {
+		return reply.code(400).send({ error: 'Invalid user ID.' });
+	}
+
+	const user = await userService.getUserPublicInfo(userId);
+
+	return reply.code(200).send(user);
+}
+
 export async function updateUserStatsHandler(req: FastifyRequest, reply: FastifyReply) {
     const userId = parseInt((req.params as UserIdParams).userId, 10);
     const statsUpdate = req.body as UpdateUserStatsBody;

@@ -16,31 +16,31 @@ import { createElement, clearElement } from '../utils/domUtils.js';
 const DASHBOARD_ACTIVE_TAB_KEY = 'dashboardActiveTab';
 
 function nextFrame(): Promise<void> {
-    return new Promise(resolve => requestAnimationFrame(() => resolve()));
+	return new Promise(resolve => requestAnimationFrame(() => resolve()));
 }
 
 export async function adjustFontSizeToFit(
-    element: HTMLElement,
-    fontSizes: string[] = ['text-2xl', 'text-xl', 'text-lg', 'text-base', 'text-sm', 'text-xs'],
-    truncateClass: string = 'truncate'
+	element: HTMLElement,
+	fontSizes: string[] = ['text-2xl', 'text-xl', 'text-lg', 'text-base', 'text-sm', 'text-xs'],
+	truncateClass: string = 'truncate'
 ) {
-    element.classList.add('whitespace-nowrap', 'overflow-hidden');
+	element.classList.add('whitespace-nowrap', 'overflow-hidden');
 
-    await nextFrame();
+	await nextFrame();
 
-    for (const sizeClass of fontSizes) {
-        fontSizes.forEach(s => element.classList.remove(s));
-        element.classList.add(sizeClass);
+	for (const sizeClass of fontSizes) {
+		fontSizes.forEach(s => element.classList.remove(s));
+		element.classList.add(sizeClass);
 
-        await nextFrame();
+		await nextFrame();
 
-        if (element.scrollWidth <= element.clientWidth) {
-            element.classList.remove(truncateClass);
-            return;
-        }
-    }
+		if (element.scrollWidth <= element.clientWidth) {
+			element.classList.remove(truncateClass);
+			return;
+		}
+	}
 
-    element.classList.add(truncateClass);
+	element.classList.add(truncateClass);
 }
 
 export async function DashboardPage(): Promise<HTMLElement> {
@@ -63,10 +63,10 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	sidebar.dataset.testid = 'sidebar';
 	const activeTabContentContainer = createElement('div', { id: 'active-tab-content', className: 'flex-grow overflow-y-auto min-h-0' });
 	const tabNavigation = createElement('div', { className: 'flex-shrink-0 flex space-x-1 border-b border-gray-400/30 mb-6' });
-	const tabContentWrapper = createElement('div', { className: 'w-3/4 p-6 flex flex-col' }, [ tabNavigation, activeTabContentContainer ]);
+	const tabContentWrapper = createElement('div', { className: 'w-3/4 p-6 flex flex-col' }, [tabNavigation, activeTabContentContainer]);
 	const mainSection = createElement('div', { className: 'flex flex-1 min-h-0' }, [sidebar, tabContentWrapper]);
 	let headerElement = HeaderComponent({ currentUser: currentUser! });
-	
+
 	const dashboardWrapper = createElement('div', {
 		className: 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 w-full max-w-6xl mx-auto my-8 rounded-2xl shadow-2xl flex flex-col flex-1 min-h-0'
 	}, [headerElement, mainSection]);
@@ -74,43 +74,43 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	const pageContainer = createElement('div', { className: 'flex flex-col h-screen' }, [dashboardWrapper]);
 
 	function createSidebarItem(label: string, value: string | number | Date | undefined | null): HTMLElement {
-        const isEmailField = label === t('user.email');
+		const isEmailField = label === t('user.email');
 		const isDateField = value instanceof Date;
 
 		const valueClass = 'font-beach font-medium text-2xl text-gray-200 overflow-hidden whitespace-nowrap';
-		
-		let valueText: string;
-        let titleText: string | undefined;
 
-        if (isDateField) {
-            const date = value as Date;
+		let valueText: string;
+		let titleText: string | undefined;
+
+		if (isDateField) {
+			const date = value as Date;
 			const currentAppLanguage = getLanguage();
-            valueText = new Intl.DateTimeFormat(currentAppLanguage, {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
-            }).format(date);
+			valueText = new Intl.DateTimeFormat(currentAppLanguage, {
+				day: 'numeric',
+				month: 'long',
+				year: 'numeric'
+			}).format(date);
 
 			const datePart = date.toLocaleDateString(currentAppLanguage);
-            const timePart = date.toLocaleTimeString(currentAppLanguage);
-            titleText = `${t('general.on')} ${datePart} ${t('general.at')} ${timePart}`;
+			const timePart = date.toLocaleTimeString(currentAppLanguage);
+			titleText = `${t('general.on')} ${datePart} ${t('general.at')} ${timePart}`;
 		} else {
-            valueText = value?.toString() || 'N/A';
-            if (isEmailField) {
-                titleText = valueText;
-            }
-        }
+			valueText = value?.toString() || 'N/A';
+			if (isEmailField) {
+				titleText = valueText;
+			}
+		}
 
-        const valueElement = createElement('p', { 
-            textContent: valueText, 
-            className: valueClass, 
-            title: titleText 
-        });
+		const valueElement = createElement('p', {
+			textContent: valueText,
+			className: valueClass,
+			title: titleText
+		});
 		adjustFontSizeToFit(valueElement, ['text-2xl', 'text-xl', 'text-lg', 'text-base', 'text-sm', 'text-xs']);
 
-        return createElement('div', { className: 'p-4 bg-black/20 border border-gray-400/20 rounded-lg' }, [
+		return createElement('div', { className: 'p-4 bg-black/20 border border-gray-400/20 rounded-lg' }, [
 			createElement('span', { textContent: label, className: 'text-sm text-gray-300 block mb-1' }),
-            valueElement
+			valueElement
 		]);
 	}
 
@@ -155,9 +155,8 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		sessionStorage.setItem(DASHBOARD_ACTIVE_TAB_KEY, tabId);
 		tabNavigation.querySelectorAll('button').forEach(btn => {
 			const isActive = btn.dataset.tabId === tabId;
-			btn.className = `py-2 px-4 text-2xl font-beach focus:outline-none transition-colors ${
-				isActive ? 'border-b-2 border-blue-400 text-white' : 'text-gray-300 hover:text-white hover:border-gray-300/70'
-			}`;
+			btn.className = `py-2 px-4 text-2xl font-beach focus:outline-none transition-colors ${isActive ? 'border-b-2 border-blue-400 text-white' : 'text-gray-300 hover:text-white hover:border-gray-300/70'
+				}`;
 		});
 		loadActiveTabContent();
 	}
@@ -165,9 +164,8 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	TABS.forEach(tabInfo => {
 		const tabButton = createElement('button', {
 			textContent: tabInfo.label,
-			className: `py-2 px-4 text-2xl font-beach focus:outline-none transition-colors ${
-				tabInfo.id === activeTabId ? 'border-b-2 border-blue-400 text-white' : 'text-gray-300 hover:text-white hover:border-gray-300/70'
-			}`
+			className: `py-2 px-4 text-2xl font-beach focus:outline-none transition-colors ${tabInfo.id === activeTabId ? 'border-b-2 border-blue-400 text-white' : 'text-gray-300 hover:text-white hover:border-gray-300/70'
+				}`
 		});
 		tabButton.dataset.tabId = tabInfo.id;
 		tabButton.addEventListener('click', () => switchTab(tabInfo.id));
@@ -214,7 +212,7 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		showToast(translateResultMessage(result.message), 'success');
 		if (activeTabId === 'users' || activeTabId === 'pending') await loadActiveTabContent();
 	};
-    
+
 	async function loadUsersContent(): Promise<HTMLElement> {
 		const [usersData, friendsData, sentRequestsData, receivedRequestsData] = await Promise.all([
 			fetchUsers(), FriendService.getFriendsList(), FriendService.getSentFriendRequests(), FriendService.getReceivedFriendRequests()

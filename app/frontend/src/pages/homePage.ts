@@ -15,7 +15,7 @@ export function HomePage(): HTMLElement {
 		textContent: t('app.catchPhrase'),
 		className: 'text-lg sm:text-xl text-gray-200 mb-12 max-w-2xl text-shadow font-beach'
 	});
-	
+
 	const playButton = createElement('a', {
 		href: '/local-game',
 		textContent: t('app.button'),
@@ -37,7 +37,7 @@ export function HomePage(): HTMLElement {
 	const container = createElement('div', {
 		className: 'relative bg-cover bg-center flex-grow text-white flex flex-col items-center justify-center p-4 sm:p-8'
 	}, [mainContent, styleElement]);
-	
+
 	const pageWrapper = createElement('div', {
 		className: 'flex flex-col min-h-screen bg-cover bg-center'
 	}, [

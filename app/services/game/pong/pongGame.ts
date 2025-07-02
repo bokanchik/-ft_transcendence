@@ -175,35 +175,51 @@ function isBallCollision(ball: any, paddleX: any, paddleY): boolean {
 }
 
 // --- KeyInput Handlers for local && remote mode ---
-export function handleKeydownRemote(key: number, side: string) {
+// export function handleKeydownRemote(key: number, side: string) {
+export function handleKeydownRemote(key: string, side: string) {
     switch (key) {
-        case ARROW_UP: keyState.remote[side].UP = true; break;
-        case ARROW_DOWN: keyState.remote[side].DOWN = true; break;
+        // case ARROW_UP: keyState.remote[side].UP = true; break;
+        // case ARROW_DOWN: keyState.remote[side].DOWN = true; break;
+        case 'ArrowUp': keyState.remote[side].UP = true; break;
+        case 'ArrowDown': keyState.remote[side].DOWN = true; break;
     }
 }
 
-export function handleKeyupRemote(key: number, side: string) {
+// export function handleKeyupRemote(key: number, side: string) {
+export function handleKeyupRemote(key: string, side: string) {
     switch (key) {
-            case ARROW_UP: keyState.remote[side].UP = false; break;
-            case ARROW_DOWN: keyState.remote[side].DOWN = false; break;
+            // case ARROW_UP: keyState.remote[side].UP = false; break;
+            // case ARROW_DOWN: keyState.remote[side].DOWN = false; break;
+        case 'ArrowUp': keyState.remote[side].UP = false; break;
+        case 'ArrowDown': keyState.remote[side].DOWN = false; break;
     }
 }
 
-export function handleKeydownLocal(key: number) {
+// export function handleKeydownLocal(key: number) {
+export function handleKeydownLocal(key: string) {
     switch (key) {
-        case W: keyState.local.W = true; break;
-        case S: keyState.local.S = true; break;
-        case ARROW_UP: keyState.local.UP = true; break;
-        case ARROW_DOWN: keyState.local.DOWN = true; break;
+        // case W: keyState.local.W = true; break;
+        // case S: keyState.local.S = true; break;
+        // case ARROW_UP: keyState.local.UP = true; break;
+        // case ARROW_DOWN: keyState.local.DOWN = true; break;
+        case 'KeyW': keyState.local.W = true; break;
+        case 'KeyS': keyState.local.S = true; break;
+        case 'ArrowUp': keyState.local.UP = true; break;
+        case 'ArrowDown': keyState.local.DOWN = true; break;
     }
 }
             
-export function handleKeyupLocal(key: number) {
+// export function handleKeyupLocal(key: number) {
+export function handleKeyupLocal(key: string) {
     switch (key) {
-        case W: keyState.local.W = false; break;
-        case S: keyState.local.S = false; break;
-        case ARROW_UP: keyState.local.UP = false; break;
-        case ARROW_DOWN: keyState.local.DOWN = false; break;
+        // case W: keyState.local.W = false; break;
+        // case S: keyState.local.S = false; break;
+        // case ARROW_UP: keyState.local.UP = false; break;
+        // case ARROW_DOWN: keyState.local.DOWN = false; break;
+        case 'KeyW': keyState.local.W = false; break;
+        case 'KeyS': keyState.local.S = false; break;
+        case 'ArrowUp': keyState.local.UP = false; break;
+        case 'ArrowDown': keyState.local.DOWN = false; break;
     }
 }
       

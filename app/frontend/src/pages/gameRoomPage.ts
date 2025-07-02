@@ -394,188 +394,190 @@ let isGameOver = false;
 
 // --- Point d'entrée de la page ---
 export function GameRoomPage(mode: GameMode): HTMLElement {
-    isGameOver = false;
+	isGameOver = false;
 
-    const leftUsername = createElement('div', { id: 'left-username', className: 'w-32 text-center text-lg font-bold text-white bg-teal-600/30 border-2 border-teal-500/50 p-2 rounded-lg shadow-md' });
-    const rightUsername = createElement('div', { id: 'right-username', className: 'w-32 text-center text-lg font-bold text-white bg-rose-600/30 border-2 border-rose-500/50 p-2 rounded-lg shadow-md' });
-    const scoreDisplay = createElement('div', { id: 'score-display', textContent: '0 - 0', className: 'text-5xl font-extrabold text-yellow-300 drop-shadow-lg [text-shadow:_0_2px_4px_rgb(0_0_0_/_40%)]' });
-    
-    const canvas = createElement('canvas', { id: 'pong-canvas', className: 'border-4 border-white/10 rounded-lg shadow-inner' });
-    canvas.width = 800;
-    canvas.height = 500;
-    
-    const quitButton = createElement('button', { textContent: t('game.quitButton'), className: 'px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-lg transition duration-200 border border-red-500/50' });
+	const leftUsername = createElement('div', { id: 'left-username', className: 'w-32 text-center text-lg font-bold text-white bg-teal-600/30 border-2 border-teal-500/50 p-2 rounded-lg shadow-md' });
+	const rightUsername = createElement('div', { id: 'right-username', className: 'w-32 text-center text-lg font-bold text-white bg-rose-600/30 border-2 border-rose-500/50 p-2 rounded-lg shadow-md' });
+	const scoreDisplay = createElement('div', { id: 'score-display', textContent: '0 - 0', className: 'text-5xl font-extrabold text-yellow-300 drop-shadow-lg [text-shadow:_0_2px_4px_rgb(0_0_0_/_40%)]' });
 
-    const gameRow = createElement('div', { className: 'flex items-center' }, [leftUsername, canvas, rightUsername]);
-    const container = createElement('div', { className: 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-2xl shadow-2xl p-6 sm:p-8 flex flex-col items-center gap-4' }, [
-        scoreDisplay, gameRow, quitButton
-    ]);
-    const pageWrapper = createElement('div', { className: 'w-full h-screen flex flex-col items-center justify-center bg-cover bg-center bg-fixed' }, [container]);
-    pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
+	const canvas = createElement('canvas', { id: 'pong-canvas', className: 'border-4 border-white/10 rounded-lg shadow-inner' });
+	canvas.width = 800;
+	canvas.height = 500;
 
-    const gameMode = sessionStorage.getItem('gameMode') as GameMode | null;
-    if (!gameMode) {
-        console.error('Game mode not found in sessionStorage. Navigating home.');
-        navigateTo('/');
-        return pageWrapper;
-    }
+	const quitButton = createElement('button', { textContent: t('game.quitButton'), className: 'px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-lg transition duration-200 border border-red-500/50' });
 
-    setupUsernames(leftUsername, rightUsername, gameMode);
-    
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('Canvas context not supported');
-    
-    initializeGame(gameMode, ctx, scoreDisplay);
+	const gameRow = createElement('div', { className: 'flex items-center' }, [leftUsername, canvas, rightUsername]);
+	const container = createElement('div', { className: 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-2xl shadow-2xl p-6 sm:p-8 flex flex-col items-center gap-4' }, [
+		scoreDisplay, gameRow, quitButton
+	]);
+	const pageWrapper = createElement('div', { className: 'w-full h-screen flex flex-col items-center justify-center bg-cover bg-center bg-fixed' }, [container]);
+	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
 
-    quitButton.addEventListener('click', () => quitGameHandler(gameMode));
-    
-    return pageWrapper;
+	const gameMode = sessionStorage.getItem('gameMode') as GameMode | null;
+	if (!gameMode) {
+		console.error('Game mode not found in sessionStorage. Navigating home.');
+		navigateTo('/');
+		return pageWrapper;
+	}
+
+	setupUsernames(leftUsername, rightUsername, gameMode);
+
+	const ctx = canvas.getContext('2d');
+	if (!ctx) throw new Error('Canvas context not supported');
+
+	initializeGame(gameMode, ctx, scoreDisplay);
+
+	quitButton.addEventListener('click', () => quitGameHandler(gameMode));
+
+	return pageWrapper;
 }
 
 function setupUsernames(leftUsername: HTMLElement, rightUsername: HTMLElement, gameMode: GameMode) {
-    if (gameMode === 'local' || gameMode === 'tournament') {
-        leftUsername.textContent = sessionStorage.getItem('player1') || 'Player 1';
-        rightUsername.textContent = sessionStorage.getItem('player2') || 'Player 2';
-    } else {
-        const side = sessionStorage.getItem('side');
-        const displayName = sessionStorage.getItem('displayName');
-        const opponent = sessionStorage.getItem('opponent');
-        if (side === 'left') {
-            leftUsername.textContent = displayName;
-            rightUsername.textContent = opponent;
-        } else {
-            rightUsername.textContent = displayName;
-            leftUsername.textContent = opponent;
-        }
-    }
+	if (gameMode === 'local' || gameMode === 'tournament') {
+		leftUsername.textContent = sessionStorage.getItem('player1') || 'Player 1';
+		rightUsername.textContent = sessionStorage.getItem('player2') || 'Player 2';
+	} else {
+		const side = sessionStorage.getItem('side');
+		const displayName = sessionStorage.getItem('displayName');
+		const opponent = sessionStorage.getItem('opponent');
+		if (side === 'left') {
+			leftUsername.textContent = displayName;
+			rightUsername.textContent = opponent;
+		} else {
+			rightUsername.textContent = displayName;
+			leftUsername.textContent = opponent;
+		}
+	}
 }
 
 function initializeGame(gameMode: GameMode, ctx: CanvasRenderingContext2D, scoreDisplay: HTMLDivElement) {
-    const initialGameState: GameState = { leftPaddle: { y: 200 }, rightPaddle: { y: 200 }, ball: { x: 400, y: 250 }, score1: 0, score2: 0 };
-    drawGame(initialGameState, ctx);
-    updateScore(scoreDisplay, initialGameState);
-    
-    clientSocketHandler(gameMode, ctx, scoreDisplay);
+	const initialGameState: GameState = { leftPaddle: { y: 200 }, rightPaddle: { y: 200 }, ball: { x: 400, y: 250 }, score1: 0, score2: 0 };
+	drawGame(initialGameState, ctx);
+	updateScore(scoreDisplay, initialGameState);
+
+	clientSocketHandler(gameMode, ctx, scoreDisplay);
 }
 
 function clientSocketHandler(gameMode: GameMode, ctx: CanvasRenderingContext2D, scoreDisplay: HTMLDivElement) {
-    if (!socket.connected) {
-        socket.connect();
-    }
-    
-    const handleGameState = (state: GameState) => {
-        if (isGameOver) return;
-        requestAnimationFrame(() => drawGame(state, ctx));
-        updateScore(scoreDisplay, state);
-    };
+	if (!socket.connected) {
+		socket.connect();
+	}
 
-    socket.on('gameState', handleGameState);
-    socket.on('gameOver', (finalState?: GameState) => onGameOver(finalState)); // Modifié pour accepter l'état final
-    
-    if (gameMode === 'remote') {
-        socket.on('opponentLeft', () => onGameOver());
-    } else {
-        const matchId = sessionStorage.getItem('matchId');
-        if (matchId) socket.emit('startLocal', matchId);
-    }
+	const handleGameState = (state: GameState) => {
+		if (isGameOver) return;
+		requestAnimationFrame(() => drawGame(state, ctx));
+		updateScore(scoreDisplay, state);
+	};
 
-    document.addEventListener('keydown', handleKeydown);
-    document.addEventListener('keyup', handleKeyup);
+	socket.on('gameState', handleGameState);
+	socket.on('gameOver', (finalState?: GameState) => onGameOver(finalState));
+
+	if (gameMode === 'remote') {
+		socket.on('opponentLeft', () => onGameOver());
+	} else {
+		const matchId = sessionStorage.getItem('matchId');
+		if (matchId) socket.emit('startLocal', matchId);
+	}
+
+	document.addEventListener('keydown', handleKeydown);
+	document.addEventListener('keyup', handleKeyup);
 }
 
-function handleKeydown(e: KeyboardEvent) { socket.emit('keydown', e.keyCode); }
-function handleKeyup(e: KeyboardEvent) { socket.emit('keyup', e.keyCode); }
+// function handleKeydown(e: KeyboardEvent) { socket.emit('keydown', e.keyCode); }
+// function handleKeyup(e: KeyboardEvent) { socket.emit('keyup', e.keyCode); }
+function handleKeydown(e: KeyboardEvent) { socket.emit('keydown', e.code); }
+function handleKeyup(e: KeyboardEvent) { socket.emit('keyup', e.code); }
 
 async function onGameOver(finalState?: GameState) {
-    if (isGameOver) return;
-    isGameOver = true;
-    
-    const gameMode = sessionStorage.getItem('gameMode');
-    const matchId = sessionStorage.getItem('matchId');
+	if (isGameOver) return;
+	isGameOver = true;
 
-    cleanupAll();
+	const gameMode = sessionStorage.getItem('gameMode');
+	const matchId = sessionStorage.getItem('matchId');
 
-    if (gameMode === 'local' || gameMode === 'tournament') {
-        if (finalState) {
-            const player1 = sessionStorage.getItem('player1') || 'Player 1';
-            const player2 = sessionStorage.getItem('player2') || 'Player 2';
-            const defaultAvatar = (name: string) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=128`;
-            const destination = gameMode === 'tournament' ? '/tournament' : '/local-game';
-            const buttonText = gameMode === 'tournament' ? t('link.tournament') : t('link.newGame');
-            showGameResult(player1, player2, finalState.score1, finalState.score2, defaultAvatar(player1), defaultAvatar(player2), destination, buttonText);
-        } else {
-            navigateTo('/local-game');
-        }
-        return;
-    }
+	cleanupAll();
 
-    try {
-        if (!matchId) throw new Error("Match ID not found for remote game over.");
-        const matchRes = await fetch(`/api/game/match/remote/${matchId}`);
-        if (!matchRes.ok) throw new Error('Failed to fetch match info');
-        const data = await matchRes.json();
-        
-        const [url1, url2, name1, name2] = await Promise.all([
-            getUserAvatar(data.player1_id),
-            getUserAvatar(data.player2_id),
-            getDisplayName(data.player1_id),
-            getDisplayName(data.player2_id)
-        ]);
+	if (gameMode === 'local' || gameMode === 'tournament') {
+		if (finalState) {
+			const player1 = sessionStorage.getItem('player1') || 'Player 1';
+			const player2 = sessionStorage.getItem('player2') || 'Player 2';
+			const defaultAvatar = (name: string) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=128`;
+			const destination = gameMode === 'tournament' ? '/tournament' : '/local-game';
+			const buttonText = gameMode === 'tournament' ? t('link.tournament') : t('link.newGame');
+			showGameResult(player1, player2, finalState.score1, finalState.score2, defaultAvatar(player1), defaultAvatar(player2), destination, buttonText);
+		} else {
+			navigateTo('/local-game');
+		}
+		return;
+	}
 
-        showGameResult(name1, name2, data.player1_score ?? 0, data.player2_score ?? 0, url1, url2, '/game', t('link.lobby'));
-    } catch (err) {
-        console.error("Error on game over:", err);
-        navigateTo('/game');
-    }
+	try {
+		if (!matchId) throw new Error("Match ID not found for remote game over.");
+		const matchRes = await fetch(`/api/game/match/remote/${matchId}`);
+		if (!matchRes.ok) throw new Error('Failed to fetch match info');
+		const data = await matchRes.json();
+
+		const [url1, url2, name1, name2] = await Promise.all([
+			getUserAvatar(data.player1_id),
+			getUserAvatar(data.player2_id),
+			getDisplayName(data.player1_id),
+			getDisplayName(data.player2_id)
+		]);
+
+		showGameResult(name1, name2, data.player1_score ?? 0, data.player2_score ?? 0, url1, url2, '/game', t('link.lobby'));
+	} catch (err) {
+		console.error("Error on game over:", err);
+		navigateTo('/game');
+	}
 }
 
 async function quitGameHandler(gameMode: GameMode) {
-    const confirmed = await showCustomConfirm(t('game.quitConfirm'));
-    if (confirmed) {
-        isGameOver = true;
-        cleanupAll();
-        const destination = (gameMode === 'local' || gameMode === 'tournament') ? '/local-game' : '/game';
-        navigateTo(destination);
-    }
+	const confirmed = await showCustomConfirm(t('game.quitConfirm'));
+	if (confirmed) {
+		isGameOver = true;
+		cleanupAll();
+		const destination = (gameMode === 'local' || gameMode === 'tournament') ? '/local-game' : '/game';
+		navigateTo(destination);
+	}
 }
 
 function drawGame(state: GameState, ctx: CanvasRenderingContext2D) {
-    ctx.fillStyle = BG_COLOUR;
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    
-    ctx.fillStyle = BALL_COLOUR;
-    ctx.beginPath();
-    ctx.arc(state.ball.x, state.ball.y, BALL_RADIUS, 0, Math.PI * 2);
-    ctx.fill();
-    
-    ctx.fillStyle = PADDLE_COLOUR;
-    ctx.fillRect(PADDLE_X_LEFT, state.leftPaddle.y, PADDLE_WIDTH, PADDLE_HEIGHT);
-    ctx.fillRect(PADDLE_X_RIGHT, state.rightPaddle.y, PADDLE_WIDTH, PADDLE_HEIGHT);
+	ctx.fillStyle = BG_COLOUR;
+	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+	ctx.fillStyle = BALL_COLOUR;
+	ctx.beginPath();
+	ctx.arc(state.ball.x, state.ball.y, BALL_RADIUS, 0, Math.PI * 2);
+	ctx.fill();
+
+	ctx.fillStyle = PADDLE_COLOUR;
+	ctx.fillRect(PADDLE_X_LEFT, state.leftPaddle.y, PADDLE_WIDTH, PADDLE_HEIGHT);
+	ctx.fillRect(PADDLE_X_RIGHT, state.rightPaddle.y, PADDLE_WIDTH, PADDLE_HEIGHT);
 }
 
 function updateScore(scoreDisplay: HTMLElement, state: GameState) {
-    scoreDisplay.textContent = `${state.score1} - ${state.score2}`;
+	scoreDisplay.textContent = `${state.score1} - ${state.score2}`;
 }
 
 async function getDisplayName(userId: number): Promise<string> {
-    const userRes = await fetch(`api/users/${userId}`);
-    if (!userRes.ok) return `Player ${userId}`;
-    const userData = await userRes.json();
-    return userData.display_name || `Player ${userId}`;
+	const userRes = await fetch(`api/users/${userId}`);
+	if (!userRes.ok) return `Player ${userId}`;
+	const userData = await userRes.json();
+	return userData.display_name || `Player ${userId}`;
 }
 
 async function getUserAvatar(userId: number): Promise<string> {
-    const userRes = await fetch(`/api/users/${userId}`);
-    if (!userRes.ok) return `https://ui-avatars.com/api/?name=??`;
-    const userData = await userRes.json();
-    return userData.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.display_name)}&background=random&color=fff&size=128`;
+	const userRes = await fetch(`/api/users/${userId}`);
+	if (!userRes.ok) return `https://ui-avatars.com/api/?name=??`;
+	const userData = await userRes.json();
+	return userData.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.display_name)}&background=random&color=fff&size=128`;
 }
 
 function cleanupAll() {
-    document.removeEventListener('keydown', handleKeydown);
-    document.removeEventListener('keyup', handleKeyup);
-    cleanupSocket(socket);
-    // On ne nettoie pas tout sessionStorage pour garder les infos du tournoi si besoin
-    sessionStorage.removeItem('gameMode');
-    sessionStorage.removeItem('side');
+	document.removeEventListener('keydown', handleKeydown);
+	document.removeEventListener('keyup', handleKeyup);
+	cleanupSocket(socket);
+	// On ne nettoie pas tout sessionStorage pour garder les infos du tournoi si besoin
+	sessionStorage.removeItem('gameMode');
+	sessionStorage.removeItem('side');
 }
