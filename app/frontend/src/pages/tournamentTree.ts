@@ -12,6 +12,11 @@ type Rounds = {
     [round: number]: Match[];
 };
 
+type TournamentData = {
+    pairs: { player1: string, player2: string }[];  // Tableau des paires de joueurs
+    results: (number | null)[];  // Tableau des résultats des matchs (1 pour player1, 0 pour player2, null pour non déterminé)
+};
+
 export function TournamentPage(): HTMLElement {
     const container = document.createElement('div');
     container.className = 'p-8 flex flex-col items-center';
@@ -22,14 +27,18 @@ export function TournamentPage(): HTMLElement {
         return container;
     }
 
-    let data;
+    let data: TournamentData;
     try {
         data = JSON.parse(rawData);
+        if (!data.results) {
+            data.results = new Array(data.pairs.length).fill(null);
+    }
     } catch (err) {
         container.innerHTML = `<div class="text-center text-red-500 text-lg">Erreur de parsing des données du tournoi.</div>`;
         return container;
     }
-
+    
+    
     const title = document.createElement('h1');
     title.className = 'text-3xl font-bold mb-6 text-center';
     title.textContent = 'King-Pong Tournoi';
@@ -54,6 +63,7 @@ export function TournamentPage(): HTMLElement {
 
         const sortedRounds = Object.entries(rounds).sort((a, b) => Number(a[0]) - Number(b[0]));
 
+        let index = 0;
         for (const [roundStr, matches] of sortedRounds) {
             const roundNum = parseInt(roundStr, 10);
             const roundEl = document.createElement('div');
@@ -66,7 +76,6 @@ export function TournamentPage(): HTMLElement {
 
             const list = document.createElement('ul');
             list.className = 'space-y-3';
-
             for (const match of matches) {
                 const li = document.createElement('li');
                 li.className = 'bg-gray-100 p-3 rounded-md flex justify-between items-center shadow-sm';
@@ -95,50 +104,32 @@ export function TournamentPage(): HTMLElement {
                 });
                 buttonsDiv.appendChild(startButton);
 
-                // const btn1 = document.createElement('button');
-                // btn1.textContent = `${match.player1} gagne`;
-                // btn1.className = 'px-2 py-1 bg-green-500 text-white rounded';
-                // btn1.onclick = () => {
-                //     match.winner = match.player1;
-                //     render();
-                // };
-
-                // const btn2 = document.createElement('button');
-                // btn2.textContent = `${match.player2} gagne`;
-                // btn2.className = 'px-2 py-1 bg-blue-500 text-white rounded';
-                // btn2.onclick = () => {
-                //     match.winner = match.player2;
-                //     render();
-                // };
-
-                // buttonsDiv.appendChild(btn1);
-                // buttonsDiv.appendChild(btn2);
                 const searchParams = new URLSearchParams(window.location.search);
                 const score = searchParams.get("score");
-                //need to add the recever for the winner
-                console.log(`score ${searchParams.get("score")}`);
                 const scoreSpan = document.createElement('span');
-                if (score) {
+                if (data.results[index] ==1){
+                    match.winner = match.player1;
+                }
+                else if (data.results[index] == 0) {
+                    match.winner = match.player2;
+                }
+                else {
+                    match.winner = null;
+                }
+                if (!match.winner && score) {
                     const [score1, score2] = score.split('-').map(Number);
-                    const score1Span = document.createElement('span');
-                    score1Span.textContent = `${match.player1} ${score1}`;
-                    score1Span.className = 'text-gray-500';
-                    const score2Span = document.createElement('span');
-                    score2Span.textContent = `${match.player2} ${score2}`;
-                    score2Span.className = 'text-gray-500';
-                    li.append(player1Span, vsSpan, player2Span, score1Span, score2Span);
+
                     console.log(`Match: ${match.player1} vs ${match.player2}, Score: ${score1}-${score2}`);
-                    // scoreSpan.className = 'text-gray-500 ml-4';
-                    // scoreSpan.textContent = `${match.player1} ${score1} - ${match.player2} ${score2}`;
-                    // li.append(player1Span, vsSpan, player2Span, scoreSpan);
                     const player1 = searchParams.get("player1");
                     const player2 = searchParams.get("player2");
                     console.log(`Player1: ${player1}, Player2: ${player2}`);
                     if (match.player2 == player1 && match.player2 == player1) {
                         if (score1 < score2) {
                             match.winner = match.player2;
+                            data.results[index] = 1;
                             console.log(`Match: ${match.player1} vs ${match.player2}, Winner: ${match.winner}`);
                         } else if (score1 > score2) {
+                            data.results[index] = 0;
                             match.winner = match.player1;
                             console.log(`Match: ${match.player1} vs ${match.player2}, Winner: ${match.winner}`);
                         }
@@ -147,6 +138,7 @@ export function TournamentPage(): HTMLElement {
                             li.append(player1Span, vsSpan, player2Span);
                         }
                     }
+                    sessionStorage.setItem('tournamentData', JSON.stringify(data));
                 } else {
                     li.append(player1Span, vsSpan, player2Span);
                 }
@@ -159,8 +151,8 @@ export function TournamentPage(): HTMLElement {
                 } else {
                     li.append(player1Span, vsSpan, player2Span, buttonsDiv);
                 }
-
                 list.appendChild(li);
+                index++;
             }
             roundEl.appendChild(list);
             contentWrapper.appendChild(roundEl);
