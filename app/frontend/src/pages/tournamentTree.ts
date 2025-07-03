@@ -65,8 +65,8 @@ export function TournamentPage(): HTMLElement {
         const sortedRounds = Object.entries(rounds).sort((a, b) => Number(a[0]) - Number(b[0]));
 
         let index = 0;
-        for (const [roundStr, matches] of sortedRounds) {
-            const roundNum = parseInt(roundStr, 10);
+        for (let roundNum = 1; roundNum <= currentRound; roundNum++) {
+            const matches = rounds[roundNum];
             const roundEl = document.createElement('div');
             roundEl.className = 'mb-8 bg-white shadow-lg rounded-lg p-6 border border-gray-200';
 
@@ -77,6 +77,7 @@ export function TournamentPage(): HTMLElement {
 
             const list = document.createElement('ul');
             list.className = 'space-y-3';
+
             for (const match of matches) {
                 const li = document.createElement('li');
                 li.className = 'bg-gray-100 p-3 rounded-md flex justify-between items-center shadow-sm';
@@ -96,19 +97,22 @@ export function TournamentPage(): HTMLElement {
                 const buttonsDiv = document.createElement('div');
                 buttonsDiv.className = 'flex gap-2';
 
-                const startButton = document.createElement('button');
-                startButton.textContent = 'Next Match';
-                startButton.className = 'mt-10 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition';
+                if (roundNum === currentRound && match.winner === null) {
+                    const startButton = document.createElement('button');
+                    startButton.textContent = 'Next Match';
+                    startButton.className = 'mt-10 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition';
 
-                startButton.addEventListener('click', () => {
-                    createLocalMatch(match.player2, match.player1, true);
-                });
-                buttonsDiv.appendChild(startButton);
+                    startButton.addEventListener('click', () => {
+                        createLocalMatch(match.player2, match.player1, true);
+                    });
+
+                    buttonsDiv.appendChild(startButton);
+                }
 
                 const searchParams = new URLSearchParams(window.location.search);
                 const score = searchParams.get("score");
                 const scoreSpan = document.createElement('span');
-                if (data.results[index] ==1){
+                if (data.results[index] == 1){
                     match.winner = match.player1;
                 }
                 else if (data.results[index] == 0) {
@@ -157,6 +161,7 @@ export function TournamentPage(): HTMLElement {
             }
             roundEl.appendChild(list);
             contentWrapper.appendChild(roundEl);
+            
         }
     }
 
