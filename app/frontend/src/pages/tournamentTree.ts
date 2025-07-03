@@ -1,5 +1,7 @@
 import { initLocalGame } from "../services/initLocalGame";
 import { createLocalMatch } from "../services/initLocalGame.js";
+import { createElement } from "../utils/domUtils";
+import { t } from '../services/i18nService.js'
 
 type Match = {
     id: string;
@@ -19,8 +21,16 @@ type TournamentData = {
 };
 
 export function TournamentPage(): HTMLElement {
+
     const container = document.createElement('div');
     container.className = 'p-8 flex flex-col items-center';
+    const title = document.createElement('h1');
+    title.className = 'text-3xl font-bold mb-6 text-center';
+    title.textContent = t('tournament.title');
+
+    // const title = createElement('h1', { className: 'text-3xl font-bold mb-6 text-center', textContent: t('tournament.title') });
+    container.appendChild(title);
+    // const container = createElement('div', { className: 'p-8 flex flex-col items-center' }, [title]);
 
     const rawData = sessionStorage.getItem('tournamentData');
     if (!rawData) {
@@ -39,12 +49,6 @@ export function TournamentPage(): HTMLElement {
         return container;
     }
     
-    
-    const title = document.createElement('h1');
-    title.className = 'text-3xl font-bold mb-6 text-center';
-    title.textContent = 'King-Pong Tournoi';
-    container.appendChild(title);
-
     // Initialize first round
     const rounds: Rounds = {};
     let currentRound = data.round || 1;

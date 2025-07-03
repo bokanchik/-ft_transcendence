@@ -486,8 +486,6 @@ function clientSocketHandler(gameMode: GameMode, ctx: CanvasRenderingContext2D, 
 	document.addEventListener('keyup', handleKeyup);
 }
 
-// function handleKeydown(e: KeyboardEvent) { socket.emit('keydown', e.keyCode); }
-// function handleKeyup(e: KeyboardEvent) { socket.emit('keyup', e.keyCode); }
 function handleKeydown(e: KeyboardEvent) { socket.emit('keydown', e.code); }
 function handleKeyup(e: KeyboardEvent) { socket.emit('keyup', e.code); }
 
@@ -577,20 +575,6 @@ function getAvatarForUser(user: UserPublic): string {
   const name = user.display_name || `John Doe`;
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=128`;
 }
-
-// async function getDisplayName(userId: number): Promise<string> {
-// 	const userRes = await fetch(`api/users/${userId}`);
-// 	if (!userRes.ok) return `Player ${userId}`;
-// 	const userData = await userRes.json();
-// 	return userData.display_name || `Player ${userId}`;
-// }
-
-// async function getUserAvatar(userId: number): Promise<string> {
-// 	const userRes = await fetch(`/api/users/${userId}`);
-// 	if (!userRes.ok) return `https://ui-avatars.com/api/?name=??`;
-// 	const userData = await userRes.json();
-// 	return userData.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.display_name)}&background=random&color=fff&size=128`;
-// }
 
 function cleanupAll() {
 	document.removeEventListener('keydown', handleKeydown);
