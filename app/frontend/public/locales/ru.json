@@ -14,6 +14,9 @@
 		"tournament": "Вернуться к турниру",
 		"lobby": "Вернуться в лобби"
 	},
+	"tournament": {
+		"title": "Турнир King-Pong"
+	},
 	"user": {
 		"username": "Имя пользователя",
 		"displayName": "Отображаемое имя",

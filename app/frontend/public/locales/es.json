@@ -14,6 +14,9 @@
 		"tournament": "Volver al torneo",
 		"lobby": "Volver a la sala"
 	},
+	"tournament": {
+		"title": "Torneo King-Pong"
+	},
 	"user": {
 		"username": "Nombre de usuario",
 		"displayName": "Nombre de visualización",
