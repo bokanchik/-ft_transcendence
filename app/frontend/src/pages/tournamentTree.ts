@@ -12,6 +12,12 @@ type Rounds = {
     [round: number]: Match[];
 };
 
+type TournamentData = {
+    pairs: { player1: string, player2: string }[];  // Tableau des paires de joueurs
+    results: (number | null)[];  // Tableau des résultats des matchs (1 pour player1, 0 pour player2, null pour non déterminé)
+    round: number;  // Numéro du round actuel
+};
+
 export function TournamentPage(): HTMLElement {
     const container = document.createElement('div');
     container.className = 'p-8 flex flex-col items-center';
@@ -22,14 +28,18 @@ export function TournamentPage(): HTMLElement {
         return container;
     }
 
-    let data;
+    let data: TournamentData;
     try {
         data = JSON.parse(rawData);
+        if (!data.results) {
+            data.results = new Array(data.pairs.length * 2).fill(null);
+    }
     } catch (err) {
         container.innerHTML = `<div class="text-center text-red-500 text-lg">Erreur de parsing des données du tournoi.</div>`;
         return container;
     }
-
+    
+    
     const title = document.createElement('h1');
     title.className = 'text-3xl font-bold mb-6 text-center';
     title.textContent = 'King-Pong Tournoi';
@@ -37,7 +47,7 @@ export function TournamentPage(): HTMLElement {
 
     // Initialize first round
     const rounds: Rounds = {};
-    let currentRound = 1;
+    let currentRound = data.round || 1;
     rounds[currentRound] = data.pairs.map((pair: any, index: number) => ({
         id: `R${currentRound}-${index}`,
         player1: pair.player1,
@@ -54,8 +64,10 @@ export function TournamentPage(): HTMLElement {
 
         const sortedRounds = Object.entries(rounds).sort((a, b) => Number(a[0]) - Number(b[0]));
 
-        for (const [roundStr, matches] of sortedRounds) {
-            const roundNum = parseInt(roundStr, 10);
+        let index = 0;
+        for (let roundNum = 1; roundNum <= currentRound; roundNum++) {
+            const matches = rounds[roundNum];
+            if (!matches) continue;
             const roundEl = document.createElement('div');
             roundEl.className = 'mb-8 bg-white shadow-lg rounded-lg p-6 border border-gray-200';
 
@@ -86,51 +98,56 @@ export function TournamentPage(): HTMLElement {
                 const buttonsDiv = document.createElement('div');
                 buttonsDiv.className = 'flex gap-2';
 
-                const startButton = document.createElement('button');
-                startButton.textContent = 'Next Match';
-                startButton.className = 'mt-10 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition';
+                if (roundNum === currentRound && match.winner === null) {
+                    const startButton = document.createElement('button');
+                    startButton.textContent = 'Next Match';
+                    startButton.className = 'mt-10 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition';
 
-                startButton.addEventListener('click', () => {
-                    createLocalMatch(match.player1, match.player2, true);
-                });
-                buttonsDiv.appendChild(startButton);
+                    startButton.addEventListener('click', () => {
+                        createLocalMatch(match.player2, match.player1, true);
+                    });
 
-                // const btn1 = document.createElement('button');
-                // btn1.textContent = `${match.player1} gagne`;
-                // btn1.className = 'px-2 py-1 bg-green-500 text-white rounded';
-                // btn1.onclick = () => {
-                //     match.winner = match.player1;
-                //     render();
-                // };
+                    buttonsDiv.appendChild(startButton);
+                }
 
-                // const btn2 = document.createElement('button');
-                // btn2.textContent = `${match.player2} gagne`;
-                // btn2.className = 'px-2 py-1 bg-blue-500 text-white rounded';
-                // btn2.onclick = () => {
-                //     match.winner = match.player2;
-                //     render();
-                // };
+                const searchParams = new URLSearchParams(window.location.search);
+                const score = searchParams.get("score");
+                const scoreSpan = document.createElement('span');
+                if (data.results[index] == 1){
+                    match.winner = match.player1;
+                }
+                else if (data.results[index] == 0) {
+                    match.winner = match.player2;
+                }
+                else {
+                    match.winner = null;
+                }
+                if (!match.winner && score) {
+                    const [score1, score2] = score.split('-').map(Number);
 
-                // buttonsDiv.appendChild(btn1);
-                // buttonsDiv.appendChild(btn2);
-                
-                //need to add the recever for the winner
-                const score1 = sessionStorage.getItem('score1');
-		        const score2 = sessionStorage.getItem('score2');
-                if (score1 && score2) {
-                    const scoreSpan = document.createElement('span');
-                    scoreSpan.className = 'text-gray-500 ml-4';
-                    scoreSpan.textContent = `${match.player1} ${score1} - ${match.player2} ${score2}`;
-                    li.append(player1Span, vsSpan, player2Span, scoreSpan);
-                     if (score1 < score2) {
-                        match.winner = match.player2;
-                    } else if (score1 > score2) {
-                        match.winner = match.player1;
+                    console.log(`Match: ${match.player1} vs ${match.player2}, Score: ${score1}-${score2}`);
+                    const player1 = searchParams.get("player1");
+                    const player2 = searchParams.get("player2");
+                    console.log(`Player1: ${player1}, Player2: ${player2}`);
+                    if (match.player2 == player1 && match.player2 == player1) {
+                        if (score1 < score2) {
+                            match.winner = match.player2;
+                            data.results[index] = 1;
+                            console.log(`Match: ${match.player1} vs ${match.player2}, Winner: ${match.winner}`);
+                        } else if (score1 > score2) {
+                            data.results[index] = 0;
+                            match.winner = match.player1;
+                            console.log(`Match: ${match.player1} vs ${match.player2}, Winner: ${match.winner}`);
+                        }
+                        else {
+                            console.log(`Match: ${match.player1} vs ${match.player2}, No winner`);
+                            li.append(player1Span, vsSpan, player2Span);
+                        }
                     }
+                    sessionStorage.setItem('tournamentData', JSON.stringify(data));
                 } else {
                     li.append(player1Span, vsSpan, player2Span);
                 }
-               
                 if (match.winner) {
                     li.classList.add('bg-green-100');
                     const winnerSpan = document.createElement('span');
@@ -140,11 +157,12 @@ export function TournamentPage(): HTMLElement {
                 } else {
                     li.append(player1Span, vsSpan, player2Span, buttonsDiv);
                 }
-
                 list.appendChild(li);
+                index++;
             }
             roundEl.appendChild(list);
             contentWrapper.appendChild(roundEl);
+            
         }
     }
 
@@ -177,8 +195,9 @@ export function TournamentPage(): HTMLElement {
                 winner: player2 === 'BYE' ? player1 : null,
             });
         }
-
         currentRound++;
+        data.round = currentRound;
+        sessionStorage.setItem('tournamentData', JSON.stringify(data));
         rounds[currentRound] = nextRound;
         render();
     }
