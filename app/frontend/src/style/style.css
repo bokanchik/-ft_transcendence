@@ -174,10 +174,9 @@
 /* --- Styles de Showcase --- */
 .titleText{
 	fill-opacity: 0;
-	stroke: #000;
 	stroke-width: 2px;
-	stroke-dasharray: 330;
-	stroke-dashoffset: 330;
+	stroke-dasharray: 350;
+	stroke-dashoffset: 350;
 	animation: titleAnimation 2s ease-in-out 1 forwards;
 }
 @keyframes titleAnimation {
