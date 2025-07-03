@@ -32,7 +32,7 @@ export function TournamentPage(): HTMLElement {
     try {
         data = JSON.parse(rawData);
         if (!data.results) {
-            data.results = new Array(data.pairs.length).fill(null);
+            data.results = new Array(data.pairs.length * 2).fill(null);
     }
     } catch (err) {
         container.innerHTML = `<div class="text-center text-red-500 text-lg">Erreur de parsing des données du tournoi.</div>`;
@@ -67,6 +67,7 @@ export function TournamentPage(): HTMLElement {
         let index = 0;
         for (let roundNum = 1; roundNum <= currentRound; roundNum++) {
             const matches = rounds[roundNum];
+            if (!matches) continue;
             const roundEl = document.createElement('div');
             roundEl.className = 'mb-8 bg-white shadow-lg rounded-lg p-6 border border-gray-200';
 

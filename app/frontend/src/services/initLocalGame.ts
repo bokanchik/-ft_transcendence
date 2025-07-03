@@ -72,7 +72,7 @@ export async function initLocalGame(form: HTMLFormElement) {
             
             console.log(pairs);
             
-            sessionStorage.setItem('tournamentData', JSON.stringify({ pairs, results: new Array(pairs.length).fill(null) }));
+            sessionStorage.setItem('tournamentData', JSON.stringify({ pairs, results: new Array(pairs.length * 2).fill(null) }));
             
             navigateTo('/tournament');
         default:
