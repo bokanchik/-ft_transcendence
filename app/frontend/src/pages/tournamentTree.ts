@@ -15,6 +15,7 @@ type Rounds = {
 type TournamentData = {
     pairs: { player1: string, player2: string }[];  // Tableau des paires de joueurs
     results: (number | null)[];  // Tableau des résultats des matchs (1 pour player1, 0 pour player2, null pour non déterminé)
+    round: number;  // Numéro du round actuel
 };
 
 export function TournamentPage(): HTMLElement {
@@ -46,7 +47,7 @@ export function TournamentPage(): HTMLElement {
 
     // Initialize first round
     const rounds: Rounds = {};
-    let currentRound = 1;
+    let currentRound = data.round || 1;
     rounds[currentRound] = data.pairs.map((pair: any, index: number) => ({
         id: `R${currentRound}-${index}`,
         player1: pair.player1,
@@ -188,8 +189,9 @@ export function TournamentPage(): HTMLElement {
                 winner: player2 === 'BYE' ? player1 : null,
             });
         }
-
         currentRound++;
+        data.round = currentRound;
+        sessionStorage.setItem('tournamentData', JSON.stringify(data));
         rounds[currentRound] = nextRound;
         render();
     }
