@@ -347,7 +347,8 @@
 // }
 
 // async function getDisplayName(userId: number): Promise<string> {
-// 	const userRes = await fetch(`api/users/${userId}`);
+// 	// const userRes = await fetch(`api/users/${userId}`);
+// 	const userRes = await fetch(`api/users/${userId}/public`);
 // 	if (!userRes.ok) throw new Error('Failed to fetch user info');
 // 	const userData = await userRes.json();
 // 	const displayName = userData.display_name;
@@ -356,7 +357,8 @@
 // }
 
 // async function getUserAvatar(userId: number): Promise<string> {
-// 	const userRes = await fetch(`/api/users/${userId}`);
+//	// const userRes = await fetch(`/api/users/${userId}`);
+// 	const userRes = await fetch(`api/users/${userId}/public`);
 // 	if (!userRes.ok) throw new Error('Failed to fetch user info');
 // 	const userData = await userRes.json();
 // 	const url: string = userData.avatar_url;
@@ -379,6 +381,7 @@ import { showCustomConfirm } from "../components/toast.js";
 import { GameState } from '../shared/gameTypes.js';
 import { t } from '../services/i18nService.js';
 import { createElement } from '../utils/domUtils.js';
+import { User, UserPublic } from "../shared/schemas/usersSchemas.js";
 
 // --- Constantes du jeu ---
 const PADDLE_HEIGHT = 120;
@@ -515,16 +518,19 @@ async function onGameOver(finalState?: GameState) {
 		if (!matchId) throw new Error("Match ID not found for remote game over.");
 		const matchRes = await fetch(`/api/game/match/remote/${matchId}`);
 		if (!matchRes.ok) throw new Error('Failed to fetch match info');
-		const data = await matchRes.json();
+		const matchData = await matchRes.json();
 
-		const [url1, url2, name1, name2] = await Promise.all([
-			getUserAvatar(data.player1_id),
-			getUserAvatar(data.player2_id),
-			getDisplayName(data.player1_id),
-			getDisplayName(data.player2_id)
-		]);
+		const [player1Data, player2Data] = await Promise.all([
+      		getUserPublic(matchData.player1_id),
+      		getUserPublic(matchData.player2_id)
+    	]);
 
-		showGameResult(name1, name2, data.player1_score ?? 0, data.player2_score ?? 0, url1, url2, '/game', t('link.lobby'));
+		const name1 = player1Data.display_name || `Player ${player1Data.id}`;
+		const name2 = player2Data.display_name || `Player ${player2Data.id}`;
+		const url1 = getAvatarForUser(player1Data);
+		const url2 = getAvatarForUser(player2Data);
+
+		showGameResult(name1, name2, matchData.player1_score ?? 0, matchData.player2_score ?? 0, url1, url2, '/game', t('link.lobby'));
 	} catch (err) {
 		console.error("Error on game over:", err);
 		navigateTo('/game');
@@ -559,19 +565,32 @@ function updateScore(scoreDisplay: HTMLElement, state: GameState) {
 	scoreDisplay.textContent = `${state.score1} - ${state.score2}`;
 }
 
-async function getDisplayName(userId: number): Promise<string> {
-	const userRes = await fetch(`api/users/${userId}`);
-	if (!userRes.ok) return `Player ${userId}`;
-	const userData = await userRes.json();
-	return userData.display_name || `Player ${userId}`;
+async function getUserPublic(userId: number): Promise<UserPublic> {
+	const userRes = await fetch(`api/users/${userId}/public`);
+	if (!userRes.ok) throw new Error('Failed to fetch user public details');
+	const userData: UserPublic = await userRes.json();
+	return userData;
 }
 
-async function getUserAvatar(userId: number): Promise<string> {
-	const userRes = await fetch(`/api/users/${userId}`);
-	if (!userRes.ok) return `https://ui-avatars.com/api/?name=??`;
-	const userData = await userRes.json();
-	return userData.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.display_name)}&background=random&color=fff&size=128`;
+function getAvatarForUser(user: UserPublic): string {
+  if (user.avatar_url) { return user.avatar_url; }
+  const name = user.display_name || `John Doe`;
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=128`;
 }
+
+// async function getDisplayName(userId: number): Promise<string> {
+// 	const userRes = await fetch(`api/users/${userId}`);
+// 	if (!userRes.ok) return `Player ${userId}`;
+// 	const userData = await userRes.json();
+// 	return userData.display_name || `Player ${userId}`;
+// }
+
+// async function getUserAvatar(userId: number): Promise<string> {
+// 	const userRes = await fetch(`/api/users/${userId}`);
+// 	if (!userRes.ok) return `https://ui-avatars.com/api/?name=??`;
+// 	const userData = await userRes.json();
+// 	return userData.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.display_name)}&background=random&color=fff&size=128`;
+// }
 
 function cleanupAll() {
 	document.removeEventListener('keydown', handleKeydown);
