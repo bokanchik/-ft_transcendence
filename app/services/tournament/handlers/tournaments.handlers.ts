@@ -1,6 +1,8 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { LocalTournamentBodySchema } from '../middleware/tournaments.schemas.ts';
 import { singleEliminationMatches } from '../utils/matchmaking.tournament.ts';
+import path from 'path';
+import fs from 'fs/promises';
 
 // POST /api/tournament/local/start
 export async function createLocalTournament(req: FastifyRequest, reply: FastifyReply) {
@@ -18,4 +20,3 @@ export async function createLocalTournament(req: FastifyRequest, reply: FastifyR
 
     return reply.code(200).send({ pairs });
 };
-
