@@ -219,6 +219,18 @@
 			"history": "Historial de partidas"
 		}
 	},
+	"tournament": {
+		"title": "Árbol del torneo",
+		"round": "Ronda",
+		"finale": "Final",
+		"current": "Actual",
+		"completed": "Completado",
+		"playMatch": "Jugar partida",
+		"waiting": "Esperando...",
+		"notOver": "Todas las partidas de la ronda actual deben completarse antes de proceder a la siguiente ronda.",
+		"winnerIs": "Ganador del torneo: ",
+		"nextRound": "Siguiente ronda"
+	},
 	"general": {
 		"yes": "Sí",
 		"no": "No",
