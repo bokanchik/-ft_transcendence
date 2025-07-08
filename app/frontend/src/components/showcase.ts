@@ -31,7 +31,7 @@ export function showcase(): HTMLElement {
 			</g>
 		</svg>
 		<!-- HTML !-->
-        <div class=" text-align-center mt-40 z-0">
+        <div class=" text-align-center mt-10 z-0">
 			<a href="/homePage" data-link class="button-53" role="button">Enter the jungle</a>
         </div>
     `;

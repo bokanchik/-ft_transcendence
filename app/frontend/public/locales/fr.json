@@ -96,6 +96,16 @@
 			"nbPlayersSpec": "Le nombre de joueurs doit être une puissance de 2 (2, 4, 8)."
 		}
 	},
+	"tournament": {
+		"title" : "Tournoi",
+		"nextRound" : "Prochain tour",
+		"notOver" : "Le tour n'est pas terminé",
+		"winnerIs" : "🏆 Le gagnant du tournoi est ${winners[0]} !",
+		"winner" : "✔️ ${match.winner} vainqueur",
+		"nextMatch" : "Prochain match",
+		"finale" : "Finale",
+		"round" : "Tour"
+	},
 	"register": {
 		"title": "Inscription",
 		"nameSpec": "3 à 20 caractères.",
