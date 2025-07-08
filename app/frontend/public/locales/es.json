@@ -229,7 +229,8 @@
 		"waiting": "Esperando...",
 		"notOver": "Todas las partidas de la ronda actual deben completarse antes de proceder a la siguiente ronda.",
 		"winnerIs": "Ganador del torneo: ",
-		"nextRound": "Siguiente ronda"
+		"nextRound": "Siguiente ronda",
+		"winner" : "Ganador :"
 	},
 	"general": {
 		"yes": "Sí",

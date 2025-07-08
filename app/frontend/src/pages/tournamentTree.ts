@@ -36,7 +36,7 @@ export function TournamentPage(): HTMLElement {
     );
 
     const tournamentContentContainer = createElement('div', {
-		className: 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-2xl shadow-2xl p-8 max-w-md w-full flex flex-col max-h-[90vh]'
+		className: 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 items-center rounded-2xl shadow-2xl p-8 flex flex-col max-h-[90vh] w-1/3'
 	}, [title]);
 
     const pageWrapper = createElement('div', {
@@ -252,7 +252,7 @@ export function TournamentPage(): HTMLElement {
                 if (match.winner) {
                     const winnerSpan = createElement('span', {
                         className : 'text-green-600 font-semibold',
-                        textContent : `GG ${match.winner}`
+                        textContent : t('tournament.winner') + ` ${match.winner}`
                     });
                     actionDiv.appendChild(winnerSpan);
                 } else if (isCurrentRound && !hasPlayableMatch) {
