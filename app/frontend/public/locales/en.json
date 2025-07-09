@@ -14,9 +14,6 @@
 		"tournament": "Back to Tournament",
 		"lobby": "Back to Lobby"
 	},
-	"tournament": {
-		"title": "King-Pong tournament"
-	},
 	"user": {
 		"username": "Username",
 		"displayName": "Display Name",
