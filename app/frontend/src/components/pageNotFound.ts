@@ -82,9 +82,6 @@ export function renderNotFoundPage(): HTMLElement {
         className : 'flex flex-col min-h-screen bg-cover bg-center bg-fixed justify-center'
         }, [
         notFoundLogo,
-        // createElement('div', { className: 'text-center mt-4 flex' }, [, ]),
-        // createElement('h1', { textContent: t('msg.error.notFound'), className: 'text-3xl font-bold text-red-500 text-center p-8' }),
         createElement('p', { textContent: t('msg.error.notFoundMsg'), className: 'text-3xl font-medium mb-6 text-center text-white font-beach' }),
-        backLink
-    ]);
+        backLink]);
 }
