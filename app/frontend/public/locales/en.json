@@ -225,6 +225,19 @@
 			"history": "Match History"
 		}
 	},
+	"tournament": {
+		"title": "Tournament Tree",
+		"round": "Round",
+		"finale": "Final",
+		"current": "Current",
+		"completed": "Completed",
+		"playMatch": "Play Match",
+		"waiting": "Waiting...",
+		"notOver": "All matches in the current round must be completed before proceeding to the next round.",
+		"winnerIs": "Tournament Winner: ",
+		"nextRound": "Next Round",
+		"winner" : "winner :"
+	},
 	"general": {
 		"yes": "Yes",
 		"no": "No",

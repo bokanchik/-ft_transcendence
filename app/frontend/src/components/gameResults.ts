@@ -3,6 +3,12 @@ import { navigateTo } from "../services/router.js";
 import socket from '../services/socket.js';
 import { t } from '../services/i18nService.js';
 
+type TournamentData = {
+    pairs: { player1: string, player2: string }[];  // Tableau des paires de joueurs
+    results: (number | null)[];  // Tableau des résultats des matchs (1 pour player1, 0 pour player2, null pour non déterminé)
+    round: number;  // Numéro du round actuel
+};
+
 // export function showGameResult(player1: string, player2: string, score1: number, score2: number, url1: string, url2: string) {
 export function showGameResult(player1: string, player2: string, score1: number, score2: number, url1: string, url2: string, destinationUrl: string, destinationText: string) {
 
@@ -80,7 +86,31 @@ export function showGameResult(player1: string, player2: string, score1: number,
 	player2Container.appendChild(name2);
 	player2Container.appendChild(scoreText2);
 
-	// Mettre en évidence le gagnant
+	const rawData = sessionStorage.getItem('tournamentData');
+    if (rawData) {
+		let data: TournamentData;
+    	try {
+    	    data = JSON.parse(rawData);
+    	    if (!data.results) {
+    	        data.results = new Array(data.pairs.length * 2).fill(null);
+    		}			
+    	} catch (err) {
+			console.log("couldnt parse data")
+			return;
+    	}
+		let i = 0
+		while (data.results[i] != null)
+			i++
+		if (score1 > score2) {
+			data.results[i] = 0;		
+		} else if (score2 > score1) {
+			data.results[i] = 1;		
+		}
+		console.log(data.results[i])
+		sessionStorage.setItem('tournamentData', JSON.stringify(data))
+	}
+	
+	// Mettre en évidence le gagnant et l'ajouter a sessionStorage
 	if (score1 > score2) {
 		player1Container.classList.add('opacity-100', 'scale-105');
 		player2Container.classList.add('opacity-60', 'scale-95');
@@ -112,7 +142,10 @@ export function showGameResult(player1: string, player2: string, score1: number,
 	closeButton.addEventListener('click', () => {
 		modal.remove();
 		cleanupSocket(socket);
+		const tmp = sessionStorage.getItem('tournamentData');
 		sessionStorage.clear();
+		if (tmp)
+			sessionStorage.setItem('tournamentData', tmp)
 		// navigateTo('/game');
 		navigateTo(destinationUrl);
 	});

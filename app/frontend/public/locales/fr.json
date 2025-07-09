@@ -222,6 +222,20 @@
 			"history": "Historique des matchs"
 		}
 	},
+	"tournament": {
+		"title": "Arbre du tournoi",
+		"nextRound": "Prochain tour",
+		"notOver": "Tous les matchs de la manche actuelle doivent être terminés avant de passer à la manche suivante.",
+		"winnerIs": "🏆 Le gagnant du tournoi est ",
+		"winner": "Vainqueur : ",
+		"nextMatch": "Prochain match",
+		"finale": "Finale",
+		"round": "Tour ",
+		"current": "Actuel",
+		"completed": "Terminé",
+		"playMatch": "Jouer le match",
+		"waiting": "En attente..."
+	},
 	"general": {
 		"yes": "Oui",
 		"no": "Non",

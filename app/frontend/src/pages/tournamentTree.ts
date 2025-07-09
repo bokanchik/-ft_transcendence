@@ -1,7 +1,11 @@
 import { initLocalGame } from "../services/initLocalGame";
 import { createLocalMatch } from "../services/initLocalGame.js";
-import { createElement } from "../utils/domUtils";
+import { createElement } from "../utils/domUtils.js";
 import { t } from '../services/i18nService.js'
+import { HeaderComponent } from '../components/headerComponent.js';
+import { navigateTo } from '../services/router.js';
+import { getUserDataFromStorage, checkAuthStatus } from '../services/authService.js';
+import { User } from '../shared/schemas/usersSchemas.js';
 
 type Match = {
     id: string;
@@ -16,26 +20,40 @@ type Rounds = {
 
 type TournamentData = {
     pairs: { player1: string, player2: string }[];  // Tableau des paires de joueurs
-    results: (number | null)[];  // Tableau des résultats des matchs (1 pour player1, 0 pour player2, null pour non déterminé)
+    results: (number | null)[];  // Tableau des résultats des matchs (0 pour player1, 1 pour player2, null pour non déterminé)
     round: number;  // Numéro du round actuel
 };
 
 export function TournamentPage(): HTMLElement {
 
-    const container = document.createElement('div');
-    container.className = 'p-8 flex flex-col items-center';
-    const title = document.createElement('h1');
-    title.className = 'text-3xl font-bold mb-6 text-center';
-    title.textContent = t('tournament.title');
+    const authData = getUserDataFromStorage();
+        const currentUser: User = authData as User;
 
-    // const title = createElement('h1', { className: 'text-3xl font-bold mb-6 text-center', textContent: t('tournament.title') });
-    container.appendChild(title);
-    // const container = createElement('div', { className: 'p-8 flex flex-col items-center' }, [title]);
+    const title = createElement('h2',
+        {   className : 'flex-shrink-0 text-3xl font-bold mb-6 text-center text-white',
+            textContent : t('tournament.title')
+        }, 
+    );
 
+    const tournamentContentContainer = createElement('div', {
+		className: 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 items-center rounded-2xl shadow-2xl p-8 flex flex-col max-h-[90vh] w-1/3'
+	}, [title]);
+
+    const pageWrapper = createElement('div', {
+            className: 'flex flex-col h-screen bg-cover bg-center bg-fixed'
+        }, [
+            HeaderComponent({ currentUser }),
+            createElement('div', {
+                className: 'flex-grow flex items-center justify-center p-4 sm:p-8'
+            }, 
+            [tournamentContentContainer])
+        ]);
+        pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
+    
     const rawData = sessionStorage.getItem('tournamentData');
     if (!rawData) {
-        container.innerHTML = `<div class="text-center text-red-500 text-lg">Aucune donnée de tournoi disponible.</div>`;
-        return container;
+        pageWrapper.innerHTML = `<div class="text-center text-red-500 text-lg">Aucune donnée de tournoi disponible.</div>`;
+        return pageWrapper;
     }
 
     let data: TournamentData;
@@ -45,173 +63,279 @@ export function TournamentPage(): HTMLElement {
             data.results = new Array(data.pairs.length * 2).fill(null);
     }
     } catch (err) {
-        container.innerHTML = `<div class="text-center text-red-500 text-lg">Erreur de parsing des données du tournoi.</div>`;
-        return container;
+        pageWrapper.innerHTML = `<div class="text-center text-red-500 text-lg">Erreur de parsing des données du tournoi.</div>`;
+        return pageWrapper;
     }
     
-    // Initialize first round
-    const rounds: Rounds = {};
-    let currentRound = data.round || 1;
-    rounds[currentRound] = data.pairs.map((pair: any, index: number) => ({
-        id: `R${currentRound}-${index}`,
-        player1: pair.player1,
-        player2: pair.player2,
-        winner: null,
-    }));
+    // Build complete tournament structure from data
+    const { rounds, currentRound, totalRounds } = buildTournamentStructure(data);
 
-    const contentWrapper = document.createElement('div');
-    contentWrapper.className = 'w-full max-w-4xl';
-    container.appendChild(contentWrapper);
+
+    const contentWrapper = createElement('div', {
+        className : 'w-full max-w-4xl'
+    });
+    tournamentContentContainer.appendChild(contentWrapper);
+
+    function buildTournamentStructure(tournamentData: TournamentData) {
+        const rounds: Rounds = {};
+        const initialPlayers = tournamentData.pairs.flatMap(pair => [pair.player1, pair.player2]);
+        
+        // Calculate total rounds needed for tournament
+        const playerCount = initialPlayers.length;
+        const totalRounds = Math.ceil(Math.log2(playerCount));
+        
+        // Initialize first round with initial pairs
+        rounds[1] = tournamentData.pairs.map((pair, index) => ({
+            id: `R1-${index}`,
+            player1: pair.player1,
+            player2: pair.player2,
+            winner: getMatchWinner(pair.player1, pair.player2, tournamentData.results[index])
+        }));
+
+        // Build subsequent rounds based on results
+        let currentRoundMatches = rounds[1];
+        let resultIndex = tournamentData.pairs.length; // Start after first round results
+        
+        for (let roundNum = 2; roundNum <= totalRounds; roundNum++) {
+            const winners: string[] = [];
+            
+            // Get winners from previous round
+            currentRoundMatches.forEach(match => {
+                if (match.winner) {
+                    winners.push(match.winner);
+                }
+            });
+            
+            // If we don't have enough winners, break (tournament not progressed that far)
+            if (winners.length < 2) break;
+            
+            // Create next round matches
+            const nextRoundMatches: Match[] = [];
+            for (let i = 0; i < winners.length; i += 2) {
+                const player1 = winners[i];
+                const player2 = winners[i + 1] || 'BYE';
+                const matchResult = tournamentData.results[resultIndex];
+                
+                nextRoundMatches.push({
+                    id: `R${roundNum}-${Math.floor(i / 2)}`,
+                    player1,
+                    player2,
+                    winner: player2 === 'BYE' ? player1 : getMatchWinner(player1, player2, matchResult)
+                });
+                
+                if (player2 !== 'BYE') {
+                    resultIndex++;
+                }
+            }
+            
+            rounds[roundNum] = nextRoundMatches;
+            currentRoundMatches = nextRoundMatches;
+        }
+        
+        // Determine current active round
+        let activeRound = 1;
+        for (let roundNum = 1; roundNum <= totalRounds; roundNum++) {
+            if (!rounds[roundNum]) break;
+            
+            const hasUnfinishedMatch = rounds[roundNum].some(match => match.winner === null);
+            if (hasUnfinishedMatch) {
+                activeRound = roundNum;
+                break;
+            }
+            activeRound = roundNum + 1;
+        }
+        
+        return { rounds, currentRound: activeRound, totalRounds };
+    }
+
+    function getMatchWinner(player1: string, player2: string, result: number | null): string | null {
+        if (result === 0) return player1;
+        if (result === 1) return player2;
+        return null;
+    }
 
     function render() {
         contentWrapper.innerHTML = '';
 
         const sortedRounds = Object.entries(rounds).sort((a, b) => Number(a[0]) - Number(b[0]));
 
-        let index = 0;
-        for (let roundNum = 1; roundNum <= currentRound; roundNum++) {
-            const matches = rounds[roundNum];
-            if (!matches) continue;
+        for (const [roundNumStr, matches] of sortedRounds) {
+            const roundNum = Number(roundNumStr);
             const roundEl = document.createElement('div');
-            roundEl.className = 'mb-8 bg-white shadow-lg rounded-lg p-6 border border-gray-200';
+            
+            // Style rounds differently based on their status
+            const isCurrentRound = roundNum === currentRound;
+            const isFinishedRound = roundNum < currentRound;
+            
+            if (isFinishedRound) {
+                roundEl.className = 'mb-8 bg-green-50 shadow-lg rounded-lg p-6 border border-green-200';
+            } else if (isCurrentRound) {
+                roundEl.className = 'mb-8 bg-blue-50 shadow-lg rounded-lg p-6 border border-blue-200 ring-2 ring-blue-300';
+            } else {
+                roundEl.className = 'mb-8 bg-gray-50 shadow-lg rounded-lg p-6 border border-gray-200 opacity-60';
+            }
 
             const header = document.createElement('h2');
-            header.className = 'text-2xl font-semibold mb-4 text-indigo-600';
-            header.textContent = roundNum === currentRound && matches.length === 1 ? 'Finale' : `Round ${roundNum}`;
+            if (isFinishedRound) {
+                header.className = 'text-2xl font-semibold mb-4 text-green-600';
+            } else if (isCurrentRound) {
+                header.className = 'text-2xl font-semibold mb-4 text-blue-600';
+            } else {
+                header.className = 'text-2xl font-semibold mb-4 text-gray-500';
+            }
+            
+            if (matches.length === 1 && roundNum === totalRounds) {
+                header.textContent = t('tournament.finale');
+            } else {
+                header.textContent = t('tournament.round') + ` ${roundNum}`;
+            }
+            
+            // Add status indicator
+            if (isCurrentRound) {
+                const statusSpan = createElement('span', {
+                    className : 'ml-2 text-sm bg-blue-100 text-blue-700 px-2 py-1 rounded-full',
+                    textContent : t('tournament.current')
+                });
+                header.appendChild(statusSpan);
+            } else if (isFinishedRound) {
+                const statusSpan = createElement('span',{
+                    className : 'ml-2 text-sm bg-green-100 text-green-700 px-2 py-1 rounded-full',
+                    textContent : t('tournament.completed')
+                });
+                header.appendChild(statusSpan);
+            }
+            
             roundEl.appendChild(header);
 
-            const list = document.createElement('ul');
-            list.className = 'space-y-3';
-
+            const list = createElement('ul', {
+                className : 'space-y-3'
+            });
+            
+            let hasPlayableMatch = false;
+            
             for (const match of matches) {
                 const li = document.createElement('li');
-                li.className = 'bg-gray-100 p-3 rounded-md flex justify-between items-center shadow-sm';
+                
+                if (match.winner) {
+                    li.className = 'bg-green-100 p-3 rounded-md flex justify-between items-center shadow-sm border border-green-200';
+                } else if (isCurrentRound) {
+                    li.className = 'bg-blue-100 p-3 rounded-md flex justify-between items-center shadow-sm border border-blue-200';
+                } else {
+                    li.className = 'bg-gray-100 p-3 rounded-md flex justify-between items-center shadow-sm';
+                }
 
-                const player1Span = document.createElement('span');
-                player1Span.textContent = match.player1;
-                player1Span.className = 'font-medium text-gray-700';
+                const matchInfo = createElement('div', {
+                    className : 'flex items-center gap-3'
+                });
 
-                const vsSpan = document.createElement('span');
-                vsSpan.textContent = 'vs';
-                vsSpan.className = 'text-gray-500';
+                const player1Span = createElement('span', {
+                    textContent : match.player1,
+                    className : match.winner === match.player1 ? 'font-bold text-green-700' : 'font-medium text-gray-700'
+                });
 
-                const player2Span = document.createElement('span');
-                player2Span.textContent = match.player2;
-                player2Span.className = 'font-medium text-gray-700';
+                const vsSpan = createElement('span', {
+                    textContent : 'vs',
+                    className : 'text-gray-500'
+                });
 
-                const buttonsDiv = document.createElement('div');
-                buttonsDiv.className = 'flex gap-2';
+                const player2Span = createElement('span', {
+                    textContent : match.player2,
+                    className : match.winner === match.player2 ? 'font-bold text-green-700' : 'font-medium text-gray-700'
+                });
 
-                if (roundNum === currentRound && match.winner === null) {
-                    const startButton = document.createElement('button');
-                    startButton.textContent = 'Next Match';
-                    startButton.className = 'mt-10 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition';
+                matchInfo.append(player1Span, vsSpan, player2Span);
 
+                const actionDiv = createElement('div', {
+                    className : 'flex items-center gap-2'
+                });
+
+                if (match.winner) {
+                    const winnerSpan = createElement('span', {
+                        className : 'text-green-600 font-semibold',
+                        textContent : t('tournament.winner') + ` ${match.winner}`
+                    });
+                    actionDiv.appendChild(winnerSpan);
+                } else if (isCurrentRound && !hasPlayableMatch) {
+                    const startButton = createElement('button', {
+                        textContent : t('tournament.playMatch') || 'Play Match',
+                        className : 'px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition shadow-sm'
+                    });
                     startButton.addEventListener('click', () => {
-                        createLocalMatch(match.player2, match.player1, true);
+                        createLocalMatch(match.player1, match.player2, true);
                     });
 
-                    buttonsDiv.appendChild(startButton);
+                    actionDiv.appendChild(startButton);
+                    hasPlayableMatch = true;
+                } else if (!match.winner) {
+                    const waitingSpan = document.createElement('span');
+                    waitingSpan.className = 'text-gray-500 italic';
+                    waitingSpan.textContent = t('tournament.waiting') || 'Waiting...';
+                    actionDiv.appendChild(waitingSpan);
                 }
 
-                const searchParams = new URLSearchParams(window.location.search);
-                const score = searchParams.get("score");
-                const scoreSpan = document.createElement('span');
-                if (data.results[index] == 1){
-                    match.winner = match.player1;
-                }
-                else if (data.results[index] == 0) {
-                    match.winner = match.player2;
-                }
-                else {
-                    match.winner = null;
-                }
-                if (!match.winner && score) {
-                    const [score1, score2] = score.split('-').map(Number);
-
-                    console.log(`Match: ${match.player1} vs ${match.player2}, Score: ${score1}-${score2}`);
-                    const player1 = searchParams.get("player1");
-                    const player2 = searchParams.get("player2");
-                    console.log(`Player1: ${player1}, Player2: ${player2}`);
-                    if (match.player2 == player1 && match.player2 == player1) {
-                        if (score1 < score2) {
-                            match.winner = match.player2;
-                            data.results[index] = 1;
-                            console.log(`Match: ${match.player1} vs ${match.player2}, Winner: ${match.winner}`);
-                        } else if (score1 > score2) {
-                            data.results[index] = 0;
-                            match.winner = match.player1;
-                            console.log(`Match: ${match.player1} vs ${match.player2}, Winner: ${match.winner}`);
-                        }
-                        else {
-                            console.log(`Match: ${match.player1} vs ${match.player2}, No winner`);
-                            li.append(player1Span, vsSpan, player2Span);
-                        }
-                    }
-                    sessionStorage.setItem('tournamentData', JSON.stringify(data));
-                } else {
-                    li.append(player1Span, vsSpan, player2Span);
-                }
-                if (match.winner) {
-                    li.classList.add('bg-green-100');
-                    const winnerSpan = document.createElement('span');
-                    winnerSpan.className = 'ml-4 text-green-600 font-semibold';
-                    winnerSpan.textContent = `✔️ ${match.winner} vainqueur`;
-                    li.append(player1Span, vsSpan, player2Span, winnerSpan);
-                } else {
-                    li.append(player1Span, vsSpan, player2Span, buttonsDiv);
-                }
+                li.append(matchInfo, actionDiv);
                 list.appendChild(li);
-                index++;
             }
+            
             roundEl.appendChild(list);
             contentWrapper.appendChild(roundEl);
-            
         }
     }
 
     function canGenerateNextRound(): boolean {
-        const matches = rounds[currentRound];
-        return matches.every(m => m.winner !== null);
+        const currentRoundMatches = rounds[currentRound];
+        if (!currentRoundMatches) return false;
+        
+        return currentRoundMatches.every(match => match.winner !== null);
     }
 
     function generateNextRound() {
         if (!canGenerateNextRound()) {
-            alert('Tous les matchs ne sont pas terminés.');
+            alert(t('tournament.notOver'));
             return;
         }
 
-        const winners = rounds[currentRound].map(m => m.winner!) as string[];
+        const currentRoundMatches = rounds[currentRound];
+        const winners = currentRoundMatches.map(match => match.winner!).filter(winner => winner !== null);
 
         if (winners.length === 1) {
-            alert(`🏆 Le gagnant du tournoi est ${winners[0]} !`);
+            alert(t('tournament.winnerIs') + winners[0] + ' !');
             return;
         }
 
-        const nextRound: Match[] = [];
-        for (let i = 0; i < winners.length; i += 2) {
-            const player1 = winners[i];
-            const player2 = winners[i + 1] ?? 'BYE';
-            nextRound.push({
-                id: `R${currentRound + 1}-${i}`,
-                player1,
-                player2,
-                winner: player2 === 'BYE' ? player1 : null,
-            });
-        }
-        currentRound++;
-        data.round = currentRound;
+        // Update tournament data and rebuild structure
+        data.round = currentRound + 1;
         sessionStorage.setItem('tournamentData', JSON.stringify(data));
-        rounds[currentRound] = nextRound;
+        
+        // Rebuild tournament structure to reflect new state
+        const newStructure = buildTournamentStructure(data);
+        Object.assign(rounds, newStructure.rounds);
+        
         render();
     }
 
-    const nextRoundButton = document.createElement('button');
-    nextRoundButton.textContent = 'Lancer le round suivant';
-    nextRoundButton.className = 'mt-6 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition';
+    function shouldShowNextRoundButton(): boolean {
+        // Show button if current round is complete and there's more than 1 winner
+        if (!canGenerateNextRound()) return false;
+        
+        const currentRoundMatches = rounds[currentRound];
+        if (!currentRoundMatches) return false;
+        
+        const winners = currentRoundMatches.map(match => match.winner!).filter(winner => winner !== null);
+        return winners.length > 1;
+    }
+
+    const nextRoundButton = createElement('button', {
+        textContent : t('tournament.nextRound'),
+        className : 'mt-6 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition',
+    });
     nextRoundButton.onclick = generateNextRound;
-    container.appendChild(nextRoundButton);
+    
+    // Only show next round button if appropriate
+    if (shouldShowNextRoundButton()) {
+        tournamentContentContainer.appendChild(nextRoundButton);
+    }
 
     render();
-    return container;
+    return pageWrapper;
 }

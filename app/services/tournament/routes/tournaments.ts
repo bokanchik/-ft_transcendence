@@ -8,5 +8,4 @@ export function tournamentRoutes(fastify: FastifyInstance, _options: unknown) {
         schema: LocalTournamentRouteSchema,
         handler: createLocalTournament
     });
-    
 };

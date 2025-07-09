@@ -69,9 +69,9 @@ export async function DashboardPage(): Promise<HTMLElement> {
 
 	const dashboardWrapper = createElement('div', {
 		className: 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 w-full max-w-6xl mx-auto my-8 rounded-2xl shadow-2xl flex flex-col flex-1 min-h-0'
-	}, [headerElement, mainSection]);
+	}, [mainSection]);
 
-	const pageContainer = createElement('div', { className: 'flex flex-col h-screen' }, [dashboardWrapper]);
+	const pageContainer = createElement('div', { className: 'flex flex-col h-screen' }, [headerElement, dashboardWrapper]);
 
 	function createSidebarItem(label: string, value: string | number | Date | undefined | null): HTMLElement {
 		const isEmailField = label === t('user.email');
