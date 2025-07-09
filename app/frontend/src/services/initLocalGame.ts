@@ -42,7 +42,7 @@ export async function initLocalGame(form: HTMLFormElement) {
                 showToast('Aliases should be unique', 'error');
                 return;
             }
-            await createLocalMatch(alias1, alias2, false);
+            await createLocalMatch(alias1, alias2);
             break;
         case 'Tournament':
             const formData = new FormData(form);
@@ -67,13 +67,11 @@ export async function initLocalGame(form: HTMLFormElement) {
                 return;
             }
 
-            const { pairs } = await fetchTournamentPlayers(players);
+            const { tournamentId } = await fetchTournament(players);
             
-            console.log(pairs);
+            sessionStorage.setItem('tournamentId', tournamentId);
             
-            sessionStorage.setItem('tournamentData', JSON.stringify({ pairs }));
-            
-            navigateTo('/tournament');
+           navigateTo(`/tournament/${tournamentId}`);
         default:
             break;
     }
@@ -96,7 +94,7 @@ export async function initLocalGame(form: HTMLFormElement) {
  *
  * @returns A promise that resolves when the match is successfully created and navigation occurs.
  */
-export async function createLocalMatch(alias1: string, alias2: string, isTournament: boolean) {
+export async function createLocalMatch(alias1: string, alias2: string) {
     try {
         const response = await fetch('/api/game/match/local', {
             method: 'POST',
@@ -125,9 +123,7 @@ export async function createLocalMatch(alias1: string, alias2: string, isTournam
         sessionStorage.setItem('player2', data.player2);
         sessionStorage.setItem('gameMode', 'local');
         sessionStorage.setItem('matchId', matchId);
-        // if (isTournament) {
-        //     sessionStorage.setItem('gameRegime', 'tournament');
-        // }
+
         navigateTo(`/game-room?matchId=${matchId}`);
 
     } catch (err: unknown) {
@@ -137,7 +133,7 @@ export async function createLocalMatch(alias1: string, alias2: string, isTournam
     }
 }
 
-async function fetchTournamentPlayers(players: string[]) {
+async function fetchTournament(players: string[]) {
     try {
         const response = await fetch('/api/tournament/local/start', {
             method: "POST",

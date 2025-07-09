@@ -262,7 +262,7 @@ async function onGameOver() {
 		}, 500);
 		
 	} catch (err: unknown) {
-		console.log(`Failed to fetch data from db: ${err}`);
+		console.error(`Failed to fetch data from db: ${err}`);
 		throw err;
 	}
 	
@@ -286,6 +286,9 @@ function handleLocalEvents(ctx: CanvasRenderingContext2D, scoreDisplay: HTMLDivE
 		cleanupListeners();
 		if (sessionStorage.getItem('gameRegime') === 'tournament') {
 			navigateTo('/tournament');
+			// send info to back ?
+			// api/tournament/local/:tournamentId/update
+			return;
 		}
 		navigateTo('/local-game');
 		sessionStorage.clear();

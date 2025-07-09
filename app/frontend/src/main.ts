@@ -9,7 +9,7 @@ import { DashboardPage } from './pages/dashboardPage.js'
 import { SettingsPage } from './pages/settingsPage.js';
 import { ProfilePage } from './pages/profilePage.js';
 import { getUserDataFromStorage } from './services/authService.js';
-import { promptAliasForm } from './components/SelectGameModeForm.js';
+import { promptAliasForm } from './components/selectGameModeForm.js';
 import { GameMode } from './components/gamePage.js'
 import { initI18n, t } from './services/i18nService.js';
 import { TournamentPage } from './pages/tournamentTree.js';
@@ -46,7 +46,7 @@ const routes: { [key: string]: RouteConfig } = {
     '/game': { component: GamePage },
     '/local-game': { component: promptAliasForm },
     '/game-room': { component: () => GameRoomPageFromParams() },
-    '/tournament': { component: TournamentPage }
+    '/tournament/:id': { component: (params) => TournamentPage(params ?? {}) }
 };
 
 function GameRoomPageFromParams(): HTMLElement {

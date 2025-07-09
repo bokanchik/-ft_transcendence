@@ -23,6 +23,7 @@
         "fastify-type-provider-zod": "^4.0.2",
         "socket.io": "^4.8.1",
         "sqlite3": "^5.1.7",
+        "uuid": "^11.1.0",
         "zod": "^3.24.4"
     },
     "devDependencies": {

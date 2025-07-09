@@ -1,7 +1,13 @@
+import { fastify }from "../server.ts";
+
 export interface Match {
+    id: string;
     round: number;
     player1: string;
     player2: string;
+    score1?: number;
+    score2?: number;
+    winner?: string;
 }
 
 export function shuffle(players: string[]): string[] {
@@ -29,14 +35,40 @@ export function makePairs(arr: string[]): [string, string][] {
 }
 
 // function to create matches for Round 1
-export function singleEliminationMatches(participants: string[]): Match[] {
+export async function singleEliminationMatches(participants: string[]): Promise<Match[]> {
     const shuffled: string[] = shuffle([...participants]);
 
     const pairs: [string, string][] = makePairs(shuffled);
 
-    return pairs.map(([p1, p2]) => ({
-        round: 1,
-        player1: p1,
-        player2: p2,
-    }))
+    const matches: Match[] = [];
+
+    for (const [player1, player2] of pairs) {
+        const matchId = await requestMatchFormGameService(player1, player2);
+        
+        fastify.log.info(`Match for players ${player1} and ${player2} created with matchId = ${matchId}`);
+
+        matches.push({
+            id: matchId,
+            round: 1,
+            player1,
+            player2
+        });
+    }
+    return matches;
+}
+
+export async function requestMatchFormGameService(player1: string, player2: string): Promise<string> {
+    const response = await fetch("http://game:3001/api/game/match/local", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ player1, player2 })
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to create a match: ${await response.text()}`);
+    }
+
+    const data = await response.json();
+
+    return data.matchId;
 }

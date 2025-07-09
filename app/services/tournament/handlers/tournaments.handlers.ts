@@ -1,6 +1,8 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { LocalTournamentBodySchema } from '../middleware/tournaments.schemas.ts';
 import { singleEliminationMatches } from '../utils/matchmaking.tournament.ts';
+import { createTournament, getTournament } from '../utils/tournaments.init.ts';
+import { GetTournamentByIdParams } from '../middleware/tournaments.schemas.ts';
 
 // POST /api/tournament/local/start
 export async function createLocalTournament(req: FastifyRequest, reply: FastifyReply) {
@@ -12,10 +14,30 @@ export async function createLocalTournament(req: FastifyRequest, reply: FastifyR
 
     const { players } = parseResult.data;
 
-    const pairs = singleEliminationMatches(players);
+    // data pour get /api/tournament/:id
+    const matches = await singleEliminationMatches(players);
 
-    console.log("Sending response: ", JSON.stringify(pairs));
+    const tournamentId = crypto.randomUUID();
 
-    return reply.code(200).send({ pairs });
+    createTournament(tournamentId, matches);
+
+    return reply.code(200).send({ tournamentId });
 };
 
+// GET /api/tournament/local/:tournamentId
+export async function getTournamentById(req: FastifyRequest<{ Params: GetTournamentByIdParams }>, reply: FastifyReply) {
+    const { tournamentId } = req.params;
+
+    const tournament = getTournament(tournamentId);
+
+    if (!tournament) {
+        return reply.code(404).send({ error: 'Tournament not found' });
+    }
+
+    return reply.code(200).send(tournament);
+
+}
+
+export function updateScore() {
+    
+}

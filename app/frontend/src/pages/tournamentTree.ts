@@ -1,99 +1,120 @@
-import { initLocalGame } from "../services/initLocalGame";
+import { showToast } from "../components/toast.js";
+import { navigateTo } from "../services/router.js";
 
-export function TournamentPage(): HTMLElement {
-    const container = document.createElement('div');
-    container.className = 'p-8 flex flex-col items-center';
-    
-    // pairs of players from 1 round ?
-    const rawData = sessionStorage.getItem('tournamentData');
-    
-    if (!rawData) {
-        // remplacer par la page d'erreur
-        container.innerHTML = `<div class="text-center text-red-500 text-lg">Aucune donnée de tournoi disponible.</div>`;
-        return container;
-    }
-    
-    let data;
-    try {
-        data = JSON.parse(rawData);
-    } catch (err) {
-        // remplacer par la page d'erreur
-        container.innerHTML = `<div class="text-center text-red-500 text-lg">Erreur de parsing des données du tournoi.</div>`;
-        return container;
-    }
+export async function TournamentPage(params: { [key: string]: string }): Promise<HTMLElement> {
+	const container = document.createElement("div");
+	container.className = "p-8 flex flex-col items-center";
 
-    console.log(`Data.pairs: `, data.pairs);
-    
-    const title = document.createElement('h1');
-    title.className = 'text-3xl font-bold mb-6 text-center';
-    title.textContent = 'King-Pong Tournoi';
-    container.appendChild(title);
+	const tournamentId = sessionStorage.getItem("tournamentId");
 
-    // Initialisation avec Round 1
-    const rounds: { [round: number]: { player1: string, player2: string }[] } = {};
-    rounds[1] = data.pairs;
+	if (!tournamentId) {
+		showToast("No tournament found", "error");
+		navigateTo("/local-game");
+		return document.createElement("div");
+	}
 
-    let roundNumber = 1;
-    while (rounds[roundNumber].length > 1) {
-        const nextRound = roundNumber + 1;
-        const currentMatches = rounds[roundNumber];
+	const data = await fetchTournamentById(tournamentId);
 
-        const nextMatches: { player1: string, player2: string }[] = [];
-        for (let i = 0; i < currentMatches.length; i += 2) {
-            const winner1 = `Winner ${roundNumber}-${i + 1}`;
-            const winner2 = `Winner ${roundNumber}-${i + 2}`;
-            nextMatches.push({ player1: winner1, player2: winner2 });
-        }
+	if (!data) {
+		showToast("No tournament data found", "error");
+		navigateTo("/local-game");
+		return document.createElement("div");
+	}
 
-        rounds[nextRound] = nextMatches;
-        roundNumber = nextRound;
-    }
+	const title = document.createElement("h1");
+	title.className = "text-3xl font-bold mb-4 text-center";
+	title.textContent = "King-Pong Tournoi";
+	container.appendChild(title);
 
-    // Affichage des rounds
-    const contentWrapper = document.createElement('div');
-    contentWrapper.className = 'w-full max-w-3xl';
+	const rounds: { [round: number]: { id: string; player1: string; player2: string }[] } = {};
+	for (const match of data.matches) {
+		if (!rounds[match.round]) {
+			rounds[match.round] = [];
+		}
+		rounds[match.round].push({
+			id: match.id,
+			player1: match.player1,
+			player2: match.player2,
+		});
+	}
 
-    const sortedRounds = Object.entries(rounds).sort((a, b) => Number(a[0]) - Number(b[0]));
-    for (const [roundStr, matches] of sortedRounds) {
-        const round = parseInt(roundStr, 10);
-        const roundEl = document.createElement('div');
-        roundEl.className = 'mb-8 bg-white shadow-lg rounded-lg p-6 border border-gray-200';
+	const round = 1;
+	const roundEl = document.createElement("div");
+	roundEl.className = "mb-8 bg-white shadow-lg rounded-lg p-6 border border-gray-200 w-full max-w-3xl";
 
-        const header = document.createElement('h2');
-        header.className = 'text-2xl font-semibold mb-4 text-indigo-600';
-        header.textContent = round === roundNumber ? 'Finale' : `Round ${round}`;
-        roundEl.appendChild(header);
+	const header = document.createElement("h2");
+	header.className = "text-2xl font-semibold mb-4 text-indigo-600";
+	header.textContent = "Round 1";
+	roundEl.appendChild(header);
 
-        const list = document.createElement('ul');
-        list.className = 'space-y-3';
-        for (let i = 0; i < matches.length; i++) {
-            const match = matches[i];
-            const li = document.createElement('li');
-            li.className = 'bg-gray-100 p-3 rounded-md flex justify-between items-center shadow-sm';
-            li.innerHTML = `
-                <span class="font-medium text-gray-700">${match.player1}</span>
-                <span class="text-gray-500">vs</span>
-                <span class="font-medium text-gray-700">${match.player2}</span>
-            `;
-            list.appendChild(li);
-        }
+	const list = document.createElement("ul");
+	list.className = "space-y-3";
 
-        roundEl.appendChild(list);
-        contentWrapper.appendChild(roundEl);
-    }
+	const matches = rounds[round];
 
-    container.appendChild(contentWrapper);
+	if (matches && matches.length > 0) {
+		for (let i = 0; i < matches.length; i++) {
+			const match = matches[i];
+			const hasPlayers = match.player1 && match.player2;
 
-    const startButton = document.createElement('button');
-    startButton.textContent = 'Start Tournament';
-    startButton.className = 'mt-10 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition';
+			const li = document.createElement("li");
 
+			if (hasPlayers) {
+				li.className =
+					"bg-gray-100 p-6 rounded-lg flex justify-between items-center shadow-md cursor-pointer transition hover:bg-indigo-100 hover:shadow-lg text-lg";
 
-    startButton.addEventListener('click', () => {
-      //  createLocalMatch()
-    });
+				li.innerHTML = `
+					<span class="font-medium text-gray-700">${match.player1}</span>
+					<span class="text-gray-500">vs</span>
+					<span class="font-medium text-gray-700">${match.player2}</span>
+				`;
 
-    container.appendChild(startButton);
+				li.addEventListener("click", () => {
+					sessionStorage.setItem("player1", match.player1);
+					sessionStorage.setItem("player2", match.player2);
+					sessionStorage.setItem("gameMode", "local");
+					sessionStorage.setItem("matchId", match.id);
+					sessionStorage.setItem("gameRegime", "tournament");
+					navigateTo(`/game-room?matchId=${match.id}`);
+				});
+			} else {
+				li.className =
+					"bg-gray-50 p-3 rounded-md flex justify-between items-center text-gray-400 italic border border-dashed border-gray-300";
+				li.innerHTML = `
+					<span>Unknown Player 1</span>
+					<span>vs</span>
+					<span>Unknown Player 2</span>
+				`;
+			}
 
-    return container;
+			list.appendChild(li);
+		}
+	}
+
+	roundEl.appendChild(list);
+	container.appendChild(roundEl);
+
+	const cancelButton = document.createElement("button");
+	cancelButton.textContent = "Cancel Tournament";
+	cancelButton.className =
+		"mt-10 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition";
+	cancelButton.addEventListener("click", () => {
+		sessionStorage.clear();
+		navigateTo("/local-game");
+	});
+	container.appendChild(cancelButton);
+
+	return container;
+}
+
+export async function fetchTournamentById(id: string) {
+	try {
+		const response = await fetch(`/api/tournament/local/${id}`);
+		if (!response.ok) throw new Error("Failed to fetch tournament by id");
+		const data = await response.json();
+		return data;
+	} catch (err: unknown) {
+		console.error(`Failed to fetch tournament from server: ${err}`);
+		throw err;
+	}
 }
