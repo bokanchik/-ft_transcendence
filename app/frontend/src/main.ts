@@ -14,27 +14,13 @@ import { navigateTo } from './services/router.js';
 import { initI18n, t } from './services/i18nService.js';
 import { showcase } from './components/showcase.js';
 import { createElement, clearElement } from './utils/domUtils.js';
+import { renderNotFoundPage } from './components/pageNotFound.js';
 
 const appContainer = document.getElementById('main');
 
 interface RouteConfig {
 	component: (params?: { [key: string]: string }) => HTMLElement | Promise<HTMLElement>;
 	requiredAuth?: boolean;
-}
-
-function renderNotFoundPage(): HTMLElement {
-	const backLink = createElement('a', {
-		href: '/',
-		textContent: t('link.home'),
-		className: 'text-blue-500 hover:underline'
-	});
-	backLink.setAttribute('data-link', '');
-
-	return createElement('div', {}, [
-		createElement('h1', { textContent: t('msg.error.notFound'), className: 'text-3xl font-bold text-red-500 text-center p-8' }),
-		createElement('p', { textContent: t('msg.error.notFoundMsg'), className: 'text-center' }),
-		createElement('div', { className: 'text-center mt-4' }, [backLink])
-	]);
 }
 
 const routes: { [key: string]: RouteConfig } = {
