@@ -34,7 +34,8 @@ const routes: { [key: string]: RouteConfig } = {
 	'/game': { component: GamePage },
 	'/local-game': { component: promptAliasForm },
 	'/game-room': { component: () => GameRoomPageFromParams() },
-	'/tournament': { component: TournamentPage }
+	'/tournament': { component: TournamentPage },
+	'/tournament/:id': { component: (params) => TournamentPage(params), requiredAuth: true },
 };
 
 function GameRoomPageFromParams(): HTMLElement {

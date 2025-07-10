@@ -11,6 +11,12 @@ export const config = {
             csrfToken: 'csrfTokenKey',
         },
     },
+    settings: {
+        online: {
+            waitTimeout: 60,
+            tournamentTimeout: 60 * 5, // 5 minutes
+        },
+    },
     api: {
         users: {
             all: `${USER_API_PREFIX}/`, // URL_ALL_USERS

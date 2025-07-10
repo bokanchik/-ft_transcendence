@@ -576,11 +576,25 @@ function getAvatarForUser(user: UserPublic): string {
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=128`;
 }
 
+// function cleanupAll() {
+// 	document.removeEventListener('keydown', handleKeydown);
+// 	document.removeEventListener('keyup', handleKeyup);
+// 	cleanupSocket(socket);
+// 	// On ne nettoie pas tout sessionStorage pour garder les infos du tournoi si besoin
+// 	sessionStorage.removeItem('gameMode');
+// 	sessionStorage.removeItem('side');
+// }
+
 function cleanupAll() {
-	document.removeEventListener('keydown', handleKeydown);
-	document.removeEventListener('keyup', handleKeyup);
-	cleanupSocket(socket);
-	// On ne nettoie pas tout sessionStorage pour garder les infos du tournoi si besoin
-	sessionStorage.removeItem('gameMode');
-	sessionStorage.removeItem('side');
+    document.removeEventListener('keydown', handleKeydown);
+    document.removeEventListener('keyup', handleKeyup);
+    cleanupSocket(socket);
+
+    const gameMode = sessionStorage.getItem('gameMode');
+
+    // On ne supprime gameMode que si ce n'est PAS un tournoi
+    if (gameMode !== 'tournament') {
+        sessionStorage.removeItem('gameMode');
+    }
+    sessionStorage.removeItem('side');
 }

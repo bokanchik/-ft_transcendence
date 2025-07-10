@@ -40,13 +40,43 @@ const neSupprimePasStpCommente: string = `
 	('match16', 6, 8, 'socket31', 'socket32', 0, 10, 8, 'finished'),
 	('match17', 7, 8, 'socket33', 'socket34', 0, 10, 8, 'finished');`;
 
+	// --- Nouvelles tables pour les tournois ---
+const tournamentTable = `
+CREATE TABLE IF NOT EXISTS tournaments (
+    id TEXT PRIMARY KEY, -- UUID
+    status TEXT NOT NULL CHECK(status IN ('pending', 'in_progress', 'finished')) DEFAULT 'in_progress',
+    winner_id INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);`;
+
+const tournamentPlayersTable = `
+CREATE TABLE IF NOT EXISTS tournament_players (
+    tournament_id TEXT NOT NULL,
+    user_id INTEGER NOT NULL,
+    PRIMARY KEY (tournament_id, user_id),
+    FOREIGN KEY (tournament_id) REFERENCES tournaments(id)
+);`;
+
+const tournamentMatchesTable = `
+CREATE TABLE IF NOT EXISTS tournament_matches (
+    match_id TEXT PRIMARY KEY, -- UUID
+    tournament_id TEXT NOT NULL,
+    round_number INTEGER NOT NULL,
+    player1_id INTEGER NOT NULL,
+    player2_id INTEGER NOT NULL,
+    winner_id INTEGER,
+    FOREIGN KEY (tournament_id) REFERENCES tournaments(id)
+);`;
+
 // --- HELPER FUNCTIONS FOR GENERAL DB ACTIONS (all(), get(), run(), exec() etc.)
 export async function createMatchTable() {
 	try {
 		await execute(db, matchTable);
-		console.log('Matches table created or already exists.');
-		await execute(db, neSupprimePasStpCommente);
-		console.log('Sample matches inserted into the table.');
+		await execute(db, tournamentTable);
+        await execute(db, tournamentPlayersTable);
+        await execute(db, tournamentMatchesTable);
+		// await execute(db, neSupprimePasStpCommente);
+		console.log('All tables created or already exist.');
 
 	} catch (err: unknown) {
 		console.error(`Error creating matches table: ${err}`);
@@ -251,4 +281,40 @@ export const fetchFirst = async (db: any, sql: string, params: any): Promise<any
 			resolve(row);
 		});
 	});
+}
+
+export async function createTournament(tournamentId: string, playerIds: number[]) {
+    await execute(db, 'INSERT INTO tournaments (id) VALUES (?)', [tournamentId]);
+    const stmt = db.prepare('INSERT INTO tournament_players (tournament_id, user_id) VALUES (?, ?)');
+    for (const userId of playerIds) {
+        stmt.run(tournamentId, userId);
+    }
+    stmt.finalize();
+}
+
+export async function addMatchToTournament(tournamentId: string, matchId: string, p1Id: number, p2Id: number, round: number) {
+    const sql = `INSERT INTO tournament_matches (tournament_id, match_id, round_number, player1_id, player2_id) VALUES (?, ?, ?, ?, ?)`;
+    await execute(db, sql, [tournamentId, matchId, round, p1Id, p2Id]);
+}
+
+export async function updateMatchWinner(matchId: string, winnerId: number) {
+    const sql = `UPDATE tournament_matches SET winner_id = ? WHERE match_id = ?`;
+    await execute(db, sql, [winnerId, matchId]);
+}
+
+export async function getTournamentById(tournamentId: string) {
+    const tournamentSql = `SELECT * FROM tournaments WHERE id = ?`;
+    const matchesSql = `
+        SELECT tm.*, 
+               p1.display_name as player1_display_name, 
+               p2.display_name as player2_display_name
+        FROM tournament_matches tm
+        JOIN users p1 ON tm.player1_id = p1.id
+        JOIN users p2 ON tm.player2_id = p2.id
+        WHERE tm.tournament_id = ?
+        ORDER BY tm.round_number
+    `;
+    const tournament = await fetchFirst(db, tournamentSql, [tournamentId]);
+    const matches = await fetchAll(db, matchesSql, [tournamentId]);
+    return { tournament, matches };
 }

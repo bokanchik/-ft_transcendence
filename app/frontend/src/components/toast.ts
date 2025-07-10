@@ -195,60 +195,104 @@ export function showCustomConfirm(message: string, title: string = "Confirmation
 	});
 }
 
-export function showWaitingToast(socket: SocketIOClient.Socket, controller: AbortController, timeLeft: number) {
-	const existingToast = document.querySelector('.custom-waiting-toast');
-	if (existingToast) {
-		existingToast.remove();
-	}
+// export function showWaitingToast(socket: SocketIOClient.Socket, controller: AbortController, timeLeft: number) {
+// 	const existingToast = document.querySelector('.custom-waiting-toast');
+// 	if (existingToast) {
+// 		existingToast.remove();
+// 	}
 
-	const timer = createElement('div', {
-		textContent: formatTime(timeLeft),
-		className: 'absolute inset-0 flex items-center justify-center text-lg font-bold text-green-300'
-	});
+// 	const timer = createElement('div', {
+// 		textContent: formatTime(timeLeft),
+// 		className: 'absolute inset-0 flex items-center justify-center text-lg font-bold text-green-300'
+// 	});
 
-	const spinnerContainer = createElement('div', { className: 'relative w-16 h-16' }, [
-		createElement('div', { className: 'absolute inset-0 rounded-full border-4 border-green-400 border-t-transparent animate-spin' }),
-		timer
-	]);
+// 	const spinnerContainer = createElement('div', { className: 'relative w-16 h-16' }, [
+// 		createElement('div', { className: 'absolute inset-0 rounded-full border-4 border-green-400 border-t-transparent animate-spin' }),
+// 		timer
+// 	]);
 
-	const cancelBtn = createElement('button', {
-		textContent: t('general.cancel'),
-		className: 'bg-red-600 hover:bg-red-700 text-white font-medium py-1 px-4 rounded-lg border border-red-500/50 transition-colors'
-	});
+// 	const cancelBtn = createElement('button', {
+// 		textContent: t('general.cancel'),
+// 		className: 'bg-red-600 hover:bg-red-700 text-white font-medium py-1 px-4 rounded-lg border border-red-500/50 transition-colors'
+// 	});
 
-	const toast = createElement('div', {
-		className: 'custom-waiting-toast fixed bottom-6 right-6 z-[1000] bg-gray-900/60 backdrop-blur-lg text-white shadow-2xl rounded-full w-48 h-48 p-4 flex flex-col items-center justify-center gap-4 transition-all duration-300 ease-in-out border border-gray-400/30'
-	}, [
-		spinnerContainer,
-		createElement('p', { textContent: t('game.waitOpponent'), className: 'text-center text-sm font-medium text-gray-300' }),
-		cancelBtn
-	]);
+// 	const toast = createElement('div', {
+// 		className: 'custom-waiting-toast fixed bottom-6 right-6 z-[1000] bg-gray-900/60 backdrop-blur-lg text-white shadow-2xl rounded-full w-48 h-48 p-4 flex flex-col items-center justify-center gap-4 transition-all duration-300 ease-in-out border border-gray-400/30'
+// 	}, [
+// 		spinnerContainer,
+// 		createElement('p', { textContent: t('game.waitOpponent'), className: 'text-center text-sm font-medium text-gray-300' }),
+// 		cancelBtn
+// 	]);
 
-	// Animation et logique
-	toast.style.opacity = '0';
-	toast.style.transform = 'translateY(20px)';
-	document.body.appendChild(toast);
+// 	// Animation et logique
+// 	toast.style.opacity = '0';
+// 	toast.style.transform = 'translateY(20px)';
+// 	document.body.appendChild(toast);
 
-	setTimeout(() => {
-		toast.style.opacity = '1';
-		toast.style.transform = 'translateY(0)';
-	}, 10);
+// 	setTimeout(() => {
+// 		toast.style.opacity = '1';
+// 		toast.style.transform = 'translateY(0)';
+// 	}, 10);
 
-	const countdown = setInterval(() => {
-		timeLeft--;
-		timer.textContent = formatTime(timeLeft);
-		if (timeLeft <= 0) {
-			clearInterval(countdown);
-		}
-	}, 1000);
+// 	const countdown = setInterval(() => {
+// 		timeLeft--;
+// 		timer.textContent = formatTime(timeLeft);
+// 		if (timeLeft <= 0) {
+// 			clearInterval(countdown);
+// 		}
+// 	}, 1000);
 
-	cancelBtn.addEventListener('click', () => {
-		clearInterval(countdown);
-		controller.abort();
-		socket.emit('cancelMatch');
-		socket.disconnect();
-		removeWaitingToast();
-	});
+// 	cancelBtn.addEventListener('click', () => {
+// 		clearInterval(countdown);
+// 		controller.abort();
+// 		socket.emit('cancelMatch');
+// 		socket.disconnect();
+// 		removeWaitingToast();
+// 	});
+// }
+
+export function showWaitingToast(socket: SocketIOClient.Socket, controller: AbortController, timeLeft: number, initialMessage: string) {
+    const existingToast = document.querySelector('.custom-waiting-toast');
+    if (existingToast) {
+        const messageEl = existingToast.querySelector('p');
+        if (messageEl) messageEl.textContent = initialMessage;
+        return;
+    }
+
+    const timer = createElement('div', { textContent: formatTime(timeLeft), className: 'absolute inset-0 flex items-center justify-center text-lg font-bold text-green-300' });
+    const spinnerContainer = createElement('div', { className: 'relative w-16 h-16' }, [
+        createElement('div', { className: 'absolute inset-0 rounded-full border-4 border-green-400 border-t-transparent animate-spin' }),
+        timer
+    ]);
+    const message = createElement('p', { textContent: initialMessage, className: 'text-center text-sm font-medium text-gray-300' });
+    const cancelBtn = createElement('button', { textContent: t('general.cancel'), className: 'bg-red-600 hover:bg-red-700 text-white font-medium py-1 px-4 rounded-lg border border-red-500/50 transition-colors' });
+
+    const toast = createElement('div', {
+        className: 'custom-waiting-toast fixed bottom-6 right-6 z-[1000] bg-gray-900/60 backdrop-blur-lg text-white shadow-2xl rounded-full w-48 h-48 p-4 flex flex-col items-center justify-center gap-4 transition-all duration-300 ease-in-out border border-gray-400/30'
+    }, [spinnerContainer, message, cancelBtn]);
+
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(20px)';
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+    }, 10);
+
+    const countdown = setInterval(() => {
+        timeLeft--;
+        timer.textContent = formatTime(timeLeft);
+        if (timeLeft <= 0) clearInterval(countdown);
+    }, 1000);
+
+    cancelBtn.addEventListener('click', () => {
+        clearInterval(countdown);
+        controller.abort();
+        socket.emit('cancelMatch'); // ou un nouvel événement 'cancelTournamentSearch'
+        socket.disconnect();
+        removeWaitingToast();
+    });
 }
 
 export function removeWaitingToast() {

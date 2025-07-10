@@ -75,11 +75,15 @@
 		"welcome": "Bienvenue dans le jeu",
 		"loading": "Chargement du jeu...",
 		"start": "Démarrer le jeu",
+		"quickMatch": "Partie rapide",
+		"startTournament": "Tournoi",
 		"quitButton": "Quitter",
+		"quitConfirm": "Êtes-vous sûr de vouloir quitter le jeu ?",
 		"startIn": "Démarrage dans",
 		"waitOpponent": "En attente de l'adversaire...",
 		"vs": "VS",
 		"player": "Joueur",
+		"players": "{count} Joueurs",
 		"deniedMsg": "Vous devez être connecté pour jouer en ligne.",
 		"button": "Jouer",
 		"result": {
@@ -93,8 +97,10 @@
 			"tournament": "Tournoi",
 			"nbPlayers": "Combien de joueurs ?",
 			"nbPlayersPlaceholder": "Enter 2, 4, or 8",
-			"nbPlayersSpec": "Le nombre de joueurs doit être une puissance de 2 (2, 4, 8)."
-		}
+			"nbPlayersSpec": "Le nombre de joueurs doit être une puissance de 2 (2, 4, 8).",
+			"allAliases": "Tous les noms de joueurs doivent être remplis."
+		},
+		"selectTournamentSize": "Sélectionnez la taille du tournoi"
 	},
 	"register": {
 		"title": "Inscription",
@@ -221,6 +227,9 @@
 	},
 	"tournament": {
 		"title": "Arbre du tournoi",
+		"titleOnline": "Tournoi en ligne",
+		"waitingForPlayers": "En attente de joueurs... {current}/{required}",
+		"timeout": "La recherche de match a expiré. Veuillez réessayer.",
 		"nextRound": "Prochain tour",
 		"notOver": "Tous les matchs de la manche actuelle doivent être terminés avant de passer à la manche suivante.",
 		"winnerIs": "🏆 Le gagnant du tournoi est ",
@@ -241,7 +250,8 @@
 		"error": "Erreur",
 		"loading": "Chargement...",
 		"cancel": "Annuler",
-		"confirm": "Confirmer"
+		"confirm": "Confirmer",
+		"back": "Retour"
 	},
 	"msg": {
 		"redirect": {

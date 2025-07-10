@@ -78,11 +78,15 @@
 		"welcome": "Welcome to the Game",
 		"loading": "Loading game...",
 		"start": "Start Game",
+		"quickMatch": "Quick Match",
+		"startTournament": "Tournament",
 		"quitButton": "Quit",
+		"quitConfirm": "Are you sure you want to quit the game?",
 		"startIn": "Starting in",
 		"waitOpponent": "Waiting for opponent...",
 		"vs": "VS",
 		"player": "Player",
+		"players": "{count} Players",
 		"deniedMsg": "You must be logged in to play online.",
 		"button": "start",
 		"result": {
@@ -96,8 +100,10 @@
 			"tournament": "Tournament",
 			"nbPlayers": "How many players?",
 			"nbPlayersPlaceholder": "Enter 2, 4, or 8",
-			"nbPlayersSpec": "Number of players must be a power of 2 (2, 4, 8)."
-		}
+			"nbPlayersSpec": "Number of players must be a power of 2 (2, 4, 8).",
+			"allAliases": "All player names must be filled."
+		},
+		"selectTournamentSize": "Select Tournament Size"
 	},
 	"register": {
 		"title": "Register",
@@ -224,6 +230,9 @@
 	},
 	"tournament": {
 		"title": "Tournament Tree",
+		"titleOnline": "Online Tournament",
+		"waitingForPlayers": "Waiting for players... {current}/{required}",
+		"timeout": "Match search timed out. Please try again.",
 		"round": "Round",
 		"finale": "Final",
 		"current": "Current",
@@ -243,7 +252,8 @@
 		"error": "Error",
 		"loading": "Loading...",
 		"cancel": "Cancel",
-		"confirm": "Confirm"
+		"confirm": "Confirm",
+		"back": "Back"
 	},
 	"msg": {
 		"redirect": {

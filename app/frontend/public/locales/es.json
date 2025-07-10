@@ -75,11 +75,15 @@
 		"welcome": "Bienvenido al juego",
 		"loading": "Cargando juego...",
 		"start": "Iniciar Juego",
+		"quickMatch": "Partida rápida",
+		"startTournament": "Torneo",
 		"quitButton": "Salir",
+		"quitConfirm": "¿Estás seguro de que quieres salir de la Partida?",
 		"startIn": "Empezando en",
 		"waitOpponent": "Esperando oponente...",
 		"vs": "VS",
 		"player": "Jugador",
+		"players": "{count} Jugadores",
 		"deniedMsg": "Debes iniciar sesión para jugar en línea.",
 		"button": "Jugar",
 		"result": {
@@ -93,8 +97,10 @@
 			"tournament": "Torneo",
 			"nbPlayers": "¿Cuántos jugadores?",
 			"nbPlayersPlaceholder": "Introduce 2, 4 u 8",
-			"nbPlayersSpec": "El número de jugadores debe ser una potencia de 2 (2, 4, 8)."
-		}
+			"nbPlayersSpec": "El número de jugadores debe ser una potencia de 2 (2, 4, 8).",
+			"allAliases": "Todos los nombres de jugadores deben estar completos."
+		},
+		"selectTournamentSize": "Selecciona el tamaño del torneo"
 	},
 	"register": {
 		"title": "Registro",
@@ -221,6 +227,9 @@
 	},
 	"tournament": {
 		"title": "Árbol del torneo",
+		"titleOnline": "Torneo en línea",
+		"waitingForPlayers": "Esperando jugadores... {current}/{required}",
+		"timeout": "La búsqueda de partidas ha expirado. Por favor, inténtalo de nuevo.",
 		"round": "Ronda",
 		"finale": "Final",
 		"current": "Actual",
@@ -240,7 +249,8 @@
 		"error": "Error",
 		"loading": "Cargando...",
 		"cancel": "Cancelar",
-		"confirm": "Confirmar"
+		"confirm": "Confirmar",
+		"back": "Atrás"
 	},
 	"msg": {
 		"redirect": {
