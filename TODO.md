@@ -120,6 +120,7 @@ at the end of a match -> call to database if need matchhistory)
 - [ ] Les touches sensibles au click + Enter plus les fleches (experience user agreable)
 - [ ] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde)
 - [ ] La gestion d'erreurs (voir le fichier d'Arthur)
+- [ ] Quitter en local game
 
 ## Custom settings
 -> blind mode ()
