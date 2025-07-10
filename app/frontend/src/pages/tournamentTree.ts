@@ -272,16 +272,26 @@ export function TournamentPage(): HTMLElement {
                     waitingSpan.textContent = t('tournament.waiting') || 'Waiting...';
                     actionDiv.appendChild(waitingSpan);
                 }
-
+                
                 li.append(matchInfo, actionDiv);
                 list.appendChild(li);
+                if (matches.length === 1 && roundNum === totalRounds && match.winner != null) {
+                    const leaveButton = createElement('button', {
+                        textContent : t('tournament.leave') || 'Leave',
+                        className : 'px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition shadow-sm'
+                    })
+                    leaveButton.addEventListener('click', () => {
+                        navigateTo('/local-game');
+                    })
+                tournamentContentContainer.appendChild(leaveButton)
+                }
             }
-            
             roundEl.appendChild(list);
             contentWrapper.appendChild(roundEl);
+            
         }
     }
-
+    
     function canGenerateNextRound(): boolean {
         const currentRoundMatches = rounds[currentRound];
         if (!currentRoundMatches) return false;
@@ -302,7 +312,6 @@ export function TournamentPage(): HTMLElement {
             alert(t('tournament.winnerIs') + winners[0] + ' !');
             return;
         }
-
         // Update tournament data and rebuild structure
         data.round = currentRound + 1;
         sessionStorage.setItem('tournamentData', JSON.stringify(data));

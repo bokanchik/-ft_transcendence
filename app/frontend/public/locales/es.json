@@ -230,7 +230,8 @@
 		"notOver": "Todas las partidas de la ronda actual deben completarse antes de proceder a la siguiente ronda.",
 		"winnerIs": "Ganador del torneo: ",
 		"nextRound": "Siguiente ronda",
-		"winner" : "Ganador :"
+		"winner" : "Ganador :",
+		"leave" : "Dejar"
 	},
 	"general": {
 		"yes": "Sí",

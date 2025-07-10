@@ -233,7 +233,8 @@
 		"notOver": "All matches in the current round must be completed before proceeding to the next round.",
 		"winnerIs": "Tournament Winner: ",
 		"nextRound": "Next Round",
-		"winner" : "winner :"
+		"winner" : "winner :",
+		"leave" : "Leave"
 	},
 	"general": {
 		"yes": "Yes",
