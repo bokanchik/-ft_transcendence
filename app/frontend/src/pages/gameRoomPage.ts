@@ -540,7 +540,13 @@ async function quitGameHandler(gameMode: GameMode) {
 	if (confirmed) {
 		isGameOver = true;
 		cleanupAll();
-		const destination = (gameMode === 'local' || gameMode === 'tournament') ? '/local-game' : '/game';
+		let destination;
+		if (gameMode === 'local')
+			destination = '/local-game';
+		else if (gameMode === 'tournament')
+			destination = '/tournament';
+		else 
+			destination = '/game';
 		navigateTo(destination);
 	}
 }
