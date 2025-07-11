@@ -84,9 +84,9 @@ export async function createLocalMatch(alias1: string, alias2: string, isTournam
 
         sessionStorage.setItem('gameMode', isTournament ? 'tournament' : 'local');
         sessionStorage.setItem('matchId', matchId);
-        if (isTournament) {
-            sessionStorage.setItem('gameRegime', 'tournament');
-        }
+        // if (isTournament) {
+        //     sessionStorage.setItem('gameRegime', 'tournament');
+        // }
         navigateTo(`/game-room?matchId=${matchId}`);
 
     } catch (err: unknown) {
