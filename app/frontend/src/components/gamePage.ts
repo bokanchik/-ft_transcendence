@@ -108,7 +108,7 @@ import { showToast } from './toast.js';
 import { t } from '../services/i18nService.js';
 import { createElement, createActionButton, clearElement } from '../utils/domUtils.js';
 
-export type GameMode = 'local' | 'remote' | 'tournament';
+export type GameMode = 'local' | 'remote' | 'tournament' | 'onlineTournament';
 
 export function GamePage(): HTMLElement {
     const authData = getUserDataFromStorage();
@@ -230,6 +230,7 @@ async function tournamentSearchHandler(size: number) {
             navigateTo('/login');
             return;
         }
+        sessionStorage.setItem('gameMode', 'onlineTournament');
         await handleTournamentSearch(size, freshUser.display_name, freshUser.id);
     } catch (err) {
         console.error(`Failed to initiate tournament search:`, err);

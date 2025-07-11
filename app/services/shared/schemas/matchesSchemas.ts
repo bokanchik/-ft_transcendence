@@ -66,7 +66,6 @@ export const GetMatchIdRouteSchema = {
 // GET MATCH HISTORY by USER_ID
 export const MatchUserIdParamsSchema = z.object({
     userId: z.string().regex(/^\d+$/, "User ID must be a positive integer."),
-    // userId: z.number().int(), // check avec arthur ? pourquoi il utilise regex -> parce que fastify t'envoie une string
 });
 
 export type MatchUserIdParams = z.infer<typeof MatchUserIdParamsSchema>;
@@ -78,4 +77,8 @@ export const GetMatchByUserIdRouteSchema = {
         400: z.object({ error: z.string() }),
         500: z.object({ error: z.string() })
     }
+}
+
+export interface MatchHistoryComponentProps {
+	userId: number;
 }

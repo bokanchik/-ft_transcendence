@@ -113,7 +113,8 @@ export class RemoteGameSession {
     players: Map<string, string>;
     intervalId: NodeJS.Timeout | null = null;
     isFinished: boolean = false;
-    
+    isTournamentMatch: boolean = false; // Nouvelle propriété
+
     constructor(roomName: string, matchId: string) {
         this.roomName = roomName;
         this.velocity = createBallState();
@@ -150,29 +151,29 @@ export class RemoteGameSession {
                 if (this.isFinished) return;
                 this.isFinished = true;
                 
-                const match = await getRowByMatchId(this.matchId);
-                const isTournamentMatch = !match;
+                const playerSockets = Array.from(this.players.keys()).map(id => fastify.io.sockets.sockets.get(id));
+                const p1Socket = playerSockets.find(s => this.getPlayerSide(s!.id) === 'left');
+                const p2Socket = playerSockets.find(s => this.getPlayerSide(s!.id) === 'right');
+                
+                if (!p1Socket || !p2Socket) {
+                    this.clearGameInterval();
+                    return;
+                }
 
-                let winnerId: number;
-                let loserId: number;
+                const winnerId = winner === 1 ? (p1Socket as any).playerInfo.userId : (p2Socket as any).playerInfo.userId;
+                const loserId = winner === 1 ? (p2Socket as any).playerInfo.userId : (p1Socket as any).playerInfo.userId;
 
-                if (isTournamentMatch) {
-                    // Pour un tournoi, on récupère les infos depuis les sockets
-                    const playerSockets = Array.from(this.players.keys()).map(id => fastify.io.sockets.sockets.get(id));
-                    const p1Socket = playerSockets.find(s => this.getPlayerSide(s!.id) === 'left');
-                    const p2Socket = playerSockets.find(s => this.getPlayerSide(s!.id) === 'right');
-                    winnerId = winner === 1 ? (p1Socket as any).playerInfo.userId : (p2Socket as any).playerInfo.userId;
-                    loserId = winner === 1 ? (p2Socket as any).playerInfo.userId : (p1Socket as any).playerInfo.userId;
-                    
+                if (this.isTournamentMatch) {
                     const tournamentInfo = (p1Socket as any).tournamentInfo;
                     if (tournamentInfo) {
                         await handleMatchEnd(tournamentInfo.tournamentId, tournamentInfo.matchId, winnerId);
                     }
                 } else {
-                    // Pour un match rapide, on utilise la DB
-                    winnerId = winner === 1 ? match.player1_id : match.player2_id;
-                    loserId = winner === 1 ? match.player2_id : match.player1_id;
-                    await setGameResult(this.matchId, this.state.score1, this.state.score2, winnerId.toString(), 'score');
+                    // C'est un match rapide, on utilise la DB `matches`
+                    const match = await getRowByMatchId(this.matchId);
+                    if (match) {
+                        await setGameResult(this.matchId, this.state.score1, this.state.score2, winnerId.toString(), 'score');
+                    }
                 }
                 
                 await Promise.all([
@@ -185,7 +186,6 @@ export class RemoteGameSession {
                 this.clearGameInterval();
             }
         }, 1000 / FRAME_RATE);
-
     }
 
     clearGameInterval() {

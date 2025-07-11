@@ -151,7 +151,6 @@ export function showGameResult(player1: string, player2: string, score1: number,
     } else {
         sessionStorage.clear();
     }
-
 		navigateTo(destinationUrl);
 	});
 }

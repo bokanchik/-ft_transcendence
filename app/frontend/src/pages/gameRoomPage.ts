@@ -382,16 +382,17 @@ import { GameState } from '../shared/gameTypes.js';
 import { t } from '../services/i18nService.js';
 import { createElement } from '../utils/domUtils.js';
 import { User, UserPublic } from "../shared/schemas/usersSchemas.js";
+import { config } from "../utils/config.js";
 
 // --- Constantes du jeu ---
-const PADDLE_HEIGHT = 120;
-const PADDLE_WIDTH = 20;
-const PADDLE_X_LEFT = 20;
-const PADDLE_X_RIGHT = 770;
-const BALL_RADIUS = 15;
-const BG_COLOUR = "rgba(17, 24, 39, 0.8)";
-const BALL_COLOUR = "rgb(234, 179, 8)";
-const PADDLE_COLOUR = "rgb(209, 213, 219)";
+const PADDLE_HEIGHT = config.settings.game.paddleHeight;
+const PADDLE_WIDTH = config.settings.game.paddleWidth;
+const PADDLE_X_LEFT = config.settings.game.paddleXLeft;
+const PADDLE_X_RIGHT = config.settings.game.paddleXRight;
+const BALL_RADIUS = config.settings.game.ballRadius;
+const BG_COLOUR = config.settings.game.backgroundColor;
+const BALL_COLOUR = config.settings.game.ballColor;
+const PADDLE_COLOUR = config.settings.game.paddleColor;
 
 let isGameOver = false;
 
@@ -490,49 +491,77 @@ function handleKeydown(e: KeyboardEvent) { socket.emit('keydown', e.code); }
 function handleKeyup(e: KeyboardEvent) { socket.emit('keyup', e.code); }
 
 async function onGameOver(finalState?: GameState) {
-	if (isGameOver) return;
-	isGameOver = true;
+    if (isGameOver) return;
+    isGameOver = true;
 
-	const gameMode = sessionStorage.getItem('gameMode');
-	const matchId = sessionStorage.getItem('matchId');
+    const gameMode = sessionStorage.getItem('gameMode');
+    const matchId = sessionStorage.getItem('matchId');
 
-	cleanupAll();
+    cleanupAll();
 
-	if (gameMode === 'local' || gameMode === 'tournament') {
-		if (finalState) {
-			const player1 = sessionStorage.getItem('player1') || 'Player 1';
-			const player2 = sessionStorage.getItem('player2') || 'Player 2';
-			const defaultAvatar = (name: string) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=128`;
-			const destination = gameMode === 'tournament' ? '/tournament' : '/local-game';
-			const buttonText = gameMode === 'tournament' ? t('link.tournament') : t('link.newGame');
-			showGameResult(player1, player2, finalState.score1, finalState.score2, defaultAvatar(player1), defaultAvatar(player2), destination, buttonText);
-		} else {
-			navigateTo('/local-game');
-		}
-		return;
-	}
+    // --- CAS TOURNOI LOCAL ---
+    if (gameMode === 'tournament' && sessionStorage.getItem('onlineTournamentId') === null) {
+        if (finalState) {
+            const rawData = sessionStorage.getItem('tournamentData');
+            if (rawData) {
+                let data = JSON.parse(rawData);
+				if (!data.results) {
+                    // On crée un tableau assez grand pour tous les matchs potentiels
+                    // Si on a N paires, il y aura au maximum 2N-1 matchs.
+                    const matchCount = data.pairs.length * 2 -1;
+                    data.results = new Array(matchCount).fill(null);
+                }
+                let i = 0;
+                while (data.results[i] != null) i++;
+                data.results[i] = finalState.score1 > finalState.score2 ? 0 : 1;
+                sessionStorage.setItem('tournamentData', JSON.stringify(data));
+            }
+        }
+        navigateTo('/tournament');
+        return;
+    }
 
-	try {
-		if (!matchId) throw new Error("Match ID not found for remote game over.");
-		const matchRes = await fetch(`/api/game/match/remote/${matchId}`);
-		if (!matchRes.ok) throw new Error('Failed to fetch match info');
-		const matchData = await matchRes.json();
+    // --- CAS TOURNOI EN LIGNE ou MATCH RAPIDE ---
+    if (gameMode === 'remote' || sessionStorage.getItem('onlineTournamentId')) {
+        try {
+            if (!matchId) throw new Error("Match ID not found for remote game over.");
+            const matchRes = await fetch(`/api/game/match/remote/${matchId}`);
+            if (!matchRes.ok) throw new Error('Failed to fetch match info');
+            const matchData = await matchRes.json();
+    
+            const [player1Data, player2Data] = await Promise.all([
+                  getUserPublic(matchData.player1_id),
+                  getUserPublic(matchData.player2_id)
+            ]);
+    
+            const name1 = player1Data.display_name || `Player ${player1Data.id}`;
+            const name2 = player2Data.display_name || `Player ${player2Data.id}`;
+            const url1 = getAvatarForUser(player1Data);
+            const url2 = getAvatarForUser(player2Data);
+    
+            // Redirige vers la page du tournoi en ligne si on vient de là.
+            const onlineTournamentId = sessionStorage.getItem('onlineTournamentId');
+            const destination = onlineTournamentId ? `/tournament/${onlineTournamentId}` : '/game';
+            const buttonText = onlineTournamentId ? t('link.tournament') : t('link.lobby');
+    
+            showGameResult(name1, name2, matchData.player1_score ?? 0, matchData.player2_score ?? 0, url1, url2, destination, buttonText);
+        } catch (err) {
+            console.error("Error on game over:", err);
+            navigateTo('/game');
+        }
+        return;
+    }
 
-		const [player1Data, player2Data] = await Promise.all([
-      		getUserPublic(matchData.player1_id),
-      		getUserPublic(matchData.player2_id)
-    	]);
-
-		const name1 = player1Data.display_name || `Player ${player1Data.id}`;
-		const name2 = player2Data.display_name || `Player ${player2Data.id}`;
-		const url1 = getAvatarForUser(player1Data);
-		const url2 = getAvatarForUser(player2Data);
-
-		showGameResult(name1, name2, matchData.player1_score ?? 0, matchData.player2_score ?? 0, url1, url2, '/game', t('link.lobby'));
-	} catch (err) {
-		console.error("Error on game over:", err);
-		navigateTo('/game');
-	}
+    // --- CAS MATCH LOCAL SIMPLE (DUEL) ---
+    if (gameMode === 'local' && finalState) {
+        const player1 = sessionStorage.getItem('player1') || 'Player 1';
+        const player2 = sessionStorage.getItem('player2') || 'Player 2';
+        const defaultAvatar = (name: string) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=128`;
+        showGameResult(player1, player2, finalState.score1, finalState.score2, defaultAvatar(player1), defaultAvatar(player2), '/local-game', t('link.newGame'));
+    } else {
+        // Fallback
+        navigateTo('/game');
+    }
 }
 
 async function quitGameHandler(gameMode: GameMode) {
@@ -576,15 +605,6 @@ function getAvatarForUser(user: UserPublic): string {
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=128`;
 }
 
-// function cleanupAll() {
-// 	document.removeEventListener('keydown', handleKeydown);
-// 	document.removeEventListener('keyup', handleKeyup);
-// 	cleanupSocket(socket);
-// 	// On ne nettoie pas tout sessionStorage pour garder les infos du tournoi si besoin
-// 	sessionStorage.removeItem('gameMode');
-// 	sessionStorage.removeItem('side');
-// }
-
 function cleanupAll() {
     document.removeEventListener('keydown', handleKeydown);
     document.removeEventListener('keyup', handleKeyup);
@@ -593,7 +613,7 @@ function cleanupAll() {
     const gameMode = sessionStorage.getItem('gameMode');
 
     // On ne supprime gameMode que si ce n'est PAS un tournoi
-    if (gameMode !== 'tournament') {
+    if (gameMode !== 'tournament' && gameMode !== 'onlineTournament') {
         sessionStorage.removeItem('gameMode');
     }
     sessionStorage.removeItem('side');

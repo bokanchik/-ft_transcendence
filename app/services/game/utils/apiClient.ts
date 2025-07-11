@@ -1,6 +1,6 @@
 import { fastify } from '../server.js';
 import { config } from '../shared/env.js';
-import { UserOnlineStatus } from '../shared/schemas/usersSchemas.js';
+import { UserOnlineStatus, UserPublic } from '../shared/schemas/usersSchemas.js';
 
 const API_KEY = config.API_KEY;
 const USER_SERVICE_URL = config.API_USER_URL;
@@ -18,7 +18,6 @@ export async function updatePlayerStats(userId: number, result: 'win' | 'loss'):
 
     try {
         const response = await fetch(`${USER_SERVICE_URL}/api/users/${userId}/stats`, {
-        // const response = await fetch(`http://users:4000/api/users/${userId}/stats`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',

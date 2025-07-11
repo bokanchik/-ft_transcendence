@@ -63,7 +63,7 @@ export async function router() {
 					const paramName = routePattern.split('/:')[1];
 					const paramValue = path.slice(base.length + 1);
 					routeCfg = routes[routePattern];
-					if (paramName === 'id') {
+					if (routePattern.startsWith('/profile/') && paramName === 'id') {
 						params.userId = paramValue;
 					} else {
 						params[paramName] = paramValue;

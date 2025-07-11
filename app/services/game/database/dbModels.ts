@@ -7,20 +7,23 @@ const matchTable: string = `
 	CREATE TABLE IF NOT EXISTS matches (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	matchId TEXT UNIQUE NOT NULL,
+	tournament_id TEXT,
+	round_number INTEGER,
 	player1_id INTEGER NOT NULL,
 	player2_id INTEGER NOT NULL,
-	player1_socket TEXT NOT NULL,
-	player2_socket TEXT NOT NULL,
+	player1_socket TEXT,
+	player2_socket TEXT,
 	player1_score INTEGER,
 	player2_score INTEGER,
 	winner_id INTEGER,
 	win_type TEXT DEFAULT 'score',
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	status TEXT NOT NULL CHECK (status IN ('pending', 'in_progress', 'finished'))
+	status TEXT NOT NULL CHECK (status IN ('pending', 'in_progress', 'finished')),
+	FOREIGN KEY (tournament_id) REFERENCES tournaments(id) ON DELETE SET NULL
 	)`;
 
 const neSupprimePasStpCommente: string = `
-	INSERT INTO matches( matchId, player1_id, player2_id, player1_socket, player2_socket, player1_score, player2_score, winner_id, status)
+	INSERT OR IGNORE INTO matches( matchId, player1_id, player2_id, player1_socket, player2_socket, player1_score, player2_score, winner_id, status)
 	VALUES
 	('match1', 1, 2, 'socket1', 'socket2', 10, 8, 1, 'finished'),
 	('match2', 1, 3, 'socket3', 'socket4', 10, 9, 1, 'finished'),
@@ -57,25 +60,25 @@ CREATE TABLE IF NOT EXISTS tournament_players (
     FOREIGN KEY (tournament_id) REFERENCES tournaments(id)
 );`;
 
-const tournamentMatchesTable = `
-CREATE TABLE IF NOT EXISTS tournament_matches (
-    match_id TEXT PRIMARY KEY, -- UUID
-    tournament_id TEXT NOT NULL,
-    round_number INTEGER NOT NULL,
-    player1_id INTEGER NOT NULL,
-    player2_id INTEGER NOT NULL,
-    winner_id INTEGER,
-    FOREIGN KEY (tournament_id) REFERENCES tournaments(id)
-);`;
+// const tournamentMatchesTable = `
+// CREATE TABLE IF NOT EXISTS tournament_matches (
+//     match_id TEXT PRIMARY KEY, -- UUID
+//     tournament_id TEXT NOT NULL,
+//     round_number INTEGER NOT NULL,
+//     player1_id INTEGER NOT NULL,
+//     player2_id INTEGER NOT NULL,
+//     winner_id INTEGER,
+//     FOREIGN KEY (tournament_id) REFERENCES tournaments(id)
+// );`;
 
 // --- HELPER FUNCTIONS FOR GENERAL DB ACTIONS (all(), get(), run(), exec() etc.)
 export async function createMatchTable() {
 	try {
-		await execute(db, matchTable);
 		await execute(db, tournamentTable);
+		await execute(db, matchTable);
         await execute(db, tournamentPlayersTable);
-        await execute(db, tournamentMatchesTable);
-		// await execute(db, neSupprimePasStpCommente);
+        // await execute(db, tournamentMatchesTable);
+		await execute(db, neSupprimePasStpCommente);
 		console.log('All tables created or already exist.');
 
 	} catch (err: unknown) {
@@ -84,8 +87,8 @@ export async function createMatchTable() {
 	}
 };
 
-// pourquoi winner_id est une string ? 
-export async function setGameResult(matchId: string, player1_score: number, player2_score: number, winner_id: string, win_type: string) {
+export async function setGameResult(matchId: string, player1_score: number, player2_score: number, winner_id: number, win_type: string) {
+
 	
 	const existingMatch = await getRowByMatchId(matchId);
 
@@ -94,14 +97,19 @@ export async function setGameResult(matchId: string, player1_score: number, play
 	}
 
 	if (existingMatch.status === 'finished') {
-		throw new Error(`Match with id ${matchId} is already finished.`);
+		console.warn(`Match with id ${matchId} is already finished.`);
 	}
 	
 	// Update player stats in the database
-	const winnerId = parseInt(winner_id, 10);
-	const loserId = (winner_id === existingMatch.player1_id) ? existingMatch.player2_id : existingMatch.player1_id;
+	const loserId = winner_id === existingMatch.player1_id ? existingMatch.player2_id : existingMatch.player1_id;
 
-	await updatePlayerStats(winnerId, 'win');
+	// On vérifie que le perdant n'est pas le gagnant (cas d'erreur)
+	if (winner_id === loserId) {
+		console.error(`Winner and loser are the same for match ${matchId}`);
+		return;
+	}
+
+	await updatePlayerStats(winner_id, 'win');
 	await updatePlayerStats(loserId, 'loss');
 
 	const sql = `
@@ -293,27 +301,27 @@ export async function createTournament(tournamentId: string, playerIds: number[]
 }
 
 export async function addMatchToTournament(tournamentId: string, matchId: string, p1Id: number, p2Id: number, round: number) {
-    const sql = `INSERT INTO tournament_matches (tournament_id, match_id, round_number, player1_id, player2_id) VALUES (?, ?, ?, ?, ?)`;
-    await execute(db, sql, [tournamentId, matchId, round, p1Id, p2Id]);
+    const sql = `
+    INSERT INTO matches(matchId, tournament_id, player1_id, player2_id, round_number, status)
+    VALUES(?, ?, ?, ?, ?, ?)`; // Ajout d'un '?'
+    await execute(db, sql, [matchId, tournamentId, p1Id, p2Id, round, 'pending']); // Ajout de 'round'
 }
 
 export async function updateMatchWinner(matchId: string, winnerId: number) {
-    const sql = `UPDATE tournament_matches SET winner_id = ? WHERE match_id = ?`;
+    const sql = `UPDATE matches SET winner_id = ?, status = 'finished' WHERE matchId = ?`;
     await execute(db, sql, [winnerId, matchId]);
 }
 
 export async function getTournamentById(tournamentId: string) {
     const tournamentSql = `SELECT * FROM tournaments WHERE id = ?`;
+
     const matchesSql = `
-        SELECT tm.*, 
-               p1.display_name as player1_display_name, 
-               p2.display_name as player2_display_name
-        FROM tournament_matches tm
-        JOIN users p1 ON tm.player1_id = p1.id
-        JOIN users p2 ON tm.player2_id = p2.id
-        WHERE tm.tournament_id = ?
-        ORDER BY tm.round_number
+        SELECT *
+        FROM matches
+        WHERE tournament_id = ?
+        ORDER BY round_number
     `;
+
     const tournament = await fetchFirst(db, tournamentSql, [tournamentId]);
     const matches = await fetchAll(db, matchesSql, [tournamentId]);
     return { tournament, matches };

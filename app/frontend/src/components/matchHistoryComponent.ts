@@ -2,10 +2,8 @@ import { fetchUserPublicDetails } from '../services/authService.js';
 import { fetchMatchHistoryForUser } from '../services/authService.js';
 import { t } from '../services/i18nService.js';
 import { createElement } from '../utils/domUtils.js';
-
-export interface MatchHistoryComponentProps {
-	userId: number;
-}
+import { formatTimeAgo, formatFullDate } from '../utils/format.js';
+import { MatchHistoryComponentProps } from '../shared/schemas/matchesSchemas.js';
 
 const opponentsDetailsCache: { [key: number]: { display_name: string; avatar_url: string | null } } = {};
 
@@ -116,32 +114,4 @@ export async function MatchHistoryComponent(props: MatchHistoryComponentProps): 
 	}
 
 	return el;
-}
-
-function formatFullDate(date: Date): string {
-	const adjustedTimestamp = date.getTime();
-	const adjustedDate = new Date(adjustedTimestamp);
-	return adjustedDate.toLocaleString();
-}
-
-function formatTimeAgo(date: Date): string {
-	const now = new Date();
-	const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-	const years = Math.floor(seconds / 31536000);
-	if (years > 0) return t(years === 1 ? 'time.ago.year' : 'time.ago.years', { count: years.toString() });
-
-	const months = Math.floor(seconds / 2592000);
-	if (months > 0) return t(months === 1 ? 'time.ago.month' : 'time.ago.months', { count: months.toString() });
-
-	const days = Math.floor(seconds / 86400);
-	if (days > 0) return t(days === 1 ? 'time.ago.day' : 'time.ago.days', { count: days.toString() });
-
-	const hours = Math.floor(seconds / 3600);
-	if (hours > 0) return t(hours === 1 ? 'time.ago.hour' : 'time.ago.hours', { count: hours.toString() });
-
-	const minutes = Math.floor(seconds / 60);
-	if (minutes > 0) return t(minutes === 1 ? 'time.ago.minute' : 'time.ago.minutes', { count: minutes.toString() });
-
-	return t('time.ago.now');
 }
