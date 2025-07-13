@@ -1,8 +1,8 @@
 import { navigateTo } from "../services/router.js";
 import { initLocalGame } from "../services/initLocalGame.js";
-import { showToast } from "./toast.js";
+import { showToast } from "../components/toast.js";
 import { t } from "../services/i18nService.js";
-import { HeaderComponent } from "./headerComponent.js";
+import { HeaderComponent } from "../components/headerComponent.js";
 import { getUserDataFromStorage } from "../services/authService.js";
 import { createElement, createInputField, createActionButton, createSelectField, clearElement } from "../utils/domUtils.js";
 

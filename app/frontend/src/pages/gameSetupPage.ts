@@ -3,7 +3,7 @@ import { handleOnlineGame, handleTournamentSearch } from '../services/initOnline
 import { HeaderComponent } from '../components/headerComponent.js';
 import { User } from '../shared/schemas/usersSchemas.js';
 import { getUserDataFromStorage, checkAuthStatus } from '../services/authService.js';
-import { showToast } from './toast.js';
+import { showToast } from '../components/toast.js';
 import { t } from '../services/i18nService.js';
 import { createElement, createActionButton, clearElement } from '../utils/domUtils.js';
 

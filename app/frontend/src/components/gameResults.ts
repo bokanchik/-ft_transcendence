@@ -124,7 +124,6 @@ export function showGameResult(player1: string, player2: string, score1: number,
 	closeButton.addEventListener('click', () => {
 		modal.remove();
         
-        // On ne nettoie le socket que si ce n'est pas un match de tournoi en ligne
         const onlineTournamentId = sessionStorage.getItem('onlineTournamentId');
         if (!onlineTournamentId) {
 		    cleanupSocket(socket);
@@ -134,8 +133,8 @@ export function showGameResult(player1: string, player2: string, score1: number,
 
         if (gameMode === 'tournament') {
         sessionStorage.removeItem('matchId');
-        sessionStorage.removeItem('player1'); // Ajout pour la propreté
-        sessionStorage.removeItem('player2'); // Ajout pour la propreté
+        sessionStorage.removeItem('player1');
+        sessionStorage.removeItem('player2');
     } else {
         sessionStorage.clear();
     }
