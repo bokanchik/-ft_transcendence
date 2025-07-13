@@ -6,20 +6,6 @@ import { initCountdown } from "../components/countdown.js";
 import { config } from "../utils/config.js";
 import { t } from "./i18nService.js";
 
-// --- Main Fonction for online game: 
-// export async function handleOnlineGame(display_name: string, userId: number, container: HTMLElement, button: HTMLButtonElement, title: HTMLHeadElement): Promise<void> {
-//     button.disabled = true;
-//     try {
-//         await initOnlineGame(display_name, userId, container, title);
-//     } catch (err: unknown) {
-//         console.log(err);
-//         showToast('Error while creating a waiting room. Please, try again later', 'error');
-//         navigateTo('/game');
-//     } finally {
-//         button.disabled = false;
-//     }
-// }
-
 export async function handleOnlineGame(display_name: string, userId: number): Promise<void> {
     try {
         await initOnlineGame(display_name, userId);
@@ -49,18 +35,10 @@ export async function handleTournamentSearch(size: number, displayName: string, 
     sessionStorage.removeItem('tournamentData');
     sessionStorage.removeItem('onlineTournamentId');
 
-    // if (!socket.connected) {
-    //     socket.connect();
-    // }
-
     if (socket.connected) {
         socket.disconnect();
     }
     socket.removeAllListeners();
-
-    // Authenticate and join queue
-    // socket.emit('authenticate', { display_name: displayName, userId });
-    // socket.emit('joinTournamentQueue', { size });
 
     // Show initial waiting toast
     showWaitingToast(socket, controller, config.settings.online.waitTimeout, t('tournament.waitingForPlayers', { current: '1', required: size.toString() }));
@@ -104,9 +82,6 @@ export async function handleTournamentSearch(size: number, displayName: string, 
 export async function initOnlineGame(display_name: string, userId: number) {
     const controller: AbortController = new AbortController();
 
-    // if (!socket.connected) {
-    //     socket.connect();
-    // }
     if (socket.connected) {
         socket.disconnect();
     }

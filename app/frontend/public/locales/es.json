@@ -12,6 +12,7 @@
 		"dashboard": "Volver al panel",
 		"newGame": "Volver a la sala de juego",
 		"tournament": "Volver al torneo",
+		"backToGame": "Volver a la selección de juego",
 		"lobby": "Volver a la sala"
 	},
 	"user": {
@@ -233,6 +234,7 @@
 		"ready": "Listo",
 		"waitingForOpponent": "Esperando oponente...",
 		"yourNextMatch": "Tu próximo partido",
+		"winnerShort": "Ganador",
 		"timeout": "La búsqueda de partidas ha expirado. Por favor, inténtalo de nuevo.",
 		"round": "Ronda",
 		"finale": "Final",
@@ -241,7 +243,7 @@
 		"playMatch": "Jugar partida",
 		"waiting": "Esperando...",
 		"notOver": "Todas las partidas de la ronda actual deben completarse antes de proceder a la siguiente ronda.",
-		"winnerIs": "Ganador del torneo: ",
+		"winnerIs": "🏆 Ganador del torneo: ",
 		"nextRound": "Siguiente ronda",
 		"winner" : "Ganador :"
 	},

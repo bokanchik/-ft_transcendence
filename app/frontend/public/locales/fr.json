@@ -12,6 +12,7 @@
 		"dashboard": "Retour au tableau de bord",
 		"newGame": "Retour à la salle de jeu",
 		"tournament": "Retour au tournoi",
+		"backToGame": "Retour à la sélection de jeu",
 		"lobby": "Retour au salon"
 	},
 	"user": {
@@ -233,10 +234,11 @@
 		"ready": "Prêt",
 		"waitingForOpponent": "En attente de l'adversaire...",
 		"yourNextMatch": "Votre prochain match",
+		"winnerShort": "Vainqueur",
 		"timeout": "La recherche de match a expiré. Veuillez réessayer.",
 		"nextRound": "Prochain tour",
 		"notOver": "Tous les matchs de la manche actuelle doivent être terminés avant de passer à la manche suivante.",
-		"winnerIs": "🏆 Le gagnant du tournoi est ",
+		"winnerIs": "🏆 Gagnant du tournoi: ",
 		"winner": "Vainqueur : ",
 		"nextMatch": "Prochain match",
 		"finale": "Finale",

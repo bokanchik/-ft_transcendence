@@ -120,19 +120,7 @@ export function showGameResult(player1: string, player2: string, score1: number,
 	content.appendChild(closeButton);
 	modal.appendChild(content);
 	document.body.appendChild(modal);
-
-	// // --- Event: Close bouton
-	// closeButton.addEventListener('click', () => {
-	// 	modal.remove();
-	// 	cleanupSocket(socket);
-	// 	const tmp = sessionStorage.getItem('tournamentData');
-	// 	sessionStorage.clear();
-	// 	if (tmp)
-	// 		sessionStorage.setItem('tournamentData', tmp)
-	// 	// navigateTo('/game');
-	// 	navigateTo(destinationUrl);
-	// });
-
+	
 	closeButton.addEventListener('click', () => {
 		modal.remove();
         
