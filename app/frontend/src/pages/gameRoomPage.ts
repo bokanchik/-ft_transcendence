@@ -1,4 +1,4 @@
-import { GameMode } from "../components/gamePage.js";
+import { GameMode } from "../pages/gameSetupPage.js";
 import { cleanupSocket } from "../services/initOnlineGame.js";
 import { navigateTo } from "../services/router.js";
 import socket from '../services/socket.js';
@@ -117,11 +117,11 @@ function handleKeydown(e: KeyboardEvent) { socket.emit('keydown', e.code); }
 function handleKeyup(e: KeyboardEvent) { socket.emit('keyup', e.code); }
 
 async function onGameOver(finalState?: GameState) {
-    if (isGameOver) return;
-    isGameOver = true;
+	if (isGameOver) return;
+	isGameOver = true;
 
-    const gameMode = sessionStorage.getItem('gameMode');
-    const matchId = sessionStorage.getItem('matchId');
+	const gameMode = sessionStorage.getItem('gameMode');
+	const matchId = sessionStorage.getItem('matchId');
 	const onlineTournamentId = sessionStorage.getItem('onlineTournamentId');
 
 	// --- CAS TOURNOI EN LIGNE ---
@@ -133,12 +133,12 @@ async function onGameOver(finalState?: GameState) {
 			const matchRes = await fetch(`/api/game/match/remote/${matchId}`);
 			if (!matchRes.ok) throw new Error('Failed to fetch match info');
 			const matchData = await matchRes.json();
-			
+
 			const [player1Data, player2Data] = await Promise.all([
 				getUserPublic(matchData.player1_id),
 				getUserPublic(matchData.player2_id)
 			]);
-			showGameResult( player1Data.display_name || 'Player 1',
+			showGameResult(player1Data.display_name || 'Player 1',
 				player2Data.display_name || 'Player 2',
 				matchData.player1_score ?? 0,
 				matchData.player2_score ?? 0,
@@ -154,20 +154,20 @@ async function onGameOver(finalState?: GameState) {
 		return;
 	}
 
-    // --- CAS MATCH RAPIDE ---
-    if (gameMode === 'remote') {
+	// --- CAS MATCH RAPIDE ---
+	if (gameMode === 'remote') {
 		cleanupGameRoom({ keepSocketAlive: false });
-        try {
-            if (!matchId) throw new Error("Match ID not found for remote game over.");
-            const matchRes = await fetch(`/api/game/match/remote/${matchId}`);
-            if (!matchRes.ok) throw new Error('Failed to fetch match info');
-            const matchData = await matchRes.json();
-    
-            const [player1Data, player2Data] = await Promise.all([
-                  getUserPublic(matchData.player1_id),
-                  getUserPublic(matchData.player2_id)
-            ]);
-    
+		try {
+			if (!matchId) throw new Error("Match ID not found for remote game over.");
+			const matchRes = await fetch(`/api/game/match/remote/${matchId}`);
+			if (!matchRes.ok) throw new Error('Failed to fetch match info');
+			const matchData = await matchRes.json();
+
+			const [player1Data, player2Data] = await Promise.all([
+				getUserPublic(matchData.player1_id),
+				getUserPublic(matchData.player2_id)
+			]);
+
 			showGameResult(
 				player1Data.display_name || 'Player 1',
 				player2Data.display_name || 'Player 2',
@@ -178,64 +178,64 @@ async function onGameOver(finalState?: GameState) {
 				'/game',
 				t('link.newGame')
 			);
-    
-        } catch (err) {
-            console.error("Error on game over:", err);
-            navigateTo('/game');
-        }
-        return;
-    }
+
+		} catch (err) {
+			console.error("Error on game over:", err);
+			navigateTo('/game');
+		}
+		return;
+	}
 
 	// --- CAS TOURNOI LOCAL ---
-    if (gameMode === 'tournament') {
-        if (finalState) {
+	if (gameMode === 'tournament') {
+		if (finalState) {
 			cleanupGameRoom({ keepSocketAlive: true });
-            const rawData = sessionStorage.getItem('tournamentData');
-            if (rawData) {
-                let data = JSON.parse(rawData);
+			const rawData = sessionStorage.getItem('tournamentData');
+			if (rawData) {
+				let data = JSON.parse(rawData);
 				if (!data.results) {
-                    const matchCount = data.pairs.length * 2 -1;
-                    data.results = new Array(matchCount).fill(null);
-                }
-                let i = 0;
-                while (data.results[i] != null) i++;
-                data.results[i] = finalState.score1 > finalState.score2 ? 0 : 1;
-                sessionStorage.setItem('tournamentData', JSON.stringify(data));
-            }
-        }
-        navigateTo('/tournament');
-        return;
-    }
+					const matchCount = data.pairs.length * 2 - 1;
+					data.results = new Array(matchCount).fill(null);
+				}
+				let i = 0;
+				while (data.results[i] != null) i++;
+				data.results[i] = finalState.score1 > finalState.score2 ? 0 : 1;
+				sessionStorage.setItem('tournamentData', JSON.stringify(data));
+			}
+		}
+		navigateTo('/tournament');
+		return;
+	}
 
-    // --- CAS MATCH LOCAL SIMPLE (DUEL) ---
-    if (gameMode === 'local' && finalState) {
-        const player1 = sessionStorage.getItem('player1') || 'Player 1';
-        const player2 = sessionStorage.getItem('player2') || 'Player 2';
+	// --- CAS MATCH LOCAL SIMPLE (DUEL) ---
+	if (gameMode === 'local' && finalState) {
+		const player1 = sessionStorage.getItem('player1') || 'Player 1';
+		const player2 = sessionStorage.getItem('player2') || 'Player 2';
 		const defaultAvatar = (name: string) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=128`;
-        cleanupGameRoom({ keepSocketAlive: false });
+		cleanupGameRoom({ keepSocketAlive: false });
 		showGameResult(player1, player2, finalState.score1, finalState.score2, defaultAvatar(player1), defaultAvatar(player2), '/local-game', t('link.newGame'));
-    } else {
-        navigateTo('/game');
-    }
+	} else {
+		navigateTo('/game');
+	}
 }
 
 async function quitGameHandler(gameMode: GameMode) {
-    const confirmed = await showCustomConfirm(t('game.quitConfirm'));
-    if (confirmed) {
-        isGameOver = true;
+	const confirmed = await showCustomConfirm(t('game.quitConfirm'));
+	if (confirmed) {
+		isGameOver = true;
 
-        const onlineTournamentId = sessionStorage.getItem('onlineTournamentId');
-        const keepSocketAlive = !!onlineTournamentId;
-        cleanupGameRoom({ keepSocketAlive });
-        
-        if (onlineTournamentId) {
-             socket.disconnect();
-             navigateTo(`/tournament/${onlineTournamentId}`);
-        } else {
-            const destination = (gameMode === 'local' || gameMode === 'tournament') ? '/local-game' : '/game';
-            navigateTo(destination);
-        }
-    }
+		const onlineTournamentId = sessionStorage.getItem('onlineTournamentId');
+		const keepSocketAlive = !!onlineTournamentId;
+		cleanupGameRoom({ keepSocketAlive });
+
+		if (onlineTournamentId) {
+			socket.disconnect();
+			navigateTo(`/tournament/${onlineTournamentId}`);
+		} else {
+			const destination = (gameMode === 'local' || gameMode === 'tournament') ? '/local-game' : '/game';
+			navigateTo(destination);
+		}
+	}
 }
 
 function drawGame(state: GameState, ctx: CanvasRenderingContext2D) {
@@ -264,12 +264,12 @@ async function getUserPublic(userId: number): Promise<UserPublic> {
 }
 
 function getAvatarForUser(user: UserPublic): string {
-  if (user.avatar_url) { return user.avatar_url; }
-  const name = user.display_name || `John Doe`;
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=128`;
+	if (user.avatar_url) { return user.avatar_url; }
+	const name = user.display_name || `John Doe`;
+	return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=128`;
 }
 
-function cleanupGameRoom( options: { keepSocketAlive?: boolean } = {}) {
+function cleanupGameRoom(options: { keepSocketAlive?: boolean } = {}) {
 	document.removeEventListener('keydown', handleKeydown);
 	document.removeEventListener('keyup', handleKeyup);
 
@@ -281,7 +281,7 @@ function cleanupGameRoom( options: { keepSocketAlive?: boolean } = {}) {
 		cleanupSocket(socket);
 		sessionStorage.clear();
 	} else {
-	sessionStorage.removeItem('side');
-	sessionStorage.removeItem('matchId');
+		sessionStorage.removeItem('side');
+		sessionStorage.removeItem('matchId');
 	}
 }
