@@ -83,8 +83,8 @@ export const RemoteMatchBaseSchema = z.object({
     matchId: z.string(),
     player1_id: z.number().int(),
     player2_id: z.number().int(),
-    player1_socket: z.string(),
-    player2_socket: z.string(),
+    player1_socket: z.string().nullable(), // Nullable if player is not connected
+    player2_socket: z.string().nullable(), // Nullable if player is not connected
     player1_score: z.number().int().nullable(),
     player2_score: z.number().int().nullable(),
     winner_id: z.number().nullable(),

@@ -476,7 +476,7 @@ function clientSocketHandler(gameMode: GameMode, ctx: CanvasRenderingContext2D, 
 	socket.on('gameState', handleGameState);
 	socket.on('gameOver', (finalState?: GameState) => onGameOver(finalState));
 
-	if (gameMode === 'remote') {
+	if (gameMode === 'remote' || gameMode === 'onlineTournament') {
 		socket.on('opponentLeft', () => onGameOver());
 	} else {
 		const matchId = sessionStorage.getItem('matchId');
@@ -608,7 +608,12 @@ function getAvatarForUser(user: UserPublic): string {
 function cleanupAll() {
     document.removeEventListener('keydown', handleKeydown);
     document.removeEventListener('keyup', handleKeyup);
-    cleanupSocket(socket);
+	
+    // Ne déconnecte le socket que si ce n'est pas un tournoi en ligne
+    const onlineTournamentId = sessionStorage.getItem('onlineTournamentId');
+    if (!onlineTournamentId) {
+        cleanupSocket(socket);
+    }
 
     const gameMode = sessionStorage.getItem('gameMode');
 
