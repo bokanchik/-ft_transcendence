@@ -307,9 +307,15 @@ export async function addMatchToTournament(tournamentId: string, matchId: string
     await execute(db, sql, [matchId, tournamentId, p1Id, p2Id, round, 'pending']); // Ajout de 'round'
 }
 
-export async function updateMatchWinner(matchId: string, winnerId: number) {
-    const sql = `UPDATE matches SET winner_id = ?, status = 'finished' WHERE matchId = ?`;
-    await execute(db, sql, [winnerId, matchId]);
+export async function updateTournamentWinner(tournamentId: string, winnerId: number) {
+    const sql = `UPDATE tournaments SET winner_id = ?, status = 'finished' WHERE id = ?`;
+	try {
+		await execute(db, sql, [winnerId, tournamentId]);
+		console.log(`Tournament ${tournamentId} winner updated to ${winnerId}`);
+	} catch (err: unknown) {
+		console.error(`Failed to update tournament winner: ${err}`);
+		throw err;
+	}
 }
 
 export async function getTournamentById(tournamentId: string) {

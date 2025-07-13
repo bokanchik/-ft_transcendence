@@ -163,18 +163,21 @@ export class RemoteGameSession {
                 const winnerId = winner === 1 ? (p1Socket as any).playerInfo.userId : (p2Socket as any).playerInfo.userId;
                 const loserId = winner === 1 ? (p2Socket as any).playerInfo.userId : (p1Socket as any).playerInfo.userId;
 
+                // ajout arthur
+                await setGameResult(this.matchId, this.state.score1, this.state.score2, winnerId.toString(), 'score');
                 if (this.isTournamentMatch) {
                     const tournamentInfo = (p1Socket as any).tournamentInfo;
                     if (tournamentInfo) {
                         await handleMatchEnd(tournamentInfo.tournamentId, tournamentInfo.matchId, winnerId);
                     }
-                } else {
-                    // C'est un match rapide, on utilise la DB `matches`
-                    const match = await getRowByMatchId(this.matchId);
-                    if (match) {
-                        await setGameResult(this.matchId, this.state.score1, this.state.score2, winnerId.toString(), 'score');
-                    }
                 }
+                //  else {
+                //     // C'est un match rapide, on utilise la DB `matches`
+                //     const match = await getRowByMatchId(this.matchId);
+                //     if (match) {
+                //         await setGameResult(this.matchId, this.state.score1, this.state.score2, winnerId.toString(), 'score');
+                //     }
+                // }
                 
                 await Promise.all([
                     updateUserStatus(winnerId, UserOnlineStatus.ONLINE),

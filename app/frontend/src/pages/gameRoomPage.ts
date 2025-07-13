@@ -496,18 +496,80 @@ async function onGameOver(finalState?: GameState) {
 
     const gameMode = sessionStorage.getItem('gameMode');
     const matchId = sessionStorage.getItem('matchId');
+	const onlineTournamentId = sessionStorage.getItem('onlineTournamentId');
 
-    cleanupAll();
+    // cleanupAll();
 
-    // --- CAS TOURNOI LOCAL ---
-    if (gameMode === 'tournament' && sessionStorage.getItem('onlineTournamentId') === null) {
+	// --- CAS TOURNOI EN LIGNE ---
+	if (gameMode === 'onlineTournament') {
+		cleanupGameRoom({ keepSocketAlive: true });
+		try {
+			if (!matchId) throw new Error("Match ID not found for online tournament game over.");
+
+			const matchRes = await fetch(`/api/game/match/remote/${matchId}`);
+			if (!matchRes.ok) throw new Error('Failed to fetch match info');
+			const matchData = await matchRes.json();
+			
+			const [player1Data, player2Data] = await Promise.all([
+				getUserPublic(matchData.player1_id),
+				getUserPublic(matchData.player2_id)
+			]);
+			showGameResult( player1Data.display_name || 'Player 1',
+				player2Data.display_name || 'Player 2',
+				matchData.player1_score ?? 0,
+				matchData.player2_score ?? 0,
+				getAvatarForUser(player1Data),
+				getAvatarForUser(player2Data),
+				`/tournament/${onlineTournamentId}`,
+				t('link.tournament')
+			);
+		} catch (err) {
+			console.error("Error on game over:", err);
+			navigateTo('/game');
+		}
+		return;
+	}
+
+    // --- CAS MATCH RAPIDE ---
+    if (gameMode === 'remote') {
+		cleanupGameRoom({ keepSocketAlive: false });
+        try {
+            if (!matchId) throw new Error("Match ID not found for remote game over.");
+            const matchRes = await fetch(`/api/game/match/remote/${matchId}`);
+            if (!matchRes.ok) throw new Error('Failed to fetch match info');
+            const matchData = await matchRes.json();
+    
+            const [player1Data, player2Data] = await Promise.all([
+                  getUserPublic(matchData.player1_id),
+                  getUserPublic(matchData.player2_id)
+            ]);
+    
+			showGameResult(
+				player1Data.display_name || 'Player 1',
+				player2Data.display_name || 'Player 2',
+				matchData.player1_score ?? 0,
+				matchData.player2_score ?? 0,
+				getAvatarForUser(player1Data),
+				getAvatarForUser(player2Data),
+				'/game',
+				t('link.newGame')
+			);
+    
+        } catch (err) {
+            console.error("Error on game over:", err);
+            navigateTo('/game');
+        }
+        return;
+    }
+
+	// --- CAS TOURNOI LOCAL ---
+    if (gameMode === 'tournament') {
         if (finalState) {
+			cleanupGameRoom({ keepSocketAlive: true });
             const rawData = sessionStorage.getItem('tournamentData');
             if (rawData) {
                 let data = JSON.parse(rawData);
 				if (!data.results) {
-                    // On crée un tableau assez grand pour tous les matchs potentiels
-                    // Si on a N paires, il y aura au maximum 2N-1 matchs.
                     const matchCount = data.pairs.length * 2 -1;
                     data.results = new Array(matchCount).fill(null);
                 }
@@ -521,57 +583,46 @@ async function onGameOver(finalState?: GameState) {
         return;
     }
 
-    // --- CAS TOURNOI EN LIGNE ou MATCH RAPIDE ---
-    if (gameMode === 'remote' || sessionStorage.getItem('onlineTournamentId')) {
-        try {
-            if (!matchId) throw new Error("Match ID not found for remote game over.");
-            const matchRes = await fetch(`/api/game/match/remote/${matchId}`);
-            if (!matchRes.ok) throw new Error('Failed to fetch match info');
-            const matchData = await matchRes.json();
-    
-            const [player1Data, player2Data] = await Promise.all([
-                  getUserPublic(matchData.player1_id),
-                  getUserPublic(matchData.player2_id)
-            ]);
-    
-            const name1 = player1Data.display_name || `Player ${player1Data.id}`;
-            const name2 = player2Data.display_name || `Player ${player2Data.id}`;
-            const url1 = getAvatarForUser(player1Data);
-            const url2 = getAvatarForUser(player2Data);
-    
-            // Redirige vers la page du tournoi en ligne si on vient de là.
-            const onlineTournamentId = sessionStorage.getItem('onlineTournamentId');
-            const destination = onlineTournamentId ? `/tournament/${onlineTournamentId}` : '/game';
-            const buttonText = onlineTournamentId ? t('link.tournament') : t('link.lobby');
-    
-            showGameResult(name1, name2, matchData.player1_score ?? 0, matchData.player2_score ?? 0, url1, url2, destination, buttonText);
-        } catch (err) {
-            console.error("Error on game over:", err);
-            navigateTo('/game');
-        }
-        return;
-    }
-
     // --- CAS MATCH LOCAL SIMPLE (DUEL) ---
     if (gameMode === 'local' && finalState) {
         const player1 = sessionStorage.getItem('player1') || 'Player 1';
         const player2 = sessionStorage.getItem('player2') || 'Player 2';
-        const defaultAvatar = (name: string) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=128`;
-        showGameResult(player1, player2, finalState.score1, finalState.score2, defaultAvatar(player1), defaultAvatar(player2), '/local-game', t('link.newGame'));
+		const defaultAvatar = (name: string) => `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&color=fff&size=128`;
+        cleanupGameRoom({ keepSocketAlive: false });
+		showGameResult(player1, player2, finalState.score1, finalState.score2, defaultAvatar(player1), defaultAvatar(player2), '/local-game', t('link.newGame'));
     } else {
         // Fallback
         navigateTo('/game');
     }
 }
 
+// async function quitGameHandler(gameMode: GameMode) {
+// 	const confirmed = await showCustomConfirm(t('game.quitConfirm'));
+// 	if (confirmed) {
+// 		isGameOver = true;
+// 		cleanupAll();
+// 		const destination = (gameMode === 'local' || gameMode === 'tournament') ? '/local-game' : '/game';
+// 		navigateTo(destination);
+// 	}
+// }
+
 async function quitGameHandler(gameMode: GameMode) {
-	const confirmed = await showCustomConfirm(t('game.quitConfirm'));
-	if (confirmed) {
-		isGameOver = true;
-		cleanupAll();
-		const destination = (gameMode === 'local' || gameMode === 'tournament') ? '/local-game' : '/game';
-		navigateTo(destination);
-	}
+    const confirmed = await showCustomConfirm(t('game.quitConfirm'));
+    if (confirmed) {
+        isGameOver = true;
+
+        const onlineTournamentId = sessionStorage.getItem('onlineTournamentId');
+        const keepSocketAlive = !!onlineTournamentId;
+        cleanupGameRoom({ keepSocketAlive });
+        
+        if (onlineTournamentId) {
+             socket.disconnect();
+             navigateTo(`/tournament/${onlineTournamentId}`);
+        } else {
+            const destination = (gameMode === 'local' || gameMode === 'tournament') ? '/local-game' : '/game';
+            navigateTo(destination);
+        }
+    }
 }
 
 function drawGame(state: GameState, ctx: CanvasRenderingContext2D) {
@@ -608,7 +659,7 @@ function getAvatarForUser(user: UserPublic): string {
 function cleanupAll() {
     document.removeEventListener('keydown', handleKeydown);
     document.removeEventListener('keyup', handleKeyup);
-	
+
     // Ne déconnecte le socket que si ce n'est pas un tournoi en ligne
     const onlineTournamentId = sessionStorage.getItem('onlineTournamentId');
     if (!onlineTournamentId) {
@@ -622,4 +673,21 @@ function cleanupAll() {
         sessionStorage.removeItem('gameMode');
     }
     sessionStorage.removeItem('side');
+}
+
+function cleanupGameRoom( options: { keepSocketAlive?: boolean } = {}) {
+	document.removeEventListener('keydown', handleKeydown);
+	document.removeEventListener('keyup', handleKeyup);
+
+	socket.off('gameState');
+	socket.off('gameOver');
+	socket.off('opponentLeft');
+
+	if (!options.keepSocketAlive) {
+		cleanupSocket(socket);
+		sessionStorage.clear();
+	} else {
+	sessionStorage.removeItem('side');
+	sessionStorage.removeItem('matchId');
+	}
 }

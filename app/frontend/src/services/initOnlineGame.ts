@@ -49,13 +49,18 @@ export async function handleTournamentSearch(size: number, displayName: string, 
     sessionStorage.removeItem('tournamentData');
     sessionStorage.removeItem('onlineTournamentId');
 
-    if (!socket.connected) {
-        socket.connect();
+    // if (!socket.connected) {
+    //     socket.connect();
+    // }
+
+    if (socket.connected) {
+        socket.disconnect();
     }
+    socket.removeAllListeners();
 
     // Authenticate and join queue
-    socket.emit('authenticate', { display_name: displayName, userId });
-    socket.emit('joinTournamentQueue', { size });
+    // socket.emit('authenticate', { display_name: displayName, userId });
+    // socket.emit('joinTournamentQueue', { size });
 
     // Show initial waiting toast
     showWaitingToast(socket, controller, config.settings.online.waitTimeout, t('tournament.waitingForPlayers', { current: '1', required: size.toString() }));
@@ -87,14 +92,25 @@ export async function handleTournamentSearch(size: number, displayName: string, 
         cleanupSocket(socket);
         removeWaitingToast();
     });
+
+    socket.on('connect', () => {
+        console.log('Connected to the server for tournament search');
+        socket.emit('authenticate', { display_name: displayName, userId });
+        socket.emit('joinTournamentQueue', { size });
+    });
+    socket.connect();
 }
 
 export async function initOnlineGame(display_name: string, userId: number) {
     const controller: AbortController = new AbortController();
 
-    if (!socket.connected) {
-        socket.connect();
+    // if (!socket.connected) {
+    //     socket.connect();
+    // }
+    if (socket.connected) {
+        socket.disconnect();
     }
+    socket.removeAllListeners();
     
     socket.on('connect', () => {
         console.log('Connect to the server');
@@ -149,6 +165,7 @@ export async function initOnlineGame(display_name: string, userId: number) {
         removeWaitingToast();
         navigateTo('/game');
     });
+    socket.connect();
 }
 
 // --- Helper to cleanup Socket connexion ---

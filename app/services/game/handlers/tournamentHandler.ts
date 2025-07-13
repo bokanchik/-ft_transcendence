@@ -3,7 +3,7 @@
 import { Socket } from "socket.io";
 import { fastify } from "../server.ts";
 import { PlayerInfo, tournamentQueues } from "../utils/waitingListUtils.ts";
-import { createTournament, addMatchToTournament, getTournamentById, updateMatchWinner } from "../database/dbModels.ts";
+import { createTournament, addMatchToTournament, getTournamentById, updateTournamentWinner } from "../database/dbModels.ts";
 import { startRemoteGame } from "../pong/matchSocketHandler.ts";
 import { updateUserStatus } from "../utils/apiClient.ts";
 import { UserOnlineStatus } from "../shared/schemas/usersSchemas.js";
@@ -36,7 +36,6 @@ export async function handleTournamentLogic(socket: Socket) {
         queue.push(playerInfo);
         tournamentQueues.set(size, queue);
         
-
         fastify.log.info(`Player ${playerInfo.display_name} joined tournament queue for size ${size}. Queue size: ${queue.length}/${size}`);
 
         // Emettre une mise à jour à tous les joueurs dans la file
@@ -95,20 +94,18 @@ async function startTournament(players: PlayerInfo[]) {
 export async function handleMatchEnd(tournamentId: string, matchId: string, winnerId: number) {
     fastify.log.info(`Match ${matchId} ended in tournament ${tournamentId}. Winner: ${winnerId}`);
     
-    await updateMatchWinner(matchId, winnerId);
-    
     const tournamentState = await getTournamentState(tournamentId);
     activeTournaments.set(tournamentId, tournamentState);
 
     // Mettre à jour tous les participants
     fastify.io.to(`tournament-${tournamentId}`).emit('tournamentState', tournamentState);
 
-    // Si le tournoi n'est pas terminé, lancer le match suivant
-    if (!tournamentState.isFinished) {
-        triggerNextMatch(tournamentId);
-    } else {
-        fastify.log.info(`Tournament ${tournamentId} has finished. Winner is ${tournamentState.winner}`);
-        // Nettoyage
+    const nextMatchAvailable = await triggerNextMatch(tournamentId);
+    if (!nextMatchAvailable && !tournamentState.isFinished) {
+        fastify.log.info(`Tournament ${tournamentId} has finished. Winner is ${winnerId}.`);
+        await updateTournamentWinner(tournamentId, winnerId);
+        console.log(`\x1b[35m[DEBUG] Emitting 'tournamentFinished' for tournament ${tournamentId}\x1b[0m`);
+        fastify.io.to(`tournament-${tournamentId}`).emit('tournamentFinished', { winnerId, tournamentId });
         activeTournaments.delete(tournamentId);
         const sockets = await fastify.io.in(`tournament-${tournamentId}`).fetchSockets();
         sockets.forEach(s => {
@@ -117,13 +114,14 @@ export async function handleMatchEnd(tournamentId: string, matchId: string, winn
                 updateUserStatus(playerInfo.userId, UserOnlineStatus.ONLINE);
             }
             s.leave(`tournament-${tournamentId}`);
+            delete (s as any).tournamentInfo; // Nettoyer les infos de tournoi
         });
     }
 }
 
-async function triggerNextMatch(tournamentId: string) {
+async function triggerNextMatch(tournamentId: string): Promise<boolean> {
     const tournamentState = activeTournaments.get(tournamentId);
-    if (!tournamentState || tournamentState.isFinished) return;
+    if (!tournamentState || tournamentState.isFinished) return false;
 
     // On parcourt les rounds pour trouver le premier match non joué
     for (const round of Object.values(tournamentState.rounds) as any[][]) {
@@ -134,6 +132,8 @@ async function triggerNextMatch(tournamentId: string) {
                 const p2Socket = findSocketByUserId(match.player2_id);
 
                 if (p1Socket && p2Socket) {
+                    const p1Info = (p1Socket as any).playerInfo;
+                    const p2Info = (p2Socket as any).playerInfo;
                     fastify.log.info(`Triggering next match: ${match.player1_id} vs ${match.player2_id} (Match ID: ${match.id})`);
                     
                     // On attache les informations du tournoi au socket pour les retrouver plus tard
@@ -141,19 +141,28 @@ async function triggerNextMatch(tournamentId: string) {
                     (p2Socket as any).tournamentInfo = { tournamentId, matchId: match.id };
                     
                     // On informe les clients de démarrer
-                    p1Socket.emit('startTournamentMatch', { matchId: match.id });
-                    p2Socket.emit('startTournamentMatch', { matchId: match.id });
+                    p1Socket.emit('startTournamentMatch', {
+                        matchId: match.id,
+                        side: 'left',
+                        opponent: p2Info.display_name
+                    });
+                    p2Socket.emit('startTournamentMatch', {
+                        matchId: match.id,
+                        side: 'right',
+                        opponent: p1Info.display_name
+                    });
 
                     // On démarre la session de jeu sur le serveur
                     const gameSession = startRemoteGame(p1Socket, p2Socket, match.id);
                     gameSession.isTournamentMatch = true; // On marque ce match comme faisant partie d'un tournoi
 
                     // On a trouvé et lancé un match, on arrête de chercher.
-                    return; 
+                    return true; 
                 }
             }
         }
     }
+    return false; // Aucun match à jouer pour le moment
 }
 
 async function getTournamentState(tournamentId: string): Promise<any> {
