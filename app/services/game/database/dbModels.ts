@@ -43,7 +43,6 @@ const neSupprimePasStpCommente: string = `
 	('match16', 6, 8, 'socket31', 'socket32', 0, 10, 8, 'finished'),
 	('match17', 7, 8, 'socket33', 'socket34', 0, 10, 8, 'finished');`;
 
-	// --- Nouvelles tables pour les tournois ---
 const tournamentTable = `
 CREATE TABLE IF NOT EXISTS tournaments (
     id TEXT PRIMARY KEY, -- UUID
@@ -60,24 +59,11 @@ CREATE TABLE IF NOT EXISTS tournament_players (
     FOREIGN KEY (tournament_id) REFERENCES tournaments(id)
 );`;
 
-// const tournamentMatchesTable = `
-// CREATE TABLE IF NOT EXISTS tournament_matches (
-//     match_id TEXT PRIMARY KEY, -- UUID
-//     tournament_id TEXT NOT NULL,
-//     round_number INTEGER NOT NULL,
-//     player1_id INTEGER NOT NULL,
-//     player2_id INTEGER NOT NULL,
-//     winner_id INTEGER,
-//     FOREIGN KEY (tournament_id) REFERENCES tournaments(id)
-// );`;
-
-// --- HELPER FUNCTIONS FOR GENERAL DB ACTIONS (all(), get(), run(), exec() etc.)
 export async function createMatchTable() {
 	try {
 		await execute(db, tournamentTable);
 		await execute(db, matchTable);
         await execute(db, tournamentPlayersTable);
-        // await execute(db, tournamentMatchesTable);
 		await execute(db, neSupprimePasStpCommente);
 		console.log('All tables created or already exist.');
 
@@ -255,7 +241,6 @@ export async function deleteRow(id: number) {
 
 // --- WRAPPERS FOR DB ACTIONS ---
 export const execute = async (db: any, sql: string, params: any[] = []): Promise<void> => {
-	// to execute an INSERT statement or UPDATE
 	if (params && params.length > 0) {
 		return new Promise<void>((resolve, reject) => {
 			db.run(sql, params, (err: Error | null) => {
@@ -283,7 +268,6 @@ export const fetchAll = async (db: any, sql: string, params: any[]): Promise<any
 
 export const fetchFirst = async (db: any, sql: string, params: any): Promise<any> => {
 	return new Promise<any>((resolve, reject) => {
-		// check if row: any ? or better type
 		db.get(sql, params, (err: Error | null, row: any) => {
 			if (err) reject(err);
 			resolve(row);
@@ -303,8 +287,8 @@ export async function createTournament(tournamentId: string, playerIds: number[]
 export async function addMatchToTournament(tournamentId: string, matchId: string, p1Id: number, p2Id: number, round: number) {
     const sql = `
     INSERT INTO matches(matchId, tournament_id, player1_id, player2_id, round_number, status)
-    VALUES(?, ?, ?, ?, ?, ?)`; // Ajout d'un '?'
-    await execute(db, sql, [matchId, tournamentId, p1Id, p2Id, round, 'pending']); // Ajout de 'round'
+    VALUES(?, ?, ?, ?, ?, ?)`;
+    await execute(db, sql, [matchId, tournamentId, p1Id, p2Id, round, 'pending']);
 }
 
 export async function updateTournamentWinner(tournamentId: string, winnerId: number) {

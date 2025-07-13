@@ -346,12 +346,12 @@ import { createElement } from "../utils/domUtils.js";
 import { t } from '../services/i18nService.js'
 import { HeaderComponent } from '../components/headerComponent.js';
 import { navigateTo } from '../services/router.js';
-import { getUserDataFromStorage, checkAuthStatus } from '../services/authService.js';
+import { getUserDataFromStorage } from '../services/authService.js';
 import { User } from '../shared/schemas/usersSchemas.js';
 import socket from "../services/socket.js";
 import { fetchUserPublicDetails } from '../services/authService.js';
 import { UserPublic, UserOnlineStatus } from '../shared/schemas/usersSchemas.js';
-import { showToast } from '../components/toast.js';
+import { createActionButton } from "../utils/domUtils.js";
 
 type Match = {
     id: string;
@@ -361,6 +361,7 @@ type Match = {
     player1_id?: number;
     player2_id?: number;
     winner_id?: number | null;
+    ready_players?: number[];
 };
 
 type Rounds = {
@@ -476,7 +477,6 @@ function LocalTournamentPage(): HTMLElement {
         const finalRound = rounds[totalRounds];
         const tournamentWinner = (finalRound && finalRound.length === 1 && finalRound[0].winner) ? finalRound[0].winner : null;
         
-        // --- AJOUT : Afficher la bannière du vainqueur et le bouton final ---
         if (tournamentWinner) {
             const winnerBanner = createElement('div', { 
                 textContent: `${t('tournament.winnerIs')} ${tournamentWinner}!`,
@@ -489,7 +489,7 @@ function LocalTournamentPage(): HTMLElement {
             });
 
             newTournamentButton.addEventListener('click', () => {
-                sessionStorage.clear(); // Nettoyage complet pour le nouveau tournoi
+                sessionStorage.clear();
                 navigateTo('/local-game');
             });
 
@@ -543,169 +543,6 @@ function LocalTournamentPage(): HTMLElement {
     return pageWrapper;
 }
 
-const userDetailsCache: { [key: string]: UserPublic } = {};
-
-async function getPlayerDetails(playerId: string | number): Promise<UserPublic> {
-    const id = Number(playerId);
-    if (isNaN(id)) {
-        return { id: 0, display_name: String(playerId), avatar_url: null, wins: 0, losses: 0, status: UserOnlineStatus.OFFLINE, created_at: '', updated_at: '' };
-    }
-    if (userDetailsCache[id]) {
-        return userDetailsCache[id];
-    }
-    try {
-        const user = await fetchUserPublicDetails(id);
-        userDetailsCache[id] = user;
-        return user;
-    } catch (error) {
-        console.error(`Failed to fetch details for user ${id}`, error);
-        return { id, display_name: `Player ${id}`, avatar_url: null, wins: 0, losses: 0, status: UserOnlineStatus.OFFLINE, created_at: '', updated_at: '' };
-    }
-}
-
-// function OnlineTournamentPage(tournamentId: string): HTMLElement {
-//     const currentUser = getUserDataFromStorage()!;
-//     if (!currentUser) {
-//         navigateTo('/login');
-//         return createElement('div');
-//     }
-
-//     let isTournamentFinished = false;
-//     const pageWrapper = createElement('div', { className: 'flex flex-col h-screen bg-cover bg-center bg-fixed' });
-//     pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
-
-//     const title = createElement('h2', { className: 'flex-shrink-0 text-3xl font-bold mb-6 text-center text-white', textContent: t('tournament.titleOnline') });
-//     const bracketContainer = createElement('div', { className: 'w-full max-w-4xl' });
-//     const tournamentContentContainer = createElement('div', { className: 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 items-center rounded-2xl shadow-2xl p-8 flex flex-col max-h-[90vh] w-2/3' }, [title, bracketContainer]);
-//     const contentWrapper = createElement('div', { className: 'w-full max-w-4xl' });
-//     tournamentContentContainer.appendChild(contentWrapper);
-
-//     pageWrapper.append(
-//         HeaderComponent({ currentUser }),
-//         createElement('div', { className: 'flex-grow flex items-center justify-center p-4 sm:p-8' }, [tournamentContentContainer])
-//     );
-
-//     if (!socket.connected) {
-//         socket.connect();
-//     }
-//     socket.removeAllListeners('tournamentState');
-//     socket.removeAllListeners('startTournamentMatch');
-//     socket.removeAllListeners('tournamentFinished');
-
-//     socket.emit('authenticate', { display_name: currentUser.display_name, userId: currentUser.id });
-//     socket.emit('joinTournamentRoom', { tournamentId });
-
-//     socket.on('tournamentState', (data: { rounds: Rounds, isFinished: boolean, winner?: string }) => {
-//         renderOnlineBracket(data.rounds, data.isFinished, data.winner, contentWrapper, currentUser.id)
-//     });
-
-//     socket.on('startTournamentMatch', ({ matchId, side, opponent }: { matchId: string, side: string, opponent: string }) => {
-//         sessionStorage.setItem('onlineTournamentId', tournamentId);
-//         sessionStorage.setItem('gameMode', 'onlineTournament');
-//         sessionStorage.setItem('matchId', matchId);
-//         sessionStorage.setItem('matchSide', side);
-//         sessionStorage.setItem('matchOpponent', opponent);
-//         sessionStorage.setItem('displayName', currentUser.display_name);
-//         navigateTo(`/game-room?matchId=${matchId}`);
-//     });
-
-//     socket.on('tournamentFinished', async ({ winnerId }: { winnerId: number }) => {
-//         console.log(`%c[DEBUG] Received 'tournamentFinished' event! Winner ID: ${winnerId}`, 'color: magenta; font-weight: bold;');
-//         const winnerDetails = await getPlayerDetails(winnerId);
-//         const banner = createElement('div', {
-//             className: 'mt-6 p-4 bg-yellow-500 text-black text-2xl font-bold text-center rounded-lg animate-pulse'
-//         }, [
-//             createElement('p', { textContent: `${t('tournament.winnerIs')} ${winnerDetails.display_name}!` }),
-//         ]);
-
-//         const backToLobbyBtn = createElement('button', {
-//             textContent: t('link.lobby'),
-//             className: 'mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg'
-//         });
-
-//         backToLobbyBtn.addEventListener('click', () => {
-//             sessionStorage.removeItem('onlineTournamentId');
-//             sessionStorage.removeItem('gameMode');
-//             cleanupSocket(socket); // Maintenant, on peut tout nettoyer
-//             navigateTo('/game');
-//         });
-        
-//         // S'assure que le dernier état du bracket est affiché avant la bannière
-//         setTimeout(() => {
-//             const lastBracket = tournamentContentContainer.querySelector('.w-full.max-w-4xl');
-//             if (lastBracket) {
-//                 lastBracket.appendChild(banner);
-//                 lastBracket.appendChild(backToLobbyBtn);
-//             }
-//         }, 500); // Petit délai pour être sûr que le dernier render est fait
-//     });
-
-//     return pageWrapper;
-// }
-
-
-// async function renderOnlineBracket(rounds: Rounds, isFinished: boolean, winnerId: string | undefined, container: HTMLElement, currentUserId: number) {
-//     container.innerHTML = `<p class="text-white text-center">${t('general.loading')}</p>`;
-//     const sortedRounds = Object.entries(rounds).sort((a, b) => Number(a[0]) - Number(b[0]));
-    
-//     const bracketContainer = createElement('div', { className: 'space-y-6' });
-
-//     for (const [roundNumStr, matches] of sortedRounds) {
-//         const roundEl = createElement('div', { className: 'bg-blue-100/5 shadow-lg rounded-lg p-4 border border-blue-200/10' });
-//         const header = createElement('h2', { textContent: `${t('tournament.round')} ${roundNumStr}`, className: 'text-xl font-semibold mb-3 text-blue-300' });
-//         roundEl.appendChild(header);
-
-//         const list = createElement('ul', { className: 'space-y-2' });
-//         for (const match of matches) {
-//             const li = createElement('li', { className: 'bg-black/20 p-3 rounded-md flex justify-between items-center' });
-            
-//             const p1Id = match.player1_id!;
-//             const p2Id = match.player2_id!;
-
-//             const [p1Details, p2Details] = await Promise.all([
-//                 getPlayerDetails(p1Id),
-//                 getPlayerDetails(p2Id)
-//             ]);
-
-//             const winnerDetails = match.winner_id ? await getPlayerDetails(match.winner_id) : null;
-            
-//             const p1Class = winnerDetails?.id === p1Details.id ? 'font-bold text-green-400' : p1Details.id === currentUserId ? 'font-bold text-blue-400' : 'font-medium text-gray-200';
-//             const p2Class = winnerDetails?.id === p2Details.id ? 'font-bold text-green-400' : p2Details.id === currentUserId ? 'font-bold text-blue-400' : 'font-medium text-gray-200';
-
-//             const matchInfo = createElement('div', { className: 'flex items-center gap-3' }, [
-//                 createElement('span', { textContent: p1Details.display_name, className: p1Class }),
-//                 createElement('span', { textContent: 'vs', className: 'text-gray-400' }),
-//                 createElement('span', { textContent: p2Details.display_name, className: p2Class })
-//             ]);
-
-//             if (winnerDetails) {
-//                 const winnerSpan = createElement('span', { textContent: `${t('tournament.winner')} ${winnerDetails.display_name}`, className: 'text-green-500 font-semibold' });
-//                 li.append(matchInfo, winnerSpan);
-//             } else {
-//                 const isPlayerInMatch = p1Details.id === currentUserId || p2Details.id === currentUserId;
-//                 if (isPlayerInMatch) {
-//                     const statusSpan = createElement('span', { textContent: t('tournament.yourNextMatch'), className: 'text-yellow-400 italic' });
-//                     li.append(matchInfo, statusSpan);
-//                 } else {
-//                     const statusSpan = createElement('span', { textContent: t('tournament.inProgress'), className: 'text-gray-400 italic' });
-//                     li.append(matchInfo, statusSpan);
-//                 }
-//             }
-//             list.appendChild(li);
-//         }
-//         roundEl.appendChild(list);
-//         bracketContainer.appendChild(roundEl);
-//     }
-    
-//     if (isFinished && winnerId) {
-//         const winnerDetails = await getPlayerDetails(Number(winnerId));
-//         const winnerBanner = createElement('div', { textContent: `${t('tournament.winnerIs')} ${winnerDetails.display_name}!`, className: 'mt-6 p-4 bg-yellow-400 text-black text-2xl font-bold text-center rounded-lg' });
-//         bracketContainer.appendChild(winnerBanner);
-//     }
-
-//     container.innerHTML = '';
-//     container.appendChild(bracketContainer);
-// }
 function OnlineTournamentPage(tournamentId: string): HTMLElement {
     const currentUser = getUserDataFromStorage();
     if (!currentUser) {
@@ -713,14 +550,11 @@ function OnlineTournamentPage(tournamentId: string): HTMLElement {
         return createElement('div');
     }
 
-    // NOTE: On utilise une variable pour suivre l'état final, évitant les rendus multiples inutiles.
-    let isTournamentFinished = false;
-
     const pageWrapper = createElement('div', { className: 'flex flex-col h-screen bg-cover bg-center bg-fixed' });
     pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
 
     const title = createElement('h2', { className: 'flex-shrink-0 text-3xl font-bold mb-6 text-center text-white', textContent: t('tournament.titleOnline') });
-    const bracketContainer = createElement('div', { className: 'w-full max-w-4xl' });
+    const bracketContainer = createElement('div', { id: `bracket-container-${tournamentId}`, className: 'w-full max-w-4xl' });
     const tournamentContentContainer = createElement('div', { className: 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 items-center rounded-2xl shadow-2xl p-8 flex flex-col max-h-[90vh] w-2/3' }, [
         title,
         bracketContainer
@@ -731,17 +565,14 @@ function OnlineTournamentPage(tournamentId: string): HTMLElement {
         createElement('div', { className: 'flex-grow flex items-center justify-center p-4 sm:p-8' }, [tournamentContentContainer])
     );
 
-    // --- Gestion des Sockets ---
-    if (!socket.connected) {
-        socket.connect();
-    }
+    if (!socket.connected) socket.connect();
     socket.removeAllListeners();
 
     const handleTournamentState = async (data: { rounds: Rounds, isFinished: boolean, winner_id?: number }) => {
-        if (isTournamentFinished && !data.isFinished) return; // Ignore les états précédents si on sait que c'est fini
-        
-        isTournamentFinished = data.isFinished;
-        await renderOnlineBracket(data.rounds, data.isFinished, data.winner_id, bracketContainer, currentUser.id, tournamentContentContainer);
+        await renderOnlineBracket(data.rounds, bracketContainer, currentUser.id, tournamentId);
+        if (data.isFinished && data.winner_id) {
+            await displayTournamentWinner(data.winner_id, bracketContainer);
+        }
     };
 
     socket.on('connect', () => {
@@ -765,17 +596,31 @@ function OnlineTournamentPage(tournamentId: string): HTMLElement {
         navigateTo(`/game-room?matchId=${matchId}`);
     });
 
-    socket.on('tournamentFinished', handleTournamentState); // On réutilise le même handler !
-
     return pageWrapper;
 }
 
-// NOTE: Nouvelle signature pour la fonction de rendu
-async function renderOnlineBracket(rounds: Rounds, isFinished: boolean, winnerId: number | undefined, container: HTMLElement, currentUserId: number, mainContainer: HTMLElement) {
-    container.innerHTML = `<p class="text-white text-center">${t('general.loading')}</p>`;
-    const sortedRounds = Object.entries(rounds).sort((a, b) => Number(a[0]) - Number(b[0]));
+const userDetailsCache: { [key: number]: Partial<UserPublic> } = {};
+async function getPlayerDetails(playerId: number): Promise<Partial<UserPublic>> {
+    if (userDetailsCache[playerId]) return userDetailsCache[playerId];
+    try {
+        const user = await fetchUserPublicDetails(playerId);
+        userDetailsCache[playerId] = user;
+        return user;
+    } catch (error) {
+        return { id: playerId, display_name: `Player ${playerId}` };
+    }
+}
+
+async function renderOnlineBracket(rounds: Rounds, container: HTMLElement, currentUserId: number, tournamentId: string) {
+    if (!rounds) {
+        container.innerHTML = `<p class="text-white text-center">${t('general.loading')}</p>`;
+        return;
+    }
     
-    const bracketContainer = createElement('div', { className: 'space-y-6' });
+    const bracketContent = container.querySelector('.bracket-content') || createElement('div', { className: 'bracket-content space-y-6' });
+    bracketContent.innerHTML = '';
+    
+    const sortedRounds = Object.entries(rounds).sort((a, b) => Number(a[0]) - Number(b[0]));
 
     for (const [roundNumStr, matches] of sortedRounds) {
         const roundEl = createElement('div', { className: 'bg-blue-100/5 shadow-lg rounded-lg p-4 border border-blue-200/10' });
@@ -786,79 +631,82 @@ async function renderOnlineBracket(rounds: Rounds, isFinished: boolean, winnerId
         for (const match of matches) {
             const li = createElement('li', { className: 'bg-black/20 p-3 rounded-md flex justify-between items-center' });
             
-            const p1Id = match.player1_id;
-            const p2Id = match.player2_id;
-            const matchWinnerId = match.winner_id;
-
-            let p1Name = t('tournament.tbd');
-            let p2Name = t('tournament.tbd');
-            let winnerName: string | null = null;
-            
-            let p1Class = 'font-medium text-gray-400 italic';
-            let p2Class = 'font-medium text-gray-400 italic';
-
-            if (p1Id && p2Id) {
-                const [p1Details, p2Details] = await Promise.all([getPlayerDetails(p1Id), getPlayerDetails(p2Id)]);
-                p1Name = p1Details.display_name;
-                p2Name = p2Details.display_name;
-                p1Class = p1Details.id === currentUserId ? 'font-bold text-blue-400' : 'font-medium text-gray-200';
-                p2Class = p2Details.id === currentUserId ? 'font-bold text-blue-400' : 'font-medium text-gray-200';
-                
-                if (matchWinnerId) {
-                    const winnerDetails = await getPlayerDetails(matchWinnerId);
-                    winnerName = winnerDetails.display_name;
-                    if(matchWinnerId === p1Id) p1Class = 'font-bold text-green-400';
-                    if(matchWinnerId === p2Id) p2Class = 'font-bold text-green-400';
-                }
-            }
-            
-            const matchInfo = createElement('div', { className: 'flex items-center gap-3' }, [
-                createElement('span', { textContent: p1Name, className: p1Class }),
-                createElement('span', { textContent: 'vs', className: 'text-gray-400' }),
-                createElement('span', { textContent: p2Name, className: p2Class })
+            const [p1Details, p2Details] = await Promise.all([
+                match.player1_id ? getPlayerDetails(match.player1_id) : Promise.resolve({ display_name: t('tournament.tbd') }),
+                match.player2_id ? getPlayerDetails(match.player2_id) : Promise.resolve({ display_name: t('tournament.tbd') })
             ]);
 
-            if (winnerName) {
-                li.append(matchInfo, createElement('span', { textContent: `${t('tournament.winnerShort')}: ${winnerName}`, className: 'text-green-500 font-semibold text-sm' }));
-            } else if (p1Id && p2Id) {
-                 const isPlayerInMatch = p1Id === currentUserId || p2Id === currentUserId;
-                 const statusText = isPlayerInMatch ? t('tournament.yourNextMatch') : t('tournament.inProgress');
-                 const statusClass = isPlayerInMatch ? 'text-yellow-400 italic' : 'text-gray-400 italic';
-                 li.append(matchInfo, createElement('span', { textContent: statusText, className: statusClass }));
-            } else {
-                 li.append(matchInfo);
+            const winnerDetails = match.winner_id ? await getPlayerDetails(match.winner_id) : null;
+            
+            const p1Class = winnerDetails?.id === match.player1_id ? 'font-bold text-green-400' : match.player1_id === currentUserId ? 'font-bold text-blue-400' : 'font-medium text-gray-200';
+            const p2Class = winnerDetails?.id === match.player2_id ? 'font-bold text-green-400' : match.player2_id === currentUserId ? 'font-bold text-blue-400' : 'font-medium text-gray-200';
+
+            const matchInfo = createElement('div', { className: 'flex items-center gap-3' }, [
+                createElement('span', { textContent: p1Details.display_name, className: p1Class }),
+                createElement('span', { textContent: 'vs', className: 'text-gray-400' }),
+                createElement('span', { textContent: p2Details.display_name, className: p2Class })
+            ]);
+
+            const actionContainer = createElement('div', { className: 'flex items-center gap-2' });
+
+            if (winnerDetails) {
+                actionContainer.appendChild(createElement('span', { textContent: `${t('tournament.winnerShort')}: ${winnerDetails.display_name}`, className: 'text-green-500 font-semibold text-sm' }));
+            } else if (match.player1_id && match.player2_id) {
+                const isPlayerInMatch = match.player1_id === currentUserId || match.player2_id === currentUserId;
+                const isPlayerReady = (match.ready_players || []).includes(currentUserId);
+                
+                if (isPlayerInMatch && !isPlayerReady) {
+                    const readyButton = createActionButton({
+                        text: t('tournament.ready'),
+                        variant: 'success',
+                        onClick: () => {
+                            socket.emit('playerReadyForTournamentMatch', { tournamentId, matchId: match.id });
+                        }
+                    });
+                    actionContainer.appendChild(readyButton);
+                } else if (isPlayerInMatch && isPlayerReady) {
+                    actionContainer.appendChild(createElement('span', { textContent: t('tournament.waitingForOpponent'), className: 'text-yellow-400 italic text-sm' }));
+                } else {
+                    actionContainer.appendChild(createElement('span', { textContent: t('tournament.inProgress'), className: 'text-gray-400 italic text-sm' }));
+                }
             }
+            li.append(matchInfo, actionContainer);
             list.appendChild(li);
         }
         roundEl.appendChild(list);
-        bracketContainer.appendChild(roundEl);
+        bracketContent.appendChild(roundEl);
     }
     
-    // NOTE: Logique de fin de tournoi intégrée ici
-    if (isFinished && winnerId) {
-        const winnerDetails = await getPlayerDetails(winnerId);
-        const winnerBanner = createElement('div', { 
-            textContent: `${t('tournament.winnerIs')} ${winnerDetails.display_name}!`,
-            className: 'mt-6 p-4 bg-yellow-400 text-black text-2xl font-bold text-center rounded-lg animate-pulse'
-        });
+    if (!container.contains(bracketContent)) {
+        container.innerHTML = '';
+        container.appendChild(bracketContent);
+    }
+}
 
-        const backToLobbyBtn = createElement('button', {
-            textContent: t('link.lobby'),
-            className: 'mt-4 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg'
-        });
-
-        backToLobbyBtn.addEventListener('click', () => {
-            sessionStorage.removeItem('onlineTournamentId');
-            sessionStorage.removeItem('gameMode');
-            cleanupSocket(socket); // Nettoyage final
-            navigateTo('/game');
-        });
-        
-        // On ajoute les éléments au conteneur principal, PAS au conteneur du bracket
-        mainContainer.appendChild(winnerBanner);
-        mainContainer.appendChild(backToLobbyBtn);
+async function displayTournamentWinner(winnerId: number, bracketContainer: HTMLElement) {
+    if (bracketContainer.querySelector('.tournament-winner-banner')) {
+        return;
     }
 
-    container.innerHTML = '';
-    container.appendChild(bracketContainer);
+    const winnerDetails = await getPlayerDetails(winnerId);
+    
+    const winnerBanner = createElement('div', { 
+        className: 'tournament-winner-banner mt-6 p-4 bg-yellow-400 text-black text-2xl font-bold text-center rounded-lg animate-pulse'
+    });
+    winnerBanner.textContent = `${t('tournament.winnerIs')} ${winnerDetails.display_name}!`;
+
+    const backToLobbyBtn = createActionButton({
+        text: t('link.lobby'),
+        variant: 'primary',
+        onClick: () => {
+            sessionStorage.removeItem('onlineTournamentId');
+            sessionStorage.removeItem('gameMode');
+            cleanupSocket(socket);
+            navigateTo('/game');
+        },
+        // baseClass: 'w-full mt-4 text-lg py-3'
+    });
+    
+    bracketContainer.prepend(winnerBanner);
+    bracketContainer.appendChild(backToLobbyBtn);
 }

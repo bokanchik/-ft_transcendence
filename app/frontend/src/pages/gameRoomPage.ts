@@ -396,7 +396,6 @@ const PADDLE_COLOUR = config.settings.game.paddleColor;
 
 let isGameOver = false;
 
-// --- Point d'entrée de la page ---
 export function GameRoomPage(mode: GameMode): HTMLElement {
 	isGameOver = false;
 
@@ -498,8 +497,6 @@ async function onGameOver(finalState?: GameState) {
     const matchId = sessionStorage.getItem('matchId');
 	const onlineTournamentId = sessionStorage.getItem('onlineTournamentId');
 
-    // cleanupAll();
-
 	// --- CAS TOURNOI EN LIGNE ---
 	if (gameMode === 'onlineTournament') {
 		cleanupGameRoom({ keepSocketAlive: true });
@@ -591,20 +588,9 @@ async function onGameOver(finalState?: GameState) {
         cleanupGameRoom({ keepSocketAlive: false });
 		showGameResult(player1, player2, finalState.score1, finalState.score2, defaultAvatar(player1), defaultAvatar(player2), '/local-game', t('link.newGame'));
     } else {
-        // Fallback
         navigateTo('/game');
     }
 }
-
-// async function quitGameHandler(gameMode: GameMode) {
-// 	const confirmed = await showCustomConfirm(t('game.quitConfirm'));
-// 	if (confirmed) {
-// 		isGameOver = true;
-// 		cleanupAll();
-// 		const destination = (gameMode === 'local' || gameMode === 'tournament') ? '/local-game' : '/game';
-// 		navigateTo(destination);
-// 	}
-// }
 
 async function quitGameHandler(gameMode: GameMode) {
     const confirmed = await showCustomConfirm(t('game.quitConfirm'));
@@ -660,7 +646,6 @@ function cleanupAll() {
     document.removeEventListener('keydown', handleKeydown);
     document.removeEventListener('keyup', handleKeyup);
 
-    // Ne déconnecte le socket que si ce n'est pas un tournoi en ligne
     const onlineTournamentId = sessionStorage.getItem('onlineTournamentId');
     if (!onlineTournamentId) {
         cleanupSocket(socket);
@@ -668,7 +653,6 @@ function cleanupAll() {
 
     const gameMode = sessionStorage.getItem('gameMode');
 
-    // On ne supprime gameMode que si ce n'est PAS un tournoi
     if (gameMode !== 'tournament' && gameMode !== 'onlineTournament') {
         sessionStorage.removeItem('gameMode');
     }
