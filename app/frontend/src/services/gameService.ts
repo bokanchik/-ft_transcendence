@@ -19,9 +19,10 @@ const BG_COLOUR = config.settings.game.backgroundColor;
 const BALL_COLOUR = config.settings.game.ballColor;
 const PADDLE_COLOUR = config.settings.game.paddleColor;
 
-let isGameOver = false;
+let isGameOver: boolean;
 
 export function initializeGame(gameMode: GameMode, ctx: CanvasRenderingContext2D, scoreDisplay: HTMLDivElement) {
+	isGameOver = false;
 	const initialGameState: GameState = { leftPaddle: { y: 200 }, rightPaddle: { y: 200 }, ball: { x: 400, y: 250 }, score1: 0, score2: 0 };
 	drawGame(initialGameState, ctx);
 	updateScore(scoreDisplay, initialGameState);
@@ -160,11 +161,12 @@ async function onGameOver(finalState?: GameState) {
     }
 }
 
-export async function quitGameHandler(gameMode: GameMode) {
+// export async function quitGameHandler(gameMode: GameMode) {
+export async function quitGameHandler() {
     const confirmed = await showCustomConfirm(t('game.quitConfirm'));
     if (confirmed) {
         isGameOver = true;
-
+		const gameMode = sessionStorage.getItem('gameMode');
         const onlineTournamentId = sessionStorage.getItem('onlineTournamentId');
         const keepSocketAlive = !!onlineTournamentId;
         cleanupGameRoom({ keepSocketAlive });

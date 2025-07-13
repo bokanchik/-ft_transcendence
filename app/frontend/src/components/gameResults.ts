@@ -95,7 +95,6 @@ export function showGameResult(player1: string, player2: string, score1: number,
 		sessionStorage.setItem('tournamentData', JSON.stringify(data))
 	}
 	
-	// Mettre en évidence le gagnant et l'ajouter a sessionStorage
 	if (score1 > score2) {
 		player1Container.classList.add('opacity-100', 'scale-105');
 		player2Container.classList.add('opacity-60', 'scale-95');
@@ -104,13 +103,11 @@ export function showGameResult(player1: string, player2: string, score1: number,
 		player1Container.classList.add('opacity-60', 'scale-95');
 	}
 
-	// Bouton retour au lobby
 	const closeButton = document.createElement('button');
 	closeButton.id = 'close-modal';
 	closeButton.className = 'mt-8 px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg border border-blue-500/50 transition-all duration-200 hover:scale-105';
 	closeButton.textContent = destinationText;
 
-	// Assemble tout
 	playersContainer.appendChild(player1Container);
 	playersContainer.appendChild(vsText);
 	playersContainer.appendChild(player2Container);
