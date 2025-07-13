@@ -114,18 +114,13 @@ export class RemoteGameSession {
     intervalId: NodeJS.Timeout | null = null;
     isFinished: boolean = false;
     isTournamentMatch: boolean = false; // Nouvelle propriété
-    tournamentId?: string; // ID du tournoi si c'est un match de tournoi
 
-    constructor(roomName: string, matchId: string, tournamentId?: string) {
+    constructor(roomName: string, matchId: string) {
         this.roomName = roomName;
         this.velocity = createBallState();
         this.state = createGameState();
         this.players = new Map();
         this.matchId = matchId;
-        if (tournamentId) { // AJOUTER CETTE LOGIQUE
-            this.isTournamentMatch = true;
-            this.tournamentId = tournamentId;
-        }
     }
     
     addPlayer(socketId: string, side: string) {
@@ -168,18 +163,21 @@ export class RemoteGameSession {
                 const winnerId = winner === 1 ? (p1Socket as any).playerInfo.userId : (p2Socket as any).playerInfo.userId;
                 const loserId = winner === 1 ? (p2Socket as any).playerInfo.userId : (p1Socket as any).playerInfo.userId;
 
-                if (this.isTournamentMatch && this.tournamentId) {
+                // ajout arthur
+                await setGameResult(this.matchId, this.state.score1, this.state.score2, winnerId, 'score');
+                if (this.isTournamentMatch) {
                     const tournamentInfo = (p1Socket as any).tournamentInfo;
                     if (tournamentInfo) {
                         await handleMatchEnd(tournamentInfo.tournamentId, tournamentInfo.matchId, winnerId);
                     }
-                } else {
-                    // C'est un match rapide, on utilise la DB `matches`
-                    const match = await getRowByMatchId(this.matchId);
-                    if (match) {
-                        await setGameResult(this.matchId, this.state.score1, this.state.score2, winnerId.toString(), 'score');
-                    }
                 }
+                //  else {
+                //     // C'est un match rapide, on utilise la DB `matches`
+                //     const match = await getRowByMatchId(this.matchId);
+                //     if (match) {
+                //         await setGameResult(this.matchId, this.state.score1, this.state.score2, winnerId.toString(), 'score');
+                //     }
+                // }
                 
                 await Promise.all([
                     updateUserStatus(winnerId, UserOnlineStatus.ONLINE),
