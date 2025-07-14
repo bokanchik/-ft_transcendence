@@ -1,10 +1,9 @@
-import { navigateTo } from "../services/router.js";
 import { initLocalGame } from "../services/initLocalGame.js";
-import { showToast } from "../components/toast.js";
+import { cancelAllSearches, showToast } from "../components/toast.js";
 import { t } from "../services/i18nService.js";
 import { HeaderComponent } from "../components/headerComponent.js";
 import { getUserDataFromStorage } from "../services/authService.js";
-import { createElement, createInputField, createActionButton, createSelectField, clearElement } from "../utils/domUtils.js";
+import { createElement, createInputField, createSelectField, clearElement } from "../utils/domUtils.js";
 
 export function promptAliasForm(): HTMLElement {
 	const currentUser = getUserDataFromStorage();
@@ -19,23 +18,13 @@ export function promptAliasForm(): HTMLElement {
 		dynamicInputs
 	]);
 
-	const cancelButton = createActionButton({
-		text: t('general.cancel'),
-		variant: 'secondary',
-		onClick: () => {
-			sessionStorage.clear();
-			navigateTo('/');
-		}
-	});
 	const submitButton = createElement('button', {
 		type: 'submit',
 		textContent: t('game.button'),
-		className: 'px-4 py-2 rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700 border border-green-500/50 transition-colors duration-200'
+		className: 'w-full bg-teal-700 hover:bg-teal-600 text-white text-3xl font-beach font-bold py-2 px-4 rounded-lg transition-colors duration-200 border border-teal-600/50'
 	});
 
-	const buttonContainer = createElement('div', {
-		className: 'flex-shrink-0 flex justify-end space-x-4 pt-4 mt-auto border-t border-gray-500/30'
-	}, [cancelButton, submitButton]);
+	const buttonContainer = createElement('div', { className: 'flex-shrink-0 flex justify-center pt-4 mt-auto border-t border-gray-500/30'	}, [submitButton]);
 
 	const form = createElement('form', {
 		className: 'flex flex-col flex-grow min-h-0'
@@ -49,7 +38,7 @@ export function promptAliasForm(): HTMLElement {
 	}, [
 		createElement('h2', {
 			textContent: t('game.settings.gameMode'),
-			className: 'flex-shrink-0 text-3xl font-bold mb-6 text-center text-white'
+			className: 'flex-shrink-0 text-3xl font-bold mb-6 text-center text-gray-300 font-beach'
 		}),
 		form,
 		createElement('div', { className: 'flex-shrink-0 mt-6 text-center' }, [
@@ -119,6 +108,7 @@ export function promptAliasForm(): HTMLElement {
 	form.addEventListener('submit', async (event) => {
 		event.preventDefault();
 
+		cancelAllSearches();
 		const gameModeValue = selectElement.value;
 		const mode = gameModeValue === t('game.settings.duel') ? 'duel' : 'tournament';
 

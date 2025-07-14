@@ -24,32 +24,8 @@
 
 @font-face {
   font-display: swap;
-  font-family: SpiritFox;
-  src: url('../fonts/SpiritFox.woff2') format('woff2');
-}
-
-@font-face {
-  font-display: swap;
-  font-family: JungleFever;
-  src: url('../fonts/JungleFever.woff2') format('woff2');
-}
-
-@font-face {
-  font-display: swap;
   font-family: JungleRoar;
   src: url('../fonts/JungleRoar.woff2') format('woff2');
-}
-
-@font-face {
-  font-display: swap;
-  font-family: Workout;
-  src: url('../fonts/Workout.woff2') format('woff2');
-}
-
-@font-face {
-  font-display: swap;
-  font-family: Gulag;
-  src: url('../fonts/Gulag.woff2') format('woff2');
 }
 
 @font-face {
@@ -66,22 +42,13 @@
 
 @font-face {
   font-display: swap;
-  font-family: Maksimir;
-  src: url('../fonts/Maksimir.woff2') format('woff2');
-}
-
-@font-face {
-  font-display: swap;
   font-family: MoreIsLess;
   src: url('../fonts/MoreIsLess.woff2') format('woff2');
 }
 
 @theme {
-  --font-spirtit-fox: SpiritFox, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-workout: Workout, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-jurassic: JurassicPark, MoreIsLess, ZeroCool, Beograd, Maksimir, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-jurassic: JurassicPark, MoreIsLess, ZeroCool, Beograd, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-roar: JungleRoar, ZeroCool, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-fever: JungleFever, MoreIsLess, ZeroCool, Beograd, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-beach: Beachclub, JungleRoar, MoreIsLess, ZeroCool, Beograd, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 

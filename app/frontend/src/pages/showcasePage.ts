@@ -1,5 +1,4 @@
 import { createElement } from '../utils/domUtils.js';
-import { t } from '../services/i18nService.js';
 
 export function showcase(): HTMLElement {
 	const container = createElement('div', {

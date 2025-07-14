@@ -90,33 +90,36 @@ export function createActionButton(props: ActionButtonProps): HTMLButtonElement 
 		type: 'button'
 	});
 
-	let colorClasses = 'bg-gray-500 hover:bg-gray-600 text-white font-fever';
-	if (props.baseClass) {
-		colorClasses = props.baseClass;
-	} else if (props.variant) {
-		switch (props.variant) {
-			case 'primary':
-				colorClasses = 'bg-blue-700 hover:bg-blue-500 text-white border border-blue-600/50';
-				break;
-			case 'secondary':
-				colorClasses = 'bg-white/10 hover:bg-white/20 text-gray-200 border border-white/20';
-				break;
-			case 'danger':
-				colorClasses = 'bg-red-900 hover:bg-red-700 text-white border border-red-800/50';
-				break;
-			case 'warning':
-				colorClasses = 'bg-yellow-600 hover:bg-yellow-400 text-black border border-yellow-500/50';
-				break;
-			case 'success':
-				colorClasses = 'bg-teal-800 hover:bg-teal-600 text-white border border-teal-700/50';
-				break;
-			case 'info':
-				colorClasses = 'bg-teal-500 hover:bg-teal-600 text-white border border-teal-400/50';
-				break;
-		}
-	}
 
-	button.className = `${colorClasses} text-xs font-semibold py-1 px-2.5 rounded transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed`;
+	if (props.baseClass) {
+		button.className = props.baseClass;
+	} else {
+		let colorClasses = 'bg-gray-500 hover:bg-gray-600 text-white font-beach';
+		if (props.variant) {
+			switch (props.variant) {
+				case 'primary':
+					colorClasses = 'bg-blue-700 hover:bg-blue-500 text-white border border-blue-600/50';
+					break;
+				case 'secondary':
+					colorClasses = 'bg-white/10 hover:bg-white/20 text-gray-200 border border-white/20';
+					break;
+				case 'danger':
+					colorClasses = 'bg-red-900 hover:bg-red-700 text-white border border-red-800/50';
+					break;
+				case 'warning':
+					colorClasses = 'bg-yellow-600 hover:bg-yellow-400 text-black border border-yellow-500/50';
+					break;
+				case 'success':
+					colorClasses = 'bg-teal-800 hover:bg-teal-600 text-white border border-teal-700/50';
+					break;
+				case 'info':
+					colorClasses = 'bg-teal-500 hover:bg-teal-600 text-white border border-teal-400/50';
+					break;
+			}
+		}
+		button.className = `${colorClasses} text-xs font-beach font-thin py-1 px-2.5 rounded transition-all duration-200`;
+	} 
+	button.className += ' disabled:opacity-50 disabled:cursor-not-allowed';
 	if (props.disabled) {
 		button.disabled = true;
 	}

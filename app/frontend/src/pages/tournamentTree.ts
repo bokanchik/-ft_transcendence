@@ -32,7 +32,6 @@ type TournamentData = {
     round: number;
 };
 
-// --- Main Entry ---
 export function TournamentPage(params?: { id?: string }): HTMLElement {
     if (params?.id) {
         return OnlineTournamentPage(params.id);
@@ -161,13 +160,13 @@ function LocalTournamentPage(): HTMLElement {
                 const p2Class = match.winner === match.player2 ? 'font-bold text-green-400' : match.player2 === currentUser?.display_name ? 'font-bold text-blue-400' : 'font-medium text-gray-200';
 
                 const matchInfo = createElement('div', { className: 'flex items-center gap-3' }, [
-                    createElement('span', { textContent: match.player1, className: p1Class }),
-                    createElement('span', { textContent: 'vs', className: 'text-gray-400 text-xl font-jurassic' }),
-                    createElement('span', { textContent: match.player2, className: p2Class }),
+                    createElement('span', { textContent: match.player1, className: `font-beach text-xl ${p1Class}` }),
+                    createElement('span', { textContent: 'vs', className: 'text-gray-400 text-3xl font-jurassic' }),
+                    createElement('span', { textContent: match.player2, className: `font-beach text-xl ${p2Class}` }),
                 ]);
                 
                 if (match.winner) {
-                    li.append(matchInfo, createElement('span', { className: 'text-green-500 font-semibold text-sm', textContent: `${t('tournament.winnerShort')}: ${match.winner}` }));
+                    li.append(matchInfo, createElement('span', { className: 'text-green-600 font-semibold text-xl font-beach', textContent: `${t('tournament.winnerShort')}: ${match.winner}` }));
                 } else if (isCurrentRound && !hasPlayableMatch) {
                     const startButton = createActionButton({
                         text: t('tournament.playMatch'),
@@ -321,9 +320,9 @@ async function renderOnlineBracket(rounds: Rounds, container: HTMLElement, curre
             const p2Class = winnerDetails?.id === match.player2_id ? 'font-bold text-green-400' : match.player2_id === currentUserId ? 'font-bold text-blue-400' : 'font-medium text-gray-200';
 
             const matchInfo = createElement('div', { className: 'flex items-center gap-3' }, [
-                createElement('span', { textContent: p1Details.display_name, className: p1Class }),
-                createElement('span', { textContent: 'vs', className: 'text-gray-400 text-xl font-jurassic' }),
-                createElement('span', { textContent: p2Details.display_name, className: p2Class })
+                createElement('span', { textContent: p1Details.display_name, className: `font-beach text-xl ${p1Class}` }),
+                createElement('span', { textContent: 'vs', className: 'text-gray-400 text-3xl font-jurassic' }),
+                createElement('span', { textContent: p2Details.display_name, className: `font-beach text-xl ${p2Class}` })
             ]);
 
             const actionContainer = createElement('div', { className: 'flex items-center gap-2' });

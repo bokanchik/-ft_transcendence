@@ -1,13 +1,12 @@
 import { navigateTo } from '../services/router.js';
-import { handleOnlineGame, handleTournamentSearch } from '../services/initOnlineGame.js';
+import { handleOnlineGame, handleTournamentSearch, cleanupSocket } from '../services/initOnlineGame.js';
 import { HeaderComponent } from '../components/headerComponent.js';
 import { User } from '../shared/schemas/usersSchemas.js';
 import { getUserDataFromStorage, checkAuthStatus } from '../services/authService.js';
-import { showToast } from '../components/toast.js';
+import { showToast, removeWaitingToast } from '../components/toast.js';
 import { t } from '../services/i18nService.js';
 import { createElement, createActionButton, clearElement } from '../utils/domUtils.js';
-
-// export type GameMode = 'local' | 'remote' | 'tournament' | 'onlineTournament';
+import socket from '../services/socket.js';
 
 export function GamePage(): HTMLElement {
     const authData = getUserDataFromStorage();
@@ -21,7 +20,18 @@ export function GamePage(): HTMLElement {
 
     const buttonsContainer = createElement('div', { id: 'buttons-container', className: 'flex flex-col items-center space-y-4' });
 
-    // --- Fonction pour afficher les options initiales ---
+    function setButtonsState(isSearching: boolean, searchingText: string = '...') {
+        buttonsContainer.querySelectorAll('button').forEach(btn => {
+            const actionButton = btn as HTMLButtonElement;
+            if (actionButton.dataset.action === 'cancel-search') return;
+
+            actionButton.disabled = isSearching;
+            if (isSearching && actionButton.textContent === searchingText.split('...')[0]) {
+                 actionButton.textContent = searchingText;
+            }
+        });
+    }
+
     const showInitialOptions = () => {
         clearElement(buttonsContainer);
 
@@ -45,7 +55,6 @@ export function GamePage(): HTMLElement {
         buttonsContainer.append(quickMatchButton, tournamentButton);
     };
     
-    // --- Fonction pour afficher les options de tournoi ---
     const showTournamentOptions = () => {
         clearElement(buttonsContainer);
         
@@ -56,8 +65,13 @@ export function GamePage(): HTMLElement {
             const sizeButton = createActionButton({
                 text: t('game.players', { count: size.toString() }),
                 variant: 'info',
+                baseClass: 'bg-teal-800 hover:bg-green-600 text-gray-200 text-xl font-beach font-medium py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline w-full transition duration-300 ease-in-out border border-green-500/50',
                 onClick: async (e) => {
-                    (e.currentTarget as HTMLButtonElement).disabled = true;
+                    // (e.currentTarget as HTMLButtonElement).disabled = true;
+                    // await tournamentSearchHandler(size);
+                    const buttonText = t('game.players', { count: size.toString() });
+                    setButtonsState(true, buttonText + '...');
+                    setupCancelButton(showTournamentOptions);
                     await tournamentSearchHandler(size);
                 }
             });
@@ -72,6 +86,21 @@ export function GamePage(): HTMLElement {
 
         buttonsContainer.append(tournamentTitle, optionsDiv, backButton);
     };
+
+    function setupCancelButton(returnToState: () => void) {
+        clearElement(buttonsContainer);
+        const cancelButton = createActionButton({
+            text: t('general.cancel'),
+            variant: 'danger',
+            dataAction: 'cancel-search',
+            onClick: () => {
+                cleanupSocket(socket);
+                removeWaitingToast();
+                returnToState();
+            }
+        });
+        buttonsContainer.appendChild(cancelButton);
+    }
     
     showInitialOptions();
 

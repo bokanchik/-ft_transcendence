@@ -21,24 +21,17 @@ type TournamentMatch = {
     player2: string;
 };
 
-// for debugging
-interface SocketError extends Error {
-  code?: string;
-  description?: string;
-  context?: string;
-}
-
 // --- Fonction pour la recherche de tournoi ---
 export async function handleTournamentSearch(size: number, displayName: string, userId: number): Promise<void> {
     const controller: AbortController = new AbortController();
-
-    sessionStorage.removeItem('tournamentData');
-    sessionStorage.removeItem('onlineTournamentId');
 
     if (socket.connected) {
         socket.disconnect();
     }
     socket.removeAllListeners();
+
+    sessionStorage.removeItem('tournamentData');
+    sessionStorage.removeItem('onlineTournamentId');
 
     // Show initial waiting toast
     showWaitingToast(socket, controller, config.settings.online.waitTimeout, t('tournament.waitingForPlayers', { current: '1', required: size.toString() }));
@@ -107,11 +100,7 @@ export async function initOnlineGame(display_name: string, userId: number) {
         sessionStorage.setItem('opponent', opponent);
         removeWaitingToast();
 
-        const countdownContainer = document.createElement('div');
-        // countdownContainer.className = `
-        //     fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50
-        //     text-lime-200 text-6xl font-extrabold tracking-widest jungle-font
-        // `;        
+        const countdownContainer = document.createElement('div');    
         countdownContainer.className = `
         fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50
         text-white text-7xl font-beach [text-shadow:_0_3px_6px_rgb(0_0_0_/_50%)]

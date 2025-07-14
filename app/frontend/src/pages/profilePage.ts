@@ -113,6 +113,6 @@ function createProfileSidebar(profiledUser: User, loggedInUser: User): HTMLEleme
 
 	return createElement('aside', {
 		className: 'w-1/4 p-6 border-r border-gray-400/30 space-y-4 overflow-y-auto flex flex-col',
-		role: 'complementary' // Ajout du role pour le test
+		role: 'complementary'
 	}, [avatarContainer, ...infoItems]);
 }
