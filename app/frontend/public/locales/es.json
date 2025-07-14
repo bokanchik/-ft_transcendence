@@ -280,6 +280,7 @@
 			"malformedResponse": "La respuesta del servidor está mal formada.",
 			"networkError": "Error de red o no se pudo contactar al servidor.",
 			"loadingContent": "Error al cargar el contenido. Por favor, inténtalo de nuevo más tarde.",
+			"createLocalMatch": "Error al crear una partida local. Por favor, inténtalo de nuevo.",
 			"login": {
 				"invalidCredentials": "Identificador o contraseña no válidos.",
 				"unknown": "error desconocido al iniciar sesión.",
@@ -300,6 +301,7 @@
 				"missCsrf": "Falta el token CSRF. Por favor, refresca la página e inténtalo de nuevo.",
 				"fetchCsrf": "Fallo al obtener el token CSRF. Por favor, refresca la página e inténtalo de nuevo.",
 				"loadingProfile": "Ocurrió un error al cargar el perfil del usuario.",
+				"2faFailed": "La autenticación de dos factores falló. Por favor, inténtalo de nuevo.",
 				"notFound": "Usuario no encontrado."
 			}
 		}

@@ -164,7 +164,7 @@ export async function verifyTwoFactorLogin(token: string): Promise<type.ApiResul
 			await fetchCsrfToken();
 			return { success: true, data };
 		}
-		throw new Error('2FA verification failed to return user data.');
+		throw new Error('msg.error.user.2faFailed');
 	} catch (error) {
 		const errorMessage = error instanceof Error ? t('error.message') : "Unknown error during 2FA verification";
 		const statusCode = error instanceof ClientApiError ? error.httpStatus : undefined;

@@ -283,6 +283,7 @@
 			"malformedResponse": "The server's error response was malformed.",
 			"networkError": "Network error or could not reach the server.",
 			"loadingContent": "Error loading content. Please try again later.",
+			"createLocalMatch": "Error creating local match. Please try again.",
 			"login": {
 				"invalidCredentials": "Invalid identifier or password.",
 				"unknown": "Unknown error occurred during login.",
@@ -302,6 +303,7 @@
 				"errorCsrf": "Security Error: CSRF token mismatch. Please refresh the page and try again.",
 				"missCsrf": "CSRF token is missing. Please refresh the page and try again.",
 				"fetchCsrf¨": "Failed to fetch CSRF token. Please refresh the page and try again.",
+				"2faFailed": "Two-Factor Authentication failed. Please try again.",
 				"loadingProfile": "An Error occurred while loading the user profile.",
 				"notFound": "User not found."
 			}

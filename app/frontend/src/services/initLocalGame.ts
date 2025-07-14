@@ -85,7 +85,7 @@ export async function createLocalMatch(alias1: string, alias2: string, isTournam
         navigateTo(`/game-room?matchId=${matchId}`);
 
     } catch (err: unknown) {
-        showToast('Error creating local match. Please, try again later.', 'error');
+        showToast(t('msg.error.createLocalMatch'), 'error');
         console.log(err);
         throw err;
     }

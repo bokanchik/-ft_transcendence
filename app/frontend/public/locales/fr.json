@@ -281,6 +281,7 @@
 			"malformedResponse": "La réponse du serveur est mal formée.",
 			"networkError": "Erreur de réseau ou impossible de joindre le serveur.",
 			"loadingContent": "Erreur lors du chargement du contenu. Veuillez réessayer plus tard.",
+			"createLocalMatch": "Erreur lors de la création d'une partie locale. Veuillez réessayer.",
 			"login": {
 				"invalidCredentials": "Identifiant ou mot de passe invalide.",
 				"unknown": "Erreur inconnue lors de la connexion.",
@@ -301,6 +302,7 @@
 				"missCsrf": "Jeton CSRF manquant. Veuillez rafraîchir la page et réessayer.",
 				"fetchCsrf": "Echec de la récupération du jeton CSRF. Veuillez rafraîchir la page et réessayer.",
 				"loadingProfile": "Une erreur est survenue lors du chargement du profil utilisateur.",
+				"2faFailed": "L'authentification à deux facteurs a échoué. Veuillez réessayer.",
 				"notFound": "Utilisateur non trouvé."
 			}
 		}

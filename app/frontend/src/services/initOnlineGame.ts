@@ -90,7 +90,6 @@ export async function initOnlineGame(display_name: string, userId: number) {
     socket.on('connect', () => {
         console.log('Connect to the server');
         socket.emit('authenticate', { display_name, userId });
-        // Ajout arthur
         socket.emit('joinQuickMatchQueue');
     });
     
@@ -109,10 +108,14 @@ export async function initOnlineGame(display_name: string, userId: number) {
         removeWaitingToast();
 
         const countdownContainer = document.createElement('div');
+        // countdownContainer.className = `
+        //     fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50
+        //     text-lime-200 text-6xl font-extrabold tracking-widest jungle-font
+        // `;        
         countdownContainer.className = `
-            fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50
-            text-lime-200 text-6xl font-extrabold tracking-widest jungle-font
-        `;        
+        fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50
+        text-white text-7xl font-beach [text-shadow:_0_3px_6px_rgb(0_0_0_/_50%)]
+    `;  
         document.body.appendChild(countdownContainer);
         await initCountdown(countdownContainer);
         navigateTo(`/game-room?matchId=${matchId}`);
