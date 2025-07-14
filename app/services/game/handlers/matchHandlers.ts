@@ -1,7 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { getRowByMatchId, getMatchesByUserId } from '../database/dbModels.ts';
-import { MatchIdParams, MatchUserIdParams } from '../middleware/matchesSchemas.ts';
-import { RemoteMatchBaseSchema } from '../middleware/matchesSchemas.ts';
+import {  MatchIdParams, MatchUserIdParams, MatchBaseSchema } from '../shared/schemas/matchesSchemas.ts';
 import { localGames } from '../pong/matchSocketHandler.ts';
 //@ts-ignore
 import { JWTPayload } from '../shared/schemas/usersSchemas.js';
@@ -74,15 +73,16 @@ export async function getMatchIdHandler(req: FastifyRequest<{ Params: MatchIdPar
                     player2_id: match.player2_id,
                     player1_socket: match.player1_socket,
                     player2_socket: match.player2_socket,
-                    player1_score: match.player1_score,
-                    player2_score: match.player2_score,
+                    player1_score: match.player1_score ?? 0,
+                    player2_score: match.player2_score ?? 0,
                     winner_id: match.winner_id,
                     win_type: match.win_type,
                     created_at: match.created_at,
+                    tournament_id: match.tournament_id,
                     status: match.status
             };
 
-            const validatedRes = RemoteMatchBaseSchema.parse(res);
+            const validatedRes = MatchBaseSchema.parse(res);
 
             return reply.code(200).send(validatedRes);
         }  else {

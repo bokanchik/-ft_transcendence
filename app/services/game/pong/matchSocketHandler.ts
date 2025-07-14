@@ -10,7 +10,7 @@ import { GameState, FRAME_RATE, TIMEOUT_MS } from "../shared/gameTypes.js";
 import { updateUserStatus } from "../utils/apiClient.ts";
 import { UserOnlineStatus } from "../shared/schemas/usersSchemas.js";
 import { handleTournamentLogic, handleMatchEnd } from "../handlers/tournamentHandler.ts";
-import { addPlayerToWaitingList, firstInFirstOut, getWaitingListSize, removePlayerFromWaitingList, PlayerInfo, waitingList } from "../utils/waitingListUtils.ts";
+import { addPlayerToWaitingList, firstInFirstOut, getWaitingListSize, PlayerInfo, waitingList } from "../utils/waitingListUtils.ts";
 
 
 export const timeouts: Map<string, NodeJS.Timeout> = new Map();

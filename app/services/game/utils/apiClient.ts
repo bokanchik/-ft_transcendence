@@ -1,6 +1,6 @@
 import { fastify } from '../server.js';
 import { config } from '../shared/env.js';
-import { UserOnlineStatus, UserPublic } from '../shared/schemas/usersSchemas.js';
+import { UserOnlineStatus } from '../shared/schemas/usersSchemas.js';
 
 const API_KEY = config.API_KEY;
 const USER_SERVICE_URL = config.API_USER_URL;

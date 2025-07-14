@@ -70,17 +70,34 @@
   src: url('../fonts/Maksimir.woff2') format('woff2');
 }
 
+@font-face {
+  font-display: swap;
+  font-family: MoreIsLess;
+  src: url('../fonts/MoreIsLess.woff2') format('woff2');
+}
+
 @theme {
   --font-spirtit-fox: SpiritFox, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-workout: Workout, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-jurassic: JurassicPark, Beograd, ZeroCool, Maksimir, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-jurassic: JurassicPark, MoreIsLess, ZeroCool, Beograd, Maksimir, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-roar: JungleRoar, ZeroCool, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-fever: JungleFever, Beograd, ZeroCool, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-beach: Beachclub, JungleRoar, Beograd, ZeroCool, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-fever: JungleFever, MoreIsLess, ZeroCool, Beograd, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-beach: Beachclub, JungleRoar, MoreIsLess, ZeroCool, Beograd, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 @layer utilities {
-    /* ... (vos autres utilities) ... */
+    .animate-pulse-custom {
+      animation: pulseCustom 2s infinite;
+    }
+  
+    @keyframes pulseCustom {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.7; }
+    }
+
+    .animate-spin {
+      animation: spin 1s linear infinite;
+    }
 
     /* Custom scrollbar styles */
     .overflow-y-auto::-webkit-scrollbar {
@@ -165,22 +182,6 @@
   0%   { transform: rotate(0deg); }
   50%  { transform: rotate(5deg); }
   100% { transform: rotate(0deg); }
-}
-
-/* --- Styles de input.css --- */
-@layer utilities {
-    .animate-pulse-custom {
-      animation: pulseCustom 2s infinite;
-    }
-  
-    @keyframes pulseCustom {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.1); opacity: 0.7; }
-    }
-
-    .animate-spin {
-      animation: spin 1s linear infinite;
-    }
 }
 
 @keyframes spin {

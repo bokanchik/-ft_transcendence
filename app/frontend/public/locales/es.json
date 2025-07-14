@@ -208,6 +208,10 @@
 			"opponent": "Oponente",
 			"error": "Error al cargar el historial de partidas."
 		},
+		"type": {
+			"tournament": "Torneo",
+			"quickMatch": "Partida rápida"
+		},
 		"details": {
 			"player": "Jugador",
 			"players": "Jugadores",

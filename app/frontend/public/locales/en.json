@@ -211,6 +211,10 @@
 			"opponent": "Opponent",
 			"error": "Error while loading match history."
 		},
+		"type": {
+			"tournament": "Tournament",
+			"quickMatch": "Quick Match"
+		},
 		"details": {
 			"player": "Player",
 			"players": "Players",

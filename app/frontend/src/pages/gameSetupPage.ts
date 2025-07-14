@@ -7,7 +7,7 @@ import { showToast } from '../components/toast.js';
 import { t } from '../services/i18nService.js';
 import { createElement, createActionButton, clearElement } from '../utils/domUtils.js';
 
-export type GameMode = 'local' | 'remote' | 'tournament' | 'onlineTournament';
+// export type GameMode = 'local' | 'remote' | 'tournament' | 'onlineTournament';
 
 export function GamePage(): HTMLElement {
     const authData = getUserDataFromStorage();

@@ -1,4 +1,4 @@
-import { GameMode } from "../pages/gameSetupPage.js";
+import { GameMode } from "../shared/schemas/matchesSchemas.js";
 import { navigateTo } from "../services/router.js";
 // @ts-ignore
 import { t } from '../services/i18nService.js';

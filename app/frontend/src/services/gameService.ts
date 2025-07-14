@@ -1,4 +1,4 @@
-import { GameMode } from "../pages/gameSetupPage.js";
+import { GameMode } from "../shared/schemas/matchesSchemas.js";
 import { cleanupSocket } from "../services/initOnlineGame.js";
 import { navigateTo } from "../services/router.js";
 import socket from '../services/socket.js';
