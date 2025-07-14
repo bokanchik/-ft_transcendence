@@ -49,10 +49,11 @@
 - [x] certain check avec des value de string donc faire attention comme par ex: game.quitButton (anciennement Quit)
 - [ ] voir ci-desssus avec sasha la refonte des fichiers
 
+- [ ] utilisation helper db
+
 - [x] La cle de securite (avec quoi on genere, ou est-ce qu'on la garde) -> cookie jwt_token
 - [x] 2FA
 - [x] chiffrer 2fa string dans db
-- [ ] ajouter sms (twilio) et emails (sendGrid)
 
 - [x] style que dans background
 
@@ -62,7 +63,7 @@
 - [x] score après local game
 
 - [x] signe @ du font-beach pas jojo
-- [ ] Vérifier les traductions
+- [x] Vérifier les traductions
 - [ ] nettoyage
 
 ## Etienne

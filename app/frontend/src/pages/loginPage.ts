@@ -9,6 +9,9 @@ import { createElement } from '../utils/domUtils.js';
 export function LoginPage(): HTMLElement {
 	const currentUser = getUserDataFromStorage();
 
+	const GOOGLE_CLIENT_ID = '381285000900-rcla6jmd3aldv8kk9k7ga84o7jrm5dj0.apps.googleusercontent.com';
+    const REDIRECT_URI = 'http://localhost:8443/auth/google/callback';
+
 	const headerElement = HeaderComponent({ currentUser });
 
 	const title = createElement('h2', {
@@ -45,11 +48,21 @@ export function LoginPage(): HTMLElement {
 		registerLink
 	]);
 
+	const googleLoginButton = createElement('a', {
+        href: `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=openid%20profile%20email`,
+        className: 'mt-4 w-full flex items-center justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium bg-white text-gray-700 hover:bg-gray-50 border'
+    }, [
+        createElement('img', { src: '/assets/google-icon.svg', className: 'h-5 w-5 mr-3' }),
+        document.createTextNode(t('login.google'))
+    ]);
+
 	const formContainer = createElement('div', {
 		className: 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-2xl shadow-2xl p-8 max-w-md w-full'
 	}, [
 		title,
 		loginFormComponent,
+		createElement('p', { textContent: 'OR', className: 'my-4 text-center text-gray-400' }), // Séparateur
+        googleLoginButton,
 		linksDiv
 	]);
 

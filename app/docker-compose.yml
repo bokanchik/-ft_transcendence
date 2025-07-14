@@ -11,6 +11,8 @@ secrets:
     file: ../secrets/crypto_secret.txt
   api_key:
     file: ../secrets/api_key.txt
+  google_client_secret:
+    file: ../secrets/callback_secret.txt
 
 networks:
   tranet:
@@ -80,12 +82,14 @@ services:
       - SESSION_SECRET__FILE=/run/secrets/session_secret
       - CRYPTO_SECRET__FILE=/run/secrets/crypto_secret
       - API_KEY__FILE=/run/secrets/api_key
+      - GOOGLE_CLIENT_SECRET__FILE=/run/secrets/google_client_secret
     secrets:
       - jwt_secret
       - cookie_secret
       - session_secret
       - crypto_secret
       - api_key
+      - google_client_secret
     restart: always
     volumes:
       - ./services/shared:/app/shared:ro
@@ -106,12 +110,14 @@ services:
       - SESSION_SECRET__FILE=/run/secrets/session_secret
       - CRYPTO_SECRET__FILE=/run/secrets/crypto_secret
       - API_KEY__FILE=/run/secrets/api_key
+      - GOOGLE_CLIENT_SECRET__FILE=/run/secrets/google_client_secret
     secrets:
       - jwt_secret
       - cookie_secret
       - session_secret
       - crypto_secret
       - api_key
+      - google_client_secret
     restart: always
     volumes:
       - ./services/shared:/app/shared:ro
@@ -132,12 +138,14 @@ services:
       - SESSION_SECRET__FILE=/run/secrets/session_secret
       - CRYPTO_SECRET__FILE=/run/secrets/crypto_secret
       - API_KEY__FILE=/run/secrets/api_key
+      - GOOGLE_CLIENT_SECRET__FILE=/run/secrets/google_client_secret
     secrets:
       - jwt_secret
       - cookie_secret
       - session_secret
       - crypto_secret
       - api_key
+      - google_client_secret
     restart: always
     volumes:
       - ./services/shared:/app/shared:ro

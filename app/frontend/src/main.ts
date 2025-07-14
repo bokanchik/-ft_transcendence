@@ -15,6 +15,7 @@ import { initI18n, t } from './services/i18nService.js';
 import { showcase } from './pages/showcasePage.js';
 import { createElement, clearElement } from './utils/domUtils.js';
 import { renderNotFoundPage } from './pages/notFoundPage.js';
+import { AuthCallbackPage } from './pages/authCallbackPage.js';
 
 const appContainer = document.getElementById('main');
 
@@ -35,6 +36,7 @@ const routes: { [key: string]: RouteConfig } = {
 	'/local-game': { component: promptAliasForm },
 	'/game-room': { component: () => GameRoomPageFromParams() },
 	'/tournament': { component: TournamentPage },
+	'/auth/google/callback': { component: AuthCallbackPage },
 	'/tournament/:id': { component: (params) => TournamentPage(params), requiredAuth: true },
 };
 

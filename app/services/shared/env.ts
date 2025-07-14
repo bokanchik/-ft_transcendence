@@ -44,6 +44,10 @@ const envSchema = z.object({
 	URL_2FA_VERIFY: z.string().min(1, "URL_2FA_VERIFY is required"),
 	URL_2FA_DISABLE: z.string().min(1, "URL_2FA_DISABLE is required"),
 	URL_2FA_LOGIN: z.string().min(1, "URL_2FA_LOGIN is required"),
+	GOOGLE_CLIENT_ID: z.string().min(1, "GOOGLE_CLIENT_ID is required"),
+	GOOGLE_CLIENT_SECRET: z.string().min(1, "GOOGLE_CLIENT_SECRET is required"),
+	URL_GOOGLE_CALLBACK: z.string().min(1, "URL_GOOGLE_CALLBACK is required"),
+	GOOGLE_REDIRECT_URI: z.string().min(1, "GOOGLE_REDIRECT_URI is required"),
 
 	URL_FRIEND_REQUEST: z.string().min(1, "URL_FRIEND_REQUEST is required"),
 	URL_FRIEND_RECEIVED: z.string().min(1, "URL_FRIEND_RECEIVED is required"),
@@ -67,6 +71,7 @@ try {
 		SESSION_SECRET: getSecret('SESSION_SECRET'),
         CRYPTO_SECRET: getSecret('CRYPTO_SECRET'),
 		API_KEY: getSecret('API_KEY'),
+		GOOGLE_CLIENT_SECRET: getSecret('GOOGLE_CLIENT_SECRET'),
     };
 
 	validatedEnv = envSchema.parse(envVarsToValidate);
