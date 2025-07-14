@@ -97,23 +97,23 @@ export async function MatchHistoryComponent(props: MatchHistoryComponentProps): 
 			let matchTypeIcon: HTMLImageElement;
 			if (match.tournament_id) {
 				matchTypeIcon = createElement('img', {
-                    src: '/assets/tournoi.png',
-                    alt: t('match.type.tournament'),
-                    title: t('match.type.tournament'),
-                    className: 'w-8 h-8'
-                });
+					src: '/assets/tournoi.png',
+					alt: t('match.type.tournament'),
+					title: t('match.type.tournament'),
+					className: 'w-8 h-8'
+				});
 			} else {
 				matchTypeIcon = createElement('img', {
-                    src: '/assets/quick.png',
-                    alt: t('match.type.quickMatch'),
-                    title: t('match.type.quickMatch'),
-                    className: 'w-8 h-8'
-                });
+					src: '/assets/quick.png',
+					alt: t('match.type.quickMatch'),
+					title: t('match.type.quickMatch'),
+					className: 'w-8 h-8'
+				});
 			}
-			
-			const rightBlock = createElement('div', { 
-                className: 'flex flex-col justify-center items-end text-right w-28 flex-shrink-0 space-y-1' 
-            }, [timeAgoSpan, matchTypeIcon]);
+
+			const rightBlock = createElement('div', {
+				className: 'flex flex-col justify-center items-end text-right w-28 flex-shrink-0 space-y-1'
+			}, [timeAgoSpan, matchTypeIcon]);
 
 			const item = createElement('li', { className: `h-24 border border-gray-700/50 rounded-lg flex items-center p-4 gap-4 transition-colors duration-200 ${backgroundClass}` }, [
 				leftBlock,

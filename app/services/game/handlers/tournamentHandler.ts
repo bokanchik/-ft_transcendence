@@ -16,6 +16,8 @@ export async function handleTournamentLogic(socket: Socket) {
             return;
         }
 
+        await updateUserStatus(playerInfo.userId, UserOnlineStatus.IN_GAME);
+
         if (![2, 4, 8].includes(size)) {
             socket.emit('error', { message: 'Invalid tournament size.' });
             return;
@@ -63,7 +65,6 @@ export async function handleTournamentLogic(socket: Socket) {
         
         fastify.log.info(`Player ${playerInfo.userId} is ready for match ${matchId}. Total ready: ${readyPlayers.size}`);
 
-        // On envoie le nouvel état à tout le monde pour montrer qui est prêt
         const tournamentState = await getTournamentState(tournamentId);
         fastify.io.to(`tournament-${tournamentId}`).emit('tournamentState', tournamentState);
 
@@ -121,14 +122,11 @@ async function startTournament(players: PlayerInfo[]) {
     });
 }
 
-// --- LOGIQUE CORRIGÉE ET SIMPLIFIÉE ---
 export async function handleMatchEnd(tournamentId: string, matchId: string, winnerId: number) {
     fastify.log.info(`Match ${matchId} ended. Winner: ${winnerId}. Processing tournament progression for ${tournamentId}`);
 
-    // 1. Mettre à jour le vainqueur du match qui vient de se terminer
     await updateMatchWinner(matchId, winnerId);
 
-    // 2. Vérifier si tous les matchs du round sont terminés
     const allMatches = await getMatchesByTournamentId(tournamentId);
     const currentMatch = allMatches.find(m => m.matchId === matchId);
     if (!currentMatch) return;
@@ -137,7 +135,6 @@ export async function handleMatchEnd(tournamentId: string, matchId: string, winn
     const currentRoundMatches = allMatches.filter(m => m.round_number === currentRoundNumber);
     const allMatchesInRoundFinished = currentRoundMatches.every(m => m.winner_id !== null);
 
-    // 3. Si le round est terminé, créer les matchs du round suivant
     if (allMatchesInRoundFinished) {
         fastify.log.info(`Round ${currentRoundNumber} of tournament ${tournamentId} is complete.`);
         const winners = currentRoundMatches.map(m => m.winner_id!);
@@ -156,7 +153,6 @@ export async function handleMatchEnd(tournamentId: string, matchId: string, winn
             }
         }
     }
-    // 4. Envoyer le nouvel état du tournoi à tous les clients
     const newTournamentState = await getTournamentState(tournamentId);
     fastify.io.to(`tournament-${tournamentId}`).emit('tournamentState', newTournamentState);
 }
@@ -165,11 +161,9 @@ async function finishTournament(tournamentId: string, winnerId: number) {
     fastify.log.info(`Tournament ${tournamentId} has finished. Winner is ${winnerId}.`);
     await updateTournamentWinner(tournamentId, winnerId);
 
-    // Émettre un événement final pour célébrer le vainqueur côté client
     const finalState = await getTournamentState(tournamentId);
     fastify.io.to(`tournament-${tournamentId}`).emit('tournamentState', finalState);
     
-    // Nettoyer les ressources
     matchReadyState.clear();
     
     const sockets = await fastify.io.in(`tournament-${tournamentId}`).fetchSockets();
@@ -187,6 +181,9 @@ async function getTournamentState(tournamentId: string): Promise<any> {
     const { tournament, matches: rawMatches } = await getTournamentById(tournamentId);
     if (!tournament) throw new Error("Tournament not found");
 
+    const playerCount = tournament.player_count;
+    const totalRounds = playerCount > 1 ? Math.log2(playerCount) : 1;
+
     const rounds: { [key: number]: any[] } = {};
     
     rawMatches.forEach(match => {
@@ -203,7 +200,7 @@ async function getTournamentState(tournamentId: string): Promise<any> {
         });
     });
 
-    return { rounds, isFinished: !!tournament.winner_id, winner_id: tournament.winner_id };
+    return { rounds, isFinished: !!tournament.winner_id, winner_id: tournament.winner_id, totalRounds };
 }
 
 function findSocketByUserId(userId: number): Socket | undefined {

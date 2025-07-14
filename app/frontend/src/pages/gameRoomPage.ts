@@ -6,21 +6,19 @@ import { createElement } from '../utils/domUtils.js';
 import { initializeGame, quitGameHandler } from "../services/gameService.js";
 
 export function GameRoomPage(mode: GameMode): HTMLElement {
-
-	const leftUsername = createElement('div', { id: 'left-username', className: 'w-32 text-center text-lg font-bold text-white bg-teal-600/30 border-2 border-teal-500/50 p-2 rounded-lg shadow-md' });
-	const rightUsername = createElement('div', { id: 'right-username', className: 'w-32 text-center text-lg font-bold text-white bg-rose-600/30 border-2 border-rose-500/50 p-2 rounded-lg shadow-md' });
-	const scoreDisplay = createElement('div', { id: 'score-display', textContent: '0 - 0', className: 'text-5xl font-extrabold text-yellow-300 drop-shadow-lg [text-shadow:_0_2px_4px_rgb(0_0_0_/_40%)]' });
-
-	const canvas = createElement('canvas', { id: 'pong-canvas', className: 'border-4 border-white/10 rounded-lg shadow-inner' });
+	const leftUsername = createElement('div', { id: 'left-username', className: 'w-48 text-center text-3xl font-beach text-white bg-teal-800/50 border-4 border-teal-500/50 p-3 rounded-lg shadow-xl' });
+	const scoreDisplay = createElement('div', { id: 'score-display', textContent: '0 - 0', className: 'text-7xl font-roar text-yellow-300 drop-shadow-lg [text-shadow:_0_3px_6px_rgb(0_0_0_/_50%)]' });
+	const rightUsername = createElement('div', { id: 'right-username', className: 'w-48 text-center text-3xl font-beach text-white bg-rose-800/50 border-4 border-rose-500/50 p-3 rounded-lg shadow-xl' });
+	
+	const canvas = createElement('canvas', { id: 'pong-canvas', className: 'border-4 border-white/20 rounded-lg shadow-inner bg-gray-900/30' });
 	canvas.width = 800;
 	canvas.height = 500;
 
-	const quitButton = createElement('button', { textContent: t('game.quitButton'), className: 'px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg shadow-lg transition duration-200 border border-red-500/50' });
-
-	const gameRow = createElement('div', { className: 'flex items-center' }, [leftUsername, canvas, rightUsername]);
-	const container = createElement('div', { className: 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-2xl shadow-2xl p-6 sm:p-8 flex flex-col items-center gap-4' }, [
-		scoreDisplay, gameRow, quitButton
-	]);
+	const quitButton = createElement('button', { textContent: t('game.quitButton'), className: 'px-8 py-3 bg-red-800 hover:bg-red-700 text-white font-beach text-xl rounded-lg shadow-lg transition duration-200 border-2 border-red-600/50 transform hover:scale-105' });
+	
+	const gameRow = createElement('div', { className: 'flex items-center justify-center gap-8' }, 
+		[leftUsername, canvas, rightUsername]);
+	const container = createElement('div', { className: 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-2xl shadow-2xl p-6 sm:p-8 flex flex-col items-center gap-6' }, [scoreDisplay, gameRow, quitButton]);
 	const pageWrapper = createElement('div', { className: 'w-full h-screen flex flex-col items-center justify-center bg-cover bg-center bg-fixed' }, [container]);
 	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
 

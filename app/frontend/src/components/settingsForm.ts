@@ -35,7 +35,6 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 
 	const formElement = createElement('form', { id: 'profile-form-component', noValidate: true });
 
-	// --- Section Informations du profil ---
 	const usernameField = createInputField('username', t('user.username'), { value: currentUserState.username, readonly: true, helpText: t('user.settings.usernameMsg'), inputClass: 'w-full p-2 bg-black/30 border border-gray-500/50 text-gray-400 cursor-not-allowed rounded-md' });
 	const emailField = createInputField('email', t('user.email'), { type: 'email', required: true, value: currentUserState.email || '', placeholder: t('user.settings.emailPlaceholder') });
 	emailInput = emailField.querySelector('input')!;
@@ -46,7 +45,6 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 	const avatarUrlField = createInputField('avatar_url', t('register.avatarUrl'), { type: 'url', value: currentUserState.avatar_url || '', placeholder: 'https://example.com/avatar.png', helpText: t('user.settings.avatarMsg') });
 	avatarUrlInput = avatarUrlField.querySelector('input')!;
 
-	// --- Sélecteur de langue ---
 	languageSelect = createElement('select', {
 		id: 'language',
 		name: 'language',
@@ -66,7 +64,7 @@ export function SettingsForm(props: ProfileFormProps): HTMLElement {
 		languageSelect
 	]);
 
-	// --- Section Sécurité / 2FA ---
+	// 2FA
 	const securityTitle = createElement('h3', { textContent: t('user.settings.securityTitle'), className: 'mt-8 text-lg font-semibold text-white mb-4 border-b border-gray-400/30 pb-2' });
 
 	twoFaCheckbox = createElement('input', { type: 'checkbox', id: 'is_two_fa_enabled', name: 'is_two_fa_enabled', className: 'h-4 w-4 text-blue-400 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-offset-gray-800' });

@@ -237,6 +237,7 @@
 		"waitingForPlayersShort": "Esperando jugadores...",
 		"ready": "Listo",
 		"waitingForOpponent": "Esperando oponente...",
+		"inProgress": "En curso",
 		"yourNextMatch": "Tu próximo partido",
 		"winnerShort": "Ganador",
 		"timeout": "La búsqueda de partidas ha expirado. Por favor, inténtalo de nuevo.",

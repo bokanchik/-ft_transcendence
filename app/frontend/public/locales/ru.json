@@ -237,6 +237,7 @@
 		"waitingForPlayersShort": "Ожидание игроков...",
 		"ready": "Готов",
 		"waitingForOpponent": "Ожидание противника...",
+		"inProgress": "В процессе",
 		"yourNextMatch": "Ваш следующий матч",
 		"winnerShort": "Победитель",
 		"timeout": "Время ожидания истекло. Пожалуйста, попробуйте снова.",

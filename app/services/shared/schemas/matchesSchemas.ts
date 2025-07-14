@@ -131,3 +131,31 @@ export const GetMatchByUserIdRouteSchema = {
 export interface MatchHistoryComponentProps {
 	userId: number;
 }
+
+export type TournamentData = {
+	pairs: { player1: string, player2: string }[];
+	results: (number | null)[];
+	round: number;
+};
+
+export type TournamentStateData = {
+    rounds: Rounds;
+    isFinished: boolean;
+    winner_id?: number;
+    totalRounds: number;
+};
+
+export type Rounds = {
+	[round: number]: Match[];
+};
+
+export type Tournament = {
+	id: string;
+	player1: string;
+	player2: string;
+	winner: string | null;
+	player1_id?: number;
+	player2_id?: number;
+	winner_id?: number | null;
+	ready_players?: number[];
+};

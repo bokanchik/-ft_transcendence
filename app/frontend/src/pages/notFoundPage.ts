@@ -1,18 +1,18 @@
 import { t } from '../services/i18nService.js'
-import { createElement, clearElement } from '../utils/domUtils.js';
+import { createElement } from '../utils/domUtils.js';
 
 export function renderNotFoundPage(): HTMLElement {
-    const backLink = createElement('a', {
-        href: '/',
-        textContent: t('link.home'),
-        className: 'text-4xl text-blue-500 hover:underline text-center font-beach'
-    });
-    backLink.setAttribute('data-link', '');
+	const backLink = createElement('a', {
+		href: '/',
+		textContent: t('link.home'),
+		className: 'text-4xl text-blue-500 hover:underline text-center font-beach'
+	});
+	backLink.setAttribute('data-link', '');
 
-    const notFoundLogo = createElement('div', {
-        className : 'text-center mt-4 flex justify-center items-center  '
-    });
-    notFoundLogo.innerHTML = `
+	const notFoundLogo = createElement('div', {
+		className: 'text-center mt-4 flex justify-center items-center  '
+	});
+	notFoundLogo.innerHTML = `
     <svg width="600" height="300" viewBox="0 0 928 510" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g id="404">
             <path id="404_2" d="M322.8 281.4C325.467 281.4 326.8 291.533 326.8 311.8C326.8 331.8 325.467 341.8 322.8 341.8L296.4 342.2V392.6C296.4 395.533 290.933 397.667 280 399C269.067 400.333 259.6 401 251.6 401L235.2 400.2C221.6 399.133 214.8 396.733 214.8 393V343.4H135.2C128.267 336.467 122 327.533 116.4 316.6C110.8 305.4 108 297.4 108 292.6C108 287.533 108.8 283.533 110.4 280.6L198 125.4C199.067 123.267 207.2 121.667 222.4 120.6C237.867 119.533 254 119 270.8 119C287.6 119 296 119.667 296 121L296.4 281.4H322.8ZM226.4 281.8V198.2L179.6 281.8H226.4ZM470.663 405C437.329 405 409.996 392.733 388.663 368.2C367.596 343.667 357.063 307.8 357.063 260.6C357.063 213.4 367.729 177.8 389.063 153.8C410.396 129.533 437.863 117.4 471.463 117.4C505.329 117.4 532.663 129.4 553.463 153.4C574.263 177.4 584.663 213.533 584.663 261.8C584.663 310.067 573.996 346.067 552.663 369.8C531.596 393.267 504.263 405 470.663 405ZM470.663 194.2C460.529 194.2 451.863 200.067 444.663 211.8C437.729 223.267 434.263 239.667 434.263 261C434.263 282.333 437.596 298.733 444.263 310.2C451.196 321.4 459.996 327 470.663 327C481.596 327 490.396 321.267 497.063 309.8C503.996 298.333 507.463 281.933 507.463 260.6C507.463 239.267 503.863 222.867 496.663 211.4C489.729 199.933 481.063 194.2 470.663 194.2ZM817.331 281.4C819.998 281.4 821.331 291.533 821.331 311.8C821.331 331.8 819.998 341.8 817.331 341.8L790.931 342.2V392.6C790.931 395.533 785.465 397.667 774.531 399C763.598 400.333 754.131 401 746.131 401L729.731 400.2C716.131 399.133 709.331 396.733 709.331 393V343.4H629.731C622.798 336.467 616.531 327.533 610.931 316.6C605.331 305.4 602.531 297.4 602.531 292.6C602.531 287.533 603.331 283.533 604.931 280.6L692.531 125.4C693.598 123.267 701.731 121.667 716.931 120.6C732.398 119.533 748.531 119 765.331 119C782.131 119 790.531 119.667 790.531 121L790.931 281.4H817.331ZM720.931 281.8V198.2L674.131 281.8H720.931Z" fill="white"/>
@@ -78,10 +78,10 @@ export function renderNotFoundPage(): HTMLElement {
         </g>
     </svg>`
 
-    return createElement('div', {
-        className : 'flex flex-col min-h-screen bg-cover bg-center bg-fixed justify-center'
-        }, [
-        notFoundLogo,
-        createElement('p', { textContent: t('msg.error.notFoundMsg'), className: 'text-3xl font-medium mb-6 text-center text-white font-beach' }),
-        backLink]);
+	return createElement('div', {
+		className: 'flex flex-col min-h-screen bg-cover bg-center bg-fixed justify-center'
+	}, [
+		notFoundLogo,
+		createElement('p', { textContent: t('msg.error.notFoundMsg'), className: 'text-3xl font-medium mb-6 text-center text-white font-beach' }),
+		backLink]);
 }

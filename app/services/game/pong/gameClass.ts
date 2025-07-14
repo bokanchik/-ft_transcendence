@@ -1,6 +1,6 @@
 import { fastify } from "../server.ts";
 import { gameLoop, createBallState, createGameState} from "./pongGame.ts";
-import { getRowByMatchId, setGameResult } from "../database/dbModels.ts";
+import { setGameResult } from "../database/dbModels.ts";
 // @ts-ignore
 import { GameState, Velocity, FRAME_RATE } from "../shared/gameTypes.js";
 import { updateUserStatus } from "../utils/apiClient.ts";
@@ -60,10 +60,6 @@ export class RemoteGameSession {
                 const p1Socket = playerSockets.find(s => this.getPlayerSide(s!.id) === 'left');
                 const p2Socket = playerSockets.find(s => this.getPlayerSide(s!.id) === 'right');
                 
-                // if (!p1Socket || !p2Socket) {
-                //     this.clearGameInterval();
-                //     return;
-                // }
                 if (!p1Socket || !p2Socket) return;
 
                 const winnerId = winner === 1 ? (p1Socket as any).playerInfo.userId : (p2Socket as any).playerInfo.userId;
@@ -74,7 +70,6 @@ export class RemoteGameSession {
                 if (this.isTournamentMatch) {
                     const tournamentInfo = (p1Socket as any).tournamentInfo;
                     if (tournamentInfo) {
-                        // await handleMatchEnd(tournamentInfo.tournamentId, tournamentInfo.matchId, winnerId);
                         await handleMatchEnd(tournamentInfo.tournamentId, this.matchId, winnerId);
 
                     }

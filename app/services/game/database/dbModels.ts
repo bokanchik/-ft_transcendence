@@ -45,7 +45,8 @@ const neSupprimePasStpCommente: string = `
 
 const tournamentTable = `
 CREATE TABLE IF NOT EXISTS tournaments (
-    id TEXT PRIMARY KEY, -- UUID
+    id TEXT PRIMARY KEY,
+	player_count INTEGER NOT NULL DEFAULT 2,
     status TEXT NOT NULL CHECK(status IN ('pending', 'in_progress', 'finished')) DEFAULT 'in_progress',
     winner_id INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -199,7 +200,6 @@ export async function getRowByMatchId(matchId: string) {
 	}
 }
 
-// peut-etre a enlever
 export async function updateStatus(status: MatchStatus, matchId: string) {
 	
 	let sql = `UPDATE matches SET status = ? WHERE matchId = ? `;
@@ -276,7 +276,7 @@ export const fetchFirst = async (db: any, sql: string, params: any): Promise<any
 }
 
 export async function createTournament(tournamentId: string, playerIds: number[]) {
-    await execute(db, 'INSERT INTO tournaments (id) VALUES (?)', [tournamentId]);
+    await execute(db, 'INSERT INTO tournaments (id, player_count) VALUES (?, ?)', [tournamentId, playerIds.length]);
     const stmt = db.prepare('INSERT INTO tournament_players (tournament_id, user_id) VALUES (?, ?)');
     for (const userId of playerIds) {
         stmt.run(tournamentId, userId);

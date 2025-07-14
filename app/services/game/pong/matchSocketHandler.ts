@@ -17,7 +17,6 @@ export const timeouts: Map<string, NodeJS.Timeout> = new Map();
 export const localGames: Map<string, { state: GameState, intervalId: NodeJS.Timeout | null}> = new Map();
 
 
-// --- Socket.io handler for all game-related events ---
 export async function matchSocketHandler(socket: Socket): Promise<void> {
 
     socket.on('authenticate', async ({ display_name, userId }) => {
@@ -32,7 +31,6 @@ export async function matchSocketHandler(socket: Socket): Promise<void> {
 }
 
 
-// --- QUICK MATCH LOGIC ---
 function handleQuickMatchQueue(socket: Socket) {
     socket.on('joinQuickMatchQueue', async () => {
         const playerInfo: PlayerInfo | undefined = (socket as any).playerInfo;
@@ -108,7 +106,6 @@ function clearMatchmakingTimeout(socketId: string) {
 }
 
 
-// --- LOCAL GAME LOGIC ---
 function serverSocketEvents(socket: Socket) {
     socket.on('startLocal',  (matchId: string) => {    
         fastify.log.info('Game started locally'); 
@@ -154,7 +151,6 @@ function startLocalGameInterval(state: GameState, socket: Socket, matchId: strin
 }
 
 
-// --- REMOTE GAME LOGIC (SHARED) ---
 export function startRemoteGame(client1: Socket, client2: Socket, matchId: string): RemoteGameSession {    
     let roomName = makeid(5);
     
@@ -193,7 +189,6 @@ function handleClientInput(socket: Socket) {
     });
 }
 
-// --- DISCONNECTION LOGIC ---
 async function disconnectionHandler(socket: Socket) {
     socket.on('disconnect', async () => {
         await cleanOnDisconnection(socket.id);
@@ -206,7 +201,6 @@ async function disconnectionHandler(socket: Socket) {
             const opponentSocketId = [...gameSession.players.keys()].find(id => id !== socket.id);
             const tournamentInfo = (socket as any).tournamentInfo;
             
-            // Si c'est un match de tournoi, le forfait est géré par la logique de tournoi
             if (tournamentInfo) {
                 const winnerSocketId = opponentSocketId;
                 const winnerSocket = winnerSocketId ? fastify.io.sockets.sockets.get(winnerSocketId) : undefined;
@@ -214,7 +208,7 @@ async function disconnectionHandler(socket: Socket) {
                     const winnerId = (winnerSocket as any).playerInfo.userId;
                     await handleMatchEnd(tournamentInfo.tournamentId, tournamentInfo.matchId, winnerId);
                 }
-            } else { // Sinon, c'est un match rapide classique
+            } else {
                 const match = await getRowByMatchId(gameSession.matchId);
                 if (match) {
                     const looserId = gameSession.getPlayerSide(socket.id) === 'left' ? match.player1_id : match.player2_id;

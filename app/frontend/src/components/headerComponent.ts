@@ -49,7 +49,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 			menuItem.dataset.lang = langCode;
 			return menuItem;
 		});
-	
+
 	const langMenu = createElement('div', {
 		className: 'absolute left-0 mt-2 w-48 bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-lg shadow-xl z-50 hidden flex-col origin-top-left p-2'
 	}, langMenuItems);

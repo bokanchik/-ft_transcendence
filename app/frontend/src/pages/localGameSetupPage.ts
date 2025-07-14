@@ -24,7 +24,7 @@ export function promptAliasForm(): HTMLElement {
 		className: 'w-full bg-teal-700 hover:bg-teal-600 text-white text-3xl font-beach font-bold py-2 px-4 rounded-lg transition-colors duration-200 border border-teal-600/50'
 	});
 
-	const buttonContainer = createElement('div', { className: 'flex-shrink-0 flex justify-center pt-4 mt-auto border-t border-gray-500/30'	}, [submitButton]);
+	const buttonContainer = createElement('div', { className: 'flex-shrink-0 flex justify-center pt-4 mt-auto border-t border-gray-500/30' }, [submitButton]);
 
 	const form = createElement('form', {
 		className: 'flex flex-col flex-grow min-h-0'
