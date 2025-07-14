@@ -75,7 +75,7 @@ export function LoginPage(): HTMLElement {
 		className: 'flex flex-col min-h-screen bg-cover bg-center bg-fixed'
 	}, [headerElement, container]);
 
-	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
+	pageWrapper.style.backgroundImage = "url('/assets/background.webp')";
 
 	return pageWrapper;
 }

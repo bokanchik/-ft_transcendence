@@ -20,7 +20,7 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 		[leftUsername, canvas, rightUsername]);
 	const container = createElement('div', { className: 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-2xl shadow-2xl p-6 sm:p-8 flex flex-col items-center gap-6' }, [scoreDisplay, gameRow, quitButton]);
 	const pageWrapper = createElement('div', { className: 'w-full h-screen flex flex-col items-center justify-center bg-cover bg-center bg-fixed' }, [container]);
-	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
+	pageWrapper.style.backgroundImage = "url('/assets/background.webp')";
 
 	const gameMode = sessionStorage.getItem('gameMode') as GameMode | null;
 	if (!gameMode) {

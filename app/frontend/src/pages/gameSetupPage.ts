@@ -124,7 +124,7 @@ export function GamePage(): HTMLElement {
 		HeaderComponent({ currentUser }),
 		gameContentContainer
 	]);
-	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
+	pageWrapper.style.backgroundImage = "url('/assets/background.webp')";
 
 	return pageWrapper;
 }

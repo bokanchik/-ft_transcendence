@@ -48,7 +48,7 @@ export function TournamentPage(): HTMLElement {
             },
             [tournamentContentContainer])
         ]);
-        pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
+        pageWrapper.style.backgroundImage = "url('/assets/background.webp')";
 
     const rawData = sessionStorage.getItem('tournamentData');
     if (!rawData) {

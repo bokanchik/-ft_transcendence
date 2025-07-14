@@ -118,7 +118,7 @@ export async function RegisterPage(): Promise<HTMLElement> {
 	const pageWrapper = createElement('div', {
 		className: 'flex flex-col h-screen bg-cover bg-center bg-fixed'
 	}, [headerElement, container]);
-	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
+	pageWrapper.style.backgroundImage = "url('/assets/background.webp')";
 
 	form.addEventListener('submit', async (event) => {
 		event.preventDefault();

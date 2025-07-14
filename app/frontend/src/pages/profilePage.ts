@@ -34,7 +34,7 @@ export async function ProfilePage(params: { userId?: string }): Promise<HTMLElem
 	const pageContainer = createElement('div', {
 		className: 'min-h-screen p-4 sm:p-8 flex flex-col items-center bg-cover bg-center bg-fixed'
 	});
-	pageContainer.style.backgroundImage = "url('/assets/background.jpg')";
+	pageContainer.style.backgroundImage = "url('/assets/background.webp')";
 
 	const contentArea = createElement('div', { className: 'flex flex-1 w-full' });
 

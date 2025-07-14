@@ -60,7 +60,7 @@ export function promptAliasForm(): HTMLElement {
 			formContainer
 		])
 	]);
-	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
+	pageWrapper.style.backgroundImage = "url('/assets/background.webp')";
 
 	const selectElement = form.querySelector('#gameMode') as HTMLSelectElement;
 

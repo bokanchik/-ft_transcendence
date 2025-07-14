@@ -22,7 +22,7 @@ export async function SettingsPage(): Promise<HTMLElement> {
 		headerElement,
 		pageContainer
 	]);
-	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
+	pageWrapper.style.backgroundImage = "url('/assets/background.webp')";
 
 	if (!user) {
 		navigateTo('/login');
