@@ -20,14 +20,14 @@
 - [x] La gestion d'erreurs 
 - [x] Remplacer error simple dans back
 
-- [ ] tournoi local BUG: rounds suivants deja remplis (BYE)
-- [ ] Pas de page fin de tournoi dans tournoi online mais apparait avec quickMatch
-- [ ] voir au dessus -> removeItem tournoi dans quickMatch et reparation online tournament
-- [ ] pas de noms dans la page de jeu dans online tournament
-- [ ] match qui se lance par le back dans online tournament -> mettre un bouton
-- [ ] verifier le clean de socket et storage dans tous les cas de figure
+- [x] tournoi local BUG: rounds suivants deja remplis (BYE)
+- [x] Pas de page fin de tournoi dans tournoi online mais apparait avec quickMatch
+- [x] voir au dessus -> removeItem tournoi dans quickMatch et reparation online tournament
+- [x] pas de noms dans la page de jeu dans online tournament
+- [x] match qui se lance par le back dans online tournament -> mettre un bouton
+- [x] verifier le clean de socket et storage dans tous les cas de figure
 
-- [ ] fonctions au bons endroits
+- [x] fonctions au bons endroits
 
 - [x] message login pas bonne couleur
 - [x] sidebar cases trop petites
@@ -61,7 +61,7 @@
 - [x] score pas affichés dans gameResult
 - [x] score après local game
 
-- [ ] signe @ du font-beach pas jojo
+- [x] signe @ du font-beach pas jojo
 - [ ] Vérifier les traductions
 - [ ] nettoyage
 
