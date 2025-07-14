@@ -1,6 +1,7 @@
 import { getDb } from '../utils/dbConfig.js';
 import { User, UserPublic, UserWithSecrets, CreateUserPayload, UpdatedUserResult, UpdateUserPayload, UserOnlineStatus } from '../shared/schemas/usersSchemas.js'; // Importez vos types
 import { AppError, NotFoundError, ERROR_KEYS } from '../utils/appError.js';
+import { execute, fetchFirst, fetchAll } from '../utils/dbConfig.js';
 
 function toAppUser(dbUser: any): User {
     if (!dbUser) return dbUser;
@@ -23,8 +24,7 @@ function toAppUserWithSecrets(dbUser: any): UserWithSecrets {
  * @returns {Promise<User[]>} A list of all users.
  */
 export async function getAllUsersFromDb(): Promise<User[]> {
-	const db = getDb();
-	const users = await db.all<any[]>('SELECT id, username, email, display_name, avatar_url, wins, losses, status, language, created_at, updated_at, is_two_fa_enabled FROM users');
+	const users = await fetchAll<any>('SELECT id, username, email, display_name, avatar_url, wins, losses, status, language, created_at, updated_at, is_two_fa_enabled FROM users');
     return users.map(toAppUser);
 }
 
@@ -34,8 +34,7 @@ export async function getAllUsersFromDb(): Promise<User[]> {
  * @returns {Promise<UserWithSecrets | undefined>} The user object or undefined if not found.
  */
 export async function getUserByDisplayNameFromDb(displayName: string): Promise<UserWithSecrets | undefined> {
-	const db = getDb();
-	const user = await db.get<any>('SELECT * FROM users WHERE display_name = ?', [displayName]);
+	const user = await fetchFirst<any>('SELECT * FROM users WHERE display_name = ?', [displayName]);
     return user ? toAppUserWithSecrets(user) : undefined;
 }
 
@@ -45,8 +44,7 @@ export async function getUserByDisplayNameFromDb(displayName: string): Promise<U
  * @returns {Promise<UserWithSecrets | undefined>} The user object or undefined if not found.
  */
 export async function getUserByUsernameFromDb(username: string): Promise<UserWithSecrets | undefined> {
-	const db = getDb();
-	const user = await db.get<any>('SELECT * FROM users WHERE username = ?', [username]);
+	const user = await fetchFirst<any>('SELECT * FROM users WHERE username = ?', [username]);
     return user ? toAppUserWithSecrets(user) : undefined;
 }
 
@@ -56,8 +54,7 @@ export async function getUserByUsernameFromDb(username: string): Promise<UserWit
  * @returns {Promise<UserWithSecrets | undefined>} The user object or undefined if not found.
  */
 export async function getUserByEmailFromDb(email: string): Promise<UserWithSecrets | undefined> {
-	const db = getDb();
-	const user = await db.get<any>('SELECT * FROM users WHERE email = ?', [email]);
+	const user = await fetchFirst<any>('SELECT * FROM users WHERE email = ?', [email]);
     return user ? toAppUserWithSecrets(user) : undefined;
 }
 
@@ -67,15 +64,12 @@ export async function getUserByEmailFromDb(email: string): Promise<UserWithSecre
  * @returns {Promise<User | undefined>} The user object or undefined if not found.
  */
 export async function getUserByIdFromDb(userId: number): Promise<User | undefined> {
-	const db = getDb();
-	const user = await db.get<any>('SELECT id, username, email, display_name, avatar_url, wins, losses, status, language, created_at, updated_at, is_two_fa_enabled FROM users WHERE id = ?', [userId]);
+	const user = await fetchFirst<any>('SELECT id, username, email, display_name, avatar_url, wins, losses, status, language, created_at, updated_at, is_two_fa_enabled FROM users WHERE id = ?', [userId]);
     return user ? toAppUser(user) : undefined;
 }
 
 export async function getUserPublicInfoFromDb(userId: number): Promise<UserPublic | undefined> {
-	const db = getDb();
-	const user = await db.get<any>('SELECT id, display_name, avatar_url, wins, losses, status, created_at, updated_at FROM users WHERE id = ?', [userId]);
-	return user;
+	return fetchFirst<UserPublic>('SELECT id, display_name, avatar_url, wins, losses, status, created_at, updated_at FROM users WHERE id = ?', [userId]);
 }
 
 /**
@@ -84,8 +78,7 @@ export async function getUserPublicInfoFromDb(userId: number): Promise<UserPubli
  * @returns {Promise<UserWithSecrets | undefined>} The user object with secrets, or undefined if not found.
  */
 export async function getUserWithSecretsByIdFromDb(userId: number): Promise<UserWithSecrets | undefined> {
-	const db = getDb();
-	const user = await db.get<any>('SELECT * FROM users WHERE id = ?', [userId]);
+	const user = await fetchFirst<any>('SELECT * FROM users WHERE id = ?', [userId]);
     return user ? toAppUserWithSecrets(user) : undefined;
 }
 
@@ -94,14 +87,9 @@ export async function getUserWithSecretsByIdFromDb(userId: number): Promise<User
  * @param {CreateUserPayload} user - The user data to insert.
  * @returns {Promise<void>} 
  */
-export async function createUser(
-	{ username, email, password_hash, display_name, avatar_url = null, language = 'en' }: CreateUserPayload
-): Promise<void> {
-	const db = getDb();
-	const result = await db.run(
-		`INSERT INTO users (username, email, password_hash, display_name, avatar_url, language) VALUES (?, ?, ?, ?, ?, ?)`,
-		[username, email, password_hash, display_name, avatar_url, language]
-	);
+export async function createUser({ username, email, password_hash, display_name, avatar_url = null, language = 'en' }: CreateUserPayload): Promise<void> {
+	const sql = `INSERT INTO users (username, email, password_hash, display_name, avatar_url, language) VALUES (?, ?, ?, ?, ?, ?)`;
+	const result = await execute(sql, [username, email, password_hash, display_name, avatar_url, language]);
 	if (result.lastID === undefined) {
 		throw new AppError(ERROR_KEYS.DATABASE_ERROR, 500, { detail: "User creation failed, no lastID." });
 	}
@@ -117,36 +105,28 @@ export async function createUser(
 export async function updateUserInDb(userId: number, updates: UpdateUserPayload): Promise<UpdatedUserResult> {
 	const db = getDb();
 	const fields = Object.keys(updates).filter(k => (updates as any)[k] !== undefined) as Array<keyof UpdateUserPayload>;
-	if (fields.length === 0) {
-		return { changes: 0 };
-	}
+	if (fields.length === 0) { return { changes: 0 }; }
+
 	const setClause = fields.map((field) => `${String(field)} = ?`).join(', ');
 	const values: (string | number | boolean | null)[] = fields.map((field) => (updates as any)[field]);
 
 	const sql = `UPDATE users SET ${setClause}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
 	values.push(userId);
 
-	try {
-		const result = await db.run(sql, values);
-		return { changes: result.changes };
-	} catch (error: any) {
-		console.error('Error updating user:', error);
-		throw error;;
-	}
+	const result = await execute(sql, values);
+	return { changes: result.changes };
 }
 
 export async function updateStatusInDb(userId: number, status: UserOnlineStatus): Promise<void> {
-	const db = getDb();
 	const sql = `UPDATE users SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
-	const result = await db.run(sql, [status, userId]);
+	const result = await execute(sql, [status, userId]);
 	if (result.changes === 0) {
 		throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND, { userId });
 	}
 }
 
 export async function deleteUserFromDb(userId: number): Promise<void> {
-	const db = getDb();
-	const result = await db.run('DELETE FROM users WHERE id = ?', [userId]);
+	const result = await execute('DELETE FROM users WHERE id = ?', [userId]);
 	if (result.changes === 0) {
 		throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND, { userId });
 	}
@@ -198,7 +178,7 @@ export async function isDisplayNameInDb(display_name: string, id?: number): Prom
  * @returns {Promise<UpdatedUserResult>} Le résultat de l'opération de la base de données.
  */
 export async function incrementUserStatsInDb(userId: number, result: 'win' | 'loss'): Promise<UpdatedUserResult> {
-    const db = getDb();
+    // const db = getDb();
     const columnToUpdate = result === 'win' ? 'wins' : 'losses';
 
     if (!['wins', 'losses'].includes(columnToUpdate)) {
@@ -208,7 +188,8 @@ export async function incrementUserStatsInDb(userId: number, result: 'win' | 'lo
     const sql = `UPDATE users SET ${columnToUpdate} = ${columnToUpdate} + 1, updated_at = CURRENT_TIMESTAMP WHERE id = ?`;
 
     try {
-        const dbResult = await db.run(sql, [userId]);
+        // const dbResult = await db.run(sql, [userId]);
+		const dbResult = await execute(sql, [userId]);
         if (dbResult.changes === 0) {
             throw new NotFoundError(ERROR_KEYS.USER_NOT_FOUND, { userId });
         }

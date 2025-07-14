@@ -84,10 +84,10 @@ export async function MatchHistoryComponent(props: MatchHistoryComponentProps): 
 			const resultTextSpan = createElement('span', { textContent: resultText.toUpperCase(), className: `text-5xl font-jurassic tracking-wide ${resultColorClass}` });
 			const resultTextBlock = createElement('div', { className: 'text-center' }, [resultTextSpan]);
 
-			const userScoreSpan = createElement('span', { textContent: profiledUserScore.toString(), className: `${isWin ? 'text-white' : 'text-gray-400'}` });
-			const separatorSpan = createElement('span', { textContent: '/', className: 'mx-3 text-gray-600' });
-			const opponentScoreSpan = createElement('span', { textContent: opponentScore.toString(), className: `${!isWin && !isDraw ? 'text-white' : 'text-gray-400'}` });
-			const scoreBlock = createElement('div', { className: 'flex justify-end items-baseline text-3xl font-roar font-light' }, [userScoreSpan, separatorSpan, opponentScoreSpan]);
+			const userScoreSpan = createElement('span', { textContent: profiledUserScore.toString(), className: `${isWin ? 'text-white font-beach' : 'text-gray-400 font-beach'}` });
+			const separatorSpan = createElement('span', { textContent: '/', className: 'mx-3 text-gray-600 font-roar' });
+			const opponentScoreSpan = createElement('span', { textContent: opponentScore.toString(), className: `${!isWin && !isDraw ? 'text-white font-beach' : 'text-gray-400 font-beach'}` });
+			const scoreBlock = createElement('div', { className: 'flex justify-end items-baseline text-3xl' }, [userScoreSpan, separatorSpan, opponentScoreSpan]);
 
 			const centerBlock = createElement('div', { className: 'flex-grow flex justify-between items-center px-4' }, [opponentNameBlock, resultTextBlock, scoreBlock]);
 

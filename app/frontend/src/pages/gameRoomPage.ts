@@ -7,7 +7,7 @@ import { initializeGame, quitGameHandler } from "../services/gameService.js";
 
 export function GameRoomPage(mode: GameMode): HTMLElement {
 	const leftUsername = createElement('div', { id: 'left-username', className: 'w-48 text-center text-3xl font-beach text-white bg-teal-800/50 border-4 border-teal-500/50 p-3 rounded-lg shadow-xl' });
-	const scoreDisplay = createElement('div', { id: 'score-display', textContent: '0 - 0', className: 'text-7xl font-roar text-yellow-300 drop-shadow-lg [text-shadow:_0_3px_6px_rgb(0_0_0_/_50%)]' });
+	const scoreDisplay = createElement('div', { id: 'score-display', textContent: '0 - 0', className: 'text-7xl font-beach text-gray-300 drop-shadow-lg [text-shadow:_0_3px_6px_rgb(0_0_0_/_50%)]' });
 	const rightUsername = createElement('div', { id: 'right-username', className: 'w-48 text-center text-3xl font-beach text-white bg-rose-800/50 border-4 border-rose-500/50 p-3 rounded-lg shadow-xl' });
 	
 	const canvas = createElement('canvas', { id: 'pong-canvas', className: 'border-4 border-white/20 rounded-lg shadow-inner bg-gray-900/30' });

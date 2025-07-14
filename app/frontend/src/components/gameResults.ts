@@ -37,13 +37,13 @@ export function showGameResult(player1: string, player2: string, score1: number,
         textContent: player1
     });
 	const scoreText1 = createElement('p', {
-        className: 'font-roar text-7xl text-teal-700 mt-2',
+        className: 'font-beach text-7xl text-teal-700 mt-2',
         textContent: String(score1)
     });
 	player1Container.append(img1, name1, scoreText1);
 
 	const vsText = createElement('span', {
-        className: 'font-jurassic text-6xl text-gray-400 mx-4 self-center pb-8',
+        className: 'font-jurassic text-8xl text-gray-400 mx-4 self-center pb-8',
         textContent: t('game.vs')
     });
 
@@ -60,7 +60,7 @@ export function showGameResult(player1: string, player2: string, score1: number,
         textContent: player2
     });
 	const scoreText2 = createElement('p', {
-        className: 'font-roar text-7xl text-red-700 mt-2',
+        className: 'font-beach text-7xl text-red-700 mt-2',
         textContent: String(score2)
     });
 	player2Container.append(img2, name2, scoreText2);

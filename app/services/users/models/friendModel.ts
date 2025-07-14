@@ -1,6 +1,6 @@
-// app/services/users/models/friendModel.ts
 import { getDb } from '../utils/dbConfig.js';
 import { Friendship, Friend, FriendshipStatus, PendingFriendRequest, AdminFullFriendship } from '../shared/schemas/friendsSchemas.js';
+import { execute, fetchFirst, fetchAll } from '../utils/dbConfig.js';
 
 /**
  * Creates a new friendship request in the database.
@@ -10,19 +10,17 @@ import { Friendship, Friend, FriendshipStatus, PendingFriendRequest, AdminFullFr
  * @returns {Promise<Friendship>} The created friendship object with its ID.
  */
 export async function createFriendshipRequestInDb(user1Id: number, user2Id: number, initiatorId: number): Promise<Friendship> {
-	const db = getDb();
 	const [id1, id2] = user1Id < user2Id ? [user1Id, user2Id] : [user2Id, user1Id];
-	const newFriendship = await db.get<Friendship>(
-		`INSERT INTO friendships (user1_id, user2_id, initiator_id, status)
-         VALUES (?, ?, ?, ?)
-         RETURNING *`,
-		[id1, id2, initiatorId, FriendshipStatus.PENDING]
-	);
+	const sqlInsert = `INSERT INTO friendships (user1_id, user2_id, initiator_id, status) VALUES (?, ?, ?, ?)`;
+	const result = await execute(sqlInsert, [id1, id2, initiatorId, FriendshipStatus.PENDING]);
 
-
-	if (!newFriendship) {
-		throw new Error("Failed to create friendship or retrieve the created row using RETURNING.");
+	if (!result.lastID) {
+		throw new Error("Failed to create friendship.");
 	}
+	const newFriendship = await getFriendshipByIdInDb(result.lastID);
+    if (!newFriendship) {
+        throw new Error("Failed to retrieve the created friendship.");
+    }
 	return newFriendship;
 }
 
@@ -33,12 +31,8 @@ export async function createFriendshipRequestInDb(user1Id: number, user2Id: numb
  * @returns {Promise<Friendship | undefined>} The friendship object or undefined if not found.
  */
 export async function getFriendshipByUsersInDb(user1Id: number, user2Id: number): Promise<Friendship | undefined> {
-	const db = getDb();
 	const [id1, id2] = user1Id < user2Id ? [user1Id, user2Id] : [user2Id, user1Id];
-	return db.get<Friendship>(
-		`SELECT * FROM friendships WHERE user1_id = ? AND user2_id = ?`,
-		[id1, id2]
-	);
+	return fetchFirst<Friendship>(`SELECT * FROM friendships WHERE user1_id = ? AND user2_id = ?`, [id1, id2]);
 }
 
 /**
@@ -47,8 +41,7 @@ export async function getFriendshipByUsersInDb(user1Id: number, user2Id: number)
  * @returns {Promise<Friendship | undefined>} The friendship object or undefined if not found.
  */
 export async function getFriendshipByIdInDb(friendshipId: number): Promise<Friendship | undefined> {
-	const db = getDb();
-	return db.get<Friendship>(`SELECT * FROM friendships WHERE id = ?`, [friendshipId]);
+	return fetchFirst<Friendship>(`SELECT * FROM friendships WHERE id = ?`, [friendshipId]);
 }
 
 interface UpdateResult {
@@ -61,11 +54,7 @@ interface UpdateResult {
  * @returns {Promise<UpdateResult>} The result of the database operation.
  */
 export async function updateFriendshipStatusInDb(friendshipId: number, status: FriendshipStatus): Promise<UpdateResult> {
-	const db = getDb();
-	const result = await db.run(
-		`UPDATE friendships SET status = ? WHERE id = ?`,
-		[status, friendshipId]
-	);
+	const result = await execute(`UPDATE friendships SET status = ? WHERE id = ?`, [status, friendshipId]);
 	return { changes: result.changes };
 }
 
@@ -75,8 +64,7 @@ export async function updateFriendshipStatusInDb(friendshipId: number, status: F
  * @returns {Promise<UpdateResult>} The result of the database operation.
  */
 export async function deleteFriendshipInDb(friendshipId: number): Promise<UpdateResult> {
-	const db = getDb();
-	const result = await db.run(`DELETE FROM friendships WHERE id = ?`, [friendshipId]);
+	const result = await execute(`DELETE FROM friendships WHERE id = ?`, [friendshipId]);
 	return { changes: result.changes };
 }
 
@@ -87,8 +75,6 @@ export async function deleteFriendshipInDb(friendshipId: number): Promise<Update
  * @returns {Promise<Friend[]>} List of friends with their details.
  */
 export async function getAcceptedFriendsForUserInDb(userId: number): Promise<Friend[]> {
-	const db = getDb();
-	// Le query est long, on assume qu'il retourne les champs correspondants à DetailedFriend
 	const query = `
         SELECT
             f.id as friendship_id,
@@ -105,7 +91,7 @@ export async function getAcceptedFriendsForUserInDb(userId: number): Promise<Fri
         JOIN users u2 ON f.user2_id = u2.id
         WHERE (f.user1_id = ? OR f.user2_id = ?) AND f.status = 'accepted'
     `;
-	return db.all<Friend[]>(query, userId, userId, userId, userId, userId, userId, userId, userId, userId);
+	return fetchAll<Friend>(query, [userId, userId, userId, userId, userId, userId, userId, userId, userId]);
 }
 
 /**
@@ -115,7 +101,6 @@ export async function getAcceptedFriendsForUserInDb(userId: number): Promise<Fri
  * @returns {Promise<PendingFriendRequest[]>} List of received requests with requester details.
  */
 export async function getPendingReceivedFriendRequestsInDb(userId: number): Promise<PendingFriendRequest[]> {
-	const db = getDb();
 	const query = `
         SELECT
             f.id as friendship_id, f.created_at,
@@ -126,7 +111,7 @@ export async function getPendingReceivedFriendRequestsInDb(userId: number): Prom
         WHERE (f.user1_id = ? OR f.user2_id = ?) AND f.status = 'pending' AND f.initiator_id != ?
         ORDER BY f.created_at DESC;
     `;
-	const rows = await db.all<any[]>(query, userId, userId, userId); // any[] pour l'instant
+	const rows = await fetchAll<any>(query, [userId, userId, userId]);
 	return rows.map(row => ({
 		friendship_id: row.friendship_id,
 		created_at: row.created_at,
@@ -146,7 +131,6 @@ export async function getPendingReceivedFriendRequestsInDb(userId: number): Prom
  * @returns {Promise<PendingFriendRequest[]>} List of sent requests with receiver details.
  */
 export async function getPendingSentFriendRequestsInDb(userId: number): Promise<PendingFriendRequest[]> {
-	const db = getDb();
 	const query = `
         SELECT
             f.id as friendship_id, f.created_at,
@@ -161,7 +145,7 @@ export async function getPendingSentFriendRequestsInDb(userId: number): Promise<
         WHERE f.initiator_id = ? AND f.status = 'pending'
         ORDER BY f.created_at DESC;
     `;
-	const rows = await db.all<any[]>(query, userId); // any[] pour l'instant
+	const rows = await fetchAll<any>(query, [userId]);
 	return rows.map(row => ({
 		friendship_id: row.friendship_id,
 		created_at: row.created_at,
@@ -179,8 +163,7 @@ export async function getPendingSentFriendRequestsInDb(userId: number): Promise<
  * @returns {Promise<AdminFullFriendship[]>} List of all friendships.
  */
 export async function getAllFriendshipsInDb(): Promise<AdminFullFriendship[]> {
-	const db = getDb();
-	return db.all<AdminFullFriendship[]>(`
+	return fetchAll<AdminFullFriendship>(`
         SELECT
             f.*, u1.username as user1_username, u2.username as user2_username, ui.username as initiator_username
         FROM friendships f
@@ -198,13 +181,12 @@ export async function getAllFriendshipsInDb(): Promise<AdminFullFriendship[]> {
  * @returns {Promise<Friendship[]>} List of friends with their details.
  */
 export async function getFriends(userId: number, limit: number = 10, offset: number = 0): Promise<Friendship[]> {
-	const db = getDb();
 	const query = `
         SELECT * FROM friendships
         WHERE (user1_id = ? OR user2_id = ?) AND status = 'accepted'
         LIMIT ? OFFSET ?
     `;
-	return db.all<Friendship[]>(query, userId, userId, limit, offset);
+	return fetchAll<Friendship>(query, [userId, userId, limit, offset]);
 }
 
 /**
@@ -215,13 +197,11 @@ export async function getFriends(userId: number, limit: number = 10, offset: num
  */
 export async function areUsersFriendsInDb(userId1: number, userId2: number): Promise<boolean> {
 	if (userId1 === userId2) return false;
-	const db = getDb();
 	const [id1, id2] = userId1 < userId2 ? [userId1, userId2] : [userId2, userId1];
 
-	const friendship = await db.get< { status: FriendshipStatus } >(
+	const friendship = await fetchFirst<{ status: FriendshipStatus }>(
 		`SELECT status FROM friendships WHERE user1_id = ? AND user2_id = ? AND status = 'accepted'`,
 		[id1, id2]
 	);
-	
 	return !!friendship;
 }

@@ -75,22 +75,16 @@ export async function createMatchTable() {
 };
 
 export async function setGameResult(matchId: string, player1_score: number, player2_score: number, winner_id: number, win_type: string) {
-
-	
 	const existingMatch = await getRowByMatchId(matchId);
-
 	if (!existingMatch) {
 		throw new Error(`Match with id ${matchId} does not exists in DB.`);
 	}
-
 	if (existingMatch.status === 'finished') {
 		console.warn(`Match with id ${matchId} is already finished.`);
+		return;
 	}
 	
-	// Update player stats in the database
 	const loserId = winner_id === existingMatch.player1_id ? existingMatch.player2_id : existingMatch.player1_id;
-
-	// On vérifie que le perdant n'est pas le gagnant (cas d'erreur)
 	if (winner_id === loserId) {
 		console.error(`Winner and loser are the same for match ${matchId}`);
 		return;
@@ -101,34 +95,9 @@ export async function setGameResult(matchId: string, player1_score: number, play
 
 	const sql = `
 	UPDATE matches
-	SET player1_score = ?,
-		player2_score = ?,
-		winner_id = ?,
-		win_type = ?,
-		status = 'finished'
+	SET player1_score = ?, player2_score = ?, winner_id = ?, win_type = ?, status = 'finished'
 	WHERE matchId = ? `;
-
-	const params = [
-		player1_score,
-		player2_score,
-		winner_id,
-		win_type,
-		matchId
-	];
-
-	try {
-		await execute(db, sql, params);
-
-		// --- FOR DEBUGGING ----
-		console.log(`\x1b[32m Game result saved for match ${matchId} \x1b[0m`);
-		getRowByMatchId(matchId);
-		// ----------------------
-
-	} catch (err: unknown) {
-		console.error(`Failed to insert game result to DB: ${err} `);
-		throw err;
-	}
-
+	await execute(db, sql, [player1_score, player2_score, winner_id, win_type, matchId]);
 }
 
 export async function insertMatchToDB({ matchId, player1_id, player2_id, player1_socket, player2_socket }:
@@ -143,100 +112,38 @@ INSERT INTO matches(
 		player2_socket,
 		status
 	) VALUES(?, ?, ?, ?, ?, ?)`;
-
-	const params = [
-		matchId,
-		player1_id,
-		player2_id,
-		player1_socket,
-		player2_socket,
-		'in_progress'
-	];
-
-	try {
-		await execute(db, sql, params);
-
-		// --- FOR DEBUGGING ----
-		console.log(`\x1b[32m Match ${matchId} inserted to DB \x1b[0m`);
-		getRowByMatchId(matchId);
-		// ----------------------
-
-	} catch (err: unknown) {
-		console.log(`Failed to insert match into DB ${err} `);
-		throw err;
-	}
+	await execute(db, sql, [matchId, player1_id, player2_id, player1_socket, player2_socket, 'in_progress']);
 }
 
 export async function getMatchesByUserId(userId: number) {
-	const sql = `
-	SELECT * FROM matches
-	WHERE player1_id = ? OR player2_id = ?
-		ORDER BY created_at DESC
-	`;
-
-	try {
-		const matches = await fetchAll(db, sql, [userId, userId]);
-		console.log(`All fetched matches for ${userId} : ${JSON.stringify(matches)}`);
-		return matches;
-
-	} catch (err: unknown) {
-		console.log(`Failed to find matches for this user: ${err} `);
-		throw err;
-	}
+	const sql = `SELECT * FROM matches WHERE player1_id = ? OR player2_id = ? ORDER BY created_at DESC`;
+	return fetchAll(db, sql, [userId, userId]);
 }
 
 export async function getRowByMatchId(matchId: string) {
-
 	let sql = `SELECT * FROM matches WHERE matchId = ? `;
-
-	try {
-		const match = await fetchFirst(db, sql, [matchId]);
-		console.log(`Match ${matchId} : ${match}`);
-		return match;
-
-	} catch (err: unknown) {
-		console.log(`Failed to retrieve a row from DB ${err} `);
-		throw err;
-	}
+	return fetchFirst(db, sql, [matchId]);
 }
 
 export async function updateStatus(status: MatchStatus, matchId: string) {
 	
 	let sql = `UPDATE matches SET status = ? WHERE matchId = ? `;
-	
-	try {
-		await execute(db, sql, [status, matchId]);
-		console.log(`Status for match ${matchId} updated to ${status} `);
-	} catch (err: unknown) {
-		console.log(`Failed to update status: ${err} `);
-		throw err;
-	}
+	await execute(db, sql, [status, matchId]);
+	console.log(`Status for match ${matchId} updated to ${status}`);
 }
 
-// helper function for debugging purpose
 export async function getAllRows() {
 
 	let sql = `SELECT * FROM matches`;
-
-	try {
-		const matches = await fetchAll(db, sql, []);
-		console.log(matches);
-	} catch (err: unknown) {
-		console.log(`Failed to retrieve all rows from DB: ${err} `);
-	}
+	const matches = await fetchAll(db, sql, []);
+	console.log(matches);
 }
 
 export async function deleteRow(id: number) {
 
 	let sql = `DELETE FROM matches WHERE id = ? `;
-	
-	try {
-		await execute(db, sql, [id]);
-		console.log(`Match ${id} deleted from DB`);
-	} catch (err: unknown) {
-		console.log(`Failed to delete match ${id} from DB: ${err} `);
-		throw err
-	}
+	await execute(db, sql, [id]);
+	console.log(`Match ${id} deleted from DB`);
 }
 
 // --- WRAPPERS FOR DB ACTIONS ---
