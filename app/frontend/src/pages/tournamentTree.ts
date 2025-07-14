@@ -9,6 +9,7 @@ import socket from "../services/socket.js";
 import { fetchUserPublicDetails } from '../services/authService.js';
 import { UserPublic, UserOnlineStatus } from '../shared/schemas/usersSchemas.js';
 import { createActionButton } from "../utils/domUtils.js";
+import { initCountdown } from "../components/countdown.js";
 
 type Match = {
     id: string;
@@ -44,7 +45,7 @@ function LocalTournamentPage(): HTMLElement {
     const currentUser = getUserDataFromStorage();
     if (!currentUser) { navigateTo('/login'); return createElement('div'); }
 
-    const title = createElement('h2', { className: 'flex-shrink-0 text-3xl font-bold mb-6 text-center text-white', textContent: t('tournament.title') });
+    const title = createElement('h2', { className: 'flex-shrink-0 text-3xl font-bold mb-6 text-center text-gray-300 font-beach', textContent: t('tournament.title') });
     
     const contentWrapper = createElement('div', { className: 'w-full flex-grow overflow-y-auto min-h-0 pr-4 -mr-4 space-y-6'});
     
@@ -147,7 +148,7 @@ function LocalTournamentPage(): HTMLElement {
             const roundEl = createElement('div', { className: 'bg-blue-100/5 shadow-lg rounded-lg p-4 border border-blue-200/10' });
             
             const headerText = matches.length === 1 && roundNum === totalRounds ? t('tournament.finale') : `${t('tournament.round')} ${roundNumStr}`;
-            const header = createElement('h2', { textContent: headerText, className: 'text-xl font-semibold mb-3 text-blue-300' });
+            const header = createElement('h2', { textContent: headerText, className: 'text-xl font-semibold font-beach mb-3 text-blue-300' });
             
             roundEl.appendChild(header);
             const list = createElement('ul', { className: 'space-y-2' });
@@ -161,7 +162,7 @@ function LocalTournamentPage(): HTMLElement {
 
                 const matchInfo = createElement('div', { className: 'flex items-center gap-3' }, [
                     createElement('span', { textContent: match.player1, className: p1Class }),
-                    createElement('span', { textContent: 'vs', className: 'text-gray-400' }), // 'text-gray-400' pour correspondre
+                    createElement('span', { textContent: 'vs', className: 'text-gray-400 text-xl font-jurassic' }),
                     createElement('span', { textContent: match.player2, className: p2Class }),
                 ]);
                 
@@ -186,13 +187,13 @@ function LocalTournamentPage(): HTMLElement {
 
         if (tournamentWinner) {
             const winnerBanner = createElement('div', { 
-                textContent: `${t('tournament.winnerIs')} ${tournamentWinner}!`,
-                className: 'mt-6 p-4 bg-yellow-400 text-black text-2xl font-bold text-center rounded-lg animate-pulse'
+                textContent: `${t('tournament.winnerIs')} ${tournamentWinner}`,
+                className: 'mt-6 p-4 bg-teal-700 text-gray-300 text-2xl font-beach text-center rounded-lg animate-pulse'
             });
             const newTournamentLink = createElement('a', {
                 href: '/local-game',
                 textContent: t('link.backToGame'),
-                className: 'block text-center mt-4 text-blue-400 hover:text-blue-300 text-sm transition-colors'
+                className: 'block text-center mt-4 text-blue-400 hover:text-blue-300 text-xl transition-colors'
             });
             newTournamentLink.setAttribute('data-link', '');
             newTournamentLink.addEventListener('click', (e) => {
@@ -218,7 +219,7 @@ function OnlineTournamentPage(tournamentId: string): HTMLElement {
 
     const pageWrapper = createElement('div', { className: 'flex flex-col h-screen bg-cover bg-center bg-fixed' });
 
-    const title = createElement('h2', { className: 'flex-shrink-0 text-3xl font-bold mb-6 text-center text-white', textContent: t('tournament.titleOnline') });
+    const title = createElement('h2', { className: 'flex-shrink-0 text-3xl font-bold mb-6 text-center text-gray-200 font-beach', textContent: t('tournament.titleOnline') });
     const bracketContainer = createElement('div', { 
         id: `bracket-container-${tournamentId}`, 
         className: 'w-full flex-grow overflow-y-auto min-h-0 pr-4 -mr-4'
@@ -254,13 +255,23 @@ function OnlineTournamentPage(tournamentId: string): HTMLElement {
 
     socket.on('tournamentState', handleTournamentState);
 
-    socket.on('startTournamentMatch', ({ matchId, side, opponent }: { matchId: string, side: string, opponent: string }) => {
+    socket.on('startTournamentMatch', async ({ matchId, side, opponent }: { matchId: string, side: string, opponent: string }) => {
         sessionStorage.setItem('onlineTournamentId', tournamentId);
         sessionStorage.setItem('gameMode', 'onlineTournament');
         sessionStorage.setItem('matchId', matchId);
         sessionStorage.setItem('side', side);
         sessionStorage.setItem('opponent', opponent);
         sessionStorage.setItem('displayName', currentUser.display_name);
+
+        const countdownContainer = createElement('div');
+        countdownContainer.className = `
+            fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50
+            text-white text-7xl font-beach [text-shadow:_0_3px_6px_rgb(0_0_0_/_50%)]
+        `;
+        document.body.appendChild(countdownContainer);
+
+        await initCountdown(countdownContainer);
+
         navigateTo(`/game-room?matchId=${matchId}`);
     });
 
@@ -292,7 +303,7 @@ async function renderOnlineBracket(rounds: Rounds, container: HTMLElement, curre
 
     for (const [roundNumStr, matches] of sortedRounds) {
         const roundEl = createElement('div', { className: 'bg-blue-100/5 shadow-lg rounded-lg p-4 border border-blue-200/10' });
-        const header = createElement('h2', { textContent: `${t('tournament.round')} ${roundNumStr}`, className: 'text-xl font-semibold mb-3 text-blue-300' });
+        const header = createElement('h2', { textContent: `${t('tournament.round')} ${roundNumStr}`, className: 'text-xl font-semibold font-beach mb-3 text-blue-300' });
         roundEl.appendChild(header);
 
         const list = createElement('ul', { className: 'space-y-2' });
@@ -311,7 +322,7 @@ async function renderOnlineBracket(rounds: Rounds, container: HTMLElement, curre
 
             const matchInfo = createElement('div', { className: 'flex items-center gap-3' }, [
                 createElement('span', { textContent: p1Details.display_name, className: p1Class }),
-                createElement('span', { textContent: 'vs', className: 'text-gray-400' }),
+                createElement('span', { textContent: 'vs', className: 'text-gray-400 text-xl font-jurassic' }),
                 createElement('span', { textContent: p2Details.display_name, className: p2Class })
             ]);
 
@@ -359,13 +370,13 @@ async function displayTournamentWinner(winnerId: number, bracketContainer: HTMLE
     const winnerDetails = await getPlayerDetails(winnerId);
     
     const winnerBanner = createElement('div', { 
-        className: 'tournament-winner-banner mt-6 p-4 bg-yellow-400 text-black text-2xl font-bold text-center rounded-lg animate-pulse'
+        className: 'tournament-winner-banner mt-6 p-4 bg-teal-700 text-gray-300 text-2xl font-beach text-center rounded-lg animate-pulse'
     });
-    winnerBanner.textContent = `${t('tournament.winnerIs')} ${winnerDetails.display_name}!`;
+    winnerBanner.textContent = `${t('tournament.winnerIs')} ${winnerDetails.display_name}`;
     const backToGameLink = createElement('a', {
         href: '/game',
-        textContent: t('link.backToGame'), // Utilisons une nouvelle clé de traduction
-        className: 'block text-center mt-4 text-blue-400 hover:text-blue-300 text-sm transition-colors'
+        textContent: t('link.backToGame'),
+        className: 'block text-center mt-4 text-blue-400 hover:text-blue-300 text-lg transition-colors'
     });
     backToGameLink.setAttribute('data-link', '');
     backToGameLink.addEventListener('click', (e) => {

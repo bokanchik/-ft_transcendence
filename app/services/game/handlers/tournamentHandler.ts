@@ -84,9 +84,12 @@ export async function handleTournamentLogic(socket: Socket) {
                     p1Socket.emit('startTournamentMatch', { matchId, side: 'left', opponent: p2Info.display_name });
                     p2Socket.emit('startTournamentMatch', { matchId, side: 'right', opponent: p1Info.display_name });
 
-                    const gameSession = startRemoteGame(p1Socket, p2Socket, matchId);
-                    gameSession.isTournamentMatch = true;
-
+                    setTimeout(() => {
+                        if (p1Socket.connected && p2Socket.connected) {
+                            const gameSession = startRemoteGame(p1Socket, p2Socket, matchId);
+                            gameSession.isTournamentMatch = true;
+                        }
+                    }, 3000);
                     matchReadyState.delete(matchId);
                 }
             }
