@@ -68,7 +68,6 @@ export default async function authRoute(fastify: FastifyInstance, options: Fasti
 	fastify.post(
 		config.URL_GOOGLE_CALLBACK,
 		{
-			// schema: as.GoogleCallbackRouteSchema,
 			handler: ah.googleCallbackHandler
 		},
 	);

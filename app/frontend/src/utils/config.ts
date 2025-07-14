@@ -2,6 +2,10 @@ const USER_API_PREFIX = '/api/users';
 const GAME_API_PREFIX = '/api/game';
 
 export const config = {
+    auth: {
+        googleId: '381285000900-rcla6jmd3aldv8kk9k7ga84o7jrm5dj0.apps.googleusercontent.com', // Google Client ID
+        callbackUri: 'https://localhost:8443/auth/google/callback', // Google Redirect URI
+    },
     storage: {
         user: {
             dataKey: 'userDataKey',

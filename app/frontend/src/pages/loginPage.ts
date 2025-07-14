@@ -5,12 +5,13 @@ import { LoginRequestBody, User } from '../shared/schemas/usersSchemas.js';
 import { t, setLanguage, getLanguage } from '../services/i18nService.js';
 import { HeaderComponent } from '../components/headerComponent.js';
 import { createElement } from '../utils/domUtils.js';
+import { config } from '../utils/config.js';
 
 export function LoginPage(): HTMLElement {
 	const currentUser = getUserDataFromStorage();
 
-	const GOOGLE_CLIENT_ID = '381285000900-rcla6jmd3aldv8kk9k7ga84o7jrm5dj0.apps.googleusercontent.com';
-    const REDIRECT_URI = 'http://localhost:8443/auth/google/callback';
+	const GOOGLE_CLIENT_ID = config.auth.googleId;
+    const REDIRECT_URI = config.auth.callbackUri;
 
 	const headerElement = HeaderComponent({ currentUser });
 
