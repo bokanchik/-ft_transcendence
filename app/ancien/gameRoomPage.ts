@@ -43,7 +43,7 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
 	//ajout arthur
 	const pageWrapper = document.createElement('div');
 	pageWrapper.className = 'w-full h-screen flex flex-col items-center justify-center bg-cover bg-center bg-fixed';
-	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
+	pageWrapper.style.backgroundImage = "url('/assets/background.webp')";
 
 	// Conteneur principal
 	const container = document.createElement('div');

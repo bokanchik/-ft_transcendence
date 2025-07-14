@@ -146,7 +146,7 @@ export type TournamentStateData = {
 };
 
 export type Rounds = {
-	[round: number]: Match[];
+	[round: number]: Tournament[];
 };
 
 export type Tournament = {

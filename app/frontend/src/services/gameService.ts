@@ -129,25 +129,6 @@ async function onGameOver(finalState?: GameState) {
     }
 
 	// --- CAS TOURNOI LOCAL ---
-    // if (gameMode === 'tournament') {
-    //     if (finalState) {
-	// 		cleanupGameRoom({ keepSocketAlive: true });
-    //         const rawData = sessionStorage.getItem('tournamentData');
-    //         if (rawData) {
-    //             let data = JSON.parse(rawData);
-	// 			if (!data.results) {
-    //                 const matchCount = data.pairs.length * 2 -1;
-    //                 data.results = new Array(matchCount).fill(null);
-    //             }
-    //             let i = 0;
-    //             while (data.results[i] != null) i++;
-    //             data.results[i] = finalState.score1 > finalState.score2 ? 0 : 1;
-    //             sessionStorage.setItem('tournamentData', JSON.stringify(data));
-    //         }
-    //     }
-    //     navigateTo('/tournament');
-    //     return;
-    // }
 	if (gameMode === 'tournament' && finalState) {
         const player1 = sessionStorage.getItem('player1') || 'Player 1';
         const player2 = sessionStorage.getItem('player2') || 'Player 2';
