@@ -316,3 +316,25 @@ export async function getTournamentById(tournamentId: string) {
     const matches = await fetchAll(db, matchesSql, [tournamentId]);
     return { tournament, matches };
 }
+
+export async function getMatchesByTournamentId(tournamentId: string) {
+    const sql = `SELECT * FROM matches WHERE tournament_id = ? ORDER BY round_number, created_at`;
+    try {
+        const matches = await fetchAll(db, sql, [tournamentId]);
+        return matches;
+    } catch (err: unknown) {
+        console.error(`Failed to find matches for tournament ${tournamentId}: ${err}`);
+        throw err;
+    }
+}
+
+export async function updateMatchWinner(matchId: string, winnerId: number) {
+    const sql = `UPDATE matches SET winner_id = ?, status = 'finished' WHERE matchId = ?`;
+    try {
+        await execute(db, sql, [winnerId, matchId]);
+        console.log(`Match ${matchId} winner updated to ${winnerId}`);
+    } catch (err: unknown) {
+        console.error(`Failed to update match winner for ${matchId}: ${err}`);
+        throw err;
+    }
+}

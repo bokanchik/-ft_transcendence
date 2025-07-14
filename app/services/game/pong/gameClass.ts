@@ -17,7 +17,7 @@ export class RemoteGameSession {
     players: Map<string, string>;
     intervalId: NodeJS.Timeout | null = null;
     isFinished: boolean = false;
-    isTournamentMatch: boolean = false; // Nouvelle propriété
+    isTournamentMatch: boolean = false;
 
     constructor(roomName: string, matchId: string) {
         this.roomName = roomName;
@@ -54,35 +54,37 @@ export class RemoteGameSession {
             } else {
                 if (this.isFinished) return;
                 this.isFinished = true;
+                this.clearGameInterval(); // stop loop now
                 
                 const playerSockets = Array.from(this.players.keys()).map(id => fastify.io.sockets.sockets.get(id));
                 const p1Socket = playerSockets.find(s => this.getPlayerSide(s!.id) === 'left');
                 const p2Socket = playerSockets.find(s => this.getPlayerSide(s!.id) === 'right');
                 
-                if (!p1Socket || !p2Socket) {
-                    this.clearGameInterval();
-                    return;
-                }
+                // if (!p1Socket || !p2Socket) {
+                //     this.clearGameInterval();
+                //     return;
+                // }
+                if (!p1Socket || !p2Socket) return;
 
                 const winnerId = winner === 1 ? (p1Socket as any).playerInfo.userId : (p2Socket as any).playerInfo.userId;
                 const loserId = winner === 1 ? (p2Socket as any).playerInfo.userId : (p1Socket as any).playerInfo.userId;
 
                 await setGameResult(this.matchId, this.state.score1, this.state.score2, winnerId, 'score');
+
                 if (this.isTournamentMatch) {
                     const tournamentInfo = (p1Socket as any).tournamentInfo;
                     if (tournamentInfo) {
-                        await handleMatchEnd(tournamentInfo.tournamentId, tournamentInfo.matchId, winnerId);
+                        // await handleMatchEnd(tournamentInfo.tournamentId, tournamentInfo.matchId, winnerId);
+                        await handleMatchEnd(tournamentInfo.tournamentId, this.matchId, winnerId);
+
                     }
+                } else {
+                    await Promise.all([
+                        updateUserStatus(winnerId, UserOnlineStatus.ONLINE),
+                        updateUserStatus(loserId, UserOnlineStatus.ONLINE)
+                    ]);
                 }
-                
-                await Promise.all([
-                    updateUserStatus(winnerId, UserOnlineStatus.ONLINE),
-                    updateUserStatus(loserId, UserOnlineStatus.ONLINE)
-                ]);
-                
                 fastify.io.to(this.roomName).emit('gameOver');
-                
-                this.clearGameInterval();
             }
         }, 1000 / FRAME_RATE);
     }
