@@ -1,8 +1,8 @@
 # Environment variables
-./app/.env
-# ./app/env
+app/.env
 secrets/
-# ./app/frontdata
+# app/env/
+# app/frontdata/
 
 # Node modules (can be installed with npm install)
 node_modules/
