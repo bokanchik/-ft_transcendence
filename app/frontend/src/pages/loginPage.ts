@@ -17,7 +17,7 @@ export function LoginPage(): HTMLElement {
 
 	const title = createElement('h2', {
 		textContent: t('login.title'),
-		className: 'text-3xl font-bold mb-6 text-center text-white'
+		className: 'text-3xl font-semibold font-beach mb-6 text-center text-gray-200'
 	});
 
 	const handleLoginAttempt = (credentials: LoginRequestBody) => attemptLogin(credentials);
@@ -51,7 +51,7 @@ export function LoginPage(): HTMLElement {
 
 	const googleLoginButton = createElement('a', {
         href: `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code&scope=openid%20profile%20email`,
-        className: 'mt-4 w-full flex items-center justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium bg-white text-gray-700 hover:bg-gray-50 border'
+        className: 'mt-4 w-full flex items-center justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium bg-blue-300 text-gray-700 hover:bg-gray-50 border'
     }, [
         createElement('img', { src: '/assets/google-icon.svg', className: 'h-5 w-5 mr-3' }),
         document.createTextNode(t('login.google'))
@@ -62,7 +62,7 @@ export function LoginPage(): HTMLElement {
 	}, [
 		title,
 		loginFormComponent,
-		createElement('p', { textContent: 'OR', className: 'my-4 text-center text-gray-400' }), // Séparateur
+		createElement('p', { textContent: t('general.or'), className: 'my-4 text-center text-gray-400' }),
         googleLoginButton,
 		linksDiv
 	]);

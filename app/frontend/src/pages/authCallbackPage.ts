@@ -37,7 +37,7 @@ export function AuthCallbackPage(): HTMLElement {
     }
 
     return createElement('div', {
-        textContent: t('login.google.verifying'),
+        textContent: t('login.googleVerifying'),
         className: 'min-h-screen flex items-center justify-center text-xl'
     });
 }
