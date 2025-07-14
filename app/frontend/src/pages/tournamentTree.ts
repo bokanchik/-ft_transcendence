@@ -11,7 +11,7 @@ import { UserPublic } from '../shared/schemas/usersSchemas.js';
 import { createActionButton } from "../utils/domUtils.js";
 import { initCountdown } from "../components/countdown.js";
 
-export type TournamentStateData = {
+type TournamentStateData = {
     rounds: Rounds;
     isFinished: boolean;
     winner_id?: number;
