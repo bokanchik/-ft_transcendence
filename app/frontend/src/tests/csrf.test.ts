@@ -17,7 +17,7 @@ describe('csrfService', () => {
 
     it('setCsrfToken should store the token in localStorage', () => {
         setCsrfToken(FAKE_CSRF_TOKEN);
-        expect(localStorage.getItem('csrfToken')).toBe(FAKE_CSRF_TOKEN);
+        expect(localStorage.getItem(config.storage.user.csrfToken)).toBe(FAKE_CSRF_TOKEN);
     });
 
     it('getCsrfTokenOrThrow should return token from memory if available', () => {
@@ -27,14 +27,14 @@ describe('csrfService', () => {
 
     it('getCsrfTokenOrThrow should return token from localStorage if not in memory', () => {
         setCsrfToken(null as any);
-        localStorage.setItem('csrfToken', FAKE_CSRF_TOKEN);
+        localStorage.setItem(config.storage.user.csrfToken, FAKE_CSRF_TOKEN);
         expect(getCsrfTokenOrThrow()).toBe(FAKE_CSRF_TOKEN);
     });
 
     it('getCsrfTokenOrThrow should throw an error if no token is available', () => {
         setCsrfToken(null as any);
         localStorage.clear();
-        expect(() => getCsrfTokenOrThrow()).toThrow('CSRF token missing. Please refresh the page.');
+        expect(() => getCsrfTokenOrThrow()).toThrow('msg.error.user.missCsrf');
     });
 
     it('fetchCsrfToken should fetch and set the token, making it available', async () => {
@@ -51,7 +51,7 @@ describe('csrfService', () => {
         await fetchCsrfToken();
         
         expect(getCsrfTokenOrThrow()).toBe(FAKE_CSRF_TOKEN);
-        expect(localStorage.getItem('csrfToken')).toBe(FAKE_CSRF_TOKEN);
+        expect(localStorage.getItem(config.storage.user.csrfToken)).toBe(FAKE_CSRF_TOKEN);
     });
 
     it('fetchWithCsrf should include the CSRF token in headers', async () => {

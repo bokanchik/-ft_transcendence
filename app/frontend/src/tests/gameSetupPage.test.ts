@@ -1,7 +1,7 @@
 // src/components/gamePage.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { screen, fireEvent, waitFor } from '@testing-library/dom';
-import { GamePage } from '@/components/gamePage';
+import { GamePage } from '@/pages/gameSetupPage';
 import { handleOnlineGame } from '@/services/initOnlineGame';
 import { checkAuthStatus, getUserDataFromStorage } from '@/services/authService';
 import { User, UserOnlineStatus } from '@/shared/schemas/usersSchemas';
@@ -34,24 +34,39 @@ describe('GamePage', () => {
         (checkAuthStatus as vi.Mock).mockResolvedValue(mockUser);
     });
 
-    it('should render the game page with the start button', () => {
+    it('should render the game page with initial options', () => {
         const page = GamePage();
         document.body.appendChild(page);
         
-        expect(screen.getByRole('button', { name: 'game.start' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'game.quickMatch' })).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: 'game.startTournament' })).toBeInTheDocument();
     });
 
-    it('should call handleOnlineGame when the start button is clicked', async () => {
+    it('should call handleOnlineGame when the quick match button is clicked', async () => {
         const page = GamePage();
         document.body.appendChild(page);
         
-        const startButton = screen.getByRole('button', { name: 'game.start' });
-        await fireEvent.click(startButton);
+        const quickMatchButton = screen.getByRole('button', { name: 'game.quickMatch' });
+        await fireEvent.click(quickMatchButton);
 
         await waitFor(() => {
             expect(checkAuthStatus).toHaveBeenCalled();
             expect(handleOnlineGame).toHaveBeenCalled();
         });
+    });
+    
+    it('should show tournament options when tournament button is clicked', async () => {
+        const page = GamePage();
+        document.body.appendChild(page);
+
+        const tournamentButton = screen.getByRole('button', { name: 'game.startTournament' });
+        await fireEvent.click(tournamentButton);
+
+        const sizeButtons = screen.getAllByRole('button', { name: 'game.players' });
+        expect(sizeButtons).toHaveLength(3);
+        
+        expect(screen.getByRole('button', { name: 'general.back' })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'game.quickMatch' })).not.toBeInTheDocument();
     });
 
     it('should redirect to login if user is not authenticated', () => {

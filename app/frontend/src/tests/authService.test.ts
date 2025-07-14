@@ -2,19 +2,9 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { http, HttpResponse } from 'msw';
 import { server } from '@/tests/mocks/server';
-import { 
-    getUserDataFromStorage, 
-    attemptLogin,
-    attemptRegister,
-    checkAuthStatus,
-    setUserDataInStorage,
-    clearUserDataFromStorage
-} from '@/services/authService';
+import { getUserDataFromStorage, attemptLogin, checkAuthStatus, setUserDataInStorage, clearUserDataFromStorage } from '@/services/authService';
 import { User, UserOnlineStatus } from '@/shared/schemas/usersSchemas';
 import { config } from '@/utils/config';
-
-const USER_DATA_KEY = 'userDataKey';
-const USER_DATA_EXPIRATION_KEY = 'userDataExpiration';
 
 describe('authService', () => {
     const mockUser: User = {
@@ -49,30 +39,29 @@ describe('authService', () => {
 
             setUserDataInStorage(mockUser);
             
-            const ttl = 60 * 60 * 1000;
-            const expectedExpiration = (now.getTime() + ttl).toString();
+            const expectedExpiration = (now.getTime() + config.storage.user.ttl).toString();
 
-            expect(JSON.parse(localStorage.getItem(USER_DATA_KEY)!)).toEqual(mockUser);
-            expect(localStorage.getItem(USER_DATA_EXPIRATION_KEY)).toBe(expectedExpiration);
+            expect(JSON.parse(localStorage.getItem(config.storage.user.dataKey)!)).toEqual(mockUser);
+            expect(localStorage.getItem(config.storage.user.expirationKey)).toBe(expectedExpiration);
         });
 
         it('getUserDataFromStorage should return null if expired', () => {
             setUserDataInStorage(mockUser);
             
-            vi.advanceTimersByTime(2 * 60 * 60 * 1000); // 2 heures
+            vi.advanceTimersByTime(config.storage.user.ttl + 1000);
 
             expect(getUserDataFromStorage()).toBeNull();
-            expect(localStorage.getItem(USER_DATA_KEY)).toBeNull();
+            expect(localStorage.getItem(config.storage.user.dataKey)).toBeNull();
         });
 
         it('clearUserDataFromStorage should remove user data', () => {
             setUserDataInStorage(mockUser);
-            expect(localStorage.getItem(USER_DATA_KEY)).not.toBeNull();
+            expect(localStorage.getItem(config.storage.user.dataKey)).not.toBeNull();
             
             clearUserDataFromStorage();
             
-            expect(localStorage.getItem(USER_DATA_KEY)).toBeNull();
-            expect(localStorage.getItem(USER_DATA_EXPIRATION_KEY)).toBeNull();
+            expect(localStorage.getItem(config.storage.user.dataKey)).toBeNull();
+            expect(localStorage.getItem(config.storage.user.expirationKey)).toBeNull();
         });
     });
 
@@ -132,7 +121,7 @@ describe('authService', () => {
             );
             const user = await checkAuthStatus();
             expect(user).toEqual(mockUser);
-            expect(localStorage.getItem(USER_DATA_KEY)).toBeDefined();
+            expect(localStorage.getItem(config.storage.user.dataKey)).toBeDefined();
         });
 
         it('checkAuthStatus should return null if not authenticated', async () => {
@@ -143,7 +132,7 @@ describe('authService', () => {
            );
            const user = await checkAuthStatus();
            expect(user).toBeNull();
-           expect(localStorage.getItem(USER_DATA_KEY)).toBeNull();
+           expect(localStorage.getItem(config.storage.user.dataKey)).toBeNull();
        });
     });
 });
