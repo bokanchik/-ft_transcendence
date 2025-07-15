@@ -100,6 +100,23 @@ export async function setGameResult(matchId: string, player1_score: number, play
 	await execute(db, sql, [player1_score, player2_score, winner_id, win_type, matchId]);
 }
 
+export async function insertTourMatchToDB({ matchId, player1_id, player2_id, player1_socket, player2_socket, tournament_id, round_number, status }:
+	{ matchId: string, player1_id: number, player2_id: number, player1_socket: string | null, player2_socket: string | null, tournament_id: string, round_number: number, status: MatchStatus }) {
+
+	const sql = `
+INSERT INTO matches(
+		matchId,
+		player1_id,
+		player2_id,
+		player1_socket,
+		player2_socket,
+		tournament_id,
+		round_number,
+		status
+	) VALUES(?, ?, ?, ?, ?, ?, ?, ?)`;
+	await execute(db, sql, [matchId, player1_id, player2_id, player1_socket, player2_socket, tournament_id, round_number, 'in_progress']);
+}
+
 export async function insertMatchToDB({ matchId, player1_id, player2_id, player1_socket, player2_socket }:
 	{ matchId: string, player1_id: number, player2_id: number, player1_socket: string, player2_socket: string }) {
 

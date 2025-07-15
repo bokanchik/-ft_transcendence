@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { getRowByMatchId, getMatchesByUserId } from '../database/dbModels.ts';
+import { getRowByMatchId, getMatchesByUserId, insertTourMatchToDB } from '../database/dbModels.ts';
 import {  MatchIdParams, MatchUserIdParams, MatchBaseSchema } from '../shared/schemas/matchesSchemas.ts';
 import { localGames } from '../pong/matchSocketHandler.ts';
 //@ts-ignore
@@ -121,5 +121,35 @@ export async function getMatchByUserHandler(req: AuthenticatedRequest, reply: Fa
             req.log.error(err);
             return reply.code(500).send({ error: err.message });
         }
+    }
+}
+
+
+export async function createInternalMatchHandler(req: FastifyRequest, reply: FastifyReply) {
+    const { player1_id, player2_id, tournament_id, round_number } = req.body as any;
+    
+    if (!player1_id || !player2_id || !tournament_id) {
+        return reply.code(400).send({ error: 'Missing required fields for internal match creation' });
+    }
+    
+    const matchId = crypto.randomUUID();
+
+    try {
+        await insertTourMatchToDB({
+            matchId,
+            player1_id,
+            player2_id,
+            player1_socket: null, // Les sockets seront assignés lors de la connexion
+            player2_socket: null,
+            tournament_id,
+            round_number,
+            status: 'pending' // Le match est en attente, pas encore en cours
+        });
+
+        req.log.info(`Internal request: Created match ${matchId} for tournament ${tournament_id}`);
+        return reply.code(201).send({ matchId });
+    } catch (error) {
+        req.log.error(error, "Failed to create internal match");
+        return reply.code(500).send({ error: 'Failed to create match in database' });
     }
 }

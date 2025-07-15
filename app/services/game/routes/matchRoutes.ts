@@ -1,6 +1,6 @@
 //import fastify from '../server.ts';
 import type { FastifyInstance } from 'fastify';
-import { createLocalMatchHandler, getMatchIdHandler, getMatchByUserHandler, cancelLocalMatchHandler, getLocalMatchState } from '../handlers/matchHandlers.ts'
+import { createLocalMatchHandler, getMatchIdHandler, getMatchByUserHandler, cancelLocalMatchHandler, getLocalMatchState, createInternalMatchHandler } from '../handlers/matchHandlers.ts'
 import { createLocalMatchBody, createLocalMatchRouteSchema, GetMatchIdRouteSchema, GetMatchByUserIdRouteSchema, cancelLocalMatchRouteSchema, cancelLocalMatchBody, getLocalMatchStateRouteSchema } from '../shared/schemas/matchesSchemas.ts';
 
 function matchRoutes(fastify: FastifyInstance, _options: unknown) {
@@ -54,20 +54,10 @@ function matchRoutes(fastify: FastifyInstance, _options: unknown) {
       schema: GetMatchByUserIdRouteSchema,
       handler: getMatchByUserHandler
    });
-   // fastify.post('/match/internal/create', {
-   //    // Cette route doit être protégée par une clé API, pas par un JWT utilisateur
-   //    onRequest: [fastify.authenticateService], // Assurez-vous d'avoir un plugin pour ça !
-   //    handler: async (req, reply) => {
-   //       const { player1_id, player2_id, tournament_id, round_number } = req.body as any;
-   //       const matchId = crypto.randomUUID();
-
-   //       await addMatchToTournament(tournament_id, matchId, player1_id, player2_id, round_number);
-         
-   //       req.log.info(`Internal request: Created match ${matchId} for tournament ${tournament_id}`);
-         
-   //       return reply.code(201).send({ matchId });
-   //    }
-   // });
+   fastify.post('/match/internal/create', {
+      onRequest: [fastify.authenticateService],
+      handler: createInternalMatchHandler
+   });
 }
 
 

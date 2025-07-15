@@ -1,11 +1,21 @@
 import Fastify, {  FastifyInstance,  FastifyReply, FastifyRequest } from 'fastify';
 import { serializerCompiler, validatorCompiler, ZodTypeProvider } from "fastify-type-provider-zod";
+import { Server, Socket } from 'socket.io';
 import fastifyRateLimit from '@fastify/rate-limit';
 import { tournamentRoutes } from './routes/tournaments.ts';
 //@ts-ignore
 import { setupPlugins } from './shared/auth-plugin/tokens.js'
+import { handleTournamentLogic } from './handlers/tournamentHandler.ts';
 
 const fastify: FastifyInstance = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
+
+// Initialize socket.io
+const io: Server = new Server(fastify.server, {
+    path: "/socket-tournament/" // IMPORTANT: Chemin différent de celui du service game
+});
+
+// Attach io to fastify instance
+fastify.decorate('io', io);
 
 // set rate-limit to avoid too many requests
 fastify.register(fastifyRateLimit, {
@@ -26,7 +36,6 @@ const registerRoutes = () => {
   })
   
   fastify.register(tournamentRoutes, { prefix: '/api/tournament/' });
- 
   fastify.log.info('Routes registred');
 };
 
@@ -35,6 +44,12 @@ const start = async () => {
   try {
 
     await fastify.ready(); // wait for all plugins to be ready    
+
+    fastify.io.on('connection', (socket: Socket) => {
+        handleTournamentLogic(socket);
+    });
+
+    fastify.log.info('Socket server for TOURNAMENT is ready');
 
     await fastify.listen({ port: 6001, host: '0.0.0.0' });
 
@@ -52,4 +67,4 @@ const run = async() => {
 
 run();
 
-export { fastify } ; // Export the io instance for use in other modules
+export { fastify, io } ; // Export the io instance for use in other modules

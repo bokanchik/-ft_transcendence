@@ -8,14 +8,18 @@ export function tournamentRoutes(fastify: FastifyInstance, _options: unknown) {
         schema: LocalTournamentRouteSchema,
         handler: createLocalTournament
     });
-    // fastify.post('/internal/match-result', {
-    //     onRequest: [fastify.authenticateService],
-    //     handler: async (req, reply) => {
-    //         const { tournamentId, matchId, winnerId } = req.body as any;
+    fastify.post('/internal/match-result', {
+        onRequest: [fastify.authenticateService], // Protection par clé API
+        handler: async (req, reply) => {
+            const { tournamentId, matchId, winnerId } = req.body as any;
             
-    //         await handleMatchEnd(tournamentId, matchId, winnerId);
+            if (!tournamentId || !matchId || !winnerId) {
+                 return reply.code(400).send({ error: 'Missing parameters for match result' });
+            }
 
-    //         return reply.code(200).send({ message: 'Result received' });
-    //     }
-    // });
+            await handleMatchEnd(tournamentId, matchId, winnerId);
+
+            return reply.code(200).send({ message: 'Result received' });
+        }
+    });
 };
