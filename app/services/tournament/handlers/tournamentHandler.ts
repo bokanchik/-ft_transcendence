@@ -1,12 +1,12 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { Socket } from "socket.io";
-import { fastify, io } from "../server.ts"; // Notez l'import de 'io'
+import { fastify, io } from "../server.ts";
 import { PlayerInfo, tournamentQueues, removePlayerFromTournamentQueues } from "../utils/waitingListUtils.ts";
 import { createTournament, getTournamentById, updateTournamentWinner, getMatchesForTournament, addMatchToTournament, updateMatchWinnerInTournamentDB } from "../database/dbModels.ts";
 import { createMatchInGameService, updateUserStatus } from "../utils/apiClient.ts";
 import { UserOnlineStatus } from "../shared/schemas/usersSchemas.js";
 import { LocalTournamentBodySchema } from '../middleware/tournaments.schemas.ts';
-import { singleEliminationMatches } from '../utils/matchmaking.tournament.ts';
+import { singleEliminationMatches } from '../utils/matchmaking.ts';
 
 // Map pour suivre les joueurs prêts pour un match de tournoi
 const matchReadyState = new Map<string, Set<number>>();

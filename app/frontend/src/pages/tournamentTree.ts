@@ -11,6 +11,7 @@ import { UserPublic } from '../shared/schemas/usersSchemas.js';
 import { createActionButton } from "../utils/domUtils.js";
 import { initCountdown } from "../components/countdown.js";
 import { TournamentData, Rounds, Tournament, TournamentStateData } from "../shared/schemas/matchesSchemas.js";
+import { tournamentSocket } from "../services/socket.js";
 
 export function TournamentPage(params?: { id?: string }): HTMLElement {
 	if (params?.id) {
@@ -22,7 +23,7 @@ export function TournamentPage(params?: { id?: string }): HTMLElement {
 
 function LocalTournamentPage(): HTMLElement {
 	const currentUser = getUserDataFromStorage();
-	if (!currentUser) { navigateTo('/login'); return createElement('div'); }
+	// if (!currentUser) { navigateTo('/login'); return createElement('div'); }
 
 	const title = createElement('h2', { className: 'flex-shrink-0 text-3xl font-bold mb-6 text-center text-gray-300 font-beach', textContent: t('tournament.title') });
 
@@ -216,6 +217,8 @@ function OnlineTournamentPage(tournamentId: string): HTMLElement {
 
 	if (!socket.connected) socket.connect();
 	socket.removeAllListeners();
+	// if (!tournamentSocket.connected) tournamentSocket.connect();
+    // tournamentSocket.removeAllListeners();
 
 	const handleTournamentState = async (data: TournamentStateData) => {
 		await renderOnlineBracket(data, bracketContainer, currentUser.id, tournamentId);

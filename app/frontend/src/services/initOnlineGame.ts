@@ -1,6 +1,7 @@
 import { UUID } from "crypto";
 import { navigateTo } from "./router.js";
 import socket from "./socket.js";
+import { tournamentSocket } from "../services/socket.js";
 import { removeWaitingToast, showToast, showWaitingToast } from "../components/toast.js";
 import { initCountdown } from "../components/countdown.js";
 import { config } from "../utils/config.js";
@@ -25,6 +26,11 @@ type TournamentMatch = {
 export async function handleTournamentSearch(size: number, displayName: string, userId: number): Promise<void> {
     const controller: AbortController = new AbortController();
 
+    // if (tournamentSocket.connected) {
+    //     tournamentSocket.disconnect();
+    // }
+    // tournamentSocket.removeAllListeners();
+
     if (socket.connected) {
         socket.disconnect();
     }
@@ -35,13 +41,17 @@ export async function handleTournamentSearch(size: number, displayName: string, 
 
     // Show initial waiting toast
     showWaitingToast(socket, controller, config.settings.online.waitTimeout, t('tournament.waitingForPlayers', { current: '1', required: size.toString() }));
+    // showWaitingToast(tournamentSocket, controller, config.settings.online.waitTimeout, t('tournament.waitingForPlayers', { current: '1', required: size.toString() }));
 
     // Listen for queue updates
+    // tournamentSocket.on('tournamentQueueUpdate', ({ current, required }: { current: number; required: number }) => {
     socket.on('tournamentQueueUpdate', ({ current, required }: { current: number; required: number }) => {
         showWaitingToast(socket, controller, config.settings.online.waitTimeout, t('tournament.waitingForPlayers', { current: current.toString(), required: required.toString() }));
+        // showWaitingToast(tournamentSocket, controller, config.settings.online.waitTimeout, t('tournament.waitingForPlayers', { current: current.toString(), required: required.toString() }));
     });
 
     // Listen for tournament start
+    // tournamentSocket.on('tournamentStarting', ({ tournamentId, matches }: { tournamentId: string; matches: TournamentMatch[] }) => {
     socket.on('tournamentStarting', ({ tournamentId, matches }: { tournamentId: string; matches: TournamentMatch[] }) => {
         removeWaitingToast();
         sessionStorage.setItem('onlineTournamentId', tournamentId);
@@ -49,27 +59,35 @@ export async function handleTournamentSearch(size: number, displayName: string, 
     });
 
     // Handle timeout
+    // tournamentSocket.on('matchTimeout', () => {
     socket.on('matchTimeout', () => {
         showToast(t('tournament.timeout'), 'error');
         cleanupSocket(socket);
+        // cleanupSocket(tournamentSocket);
         removeWaitingToast();
         navigateTo('/game');
     });
 
     // Standard error handling
+    // tournamentSocket.on('connect_error', (err: Error) => {
     socket.on('connect_error', (err: Error) => {
         console.error(`Connection error: ${err.message}`);
         showToast(t('msg.error.any'), 'error');
         cleanupSocket(socket);
+        // cleanupSocket(tournamentSocket);
         removeWaitingToast();
     });
 
+    // tournamentSocket.on('connect', () => {
     socket.on('connect', () => {
         console.log('Connected to the server for tournament search');
+        // tournamentSocket.emit('authenticate', { display_name: displayName, userId });
+        // tournamentSocket.emit('joinTournamentQueue', { size });
         socket.emit('authenticate', { display_name: displayName, userId });
         socket.emit('joinTournamentQueue', { size });
     });
     socket.connect();
+    // tournamentSocket.connect();
 }
 
 export async function initOnlineGame(display_name: string, userId: number) {

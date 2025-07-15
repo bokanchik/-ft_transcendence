@@ -9,7 +9,7 @@ export function tournamentRoutes(fastify: FastifyInstance, _options: unknown) {
         handler: createLocalTournament
     });
     fastify.post('/internal/match-result', {
-        onRequest: [fastify.authenticateService], // Protection par clé API
+        onRequest: [fastify.authenticateService],
         handler: async (req, reply) => {
             const { tournamentId, matchId, winnerId } = req.body as any;
             
