@@ -3,7 +3,7 @@ import { gameLoop, createBallState, createGameState} from "./pongGame.ts";
 import { setGameResult } from "../database/dbModels.ts";
 // @ts-ignore
 import { GameState, Velocity, FRAME_RATE } from "../shared/gameTypes.js";
-import { updateUserStatus } from "../utils/apiClient.ts";
+import { updateUserStatus, reportMatchResultToTournamentService } from "../utils/apiClient.ts";
 import { UserOnlineStatus } from "../shared/schemas/usersSchemas.js";
 import { handleMatchEnd } from "../handlers/tournamentHandler.ts";
 
@@ -71,7 +71,11 @@ export class RemoteGameSession {
                     const tournamentInfo = (p1Socket as any).tournamentInfo;
                     if (tournamentInfo) {
                         await handleMatchEnd(tournamentInfo.tournamentId, this.matchId, winnerId);
-
+                        // await reportMatchResultToTournamentService(
+                        //     tournamentInfo.tournamentId,
+                        //     this.matchId,
+                        //     winnerId
+                        // );
                     }
                 } else {
                     await Promise.all([
