@@ -10,7 +10,7 @@ import { GameState, FRAME_RATE, TIMEOUT_MS } from "../shared/gameTypes.js";
 import { updateUserStatus } from "../utils/apiClient.ts";
 import { UserOnlineStatus } from "../shared/schemas/usersSchemas.js";
 import { handleTournamentLogic, handleMatchEnd } from "../handlers/tournamentHandler.ts";
-import { addPlayerToWaitingList, firstInFirstOut, getWaitingListSize, PlayerInfo, waitingList } from "../utils/waitingListUtils.ts";
+import { removePlayerFromWaitingList, addPlayerToWaitingList, firstInFirstOut, getWaitingListSize, PlayerInfo, waitingList } from "../utils/waitingListUtils.ts";
 
 
 export const timeouts: Map<string, NodeJS.Timeout> = new Map();
@@ -81,8 +81,8 @@ async function tryMatchPlayers() {
         player1.socket.emit('matchFound', { matchId, displayName: player1.display_name, side: 'left', opponent: player2.display_name });
         player2.socket.emit('matchFound', { matchId, displayName: player2.display_name, side: 'right', opponent: player1.display_name });
         
-        // removePlayerFromWaitingList(player1.socket.id);
-        // removePlayerFromWaitingList(player2.socket.id);
+        removePlayerFromWaitingList(player1.socket.id);
+        removePlayerFromWaitingList(player2.socket.id);
         
         setTimeout(() => startRemoteGame(player1.socket, player2.socket, matchId), 3000);
 

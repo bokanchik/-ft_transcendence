@@ -35,8 +35,9 @@ export async function removePlayerFromWaitingList(socketId: string) {
         const player = waitingList.get(socketId);
         waitingList.delete(socketId);
         fastify.log.info(`Player ${player?.display_name} removed from waiting list. List size: ${waitingList.size}`);
+    } else {
+        fastify.log.warn(`Player with socket ID ${socketId} not found in waiting list.`);
     }
-   // fastify.log.warn(`Player with socket ID ${socketId} not found in waiting list.`);
 }
 
 export function removePlayerFromTournamentQueues(socketId: string) {
