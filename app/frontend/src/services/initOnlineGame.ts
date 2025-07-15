@@ -90,6 +90,56 @@ export async function handleTournamentSearch(size: number, displayName: string, 
     // tournamentSocket.connect();
 }
 
+// export async function handleTournamentSearch(size: number, displayName: string, userId: number): Promise<void> {
+//     const controller: AbortController = new AbortController();
+
+//     if (tournamentSocket.connected) {
+//         tournamentSocket.disconnect();
+//     }
+//     tournamentSocket.removeAllListeners();
+
+//     sessionStorage.removeItem('tournamentData');
+//     sessionStorage.removeItem('onlineTournamentId');
+
+//     // Show initial waiting toast
+//     showWaitingToast(tournamentSocket, controller, config.settings.online.waitTimeout, t('tournament.waitingForPlayers', { current: '1', required: size.toString() }));
+
+//     // Listen for queue updates
+//     tournamentSocket.on('tournamentQueueUpdate', ({ current, required }: { current: number; required: number }) => {
+//         showWaitingToast(tournamentSocket, controller, config.settings.online.waitTimeout, t('tournament.waitingForPlayers', { current: current.toString(), required: required.toString() }));
+//     });
+
+//     // Listen for tournament start
+//     tournamentSocket.on('tournamentStarting', ({ tournamentId, matches }: { tournamentId: string; matches: TournamentMatch[] }) => {
+//         removeWaitingToast();
+//         sessionStorage.setItem('onlineTournamentId', tournamentId);
+//         navigateTo(`/tournament/${tournamentId}`);
+//     });
+
+//     // Handle timeout
+//     tournamentSocket.on('matchTimeout', () => {
+//         showToast(t('tournament.timeout'), 'error');
+//         cleanupSocket(tournamentSocket);
+//         removeWaitingToast();
+//         navigateTo('/game');
+//     });
+
+//     // Standard error handling
+//     tournamentSocket.on('connect_error', (err: Error) => {
+//         console.error(`Connection error: ${err.message}`);
+//         showToast(t('msg.error.any'), 'error');
+//         cleanupSocket(tournamentSocket);
+//         removeWaitingToast();
+//     });
+
+//     tournamentSocket.on('connect', () => {
+//         console.log('Connected to the server for tournament search');
+//         tournamentSocket.emit('authenticate', { display_name: displayName, userId });
+//         tournamentSocket.emit('joinTournamentQueue', { size });
+//     });
+//     tournamentSocket.connect();
+// }
+
 export async function initOnlineGame(display_name: string, userId: number) {
     const controller: AbortController = new AbortController();
 
