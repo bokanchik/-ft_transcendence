@@ -8,7 +8,7 @@
     "clean": "rm -rf dist",
     "build": "npm run clean && tsc",
     "start": "node dist/server.js",
-    "dev": "npm run build && concurrently \"tsc -w\" \"nodemon dist/server.js\" | pino-pretty",
+    "dev": "npm run build && concurrently \"tsc -w\" \"nodemon\" | pino-pretty",
     "start:dev": "node --inspect dist/server.js"
 },
   "dependencies": {

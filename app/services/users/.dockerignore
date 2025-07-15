@@ -1,5 +1,8 @@
 # Node modules (can be installed with npm install)
-node_modules/
+node_modules
+dist
+data
+.env
 # ignore git history
 .git
 # ignore cache directory
