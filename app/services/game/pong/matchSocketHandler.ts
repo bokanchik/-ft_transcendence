@@ -89,10 +89,7 @@ function handleQuickMatchQueue(socket: Socket) {
             return socket.emit('error', { message: 'Player not authenticated.'});
         }
 
-        // evententuellement in-queue
-        // await updateUserStatus(playerInfo.userId, UserOnlineStatus.IN_GAME);
         const isNew = addPlayerToWaitingList(playerInfo.display_name, playerInfo.userId, socket);
-
         if (isNew) {
             socket.emit('inQueue');
             

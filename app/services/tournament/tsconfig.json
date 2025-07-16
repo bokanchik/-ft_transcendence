@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "ES2022",
-		"module": "nodenext", // the latest Node.js version
+		"module": "nodenext",
 		"moduleResolution": "nodenext",
 		"rootDir": "./",	
 		"outDir": "./dist",

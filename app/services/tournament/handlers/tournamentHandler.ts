@@ -1,9 +1,9 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { Socket } from "socket.io";
 import { fastify, io } from "../server.ts";
-import { PlayerInfo, tournamentQueues, removePlayerFromTournamentQueues } from "../utils/waitingListUtils.ts";
+import { PlayerInfo, tournamentQueues } from "../utils/waitingListUtils.ts";
 import { createTournament, getTournamentById, updateTournamentWinner, getMatchesForTournament, addMatchToTournament, updateMatchWinnerInTournamentDB } from "../database/dbModels.ts";
-import { createMatchInGameService, updateUserStatus, startGameInGameService } from "../utils/apiClient.ts";
+import { createMatchInGameService, updateUserStatus } from "../utils/apiClient.ts";
 import { UserOnlineStatus } from "../shared/schemas/usersSchemas.js";
 import { LocalTournamentBodySchema } from '../middleware/tournaments.schemas.ts';
 import { singleEliminationMatches } from '../utils/matchmaking.ts';
@@ -20,11 +20,8 @@ export async function createLocalTournament(req: FastifyRequest, reply: FastifyR
     }
 
     const { players } = parseResult.data;
-
     const pairs = singleEliminationMatches(players);
-
     console.log("Sending response: ", JSON.stringify(pairs));
-
     return reply.code(200).send({ pairs });
 };
 
@@ -85,7 +82,6 @@ async function startTournament(players: PlayerInfo[]) {
         const p1 = shuffledPlayers[i];
         const p2 = shuffledPlayers[i + 1];
 
-        // Demander au service GAME de créer le match
         try {
             const { matchId } = await createMatchInGameService({
                 player1_id: p1.userId,
@@ -107,7 +103,6 @@ async function startTournament(players: PlayerInfo[]) {
         }
     }
 
-    // Notifier les joueurs que le tournoi commence et qu'ils doivent rejoindre la salle
     const tournamentState = await getTournamentState(tournamentId);
     players.forEach(p => {
         p.socket.join(`tournament-${tournamentId}`);
@@ -181,12 +176,25 @@ export async function handleMatchEnd(tournamentId: string, matchId: string, winn
             await finishTournament(tournamentId, winners[0]);
         } else {
             for (let i = 0; i < winners.length; i += 2) {
-                await createMatchInGameService({
-                    player1_id: winners[i],
-                    player2_id: winners[i + 1],
-                    tournament_id: tournamentId,
-                    round_number: currentRoundNumber + 1
-                });
+                const player1Id = winners[i];
+                const player2Id = winners[i + 1];
+
+                try {
+                    const { matchId } = await createMatchInGameService({
+                        player1_id: player1Id,
+                        player2_id: player2Id,
+                        tournament_id: tournamentId,
+                        round_number: currentRoundNumber + 1
+                    });
+                    if (matchId) {
+                        fastify.log.info(`Match ${matchId} created in game service for tournament ${tournamentId}. Adding to tournament DB.`);
+                        await addMatchToTournament(tournamentId, matchId, player1Id, player2Id, currentRoundNumber + 1);
+                    } else {
+                        fastify.log.error(`Game service did not return a matchId for tournament ${tournamentId}`);
+                    }
+                } catch (error) {
+                    fastify.log.error(error, `Failed to create next round match for tournament ${tournamentId}`);
+                }
             }
         }
     }

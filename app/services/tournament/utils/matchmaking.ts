@@ -28,7 +28,6 @@ export function makePairs(arr: string[]): [string, string][] {
     return pairs;
 }
 
-// function to create matches for Round 1
 export function singleEliminationMatches(participants: string[]): Match[] {
     const shuffled: string[] = shuffle([...participants]);
 

@@ -70,4 +70,4 @@ const run = async() => {
 
 run();
 
-export { fastify } ; // Export the io instance for use in other modules
+export { fastify } ;

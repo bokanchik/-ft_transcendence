@@ -9,12 +9,10 @@ import { handleTournamentLogic } from './handlers/tournamentHandler.ts';
 
 const fastify: FastifyInstance = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
 
-// Initialize socket.io
-const io: Server = new Server(fastify.server, {
-    path: "/socket-tournament/" // IMPORTANT: Chemin différent de celui du service game
-});
 
-// Attach io to fastify instance
+const io: Server = new Server(fastify.server, {
+    path: "/socket-tournament/"
+});
 fastify.decorate('io', io);
 
 // set rate-limit to avoid too many requests
@@ -23,11 +21,9 @@ fastify.register(fastifyRateLimit, {
     timeWindow: '1 minute',
 });
 
-// Add schema validator and serializer
 fastify.setValidatorCompiler(validatorCompiler);
 fastify.setSerializerCompiler(serializerCompiler);
 
-// Register routes
 const registerRoutes = () => {
   fastify.get('/api/users/csrf-token', async (request: FastifyRequest, reply: FastifyReply) => {
     const token: string = await reply.generateCsrf();
@@ -43,7 +39,7 @@ const registerRoutes = () => {
 const start = async () => {
   try {
 
-    await fastify.ready(); // wait for all plugins to be ready    
+    await fastify.ready(); 
 
     fastify.io.on('connection', (socket: Socket) => {
         handleTournamentLogic(socket);
@@ -67,4 +63,4 @@ const run = async() => {
 
 run();
 
-export { fastify, io } ; // Export the io instance for use in other modules
+export { fastify, io } ;

@@ -17,9 +17,7 @@ export async function cleanOnDisconnection(socketId: string) {
     fastify.log.info(`Player disconnected: ${socketId}`);
     
     const playerInfo = waitingList.get(socketId);
-
     await removePlayerFromWaitingList(socketId);
-    
     clearMatchmakingTimeout(socketId);
 
     if (playerInfo) {
