@@ -9,12 +9,6 @@ export type PlayerInfo = {
     socket: Socket;
 }
 
-export const tournamentQueues: Map<number, PlayerInfo[]> = new Map([
-    [2, []],
-    [4, []],
-    [8, []],
-]);
-
 // --- Simple mathcmaking system : first in first out ---
 export function firstInFirstOut() {
     for (const [socketId, playerInfo] of waitingList.entries()){
@@ -37,17 +31,6 @@ export async function removePlayerFromWaitingList(socketId: string) {
         fastify.log.info(`Player ${player?.display_name} removed from waiting list. List size: ${waitingList.size}`);
     } else {
         fastify.log.warn(`Player with socket ID ${socketId} not found in waiting list.`);
-    }
-}
-
-export function removePlayerFromTournamentQueues(socketId: string) {
-    for (const [size, queue] of tournamentQueues.entries()) {
-        const index = queue.findIndex(p => p.socket.id === socketId);
-        if (index > -1) {
-            const player = queue.splice(index, 1)[0];
-            fastify.log.info(`Player ${player.display_name} removed from tournament queue size ${size}.`);
-            return;
-        }
     }
 }
 

@@ -5,7 +5,6 @@ import { setGameResult } from "../database/dbModels.ts";
 import { GameState, Velocity, FRAME_RATE } from "../shared/gameTypes.js";
 import { updateUserStatus, reportMatchResultToTournamentService } from "../utils/apiClient.ts";
 import { UserOnlineStatus } from "../shared/schemas/usersSchemas.js";
-import { handleMatchEnd } from "../handlers/tournamentHandler.ts";
 
 export const gameSessions: Map<string, RemoteGameSession> = new Map();
 
@@ -54,7 +53,7 @@ export class RemoteGameSession {
             } else {
                 if (this.isFinished) return;
                 this.isFinished = true;
-                this.clearGameInterval(); // stop loop now
+                this.clearGameInterval();
                 
                 const playerSocketIDs = Array.from(this.players.keys());
                 const playerSockets = playerSocketIDs

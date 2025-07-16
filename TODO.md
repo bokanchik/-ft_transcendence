@@ -28,6 +28,7 @@
 - [x] verifier le clean de socket et storage dans tous les cas de figure
 
 - [ ] Compte à rebours pour le tournoi local et partie local
+- [ ] en fin de tournoi online tjrs in-game
 
 - [x] fonctions au bons endroits
 

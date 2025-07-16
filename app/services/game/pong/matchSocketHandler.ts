@@ -7,9 +7,8 @@ import { RemoteGameSession, gameSessions, findRemoteGameSessionBySocketId } from
 import { cleanOnDisconnection, makeid } from "../utils/waitingRoomUtils.ts";
 // @ts-ignore
 import { GameState, FRAME_RATE, TIMEOUT_MS } from "../shared/gameTypes.js";
-import { updateUserStatus } from "../utils/apiClient.ts";
+import { reportMatchResultToTournamentService, updateUserStatus } from "../utils/apiClient.ts";
 import { UserOnlineStatus } from "../shared/schemas/usersSchemas.js";
-import { handleTournamentLogic, handleMatchEnd } from "../handlers/tournamentHandler.ts";
 import { removePlayerFromWaitingList, addPlayerToWaitingList, firstInFirstOut, getWaitingListSize, PlayerInfo, waitingList } from "../utils/waitingListUtils.ts";
 
 
@@ -78,7 +77,6 @@ export async function matchSocketHandler(socket: Socket): Promise<void> {
         }
     });
     handleQuickMatchQueue(socket);
-    handleTournamentLogic(socket);
     serverSocketEvents(socket);
     disconnectionHandler(socket);
 }
@@ -259,7 +257,7 @@ async function disconnectionHandler(socket: Socket) {
                 const winnerSocket = winnerSocketId ? fastify.io.sockets.sockets.get(winnerSocketId) : undefined;
                 if (winnerSocket) {
                     const winnerId = (winnerSocket as any).playerInfo.userId;
-                    await handleMatchEnd(tournamentInfo.tournamentId, tournamentInfo.matchId, winnerId);
+                    await reportMatchResultToTournamentService(tournamentInfo.tournamentId, tournamentInfo.matchId, winnerId);
                 }
             } else {
                 const match = await getRowByMatchId(gameSession.matchId);
