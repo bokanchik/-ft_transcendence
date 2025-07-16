@@ -3,7 +3,7 @@ import { Socket } from "socket.io";
 import { fastify, io } from "../server.ts";
 import { PlayerInfo, tournamentQueues, removePlayerFromTournamentQueues } from "../utils/waitingListUtils.ts";
 import { createTournament, getTournamentById, updateTournamentWinner, getMatchesForTournament, addMatchToTournament, updateMatchWinnerInTournamentDB } from "../database/dbModels.ts";
-import { createMatchInGameService, updateUserStatus } from "../utils/apiClient.ts";
+import { createMatchInGameService, updateUserStatus, startGameInGameService } from "../utils/apiClient.ts";
 import { UserOnlineStatus } from "../shared/schemas/usersSchemas.js";
 import { LocalTournamentBodySchema } from '../middleware/tournaments.schemas.ts';
 import { singleEliminationMatches } from '../utils/matchmaking.ts';
@@ -87,15 +87,23 @@ async function startTournament(players: PlayerInfo[]) {
 
         // Demander au service GAME de créer le match
         try {
-            await createMatchInGameService({
+            const { matchId } = await createMatchInGameService({
                 player1_id: p1.userId,
                 player2_id: p2.userId,
                 tournament_id: tournamentId,
                 round_number: 1
             });
+            if (matchId) {
+                fastify.log.info(`Match created: ${matchId} for tournament ${tournamentId}`);
+                await addMatchToTournament(tournamentId, matchId, p1.userId, p2.userId, 1);
+            } else {
+                fastify.log.error(`Failed to create match for tournament ${tournamentId}`);
+                throw new Error("Match creation failed");
+            }
         } catch (error) {
             fastify.log.error(error, `Failed to create match for tournament ${tournamentId}`);
             // Gérer l'erreur (annuler le tournoi, notifier les joueurs, etc.)
+            return;
         }
     }
 
@@ -125,7 +133,6 @@ async function playerReadyForTournamentMatch(socket: Socket, { tournamentId, mat
     if (!playerInfo) return;
 
     if (!matchReadyState.has(matchId)) matchReadyState.set(matchId, new Set());
-    
     const readyPlayers = matchReadyState.get(matchId)!;
     readyPlayers.add(playerInfo.userId);
     
@@ -145,6 +152,7 @@ async function playerReadyForTournamentMatch(socket: Socket, { tournamentId, mat
             if (p1Socket && p2Socket) {
                 p1Socket.emit('startTournamentMatch', { matchId, side: 'left', opponent: (p2Socket as any).playerInfo.display_name });
                 p2Socket.emit('startTournamentMatch', { matchId, side: 'right', opponent: (p1Socket as any).playerInfo.display_name });
+                fastify.log.info(`Sent 'startTournamentMatch' to players for match ${matchId}. Game service will handle the start.`);
                 matchReadyState.delete(matchId);
             }
         }

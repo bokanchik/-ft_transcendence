@@ -54,3 +54,25 @@ export async function updateUserStatus(userId: number, status: UserOnlineStatus)
         fastify.log.error(`[GameService] Network error while updating user status for ${userId}. URL: ${url}`, error.message);
     }
 }
+
+export async function startGameInGameService(payload: { matchId: string, player1_id: number, player2_id: number, tournament_id: string }): Promise<void> {
+    const url = `${GAME_SERVICE_URL}/api/game/match/internal/start`;
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': API_KEY,
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.text();
+            throw new Error(`Failed to start match in game service: ${response.status} - ${errorBody}`);
+        }
+    } catch (error) {
+        fastify.log.error(error, 'Error calling game service to start match');
+        throw error;
+    }
+}

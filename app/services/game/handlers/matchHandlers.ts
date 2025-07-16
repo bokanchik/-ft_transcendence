@@ -1,4 +1,7 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
+import { Socket } from "socket.io";
+import { startRemoteGame } from '../pong/matchSocketHandler.ts';
+import { fastify } from '../server.ts';
 import { getRowByMatchId, getMatchesByUserId, insertTourMatchToDB } from '../database/dbModels.ts';
 import {  MatchIdParams, MatchUserIdParams, MatchBaseSchema } from '../shared/schemas/matchesSchemas.ts';
 import { localGames } from '../pong/matchSocketHandler.ts';
@@ -152,4 +155,52 @@ export async function createInternalMatchHandler(req: FastifyRequest, reply: Fas
         req.log.error(error, "Failed to create internal match");
         return reply.code(500).send({ error: 'Failed to create match in database' });
     }
+}
+
+export async function startOnlineMatchHandler(req: FastifyRequest, reply: FastifyReply) {
+    const { matchId, player1_id, player2_id } = req.body as any;
+
+    if (!matchId || !player1_id || !player2_id) {
+        return reply.code(400).send({ error: 'Missing matchId, player1_id, or player2_id' });
+    }
+
+    req.log.info(`Received internal request to start match: ${matchId}`);
+
+    // Retrouver les sockets des joueurs connectés au service de jeu
+    const p1Socket = findSocketByUserId(player1_id);
+    const p2Socket = findSocketByUserId(player2_id);
+    
+    if (!p1Socket || !p2Socket) {
+        req.log.error(`Could not start match ${matchId}: One or both players are not connected to the game service.`);
+        // Il faudrait une logique de retry ou de timeout ici, mais pour l'instant on retourne une erreur.
+        return reply.code(404).send({ error: "One or both players not connected" });
+    }
+
+    const p1Info = (p1Socket as any).playerInfo;
+    const p2Info = (p2Socket as any).playerInfo;
+
+    // Associer les infos du tournoi pour la gestion de fin de partie
+    (p1Socket as any).tournamentInfo = { tournamentId: req.body.tournament_id, matchId };
+    (p2Socket as any).tournamentInfo = { tournamentId: req.body.tournament_id, matchId };
+
+    // Notifier les clients qu'ils peuvent commencer (c'est une sécurité, déjà fait par le service tournament)
+    p1Socket.emit('startTournamentMatch', { matchId, side: 'left', opponent: p2Info.display_name });
+    p2Socket.emit('startTournamentMatch', { matchId, side: 'right', opponent: p1Info.display_name });
+
+    // Démarrer la boucle de jeu
+    const gameSession = startRemoteGame(p1Socket, p2Socket, matchId);
+    gameSession.isTournamentMatch = true;
+
+    return reply.code(200).send({ message: 'Match started' });
+}
+
+// Fonction utilitaire à ajouter dans ce fichier ou un fichier d'utils
+function findSocketByUserId(userId: number): Socket | undefined {
+    for (const socket of fastify.io.sockets.sockets.values()) {
+        const playerInfo = (socket as any).playerInfo;
+        if (playerInfo && playerInfo.userId === userId) {
+            return socket;
+        }
+    }
+    return undefined;
 }

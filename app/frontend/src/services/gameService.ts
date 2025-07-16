@@ -9,6 +9,7 @@ import { GameState } from '../shared/gameTypes.js';
 import { t } from '../services/i18nService.js';
 import { User, UserPublic } from "../shared/schemas/usersSchemas.js";
 import { config } from "../utils/config.js";
+import { getUserDataFromStorage } from './authService.js';
 
 const PADDLE_HEIGHT = config.settings.game.paddleHeight;
 const PADDLE_WIDTH = config.settings.game.paddleWidth;
@@ -34,6 +35,23 @@ function clientSocketHandler(gameMode: GameMode, ctx: CanvasRenderingContext2D, 
 	if (!socket.connected) {
 		socket.connect();
 	}
+
+	socket.on('connect', () => {
+        const user = getUserDataFromStorage();
+        
+        if (user) {
+            console.log(`Authenticating on game socket as ${user.display_name}`);
+            socket.emit('authenticate', { display_name: user.display_name, userId: user.id });
+        }
+    });
+
+    if (socket.connected) {
+         const user = getUserDataFromStorage();
+         if (user) {
+            console.log(`Already connected, authenticating on game socket as ${user.display_name}`);
+            socket.emit('authenticate', { display_name: user.display_name, userId: user.id });
+         }
+    }
 
 	const handleGameState = (state: GameState) => {
 		if (isGameOver) return;

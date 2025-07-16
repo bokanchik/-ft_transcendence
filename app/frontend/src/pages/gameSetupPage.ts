@@ -1,5 +1,5 @@
 import { navigateTo } from '../services/router.js';
-import { handleOnlineGame, handleTournamentSearch, cleanupSocket } from '../services/initOnlineGame.js';
+import { handleOnlineGame, handleTournamentSearch, cleanupSocket, cancelAllSearches } from '../services/initOnlineGame.js';
 import { HeaderComponent } from '../components/headerComponent.js';
 import { User } from '../shared/schemas/usersSchemas.js';
 import { getUserDataFromStorage, checkAuthStatus } from '../services/authService.js';
@@ -41,6 +41,7 @@ export function GamePage(): HTMLElement {
 			baseClass: 'bg-teal-800 hover:bg-green-600 text-gray-200 text-2xl font-beach font-medium py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline w-full transition duration-300 ease-in-out border border-green-500/50',
 			onClick: async (e) => {
 				(e.currentTarget as HTMLButtonElement).disabled = true;
+				cancelAllSearches();
 				await onlineGameHandler();
 			}
 		});
@@ -49,7 +50,10 @@ export function GamePage(): HTMLElement {
 			text: t('game.startTournament'),
 			variant: 'secondary',
 			baseClass: 'bg-yellow-700 hover:bg-yellow-600 text-white text-2xl font-beach font-medium py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline w-full transition duration-300 ease-in-out border border-yellow-500/50',
-			onClick: () => showTournamentOptions()
+			onClick: () => {
+				cancelAllSearches();
+				showTournamentOptions();
+			}
 		});
 
 		buttonsContainer.append(quickMatchButton, tournamentButton);

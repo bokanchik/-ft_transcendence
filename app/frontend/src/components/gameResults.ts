@@ -1,8 +1,9 @@
 import { cleanupSocket } from "../services/initOnlineGame.js";
 import { navigateTo } from "../services/router.js";
 import socket from '../services/socket.js';
+import { tournamentSocket } from "../services/socket.js";
 import { t } from '../services/i18nService.js';
-import { createElement } from '../utils/domUtils.js'; // Assurez-vous d'importer createElement
+import { createElement } from '../utils/domUtils.js';
 import { TournamentData } from '../shared/schemas/matchesSchemas.js';
 
 export function showGameResult(player1: string, player2: string, score1: number, score2: number, url1: string, url2: string, destinationUrl: string, destinationText: string) {
@@ -114,11 +115,17 @@ export function showGameResult(player1: string, player2: string, score1: number,
 	closeButton.addEventListener('click', () => {
 		modal.remove();
         
-        const onlineTournamentId = sessionStorage.getItem('onlineTournamentId');
-        if (!onlineTournamentId) {
-		    cleanupSocket(socket);
+        // const onlineTournamentId = sessionStorage.getItem('onlineTournamentId');
+        // if (!onlineTournamentId) {
+		    // cleanupSocket(socket);
+        // }
+        if (destinationUrl.includes('/tournament/')) {
+            cleanupSocket(socket); 
+        } else {
+            // Sinon, on nettoie tout
+            cleanupSocket(socket);
+            cleanupSocket(tournamentSocket);
         }
-
         const gameMode = sessionStorage.getItem('gameMode');
 
         if (gameMode === 'tournament') {

@@ -15,14 +15,71 @@ import { removePlayerFromWaitingList, addPlayerToWaitingList, firstInFirstOut, g
 
 export const timeouts: Map<string, NodeJS.Timeout> = new Map();
 export const localGames: Map<string, { state: GameState, intervalId: NodeJS.Timeout | null}> = new Map();
-
+const matchWaitingRoom = new Map<string, { socket: Socket, playerInfo: PlayerInfo }[]>();
 
 export async function matchSocketHandler(socket: Socket): Promise<void> {
 
-    socket.on('authenticate', async ({ display_name, userId }) => {
+    socket.on('authenticate', async ({ display_name, userId }, callback) => {
         (socket as any).playerInfo = { display_name, userId, socket };
         await updateUserStatus(userId, UserOnlineStatus.ONLINE);
         fastify.log.info(`Player ${display_name} (ID: ${userId}, Socket: ${socket.id}) authenticated.`);
+        if (typeof callback === 'function') {
+        callback();
+    }
+    });
+    socket.on('playerReadyForGame', async ({ matchId }) => {
+        const playerInfo = (socket as any).playerInfo as PlayerInfo | undefined;
+
+        if (!playerInfo) {
+            fastify.log.warn(`Unauthenticated socket ${socket.id} tried to join game ${matchId}`);
+            return socket.emit('error', { message: 'Authentication required.' });
+        }
+
+        fastify.log.info(`Player ${playerInfo.display_name} is ready for game ${matchId}`);
+
+        if (!matchWaitingRoom.has(matchId)) {
+            matchWaitingRoom.set(matchId, []);
+        }
+        const waitingPlayers = matchWaitingRoom.get(matchId)!;
+
+        // Éviter d'ajouter le même joueur plusieurs fois
+        if (!waitingPlayers.some(p => p.playerInfo.userId === playerInfo.userId)) {
+            waitingPlayers.push({ socket, playerInfo });
+        }
+
+        if (waitingPlayers.length === 2) {
+            const [player1, player2] = waitingPlayers;
+            
+            const matchData = await getRowByMatchId(matchId);
+            if (!matchData) {
+                fastify.log.error(`Match data for ${matchId} not found in DB.`);
+                // Notifier les joueurs de l'erreur
+                player1.socket.emit('error', { message: 'Match data not found.' });
+                player2.socket.emit('error', { message: 'Match data not found.' });
+                matchWaitingRoom.delete(matchId);
+                return;
+            }
+
+            const isTournament = !!matchData.tournament_id;
+
+            // Déterminer qui est à gauche et à droite
+            const p1Socket = player1.playerInfo.userId === matchData.player1_id ? player1.socket : player2.socket;
+            const p2Socket = player1.playerInfo.userId === matchData.player2_id ? player1.socket : player2.socket;
+
+            // Mettre à jour le statut des joueurs en 'in-game' MAINTENANT
+            await updateUserStatus(matchData.player1_id, UserOnlineStatus.IN_GAME);
+            await updateUserStatus(matchData.player2_id, UserOnlineStatus.IN_GAME);
+            
+            const gameSession = startRemoteGame(p1Socket, p2Socket, matchId);
+            gameSession.isTournamentMatch = isTournament;
+            
+            if (isTournament) {
+                (p1Socket as any).tournamentInfo = { tournamentId: matchData.tournament_id, matchId };
+                (p2Socket as any).tournamentInfo = { tournamentId: matchData.tournament_id, matchId };
+            }
+            
+            matchWaitingRoom.delete(matchId);
+        }
     });
     handleQuickMatchQueue(socket);
     handleTournamentLogic(socket);
@@ -38,7 +95,8 @@ function handleQuickMatchQueue(socket: Socket) {
             return socket.emit('error', { message: 'Player not authenticated.'});
         }
 
-        await updateUserStatus(playerInfo.userId, UserOnlineStatus.IN_GAME);
+        // evententuellement in-queue
+        // await updateUserStatus(playerInfo.userId, UserOnlineStatus.IN_GAME);
         const isNew = addPlayerToWaitingList(playerInfo.display_name, playerInfo.userId, socket);
 
         if (isNew) {
@@ -68,6 +126,7 @@ async function tryMatchPlayers() {
         if (!player1 || !player2) {
             if (player1) waitingList.set(player1.socket.id, player1);
             fastify.log.error('Matchmaking failed: not enough players found after dequeue.');
+            matchmakingLock = false;
             return;
         }
         
@@ -84,7 +143,7 @@ async function tryMatchPlayers() {
         removePlayerFromWaitingList(player1.socket.id);
         removePlayerFromWaitingList(player2.socket.id);
         
-        setTimeout(() => startRemoteGame(player1.socket, player2.socket, matchId), 3000);
+        // setTimeout(() => startRemoteGame(player1.socket, player2.socket, matchId), 3000);
 
     } catch (error: unknown) {
         if (error instanceof Error) {

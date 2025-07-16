@@ -56,7 +56,16 @@ export class RemoteGameSession {
                 this.isFinished = true;
                 this.clearGameInterval(); // stop loop now
                 
-                const playerSockets = Array.from(this.players.keys()).map(id => fastify.io.sockets.sockets.get(id));
+                // const playerSockets = Array.from(this.players.keys()).map(id => fastify.io.sockets.sockets.get(id));
+                const playerSocketIDs = Array.from(this.players.keys());
+                const playerSockets = playerSocketIDs
+                    .map(id => fastify.io.sockets.sockets.get(id))
+                    .filter(socket => socket !== undefined); // <-- On ajoute ce filtre !
+                if (playerSockets.length === 0) {
+                    fastify.log.warn(`Match ${this.matchId} ended but both players disconnected before results could be processed.`);
+                    return;
+                }
+                
                 const p1Socket = playerSockets.find(s => this.getPlayerSide(s!.id) === 'left');
                 const p2Socket = playerSockets.find(s => this.getPlayerSide(s!.id) === 'right');
                 
@@ -69,13 +78,14 @@ export class RemoteGameSession {
 
                 if (this.isTournamentMatch) {
                     const tournamentInfo = (p1Socket as any).tournamentInfo;
-                    if (tournamentInfo) {
-                        await handleMatchEnd(tournamentInfo.tournamentId, this.matchId, winnerId);
-                        // await reportMatchResultToTournamentService(
-                        //     tournamentInfo.tournamentId,
-                        //     this.matchId,
-                        //     winnerId
-                        // );
+                    if (tournamentInfo && tournamentInfo.tournamentId) {
+                        fastify.log.info(`Reporting result for match ${this.matchId} to tournament ${tournamentInfo.tournamentId}`);
+                        // await handleMatchEnd(tournamentInfo.tournamentId, this.matchId, winnerId);
+                        await reportMatchResultToTournamentService(
+                            tournamentInfo.tournamentId,
+                            this.matchId,
+                            winnerId
+                        );
                     }
                 } else {
                     await Promise.all([
