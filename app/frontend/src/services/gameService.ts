@@ -170,7 +170,6 @@ async function onGameOver(finalState?: GameState) {
     }
 }
 
-// export async function quitGameHandler(gameMode: GameMode) {
 export async function quitGameHandler() {
     const confirmed = await showCustomConfirm(t('game.quitConfirm'));
     if (confirmed) {

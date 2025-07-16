@@ -115,14 +115,9 @@ export function showGameResult(player1: string, player2: string, score1: number,
 	closeButton.addEventListener('click', () => {
 		modal.remove();
         
-        // const onlineTournamentId = sessionStorage.getItem('onlineTournamentId');
-        // if (!onlineTournamentId) {
-		    // cleanupSocket(socket);
-        // }
         if (destinationUrl.includes('/tournament/')) {
             cleanupSocket(socket); 
         } else {
-            // Sinon, on nettoie tout
             cleanupSocket(socket);
             cleanupSocket(tournamentSocket);
         }

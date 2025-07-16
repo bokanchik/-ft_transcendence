@@ -42,7 +42,6 @@ export async function matchSocketHandler(socket: Socket): Promise<void> {
         }
         const waitingPlayers = matchWaitingRoom.get(matchId)!;
 
-        // Éviter d'ajouter le même joueur plusieurs fois
         if (!waitingPlayers.some(p => p.playerInfo.userId === playerInfo.userId)) {
             waitingPlayers.push({ socket, playerInfo });
         }
@@ -53,7 +52,6 @@ export async function matchSocketHandler(socket: Socket): Promise<void> {
             const matchData = await getRowByMatchId(matchId);
             if (!matchData) {
                 fastify.log.error(`Match data for ${matchId} not found in DB.`);
-                // Notifier les joueurs de l'erreur
                 player1.socket.emit('error', { message: 'Match data not found.' });
                 player2.socket.emit('error', { message: 'Match data not found.' });
                 matchWaitingRoom.delete(matchId);
@@ -62,11 +60,9 @@ export async function matchSocketHandler(socket: Socket): Promise<void> {
 
             const isTournament = !!matchData.tournament_id;
 
-            // Déterminer qui est à gauche et à droite
             const p1Socket = player1.playerInfo.userId === matchData.player1_id ? player1.socket : player2.socket;
             const p2Socket = player1.playerInfo.userId === matchData.player2_id ? player1.socket : player2.socket;
 
-            // Mettre à jour le statut des joueurs en 'in-game' MAINTENANT
             await updateUserStatus(matchData.player1_id, UserOnlineStatus.IN_GAME);
             await updateUserStatus(matchData.player2_id, UserOnlineStatus.IN_GAME);
             
@@ -143,8 +139,6 @@ async function tryMatchPlayers() {
         removePlayerFromWaitingList(player1.socket.id);
         removePlayerFromWaitingList(player2.socket.id);
         
-        // setTimeout(() => startRemoteGame(player1.socket, player2.socket, matchId), 3000);
-
     } catch (error: unknown) {
         if (error instanceof Error) {
             fastify.log.error({ msg: 'Error during matchmaking:', err: { message: error.message, stack: error.stack } });
