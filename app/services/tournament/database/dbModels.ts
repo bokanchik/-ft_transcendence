@@ -107,3 +107,13 @@ export async function getTournamentById(tournamentId: string) {
     const matches = await fetchAll(matchesSql, [tournamentId]);
     return { tournament, matches };
 }
+
+export async function findActiveTournamentByPlayerId(userId: number): Promise<{ id: string } | null> {
+    const sql = `
+        SELECT t.id FROM tournaments t
+        JOIN tournament_players tp ON t.id = tp.tournament_id
+        WHERE tp.user_id = ? AND t.status = 'in_progress'
+    `;
+    const result = await fetchFirst(sql, [userId]);
+    return result || null;
+}

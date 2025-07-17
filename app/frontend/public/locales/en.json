@@ -246,6 +246,7 @@
 		"yourNextMatch": "Your next match",
 		"winnerShort": "Winner",
 		"timeout": "Match search timed out. Please try again.",
+		"redirecting": "You have an ongoing tournament, redirecting...",
 		"round": "Round",
 		"finale": "Final",
 		"current": "Current",

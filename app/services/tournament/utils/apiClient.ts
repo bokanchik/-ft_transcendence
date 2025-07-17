@@ -76,3 +76,26 @@ export async function startGameInGameService(payload: { matchId: string, player1
         throw error;
     }
 }
+
+export async function declareForfeitInGameService(matchId: string, winnerId: number): Promise<void> {
+    const url = `${GAME_SERVICE_URL}/api/game/match/internal/forfeit`;
+    fastify.log.info(`[TournamentService] Notifying GameService of forfeit for match ${matchId}`);
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': API_KEY,
+            },
+            body: JSON.stringify({ matchId, winnerId }),
+        });
+
+        if (!response.ok) {
+            const errorBody = await response.text();
+            throw new Error(`Failed to declare forfeit in game service: ${response.status} - ${errorBody}`);
+        }
+    } catch (error) {
+        fastify.log.error(error, 'Error calling game service to declare forfeit');
+        // On ne relance pas l'erreur pour ne pas bloquer le tournoi, mais on log
+    }
+}

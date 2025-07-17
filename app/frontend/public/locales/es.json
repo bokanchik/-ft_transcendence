@@ -243,6 +243,7 @@
 		"yourNextMatch": "Tu próximo partido",
 		"winnerShort": "Ganador",
 		"timeout": "La búsqueda de partidas ha expirado. Por favor, inténtalo de nuevo.",
+		"redirecting": "Tienes un torneo en curso, redirigiendo...",
 		"round": "Ronda",
 		"finale": "Final",
 		"current": "Actual",

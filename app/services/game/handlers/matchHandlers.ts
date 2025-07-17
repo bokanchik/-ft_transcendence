@@ -2,7 +2,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { Socket } from "socket.io";
 import { startRemoteGame } from '../pong/matchSocketHandler.ts';
 import { fastify } from '../server.ts';
-import { getRowByMatchId, getMatchesByUserId, insertTourMatchToDB } from '../database/dbModels.ts';
+import { getRowByMatchId, getMatchesByUserId, insertTourMatchToDB, setGameResult } from '../database/dbModels.ts';
 import {  MatchIdParams, MatchUserIdParams, MatchBaseSchema } from '../shared/schemas/matchesSchemas.ts';
 import { localGames } from '../pong/matchSocketHandler.ts';
 //@ts-ignore
@@ -111,13 +111,19 @@ export async function getMatchByUserHandler(req: AuthenticatedRequest, reply: Fa
     }
     
     try {
-        const matches = await getMatchesByUserId(userId);
+        const matchesFromDb = await getMatchesByUserId(userId);
 
-        if (!matches) {
+        if (!matchesFromDb) {
             return reply.code(404).send({ error: 'Matches not found' });
         }
-        console.log("BACKEND - Sending matches data:", JSON.stringify(matches, null, 2));
-        return reply.code(200).send(matches);
+        const sanitizedMatches = matchesFromDb.map(match => ({
+            ...match,
+            player1_score: match.player1_score ?? 0, // Remplace null par 0
+            player2_score: match.player2_score ?? 0, // Remplace null par 0
+        }));
+        
+        console.log("BACKEND - Sending sanitized matches data:", JSON.stringify(sanitizedMatches, null, 2));
+        return reply.code(200).send(sanitizedMatches);
 
     } catch (err: unknown) {
         if (err instanceof Error) {
@@ -203,4 +209,32 @@ function findSocketByUserId(userId: number): Socket | undefined {
         }
     }
     return undefined;
+}
+
+export async function declareMatchForfeitHandler(req: FastifyRequest, reply: FastifyReply) {
+    const { matchId, winnerId } = req.body as { matchId: string, winnerId: number };
+
+    if (!matchId || !winnerId) {
+        return reply.code(400).send({ error: 'Missing matchId or winnerId' });
+    }
+
+    req.log.info(`Received internal request to declare forfeit for match ${matchId}, winner is ${winnerId}`);
+
+    try {
+        const match = await getRowByMatchId(matchId);
+        if (!match) {
+            return reply.code(404).send({ error: 'Match not found' });
+        }
+        if (match.status === 'finished') {
+            return reply.code(200).send({ message: 'Match already finished' });
+        }
+
+        // On utilise la fonction existante pour mettre à jour la DB et les stats
+        await setGameResult(matchId, 0, 0, winnerId, 'forfeit');
+
+        return reply.code(200).send({ message: `Match ${matchId} declared forfeit.` });
+    } catch (error) {
+        req.log.error(error, `Failed to declare forfeit for match ${matchId}`);
+        return reply.code(500).send({ error: 'Internal server error' });
+    }
 }

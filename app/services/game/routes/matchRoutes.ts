@@ -1,9 +1,9 @@
 //import fastify from '../server.ts';
 import type { FastifyInstance } from 'fastify';
-import { createLocalMatchHandler, getMatchIdHandler, getMatchByUserHandler, cancelLocalMatchHandler, getLocalMatchState, createInternalMatchHandler, startOnlineMatchHandler } from '../handlers/matchHandlers.ts'
+import { createLocalMatchHandler, getMatchIdHandler, getMatchByUserHandler, cancelLocalMatchHandler, getLocalMatchState, createInternalMatchHandler, startOnlineMatchHandler, declareMatchForfeitHandler } from '../handlers/matchHandlers.ts'
 import { createLocalMatchBody, createLocalMatchRouteSchema, GetMatchIdRouteSchema, GetMatchByUserIdRouteSchema, cancelLocalMatchRouteSchema, cancelLocalMatchBody, getLocalMatchStateRouteSchema } from '../shared/schemas/matchesSchemas.ts';
 
-function matchRoutes(fastify: FastifyInstance, _options: unknown) {
+function matchRoutes(fastify: FastifyInstance, _options: unknown, done: () => void) {
 
    fastify.post('/match/local', {  
       preHandler: async (req, reply) => {
@@ -62,6 +62,12 @@ function matchRoutes(fastify: FastifyInstance, _options: unknown) {
       onRequest: [fastify.authenticateService],
       handler: startOnlineMatchHandler
    });
+   fastify.post('/match/intenal/forfeit', {
+      onRequest: [fastify.authenticateService],
+      handler: declareMatchForfeitHandler
+   });
+
+   done();
 }
 
 
