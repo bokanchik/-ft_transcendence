@@ -153,7 +153,6 @@ function clearMatchmakingTimeout(socketId: string) {
     }
 }
 
-
 function serverSocketEvents(socket: Socket) {
     socket.on('startLocal',  (matchId: string) => {    
         fastify.log.info('Game started locally'); 
@@ -165,6 +164,15 @@ function serverSocketEvents(socket: Socket) {
         startLocalGameInterval(game.state, socket, matchId);      
     });
     
+    socket.on('leaveQueue', () => {
+        const playerInfo: PlayerInfo | undefined = (socket as any).playerInfo;
+        if (playerInfo) {
+            fastify.log.info(`Player ${playerInfo.display_name} (${socket.id}) explicitly left the quick match queue.`);
+            removePlayerFromWaitingList(socket.id);
+            clearMatchmakingTimeout(socket.id);
+        }
+    });
+
     handleClientInput(socket);
 }
 

@@ -1,6 +1,6 @@
 import { t } from '../services/i18nService.js';
 import { createElement } from '../utils/domUtils.js';
-import socket from '../services/socket.js';
+import socket, { tournamentSocket } from '../services/socket.js';
 import { cleanupSocket } from '../services/initOnlineGame.js';
 
 export function showToast(message: string, type: 'success' | 'error' | 'info' = 'success') {
@@ -155,19 +155,36 @@ export function showWaitingToast(socket: SocketIOClient.Socket, controller: Abor
 	});
 }
 
-export function removeWaitingToast() {
-	const toast = document.querySelector('.custom-waiting-toast');
-	if (toast instanceof HTMLElement) {
-		toast.style.opacity = '0';
-		toast.style.transform = 'translateY(20px)';
-		setTimeout(() => toast.remove(), 300);
-	}
+export function removeWaitingToast(instant: boolean = false) {
+    const toast = document.querySelector('.custom-waiting-toast');
+    if (instant && toast instanceof HTMLElement) {
+        toast.remove();
+        console.log("Waiting toast removed immediately.");
+    } else if (toast instanceof HTMLElement) {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        setTimeout(() => toast.remove(), 300);
+    }
 }
 
-export function cancelAllSearches() {
+function sendLeaveEvent(socketInstance: SocketIOClient.Socket, eventName: string) {
+    if (socketInstance.connected) {
+        socketInstance.emit(eventName);
+        cleanupSocket(socketInstance);
+        return;
+    }
+}
+
+export function cancelAllSearches(instant: boolean = false) {
 	console.log("Cancelling all game search.");
-	removeWaitingToast();
-	cleanupSocket(socket);
+	removeWaitingToast(instant);
+	sendLeaveEvent(socket, 'leaveQueue');
+    sendLeaveEvent(tournamentSocket, 'leaveTournamentQueue');
+	// cleanupSocket(socket);
+	// cleanupSocket(tournamentSocket);
+	sessionStorage.removeItem('gameMode');
+    sessionStorage.removeItem('onlineTournamentId');
+    sessionStorage.removeItem('matchId');
 }
 
 function formatTime(timeLeft: number): string {

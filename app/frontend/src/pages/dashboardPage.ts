@@ -59,7 +59,6 @@ export async function DashboardPage(): Promise<HTMLElement> {
 	}
 
 	const sidebar = createElement('div', { className: 'w-1/4 p-6 border-r border-gray-400/30 space-y-3 overflow-y-auto' });
-	// ajout pour test
 	sidebar.dataset.testid = 'sidebar';
 	const activeTabContentContainer = createElement('div', { id: 'active-tab-content', className: 'flex-grow overflow-y-auto min-h-0' });
 	const tabNavigation = createElement('div', { className: 'flex-shrink-0 flex space-x-1 border-b border-gray-400/30 mb-6' });
@@ -132,7 +131,7 @@ export async function DashboardPage(): Promise<HTMLElement> {
 			createSidebarItem(t('user.username'), user.username),
 			createSidebarItem(t('user.displayName'), user.display_name),
 			createSidebarItem(t('user.email'), user.email),
-			createSidebarItem(t('user.createdAt'), new Date(user.created_at)),
+			createSidebarItem(t('user.createdAt'), new Date(user.created_at + 'Z')),
 			createSidebarItem(t('user.wins'), user.wins),
 			createSidebarItem(t('user.losses'), user.losses)
 		);
@@ -258,7 +257,8 @@ export async function DashboardPage(): Promise<HTMLElement> {
 			currentUser = freshUser;
 			populateSidebar(freshUser);
 			const newHeader = HeaderComponent({ currentUser: freshUser });
-			dashboardWrapper.replaceChild(newHeader, headerElement);
+			// dashboardWrapper.replaceChild(newHeader, headerElement);
+			pageContainer.replaceChild(newHeader, headerElement);
 			headerElement = newHeader;
 		}
 	}).catch(err => {

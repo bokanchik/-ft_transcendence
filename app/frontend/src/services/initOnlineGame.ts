@@ -7,13 +7,14 @@ import { initCountdown } from "../components/countdown.js";
 import { config } from "../utils/config.js";
 import { t } from "./i18nService.js";
 
-export async function handleOnlineGame(display_name: string, userId: number): Promise<void> {
+export async function handleOnlineGame(display_name: string, userId: number, controller: AbortController): Promise<void> {
     try {
-        await initOnlineGame(display_name, userId);
+        await initOnlineGame(display_name, userId, controller);
     } catch (err: unknown) {
         console.log(err);
-        showToast(t('msg.error.any'), 'error');
-        navigateTo('/game');
+        // showToast(t('msg.error.any'), 'error');
+        // navigateTo('/game');
+        throw err;
     }
 }
 
@@ -22,8 +23,8 @@ type TournamentMatch = {
     player2: string;
 };
 
-export async function handleTournamentSearch(size: number, displayName: string, userId: number): Promise<void> {
-    const controller: AbortController = new AbortController();
+export async function handleTournamentSearch(size: number, displayName: string, userId: number, controller: AbortController): Promise<void> {
+    // const controller: AbortController = new AbortController();
 
     if (tournamentSocket.connected) {
         tournamentSocket.disconnect();
@@ -67,8 +68,8 @@ export async function handleTournamentSearch(size: number, displayName: string, 
     tournamentSocket.connect();
 }
 
-export async function initOnlineGame(display_name: string, userId: number) {
-    const controller: AbortController = new AbortController();
+export async function initOnlineGame(display_name: string, userId: number, controller: AbortController): Promise<void> {
+    // const controller: AbortController = new AbortController();
 
     if (socket.connected) {
         socket.disconnect();
@@ -134,11 +135,4 @@ export function cleanupSocket(socket: SocketIOClient.Socket) {
     if (socket.connected) {
         socket.disconnect();
     }
-}
-
-export function cancelAllSearches() {
-	console.log("Cancelling all game searches.");
-	removeWaitingToast();
-	cleanupSocket(socket);
-    cleanupSocket(tournamentSocket);
 }

@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 import { Socket } from "socket.io";
 import { fastify, io } from "../server.ts";
-import { PlayerInfo, tournamentQueues } from "../utils/waitingListUtils.ts";
+import { PlayerInfo, tournamentQueues, removePlayerFromTournamentQueues } from "../utils/waitingListUtils.ts";
 import { createTournament, getTournamentById, updateTournamentWinner, getMatchesForTournament, addMatchToTournament, updateMatchWinnerInTournamentDB } from "../database/dbModels.ts";
 import { createMatchInGameService, updateUserStatus } from "../utils/apiClient.ts";
 import { UserOnlineStatus } from "../shared/schemas/usersSchemas.js";
@@ -37,6 +37,30 @@ export async function handleTournamentLogic(socket: Socket) {
     socket.on('joinTournamentQueue', (data) => joinTournamentQueue(socket, data));
     socket.on('joinTournamentRoom', (data) => joinTournamentRoom(socket, data));
     socket.on('playerReadyForTournamentMatch', (data) => playerReadyForTournamentMatch(socket, data));
+
+    socket.on('leaveTournamentQueue', () => {
+        const playerInfo: PlayerInfo | undefined = (socket as any).playerInfo;
+        if (playerInfo) {
+            fastify.log.info(`Player ${playerInfo.display_name} (${socket.id}) explicitly left ALL tournament queues.`);
+            removePlayerFromTournamentQueues(socket.id);
+
+            tournamentQueues.forEach((queue, size) => {
+                io.to(`tournament_queue_${size}`).emit('tournamentQueueUpdate', {
+                    current: queue.length,
+                    required: size,
+                });
+            });
+        }
+    });
+
+    socket.on('disconnect', () => {
+        const playerInfo: PlayerInfo | undefined = (socket as any).playerInfo;
+        if (playerInfo) {
+            fastify.log.info(`Player ${playerInfo.display_name} disconnected.`);
+            removePlayerFromTournamentQueues(socket.id);
+            updateUserStatus(playerInfo.userId, UserOnlineStatus.OFFLINE);
+        }
+    })
 }
 
 /**
