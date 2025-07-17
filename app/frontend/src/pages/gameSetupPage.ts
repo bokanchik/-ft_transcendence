@@ -382,12 +382,10 @@ export function GamePage(): HTMLElement {
         return createElement('div');
     }
     const currentUser: User = authData;
-    // 1. On crée le conteneur principal qui sera retourné immédiatement.
     const pageWrapper = createElement('div', {
         className: 'flex flex-col min-h-screen bg-cover bg-center bg-fixed'
     });
     
-    // On ajoute le header tout de suite
     pageWrapper.appendChild(HeaderComponent({ currentUser }));
 
     const loadingContainer = createElement('div', {
@@ -398,7 +396,6 @@ export function GamePage(): HTMLElement {
     pageWrapper.appendChild(loadingContainer);
     pageWrapper.style.backgroundImage = "url('/assets/background.webp')";
 
-    // 2. On définit une fonction asynchrone pour faire le vrai travail.
     const initializePage = async () => {
         try {
             const activeTournamentId = await checkPlayerTournamentStatus();

@@ -339,8 +339,8 @@ async function renderOnlineBracket(data: TournamentStateData, container: HTMLEle
 	}
 }
 
-async function displayTournamentWinner(winnerId: number, bracketContainer: HTMLElement, mainContainer: HTMLElement) {
-	if (bracketContainer.querySelector('.tournament-winner-banner')) {
+async function displayTournamentWinner(winnerId: number, _bracketContainer: HTMLElement, mainContainer: HTMLElement) {
+	if (mainContainer.querySelector('.tournament-winner-banner')) {
 		return;
 	}
 
