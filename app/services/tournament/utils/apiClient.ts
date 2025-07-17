@@ -21,11 +21,6 @@ export async function createMatchInGameService(payload: any): Promise<{ matchId:
     return response.json();
 }
 
-/**
- * Appelle le service utilisateur pour mettre à jour le statut en ligne d'un joueur.
- * @param userId L'ID de l'utilisateur à mettre à jour.
- * @param status 'online', 'offline', ou 'in-game'.
- */
 export async function updateUserStatus(userId: number, status: UserOnlineStatus): Promise<void> {
     if (!API_KEY) {
         fastify.log.error('FATAL: API_KEY is not defined for inter-service communication.');
@@ -96,6 +91,5 @@ export async function declareForfeitInGameService(matchId: string, winnerId: num
         }
     } catch (error) {
         fastify.log.error(error, 'Error calling game service to declare forfeit');
-        // On ne relance pas l'erreur pour ne pas bloquer le tournoi, mais on log
     }
 }

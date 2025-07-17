@@ -24,9 +24,9 @@ export function tournamentRoutes(fastify: FastifyInstance, _options: unknown) {
         }
     });
     fastify.get('/player-status', {
-        onRequest: [fastify.authenticate], // Route protégée
+        onRequest: [fastify.authenticate],
         handler: async (req: FastifyRequest, reply) => {
-            const user = (req as any).user; // Récupère l'utilisateur depuis le token JWT
+            const user = (req as any).user;
             if (!user || !user.id) {
                 return reply.code(401).send({ error: 'Unauthorized' });
             }
