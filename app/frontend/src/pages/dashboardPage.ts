@@ -12,36 +12,9 @@ import { MatchHistoryComponent } from '../components/matchHistoryComponent.js';
 import { t, getLanguage } from '../services/i18nService.js';
 import { translateResultMessage } from '../services/responseService.js';
 import { createElement, clearElement } from '../utils/domUtils.js';
+import { adjustFontSizeToFit } from '../utils/format.js';
 
 const DASHBOARD_ACTIVE_TAB_KEY = 'dashboardActiveTab';
-
-function nextFrame(): Promise<void> {
-	return new Promise(resolve => requestAnimationFrame(() => resolve()));
-}
-
-export async function adjustFontSizeToFit(
-	element: HTMLElement,
-	fontSizes: string[] = ['text-2xl', 'text-xl', 'text-lg', 'text-base', 'text-sm', 'text-xs'],
-	truncateClass: string = 'truncate'
-) {
-	element.classList.add('whitespace-nowrap', 'overflow-hidden');
-
-	await nextFrame();
-
-	for (const sizeClass of fontSizes) {
-		fontSizes.forEach(s => element.classList.remove(s));
-		element.classList.add(sizeClass);
-
-		await nextFrame();
-
-		if (element.scrollWidth <= element.clientWidth) {
-			element.classList.remove(truncateClass);
-			return;
-		}
-	}
-
-	element.classList.add(truncateClass);
-}
 
 export async function DashboardPage(): Promise<HTMLElement> {
 	let currentUser: User | null = getUserDataFromStorage();

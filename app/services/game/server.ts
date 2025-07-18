@@ -13,7 +13,7 @@ const fastify: FastifyInstance = Fastify({ logger: true }).withTypeProvider<ZodT
 
 // Initialize socket.io
 const io: Server = new Server(fastify.server, {
-    path: "/socket-client/" // correspond a 'location' de nginx.conf, pour connecter le front et le back
+    path: "/socket-client/"
 });
 
 // Attach io to fastify instance

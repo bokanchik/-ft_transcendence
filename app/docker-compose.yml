@@ -25,14 +25,9 @@ networks:
 volumes:
   frontdata:
     name: frontdata
-    # driver: local
-    # driver_opts:
-    #   type: none
-    #   device: ./frontdata
-    #   o: bind
 
 services:
-  gateaway: # entrypoint for services
+  gateaway:
     container_name: gateaway
     build: ./gateaway
     ports:
@@ -55,13 +50,13 @@ services:
     command: npm run dev
     restart: always
     ports:
-      - "5000:5000" # for development (live-server)
+      - "5000:5000"
     volumes:
       - frontdata:/app/dist
     networks:
       - tranet
 
-  frontend-tests: # <--- NOUVEAU SERVICE POUR LES TESTS
+  frontend-tests:
     container_name: frontend-tests
     build: ./frontend
     command: npm run test:watch
@@ -173,7 +168,6 @@ services:
       - monitoring
     depends_on:
       - cadvisor
-      # - nginx_exporter
     restart: always
   
   grafana:
@@ -190,15 +184,3 @@ services:
     networks:
       - monitoring
     restart: always
-
-  # nginx_exporter:
-  #   image: nginx/nginx-prometheus-exporter:0.11
-  #   container_name: nginx_exporter
-  #   command:
-  #     - '-nginx.scrape-uri=http://gateaway:8081/stub_status'
-  #   networks:
-  #     - tranet
-  #     - monitoring
-  #   restart: unless-stopped
-  #   depends_on:
-  #     - gateaway

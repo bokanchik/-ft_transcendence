@@ -60,38 +60,7 @@ export async function handleTournamentLogic(socket: Socket) {
             removePlayerFromTournamentQueues(socket.id);
             // updateUserStatus(playerInfo.userId, UserOnlineStatus.OFFLINE);
         }
-    })
-    // socket.on('disconnect', async () => {
-    //     const playerInfo: PlayerInfo | undefined = (socket as any).playerInfo;
-    //     const tournamentId: string | undefined = (socket as any).tournamentId;
-
-    //     if (playerInfo) {
-    //         fastify.log.info(`Player ${playerInfo.display_name} disconnected.`);
-    //         removePlayerFromTournamentQueues(socket.id);
-    //         if (!tournamentId) {
-    //             updateUserStatus(playerInfo.userId, UserOnlineStatus.OFFLINE);
-    //         }
-    //     }
-
-    //     if (tournamentId) {
-    //         fastify.log.info(`Player ${playerInfo?.userId} disconnected from active tournament ${tournamentId}. Processing forfeit...`);
-
-    //         const allMatches = await getMatchesForTournament(tournamentId);
-    //         const activeMatch = allMatches.find(m => 
-    //             (m.player1_id === playerInfo?.userId || m.player2_id === playerInfo?.userId) && m.status !== 'finished'
-    //         );
-            
-    //         if (activeMatch) {
-    //             const winnerId = activeMatch.player1_id === playerInfo?.userId ? activeMatch.player2_id : activeMatch.player1_id;
-                
-    //             if (winnerId) {
-    //                 fastify.log.info(`Declaring user ${winnerId} as winner by forfeit for match ${activeMatch.matchId}`);
-    //                 await declareForfeitInGameService(activeMatch.matchId, winnerId);
-    //                 await handleMatchEnd(tournamentId, activeMatch.matchId, winnerId);
-    //             }
-    //         }
-    //     }
-    // });
+    });
 
     socket.on('joinTournamentRoom', async (data) => {
         const playerInfo: PlayerInfo | undefined = (socket as any).playerInfo;

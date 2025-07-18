@@ -92,7 +92,6 @@ export async function waitingRoom() {
             removePlayerFromWaitingList(player1.socket.id);
             removePlayerFromWaitingList(player2.socket.id);
             
-            // timeout pour syncroniser le client et le serveur : est-ce que c'est la bonne solution ?
             setTimeout(() => startRemoteGame(player1.socket, player2.socket, matchId), 3000);
             
             return;

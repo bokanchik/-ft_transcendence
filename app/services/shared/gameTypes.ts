@@ -20,7 +20,6 @@ export interface Velocity {
   y: number;
 };
 
-// ! n'a pas fonctionne pour le frontends avec './shared/constants.js' !
 export const TIMEOUT_MS: number  = 60000;
 export const FRAME_RATE: number = 60;
 export const W: number = 87;
@@ -33,7 +32,7 @@ export const GAME_WIDTH: number = 800;
 export const BALL_RADIUS: number = 15;
 export const PADDLE_HEIGHT: number  = 120;
 export const PADDLE_WIDTH: number  = 20;
-export const FINAL_SCORE: number  = 2;
+export const FINAL_SCORE: number  = 3;
 export const MAX_SPEED: number  = 15;
 export const PADDLE_X_LEFT = 20;
 export const PADDLE_X_RIGHT = 770;

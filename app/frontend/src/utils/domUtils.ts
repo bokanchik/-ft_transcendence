@@ -156,8 +156,8 @@ interface InputFieldOptions {
 	value?: string;
 	minLength?: number;
 	maxLength?: number;
-	min?: string; // for type=number
-	max?: string; // for type=number
+	min?: string;
+	max?: string;
 	readonly?: boolean;
 	inputClass?: string;
 	labelClass?: string;

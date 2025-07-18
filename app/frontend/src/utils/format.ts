@@ -41,3 +41,31 @@ export function isValidEmail(email: string): boolean {
 	const emailRegex = /^(?:[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}|(?:\[(?:(?:[0-9]{1,3}\.){3}[0-9]{1,3}|IPv6:[a-fA-F0-9:.]+)\]))$/;
 	return emailRegex.test(email);
 }
+
+function nextFrame(): Promise<void> {
+	return new Promise(resolve => requestAnimationFrame(() => resolve()));
+}
+
+export async function adjustFontSizeToFit(
+	element: HTMLElement,
+	fontSizes: string[] = ['text-2xl', 'text-xl', 'text-lg', 'text-base', 'text-sm', 'text-xs'],
+	truncateClass: string = 'truncate'
+) {
+	element.classList.add('whitespace-nowrap', 'overflow-hidden');
+
+	await nextFrame();
+
+	for (const sizeClass of fontSizes) {
+		fontSizes.forEach(s => element.classList.remove(s));
+		element.classList.add(sizeClass);
+
+		await nextFrame();
+
+		if (element.scrollWidth <= element.clientWidth) {
+			element.classList.remove(truncateClass);
+			return;
+		}
+	}
+
+	element.classList.add(truncateClass);
+}

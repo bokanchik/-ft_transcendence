@@ -15,7 +15,6 @@ const io: Server = new Server(fastify.server, {
 });
 fastify.decorate('io', io);
 
-// set rate-limit to avoid too many requests
 fastify.register(fastifyRateLimit, {
     max: 50,
     timeWindow: '1 minute',
@@ -35,7 +34,6 @@ const registerRoutes = () => {
   fastify.log.info('Routes registred');
 };
 
-// Start server game and setup socket.io
 const start = async () => {
   try {
 

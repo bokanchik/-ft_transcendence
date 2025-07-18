@@ -118,8 +118,8 @@ export async function getMatchByUserHandler(req: AuthenticatedRequest, reply: Fa
         }
         const sanitizedMatches = matchesFromDb.map(match => ({
             ...match,
-            player1_score: match.player1_score ?? 0, // Remplace null par 0
-            player2_score: match.player2_score ?? 0, // Remplace null par 0
+            player1_score: match.player1_score ?? 0,
+            player2_score: match.player2_score ?? 0,
         }));
         
         console.log("BACKEND - Sending sanitized matches data:", JSON.stringify(sanitizedMatches, null, 2));
@@ -148,11 +148,11 @@ export async function createInternalMatchHandler(req: FastifyRequest, reply: Fas
             matchId,
             player1_id,
             player2_id,
-            player1_socket: null, // Les sockets seront assignés lors de la connexion
+            player1_socket: null,
             player2_socket: null,
             tournament_id,
             round_number,
-            status: 'pending' // Le match est en attente, pas encore en cours
+            status: 'pending'
         });
 
         req.log.info(`Internal request: Created match ${matchId} for tournament ${tournament_id}`);
@@ -172,13 +172,11 @@ export async function startOnlineMatchHandler(req: FastifyRequest, reply: Fastif
 
     req.log.info(`Received internal request to start match: ${matchId}`);
 
-    // Retrouver les sockets des joueurs connectés au service de jeu
     const p1Socket = findSocketByUserId(player1_id);
     const p2Socket = findSocketByUserId(player2_id);
     
     if (!p1Socket || !p2Socket) {
         req.log.error(`Could not start match ${matchId}: One or both players are not connected to the game service.`);
-        // Il faudrait une logique de retry ou de timeout ici, mais pour l'instant on retourne une erreur.
         return reply.code(404).send({ error: "One or both players not connected" });
     }
 

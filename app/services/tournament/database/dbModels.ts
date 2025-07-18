@@ -45,7 +45,6 @@ CREATE TABLE IF NOT EXISTS tournament_players (
     FOREIGN KEY (tournament_id) REFERENCES tournaments(id)
 );`;
 
-// Cette table est la clé. Elle lie le tournoi à des matchId qui existent dans le service 'game'.
 const tournamentMatchesTable = `
 CREATE TABLE IF NOT EXISTS tournament_matches (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

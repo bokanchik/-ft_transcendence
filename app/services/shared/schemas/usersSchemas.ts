@@ -27,20 +27,6 @@ export const UserBaseSchema = UserPublicSchema.extend({
     is_two_fa_enabled: z.boolean().default(false),
 });
 
-// export const UserBaseSchema = z.object({
-//     id: z.number().int(),
-//     username: z.string().min(3).max(20),
-//     email: z.string().email(),
-//     display_name: z.string().min(3).max(20),
-//     avatar_url: z.string().url().nullable(),
-//     wins: z.number().int().default(0),
-//     losses: z.number().int().default(0),
-//     status: UserOnlineStatusSchema.default(UserOnlineStatus.OFFLINE),
-//     language: z.string().length(2).default('en'),
-//     created_at: z.string(), // Ou z.date()
-//     updated_at: z.string(), // Ou z.date()
-//     is_two_fa_enabled: z.boolean().default(false),
-// });
 export type User = z.infer<typeof UserBaseSchema>;
 
 export const UserWithPasswordHashSchema = UserBaseSchema.extend({
@@ -59,8 +45,8 @@ export type UserWithSecrets = z.infer<typeof UserWithSecretsSchema>;
 export const ErrorResponseSchema = z.object({
     error: z.string(),
     statusCode: z.number().int(),
-    messageKey: z.string().optional(), // for translation purposes
-    messageParams: z.record(z.any()).optional(), // for translation purposes
+    messageKey: z.string().optional(),
+    messageParams: z.record(z.any()).optional(),
 });
 
 // REGISTER
@@ -98,7 +84,6 @@ export const LoginRouteSchema = {
             message: z.string(),
             user: UserBaseSchema.optional(),
             two_fa_required: z.boolean().optional(),
-            // csrfToken: z.string().optional(),
         }).refine(data => data.user || data.two_fa_required, {
             message: "Either user data or two-factor authentication requirement must be present."
         }),
@@ -117,7 +102,7 @@ export const GetCsrfTokenResponseSchema = z.object({
 export const GetCsrfTokenRouteSchema = {
     response: {
         200: GetCsrfTokenResponseSchema,
-        500: ErrorResponseSchema // En cas d'erreur de génération du token
+        500: ErrorResponseSchema
     }
 };
 

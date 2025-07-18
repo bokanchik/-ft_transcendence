@@ -1,6 +1,14 @@
 # ✅ TODO List
 
 ---
+## global
+- [ ] avatar A
+- [ ] trad users A 
+- [ ] tester end-to-end S
+- [ ] verifier package.json et justifier usage ASE
+- [ ] flex game results E 
+- [ ] flex gamePage E
+
 
 ## arthur
 

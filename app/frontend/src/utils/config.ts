@@ -10,7 +10,7 @@ export const config = {
         user: {
             dataKey: 'userDataKey',
             expirationKey: 'userExpirationKey',
-            ttl: 24 * 60 * 60 * 1000, // 24 hours
+            ttl: 24 * 60 * 60 * 1000,
             tokenKey: 'userTokenKey',
             csrfToken: 'csrfTokenKey',
         },
@@ -28,7 +28,7 @@ export const config = {
         },
         online: {
             waitTimeout: 60,
-            tournamentTimeout: 60 * 5, // 5 minutes
+            tournamentTimeout: 60 * 5,
         },
     },
     api: {

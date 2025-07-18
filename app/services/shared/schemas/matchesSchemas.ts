@@ -83,13 +83,13 @@ export const MatchBaseSchema = z.object({
     matchId: z.string(), // ou i min
     player1_id: z.number().int(),
     player2_id: z.number().int(),
-    player1_socket: z.string().nullable(), // Nullable if player is not connected
-    player2_socket: z.string().nullable(), // Nullable if player is not connected
+    player1_socket: z.string().nullable(),
+    player2_socket: z.string().nullable(),
     player1_score: z.number().int().default(0),
     player2_score: z.number().int().default(0),
     winner_id: z.number().nullable(),
     win_type: z.string().nullable(),
-    created_at: z.string(), // Ou z.date()
+    created_at: z.string(),
     tournament_id: z.string().nullable(),
     status: MatchStatusSchema.default(MatchStatus.PENDING)
 });

@@ -12,8 +12,6 @@ export async function handleOnlineGame(display_name: string, userId: number, con
         await initOnlineGame(display_name, userId, controller);
     } catch (err: unknown) {
         console.log(err);
-        // showToast(t('msg.error.any'), 'error');
-        // navigateTo('/game');
         throw err;
     }
 }
@@ -24,7 +22,6 @@ type TournamentMatch = {
 };
 
 export async function handleTournamentSearch(size: number, displayName: string, userId: number, controller: AbortController): Promise<void> {
-    // const controller: AbortController = new AbortController();
 
     if (tournamentSocket.connected) {
         tournamentSocket.disconnect();
@@ -69,7 +66,6 @@ export async function handleTournamentSearch(size: number, displayName: string, 
 }
 
 export async function initOnlineGame(display_name: string, userId: number, controller: AbortController): Promise<void> {
-    // const controller: AbortController = new AbortController();
 
     if (socket.connected) {
         socket.disconnect();
