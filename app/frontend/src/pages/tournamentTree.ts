@@ -347,7 +347,7 @@ async function displayTournamentWinner(winnerId: number, _bracketContainer: HTML
 	const winnerDetails = await getPlayerDetails(winnerId);
 
 	const winnerBanner = createElement('div', {
-		className: 'tournament-winner-banner mt-6 p-4 bg-teal-700 text-gray-300 text-2xl font-beach text-center rounded-lg animate-pulse'
+		className: 'tournament-winner-banner mt-6 p-4 bg-radial-[at_50%_75%] from-yellow-100 via-amber-600 to-orange-800 to-90%text-gray-300 text-2xl font-beach text-center rounded-lg animate-pulse text-white'
 	});
 	winnerBanner.textContent = `${t('tournament.winnerIs')} ${winnerDetails.display_name}`;
 	const backToGameLink = createElement('a', {
