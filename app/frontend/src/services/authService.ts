@@ -166,7 +166,7 @@ export async function verifyTwoFactorLogin(token: string): Promise<type.ApiResul
 		}
 		throw new Error('msg.error.user.2faFailed');
 	} catch (error) {
-		const errorMessage = error instanceof Error ? t('error.message') : "Unknown error during 2FA verification";
+		const errorMessage = error instanceof Error ? t('message.error.user.2faFailed') : "Unknown error during 2FA verification";
 		const statusCode = error instanceof ClientApiError ? error.httpStatus : undefined;
 		return { success: false, error: errorMessage, statusCode };
 	}
