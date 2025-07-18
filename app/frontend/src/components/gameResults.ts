@@ -26,25 +26,24 @@ export function showGameResult(player1: string, player2: string, score1: number,
         className: 'flex justify-around items-center gap-4 my-8'
     });
 
-	const player1Container = createElement('div', {
-        className: 'block flex flex-col items-center flex-1 transition-all duration-300'
-    });
 	const img1 = createElement('img', {
-        src: url1,
+		src: url1,
         alt: player1,
         className: 'w-32 h-32 object-cover rounded-full mb-4 border-4 border-teal-700 shadow-lg'
     });
 	const name1 = createElement('p', {
-        className: 'font-beach font-medium text-2xl text-gray-200 overflow-hidden whitespace-nowrap',
+		className: 'w-48 text-center text-3xl font-beach text-gray-200 p-3 rounded-lg shadow-xl',
         textContent: player1
     });
 	adjustFontSizeToFit(name1, ['text-2xl', 'text-xl', 'text-lg', 'text-base', 'text-sm', 'text-xs']);
 	
 	const scoreText1 = createElement('p', {
-        className: 'font-beach text-7xl text-teal-700 mt-2',
+		className: 'font-beach text-7xl text-teal-700 mt-2',
         textContent: String(score1)
     });
-	player1Container.append(img1, name1, scoreText1);
+	const player1Container = createElement('div', {
+		className: 'flex flex-col items-center justify-center flex-1 transition-all duration-300'},
+		[img1, name1, scoreText1]);
 
 	const vsText = createElement('span', {
         className: 'font-jurassic text-8xl text-gray-400 mx-4 self-center pb-8',
@@ -60,7 +59,7 @@ export function showGameResult(player1: string, player2: string, score1: number,
         className: 'w-32 h-32 object-cover rounded-full mb-4 border-4 border-red-700 shadow-lg'
     });
 	const name2 = createElement('p', {
-        className: 'font-beach font-medium text-2xl text-gray-200 overflow-hidden whitespace-nowrap',
+        className: 'w-48 text-center text-3xl font-beach text-gray-200 p-3 rounded-lg shadow-xl',
         textContent: player2
     });
 	adjustFontSizeToFit(name2, ['text-2xl', 'text-xl', 'text-lg', 'text-base', 'text-sm', 'text-xs']);
