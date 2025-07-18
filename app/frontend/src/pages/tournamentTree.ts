@@ -166,7 +166,7 @@ function LocalTournamentPage(): HTMLElement {
 		if (tournamentWinner) {
 			const winnerBanner = createElement('div', {
 				textContent: `${t('tournament.winnerIs')} ${tournamentWinner}`,
-				className: 'mt-6 p-4 bg-teal-700 text-gray-300 text-2xl font-beach text-center rounded-lg animate-pulse'
+				className: 'tournament-winner-banner mt-6 p-4 bg-radial-[at_50%_75%] from-yellow-100 via-amber-600 to-orange-800 to-90% text-gray-300 text-2xl font-beach text-center rounded-lg animate-pulse text-white'
 			});
 			const newTournamentLink = createElement('a', {
 				href: '/local-game',
