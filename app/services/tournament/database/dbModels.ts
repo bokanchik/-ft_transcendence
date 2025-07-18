@@ -116,3 +116,9 @@ export async function findActiveTournamentByPlayerId(userId: number): Promise<{ 
     const result = await fetchFirst(sql, [userId]);
     return result || null;
 }
+
+
+export async function getPlayersOfTournament(tournamentId: string): Promise<{ user_id: number }[]> {
+    const sql = `SELECT user_id FROM tournament_players WHERE tournament_id = ?`;
+    return fetchAll(sql, [tournamentId]);
+}

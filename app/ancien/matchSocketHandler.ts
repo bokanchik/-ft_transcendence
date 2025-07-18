@@ -15,11 +15,8 @@ export const timeouts: Map<string, NodeJS.Timeout> = new Map();
 
 // --- Socket.io handler for local and remote games ---
 export async function matchSocketHandler(socket: Socket): Promise<void> {
-    // Handle waiting room events
     waitingRoomHandler(socket);
-    // Handle gameplay events
     serverSocketEvents(socket);
-    // Handle disconnection events
     disconnectionHandler(socket);
 }
 
@@ -103,10 +100,8 @@ function handleClientInput(socket: Socket) {
         const gameSession = findRemoteGameSessionBySocketId(socket.id);
         if (gameSession) {
             const playerSide = gameSession.getPlayerSide(socket.id);
-            // if (playerSide) handleKeydownRemote(parseInt(keyCode), playerSide);
             if (playerSide) handleKeydownRemote(keyCode, playerSide);
         } else {
-            //  handleKeydownLocal(parseInt(keyCode))
             handleKeydownLocal(keyCode);
         }
     });
@@ -115,10 +110,8 @@ function handleClientInput(socket: Socket) {
            const gameSession = findRemoteGameSessionBySocketId(socket.id);
         if (gameSession) {
             const playerSide = gameSession.getPlayerSide(socket.id);
-            // if (playerSide) handleKeyupRemote(parseInt(keyCode), playerSide);
             if (playerSide) handleKeyupRemote(keyCode, playerSide);
         } else {
-            //  handleKeyupLocal(parseInt(keyCode))
             handleKeyupLocal(keyCode);
         }
     });
@@ -129,12 +122,11 @@ async function disconnectionHandler(socket: Socket)  {
     
     socket.on('disconnect', async () => {
        
-        // waiting rooom cleanup
         await cleanOnDisconnection(socket.id)
 
         const gameSession = findRemoteGameSessionBySocketId(socket.id);
         if (gameSession) {
-            if (gameSession.isFinished) return; // ajout arthur pour éviter de faire des actions sur une gameSession déjà finie
+            if (gameSession.isFinished) return;
             gameSession.isFinished = true;
 
             const opponentSocketId = [...gameSession.players.keys()].find(id => id !== socket.id);

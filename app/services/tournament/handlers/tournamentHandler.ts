@@ -2,7 +2,7 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { Socket } from "socket.io";
 import { fastify, io } from "../server.ts";
 import { PlayerInfo, tournamentQueues, removePlayerFromTournamentQueues } from "../utils/waitingListUtils.ts";
-import { createTournament, getTournamentById, updateTournamentWinner, getMatchesForTournament, addMatchToTournament, updateMatchWinnerInTournamentDB } from "../database/dbModels.ts";
+import { createTournament, getTournamentById, updateTournamentWinner, getMatchesForTournament, addMatchToTournament, updateMatchWinnerInTournamentDB, getPlayersOfTournament } from "../database/dbModels.ts";
 import { createMatchInGameService, updateUserStatus, declareForfeitInGameService } from "../utils/apiClient.ts";
 import { UserOnlineStatus } from "../shared/schemas/usersSchemas.js";
 import { LocalTournamentBodySchema } from '../middleware/tournaments.schemas.ts';
@@ -243,15 +243,39 @@ async function finishTournament(tournamentId: string, winnerId: number) {
     
     matchReadyState.clear();
     
-    const sockets = await fastify.io.in(`tournament-${tournamentId}`).fetchSockets();
-    sockets.forEach(s => {
-        const playerInfo = (s as any).playerInfo as PlayerInfo;
-        if (playerInfo) {
-            updateUserStatus(playerInfo.userId, UserOnlineStatus.ONLINE);
+    // const sockets = await fastify.io.in(`tournament-${tournamentId}`).fetchSockets();
+    // sockets.forEach(s => {
+    //     const playerInfo = (s as any).playerInfo as PlayerInfo;
+    //     if (playerInfo) {
+    //         updateUserStatus(playerInfo.userId, UserOnlineStatus.ONLINE);
+    //     }
+    //     s.leave(`tournament-${tournamentId}`);
+    //     delete (s as any).tournamentInfo;
+    // });
+    try {
+        // 1. Récupérer la liste de tous les joueurs depuis la base de données (la source de vérité)
+        const players = await getPlayersOfTournament(tournamentId);
+        fastify.log.info(`Updating status to ONLINE for ${players.length} players of tournament ${tournamentId}.`);
+
+        // 2. Mettre à jour le statut de chaque joueur en appelant le service `users`
+        for (const player of players) {
+            await updateUserStatus(player.user_id, UserOnlineStatus.ONLINE);
         }
-        s.leave(`tournament-${tournamentId}`);
-        delete (s as any).tournamentInfo;
-    });
+
+    } catch (error) {
+        fastify.log.error(error, `Failed to update user statuses for finished tournament ${tournamentId}`);
+    }
+
+    // 3. (Bonne pratique) Tenter de déconnecter les sockets qui seraient encore dans la salle (spectateurs, etc.)
+    try {
+        const socketsInRoom = await fastify.io.in(`tournament-${tournamentId}`).fetchSockets();
+        socketsInRoom.forEach(socket => {
+            socket.leave(`tournament-${tournamentId}`);
+            delete (socket as any).tournamentId; // Nettoie les données attachées au socket
+        });
+    } catch (error) {
+        fastify.log.error(error, `Could not clean up sockets for room tournament-${tournamentId}`);
+    }
 }
 
 async function getTournamentState(tournamentId: string): Promise<any> {
