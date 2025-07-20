@@ -1,10 +1,10 @@
 # Environment variables
-./app/.env
-# ./app/env
-# ./secrets
-# ./app/frontdata
+app/.env
+secrets/
+app/env/
+# app/frontdata/
 
-# Node modules (can be installed with npm install)
+# Node modules
 node_modules/
 
 .DS_Store
