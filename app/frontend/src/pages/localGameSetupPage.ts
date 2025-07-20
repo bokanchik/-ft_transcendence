@@ -115,8 +115,21 @@ export function promptAliasForm(): HTMLElement {
 		const players = Array.from(form.querySelectorAll<HTMLInputElement>('input[name^="alias"]'))
 			.map(input => input.value.trim());
 
+		const [alias1, alias2] = players;
+		const isValidAlias = (alias: string) => /^[a-zA-Z0-9_-]+$/.test(alias);
+
 		if (players.some(p => p === '')) {
 			showToast(t('game.settings.allAliases'), 'error');
+			return;
+		}
+
+		if (!isValidAlias(alias1) || !isValidAlias(alias2)) {
+			showToast(t('game.settings.invalidAliases'), 'error');
+			return;
+		}
+		
+		if (alias1 === alias2) {
+			showToast(t('game.settings.invalidAliases'), 'error');
 			return;
 		}
 

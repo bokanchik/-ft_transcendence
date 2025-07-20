@@ -85,6 +85,7 @@
 		"quitConfirm": "Are you sure you want to quit the game?",
 		"startIn": "Starting in",
 		"waitOpponent": "Waiting for opponent...",
+		"sessionExpired": "The local game session no longer exists. Redirecting to the local game page.",
 		"vs": "VS",
 		"player": "Player",
 		"players": "{count} Players",
@@ -102,7 +103,8 @@
 			"nbPlayers": "How many players?",
 			"nbPlayersPlaceholder": "Enter 2, 4, or 8",
 			"nbPlayersSpec": "Number of players must be a power of 2 (2, 4, 8).",
-			"allAliases": "All player names must be filled."
+			"allAliases": "All player names must be filled.",
+			"invalidAliases": "Aliases are invalid. Try again"
 		},
 		"selectTournamentSize": "Select Tournament Size"
 	},

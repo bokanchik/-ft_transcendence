@@ -5,13 +5,17 @@ import { t } from '../services/i18nService.js';
 import { createElement } from '../utils/domUtils.js';
 import { initializeGame, quitGameHandler } from "../services/gameService.js";
 import { initCountdown } from '../components/countdown.js';
+import { adjustFontSizeToFit } from '../utils/format.js';
 import socket from '../services/socket.js';
+import { cleanupSocket } from '../services/initOnlineGame.js';
+import { showToast } from '../components/toast.js';
 
 export function GameRoomPage(mode: GameMode): HTMLElement {
 	const leftUsername = createElement('div', { id: 'left-username', className: 'w-48 text-center text-3xl font-beach text-white bg-teal-800/50 border-4 border-teal-500/50 p-3 rounded-lg shadow-xl' });
+	adjustFontSizeToFit(leftUsername, ['text-2xl', 'text-xl', 'text-lg', 'text-base', 'text-sm', 'text-xs']);
 	const scoreDisplay = createElement('div', { id: 'score-display', textContent: '0 - 0', className: 'text-7xl font-beach text-gray-300 drop-shadow-lg [text-shadow:_0_3px_6px_rgb(0_0_0_/_50%)]' });
 	const rightUsername = createElement('div', { id: 'right-username', className: 'w-48 text-center text-3xl font-beach text-white bg-rose-800/50 border-4 border-rose-500/50 p-3 rounded-lg shadow-xl' });
-	
+	adjustFontSizeToFit(rightUsername, ['text-2xl', 'text-xl', 'text-lg', 'text-base', 'text-sm', 'text-xs']);
 	const canvas = createElement('canvas', { id: 'pong-canvas', className: 'border-4 border-white/20 rounded-lg shadow-inner bg-gray-900/30' });
 	canvas.width = 800;
 	canvas.height = 500;
@@ -37,7 +41,7 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
         const matchId = sessionStorage.getItem('matchId');
         if (!matchId) {
             console.error("No matchId found, cannot start game flow.");
-            navigateTo('/game');
+            navigateTo('/local-game');
             return;
         }
         if (!socket.connected) {
@@ -50,6 +54,25 @@ export function GameRoomPage(mode: GameMode): HTMLElement {
                 socket.once('connect', () => resolve());
             }
         });
+
+        const cleanupErrorListener = () => {
+            socket.off('error', handleError);
+        };
+
+        const handleError = (data: { message: string }) => {
+            if (data.message === 'Local game session not found.') {
+                console.warn("Local game session not found. Navigating to local game page.");
+                showToast(t('game.sessionExpired'), 'info');
+                
+                cleanupSocket(socket);
+                sessionStorage.clear();
+                
+                navigateTo('/local-game');
+                cleanupErrorListener();
+            }
+        };
+
+        socket.on('error', handleError);
 
         const ctx = canvas.getContext('2d');
         if (!ctx) throw new Error('Canvas context not supported');

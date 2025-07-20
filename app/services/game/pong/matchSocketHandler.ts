@@ -13,7 +13,7 @@ import { removePlayerFromWaitingList, addPlayerToWaitingList, firstInFirstOut, g
 
 
 export const timeouts: Map<string, NodeJS.Timeout> = new Map();
-export const localGames: Map<string, { state: GameState, intervalId: NodeJS.Timeout | null}> = new Map();
+export const localGames: Map<string, { state: GameState, intervalId: NodeJS.Timeout | null, socket: Socket | null }> = new Map();
 const matchWaitingRoom = new Map<string, { socket: Socket, playerInfo: PlayerInfo }[]>();
 
 export async function matchSocketHandler(socket: Socket): Promise<void> {
@@ -154,16 +154,35 @@ function clearMatchmakingTimeout(socketId: string) {
 }
 
 function serverSocketEvents(socket: Socket) {
-    socket.on('startLocal',  (matchId: string) => {    
-        fastify.log.info('Game started locally'); 
+    socket.on('startLocal', (matchId: string) => {
+        fastify.log.info(`[Socket ${socket.id}] received 'startLocal' for match: ${matchId}`);
         const game = localGames.get(matchId);
+
         if (!game) {
-            fastify.log.error('Local game not found');
-            return ;
+            fastify.log.error(`Local game not found for matchId: ${matchId}`);
+            socket.emit('error', { message: 'Local game session not found.' });
+            return;
         }
-        startLocalGameInterval(game.state, socket, matchId);      
+
+        game.socket = socket;
+
+        if (!game.intervalId) {
+            fastify.log.info(`Starting new game loop for local match ${matchId}`);
+            startLocalGameInterval(matchId);
+        } else {
+            fastify.log.info(`Game loop for ${matchId} is already running. Re-attaching socket ${socket.id}.`);
+        }
+
+        socket.on('quitGame', () => {
+            const gameToQuit = localGames.get(matchId);
+            if (gameToQuit && gameToQuit.intervalId) {
+                clearInterval(gameToQuit.intervalId);
+            }
+            localGames.delete(matchId);
+            fastify.log.info(`Local game ${matchId} quit by user.`);
+        });
     });
-    
+
     socket.on('leaveQueue', () => {
         const playerInfo: PlayerInfo | undefined = (socket as any).playerInfo;
         if (playerInfo) {
@@ -176,36 +195,43 @@ function serverSocketEvents(socket: Socket) {
     handleClientInput(socket);
 }
 
-function startLocalGameInterval(state: GameState, socket: Socket, matchId: string) {
+function startLocalGameInterval(matchId: string) {
+    const game = localGames.get(matchId);
+    if (!game) {
+        fastify.log.error(`[startLocalGameInterval] Attempted to start loop for non-existent game ${matchId}`);
+        return;
+    }
+
     const velocity = createBallState();
+
     const intervalId = setInterval(() => {
-        const { winner, goalScored } = gameLoop(state, velocity, 'local');
+        const currentGame = localGames.get(matchId);
+        
+        if (!currentGame || !currentGame.socket || !currentGame.socket.connected) {
+            fastify.log.info(`Stopping game loop for local match ${matchId} due to cleanup or disconnection.`);
+            clearInterval(intervalId);
+            if (localGames.has(matchId)) {
+                localGames.delete(matchId);
+            }
+            return;
+        }
+
+        const { winner, goalScored } = gameLoop(currentGame.state, velocity, 'local');
         
         if (goalScored || !winner) {
-            socket.emit('gameState', state);
+            currentGame.socket.emit('gameState', currentGame.state);
         }
+
         if (winner) {
-            socket.emit('gameOver', state);
+            currentGame.socket.emit('gameOver', currentGame.state);
+            clearInterval(intervalId);
             localGames.delete(matchId);
-            clearInterval(intervalId);
-            return;
-        }
-        if (!localGames.get(matchId)){
-            socket.emit('gameOver');
-            clearInterval(intervalId);
-            return;
         }
     }, 1000 / FRAME_RATE);
-    
-    localGames.set(matchId, { state, intervalId });
 
-    socket.on('quitGame', () => {
-        localGames.delete(matchId);
-        clearInterval(intervalId);
-        return ;
-    });
+    game.intervalId = intervalId;
+    localGames.set(matchId, game);
 }
-
 
 export function startRemoteGame(client1: Socket, client2: Socket, matchId: string): RemoteGameSession {    
     let roomName = makeid(5);
@@ -248,6 +274,17 @@ function handleClientInput(socket: Socket) {
 async function disconnectionHandler(socket: Socket) {
     socket.on('disconnect', async () => {
         await cleanOnDisconnection(socket.id);
+
+        for (const [matchId, game] of localGames.entries()) {
+            if (game.socket && game.socket.id === socket.id) {
+                fastify.log.info(`Le joueur du match local ${matchId} s'est déconnecté. Terminaison de la partie.`);
+                if (game.intervalId) {
+                    clearInterval(game.intervalId);
+                }
+                localGames.delete(matchId);
+                break;
+            }
+        }
 
         const gameSession = findRemoteGameSessionBySocketId(socket.id);
         if (gameSession) {

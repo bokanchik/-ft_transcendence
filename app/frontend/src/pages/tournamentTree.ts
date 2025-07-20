@@ -10,6 +10,7 @@ import { UserPublic } from '../shared/schemas/usersSchemas.js';
 import { createActionButton } from "../utils/domUtils.js";
 import { TournamentData, Rounds, Tournament, TournamentStateData } from "../shared/schemas/matchesSchemas.js";
 import { tournamentSocket } from "../services/socket.js";
+import { adjustFontSizeToFit } from "../utils/format.js";
 
 export function TournamentPage(params?: { id?: string }): HTMLElement {
 	if (params?.id) {
@@ -24,7 +25,7 @@ function LocalTournamentPage(): HTMLElement {
 
 	const title = createElement('h2', { className: 'flex-shrink-0 text-3xl font-bold mb-6 text-center text-gray-300 font-beach', textContent: t('tournament.title') });
 
-	const contentWrapper = createElement('div', { className: 'w-full flex-grow overflow-y-auto min-h-0 pr-4 -mr-4 space-y-6' });
+	const contentWrapper = createElement('div', { className: 'flex flex-col w-full flex-grow overflow-y-auto min-h-0 pr-4 -mr-4 space-y-6 items-center justify-center' });
 
 	const tournamentContentContainer = createElement('div', {
 		className: 'bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 items-center rounded-2xl shadow-2xl p-8 flex flex-col max-h-[85vh] w-full max-w-2xl'
@@ -98,7 +99,7 @@ function LocalTournamentPage(): HTMLElement {
 				activeRound = i;
 				break;
 			}
-			if (i === totalRounds) activeRound = totalRounds + 1; // Tournoi fini
+			if (i === totalRounds) activeRound = totalRounds + 1;
 		}
 
 		return { rounds, currentRound: activeRound, totalRounds };
@@ -137,19 +138,25 @@ function LocalTournamentPage(): HTMLElement {
 				const p1Class = match.winner === match.player1 ? 'font-bold text-green-400' : match.player1 === currentUser?.display_name ? 'font-bold text-blue-400' : 'font-medium text-gray-200';
 				const p2Class = match.winner === match.player2 ? 'font-bold text-green-400' : match.player2 === currentUser?.display_name ? 'font-bold text-blue-400' : 'font-medium text-gray-200';
 
+				const player1 = createElement('span', { textContent: match.player1, className: `w-40 text-center text-3xl font-beach text-gray-200 p-3 rounded-lg shadow-xl ${p1Class}` });
+				adjustFontSizeToFit(player1, ['text-2xl', 'text-xl', 'text-lg', 'text-base', 'text-sm', 'text-xs']);
+				const player2 = createElement('span', { textContent: match.player2, className: `w-40 text-center text-3xl font-beach text-gray-200 p-3 rounded-lg shadow-xl ${p2Class}` });
+				adjustFontSizeToFit(player2, ['text-2xl', 'text-xl', 'text-lg', 'text-base', 'text-sm', 'text-xs']);
 				const matchInfo = createElement('div', { className: 'flex items-center gap-3' }, [
-					createElement('span', { textContent: match.player1, className: `font-beach text-xl ${p1Class}` }),
+					player1,
 					createElement('span', { textContent: 'vs', className: 'text-gray-400 text-3xl font-jurassic' }),
-					createElement('span', { textContent: match.player2, className: `font-beach text-xl ${p2Class}` }),
+					player2,
 				]);
 
 				if (match.winner) {
-					li.append(matchInfo, createElement('span', { className: 'text-green-600 font-semibold text-xl font-beach', textContent: `${t('tournament.winnerShort')}: ${match.winner}` }));
+					const matchwinner = createElement('span', { className: 'w-30 text-green-600 font-semibold text-xl font-beach', textContent: `${t('tournament.winnerShort')}: ${match.winner}` })
+					adjustFontSizeToFit(matchwinner, ['text-2xl', 'text-xl', 'text-lg', 'text-base', 'text-sm', 'text-xs']);
+					li.append(matchInfo, matchwinner);
 				} else if (isCurrentRound && !hasPlayableMatch) {
 					const startButton = createActionButton({
 						text: t('tournament.playMatch'),
 						variant: 'primary',
-                        baseClass: 'bg-blue-700 hover:bg-blue-500 text-white border border-blue-600/50 text-lg font-beach font-thin py-1 px-2.5 rounded transition-all duration-200',
+						baseClass: 'bg-blue-700 hover:bg-blue-500 text-white border border-blue-600/50 text-lg font-beach font-thin py-1 px-2.5 rounded transition-all duration-200',
 						onClick: () => createLocalMatch(match.player1, match.player2, true)
 					});
 					li.append(matchInfo, startButton);
@@ -164,10 +171,16 @@ function LocalTournamentPage(): HTMLElement {
 		}
 
 		if (tournamentWinner) {
-			const winnerBanner = createElement('div', {
-				textContent: `${t('tournament.winnerIs')} ${tournamentWinner}`,
-				className: 'mt-6 p-4 bg-teal-700 text-gray-300 text-2xl font-beach text-center rounded-lg animate-pulse'
+			const winnerName = createElement('span', {
+				textContent: tournamentWinner,
+				className: 'w-90 font-beach font-medium text-2xl text-white overflow-hidden whitespace-nowrap'
 			});
+			const winnerBanner = createElement('div', {
+				textContent: `${t('tournament.winnerIs')} `,
+				className: 'tournament-winner-banner w-100 flex mt-6 p-4 bg-radial-[at_50%_75%] from-yellow-100 via-amber-600 to-orange-800 to-90% text-gray-300 text-2xl font-beach text-center  flex-col rounded-lg text-white items-center justify-center gap-8'},
+				[winnerName]
+			);
+			adjustFontSizeToFit(winnerName, ['text-2xl', 'text-xl', 'text-lg', 'text-base', 'text-sm', 'text-xs']);
 			const newTournamentLink = createElement('a', {
 				href: '/local-game',
 				textContent: t('link.backToGame'),
@@ -347,9 +360,11 @@ async function displayTournamentWinner(winnerId: number, _bracketContainer: HTML
 	const winnerDetails = await getPlayerDetails(winnerId);
 
 	const winnerBanner = createElement('div', {
-		className: 'tournament-winner-banner mt-6 p-4 bg-teal-700 text-gray-300 text-2xl font-beach text-center rounded-lg animate-pulse'
+		className: 'tournament-winner-banner w-100 mt-6 p-4 bg-radial-[at_50%_75%] from-yellow-100 via-amber-600 to-orange-800 to-90%text-gray-300 text-2xl font-beach text-center rounded-lg text-white'
 	});
 	winnerBanner.textContent = `${t('tournament.winnerIs')} ${winnerDetails.display_name}`;
+	adjustFontSizeToFit(winnerBanner, ['text-2xl', 'text-xl', 'text-lg', 'text-base', 'text-sm', 'text-xs']);
+
 	const backToGameLink = createElement('a', {
 		href: '/game',
 		textContent: t('link.backToGame'),

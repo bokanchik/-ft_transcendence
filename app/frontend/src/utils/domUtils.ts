@@ -25,6 +25,7 @@ export function createElement<K extends keyof HTMLElementTagNameMap>(
 		selected?: boolean;
 		htmlFor?: string;
 		role?: string;
+		referrerpolicy?: string;
 	},
 	children?: (HTMLElement | string | Node | null | undefined)[]
 ): HTMLElementTagNameMap[K] {
@@ -41,6 +42,7 @@ export function createElement<K extends keyof HTMLElementTagNameMap>(
 	if (options?.selected && el instanceof HTMLOptionElement) el.selected = options.selected;
 	if (options?.htmlFor && el instanceof HTMLLabelElement) el.htmlFor = options.htmlFor;
 
+	if (options?.referrerpolicy) el.setAttribute('referrerpolicy', options.referrerpolicy);
 	if (options?.href && el instanceof HTMLAnchorElement) el.href = options.href;
 	if (options?.src && el instanceof HTMLImageElement) el.src = options.src;
 	if (options?.alt && el instanceof HTMLImageElement) el.alt = options.alt;

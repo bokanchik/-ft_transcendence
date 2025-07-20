@@ -23,7 +23,7 @@ export async function createLocalMatchHandler(req: FastifyRequest, reply: Fastif
     const state = createGameState();
     const intervalId: NodeJS.Timeout | null = null;
 
-    localGames.set(match.matchId, { state, intervalId });
+    localGames.set(match.matchId, { state, intervalId, socket: null });
     
     return reply.code(201).send(match);
 }

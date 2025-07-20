@@ -1,3 +1,0 @@
---> mon plugin csrf ne marche pas... (server.ts --> ts error)
---> est-ce que pour win-losses tu veux que je cree une route vers mon service? 
---> a quoi sert ta fonction setupHooks dans server.ts ?

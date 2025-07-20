@@ -24,6 +24,7 @@
 		"wins": "Victorias",
 		"losses": "Derrotas",
 		"loading": "Cargando datos del usuario...",
+		"noUser": "Usuario no encontrado.",
 		"status": {
 			"title": "Estado",
 			"online": "En línea",
@@ -82,6 +83,7 @@
 		"quitConfirm": "¿Estás seguro de que quieres salir de la Partida?",
 		"startIn": "Empezando en",
 		"waitOpponent": "Esperando oponente...",
+		"sessionExpired": "La sesión de juego local ya no existe. Redirigiendo a la página de juego local.",
 		"vs": "VS",
 		"player": "Jugador",
 		"players": "{count} Jugadores",
@@ -99,7 +101,8 @@
 			"nbPlayers": "¿Cuántos jugadores?",
 			"nbPlayersPlaceholder": "Introduce 2, 4 u 8",
 			"nbPlayersSpec": "El número de jugadores debe ser una potencia de 2 (2, 4, 8).",
-			"allAliases": "Todos los nombres de jugadores deben estar completos."
+			"allAliases": "Todos los nombres de jugadores deben estar completos.",
+			"invalidAliases": "Los nombres de jugadores no son válidos"
 		},
 		"selectTournamentSize": "Selecciona el tamaño del torneo"
 	},

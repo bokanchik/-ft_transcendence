@@ -92,7 +92,8 @@ export async function DashboardPage(): Promise<HTMLElement> {
 		const avatarImg = createElement('img', {
 			src: user.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.display_name)}&background=random&color=fff&size=128`,
 			alt: `Avatar de ${user.display_name}`,
-			className: 'w-24 h-24 rounded-full object-cover border-4 border-gray-400/30 shadow-lg mb-3'
+			className: 'w-24 h-24 rounded-full object-cover border-4 border-gray-400/30 shadow-lg mb-3',
+			referrerpolicy: 'no-referrer',
 		});
 
 		const profileHeader = createElement('div', { className: 'flex flex-col items-center pb-4 mb-4 border-b border-gray-400/20' }, [

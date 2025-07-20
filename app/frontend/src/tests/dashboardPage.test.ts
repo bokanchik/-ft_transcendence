@@ -30,12 +30,12 @@ describe('DashboardPage', () => {
         email: 'test@user.com',
         wins: 10,
         losses: 5,
-        created_at: new Date('2024-01-01T12:00:00.000Z').toISOString(),
+        created_at: '2024-01-01 12:00:00',
         is_two_fa_enabled: false,
         language: 'fr',
         status: 'online',
         avatar_url: null,
-        updated_at: new Date('2024-01-01T12:00:00.000Z').toISOString(),
+        updated_at: '2024-01-01 12:00:00',
     };
     const mockFriends = [{ 
         friend_id: 2, 

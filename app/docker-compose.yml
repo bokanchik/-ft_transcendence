@@ -27,13 +27,13 @@ volumes:
     name: frontdata
 
 services:
-  gateaway:
-    container_name: gateaway
-    build: ./gateaway
+  gateway:
+    container_name: gateway
+    build: ./gateway
     ports:
       - "8443:8443"
     restart: always
-    env_file: ./env/gateaway.env
+    env_file: ./env/gateway.env
     volumes:
       - frontdata:/usr/share/nginx/html:ro
     depends_on:
