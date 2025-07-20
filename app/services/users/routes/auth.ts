@@ -65,4 +65,10 @@ export default async function authRoute(fastify: FastifyInstance, options: Fasti
             handler: ah.getCsrfTokenHandler
         }
     );
+	fastify.post(
+		config.URL_GOOGLE_CALLBACK,
+		{
+			handler: ah.googleCallbackHandler
+		},
+	);
 }

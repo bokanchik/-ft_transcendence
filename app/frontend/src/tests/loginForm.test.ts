@@ -23,8 +23,8 @@ const mockUser: User = {
     losses: 5,
     status: UserOnlineStatus.ONLINE,
     language: 'en',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: '2024-01-01 12:00:00',
+    updated_at: '2024-01-01 12:00:00',
     is_two_fa_enabled: false,
 };
 

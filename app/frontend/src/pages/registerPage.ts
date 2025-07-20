@@ -7,6 +7,7 @@ import { HeaderComponent } from '../components/headerComponent.js';
 import { getUserDataFromStorage } from '../services/authService.js';
 import { createElement, createInputField } from '../utils/domUtils.js';
 import { showToast } from '../components/toast.js';
+import { isValidEmail, isValidHttpUrl } from '../utils/format.js';
 
 const supportedLanguages = {
 	'en': 'English',
@@ -117,7 +118,7 @@ export async function RegisterPage(): Promise<HTMLElement> {
 	const pageWrapper = createElement('div', {
 		className: 'flex flex-col h-screen bg-cover bg-center bg-fixed'
 	}, [headerElement, container]);
-	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
+	pageWrapper.style.backgroundImage = "url('/assets/background.webp')";
 
 	form.addEventListener('submit', async (event) => {
 		event.preventDefault();
@@ -189,18 +190,4 @@ export async function RegisterPage(): Promise<HTMLElement> {
 	});
 
 	return pageWrapper;
-}
-
-function isValidHttpUrl(string: string): boolean {
-	try {
-		const url = new URL(string);
-		return url.protocol === 'http:' || url.protocol === 'https:';
-	} catch (_) {
-		return false;
-	}
-}
-
-function isValidEmail(email: string): boolean {
-	const emailRegex = /^(?:[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}|(?:\[(?:(?:[0-9]{1,3}\.){3}[0-9]{1,3}|IPv6:[a-fA-F0-9:.]+)\]))$/;
-	return emailRegex.test(email);
 }

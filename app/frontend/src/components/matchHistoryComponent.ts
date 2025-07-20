@@ -2,10 +2,8 @@ import { fetchUserPublicDetails } from '../services/authService.js';
 import { fetchMatchHistoryForUser } from '../services/authService.js';
 import { t } from '../services/i18nService.js';
 import { createElement } from '../utils/domUtils.js';
-
-export interface MatchHistoryComponentProps {
-	userId: number;
-}
+import { formatTimeAgo, formatFullDate } from '../utils/format.js';
+import { MatchHistoryComponentProps } from '../shared/schemas/matchesSchemas.js';
 
 const opponentsDetailsCache: { [key: number]: { display_name: string; avatar_url: string | null } } = {};
 
@@ -86,17 +84,36 @@ export async function MatchHistoryComponent(props: MatchHistoryComponentProps): 
 			const resultTextSpan = createElement('span', { textContent: resultText.toUpperCase(), className: `text-5xl font-jurassic tracking-wide ${resultColorClass}` });
 			const resultTextBlock = createElement('div', { className: 'text-center' }, [resultTextSpan]);
 
-			const userScoreSpan = createElement('span', { textContent: profiledUserScore.toString(), className: `${isWin ? 'text-white' : 'text-gray-400'}` });
-			const separatorSpan = createElement('span', { textContent: '/', className: 'mx-3 text-gray-600' });
-			const opponentScoreSpan = createElement('span', { textContent: opponentScore.toString(), className: `${!isWin && !isDraw ? 'text-white' : 'text-gray-400'}` });
-			const scoreBlock = createElement('div', { className: 'flex justify-end items-baseline text-3xl font-roar font-light' }, [userScoreSpan, separatorSpan, opponentScoreSpan]);
+			const userScoreSpan = createElement('span', { textContent: profiledUserScore.toString(), className: `${isWin ? 'text-white font-beach' : 'text-gray-400 font-beach'}` });
+			const separatorSpan = createElement('span', { textContent: '/', className: 'mx-3 text-gray-500 font-jurassic font-bold' });
+			const opponentScoreSpan = createElement('span', { textContent: opponentScore.toString(), className: `${!isWin && !isDraw ? 'text-white font-beach' : 'text-gray-400 font-beach'}` });
+			const scoreBlock = createElement('div', { className: 'flex justify-end items-baseline text-3xl' }, [userScoreSpan, separatorSpan, opponentScoreSpan]);
 
 			const centerBlock = createElement('div', { className: 'flex-grow flex justify-between items-center px-4' }, [opponentNameBlock, resultTextBlock, scoreBlock]);
 
 			// 3. Date / Type
 			const timeAgoSpan = createElement('span', { textContent: formattedTime, title: fullDate, className: 'text-sm text-gray-400' });
-			const winTypeSpan = createElement('span', { textContent: match.win_type || 'Score', className: 'text-xs text-gray-500' });
-			const rightBlock = createElement('div', { className: 'flex flex-col justify-center items-end text-right w-28 flex-shrink-0' }, [timeAgoSpan, winTypeSpan]);
+
+			let matchTypeIcon: HTMLImageElement;
+			if (match.tournament_id) {
+				matchTypeIcon = createElement('img', {
+					src: '/assets/tournoi.png',
+					alt: t('match.type.tournament'),
+					title: t('match.type.tournament'),
+					className: 'w-8 h-8'
+				});
+			} else {
+				matchTypeIcon = createElement('img', {
+					src: '/assets/quick.png',
+					alt: t('match.type.quickMatch'),
+					title: t('match.type.quickMatch'),
+					className: 'w-8 h-8'
+				});
+			}
+
+			const rightBlock = createElement('div', {
+				className: 'flex flex-col justify-center items-end text-right w-28 flex-shrink-0 space-y-1'
+			}, [timeAgoSpan, matchTypeIcon]);
 
 			const item = createElement('li', { className: `h-24 border border-gray-700/50 rounded-lg flex items-center p-4 gap-4 transition-colors duration-200 ${backgroundClass}` }, [
 				leftBlock,
@@ -116,32 +133,4 @@ export async function MatchHistoryComponent(props: MatchHistoryComponentProps): 
 	}
 
 	return el;
-}
-
-function formatFullDate(date: Date): string {
-	const adjustedTimestamp = date.getTime();
-	const adjustedDate = new Date(adjustedTimestamp);
-	return adjustedDate.toLocaleString();
-}
-
-function formatTimeAgo(date: Date): string {
-	const now = new Date();
-	const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-	const years = Math.floor(seconds / 31536000);
-	if (years > 0) return t(years === 1 ? 'time.ago.year' : 'time.ago.years', { count: years.toString() });
-
-	const months = Math.floor(seconds / 2592000);
-	if (months > 0) return t(months === 1 ? 'time.ago.month' : 'time.ago.months', { count: months.toString() });
-
-	const days = Math.floor(seconds / 86400);
-	if (days > 0) return t(days === 1 ? 'time.ago.day' : 'time.ago.days', { count: days.toString() });
-
-	const hours = Math.floor(seconds / 3600);
-	if (hours > 0) return t(hours === 1 ? 'time.ago.hour' : 'time.ago.hours', { count: hours.toString() });
-
-	const minutes = Math.floor(seconds / 60);
-	if (minutes > 0) return t(minutes === 1 ? 'time.ago.minute' : 'time.ago.minutes', { count: minutes.toString() });
-
-	return t('time.ago.now');
 }

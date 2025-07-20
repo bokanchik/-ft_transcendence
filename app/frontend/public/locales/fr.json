@@ -12,6 +12,7 @@
 		"dashboard": "Retour au tableau de bord",
 		"newGame": "Retour à la salle de jeu",
 		"tournament": "Retour au tournoi",
+		"backToGame": "Retour à la sélection de jeu",
 		"lobby": "Retour au salon"
 	},
 	"user": {
@@ -23,6 +24,7 @@
 		"wins": "Victoires",
 		"losses": "Défaites",
 		"loading": "Chargement des données utilisateur...",
+		"noUser": "Aucun utilisateur trouvé.",
 		"status": {
 			"title": "Statut",
 			"online": "En ligne",
@@ -75,11 +77,16 @@
 		"welcome": "Bienvenue dans le jeu",
 		"loading": "Chargement du jeu...",
 		"start": "Démarrer le jeu",
+		"quickMatch": "Partie rapide",
+		"startTournament": "Tournoi",
 		"quitButton": "Quitter",
+		"quitConfirm": "Êtes-vous sûr de vouloir quitter le jeu ?",
 		"startIn": "Démarrage dans",
 		"waitOpponent": "En attente de l'adversaire...",
+		"sessionExpired": "La session de jeu local n'existe plus. Redirection vers la page de jeu local.",
 		"vs": "VS",
 		"player": "Joueur",
+		"players": "{count} Joueurs",
 		"deniedMsg": "Vous devez être connecté pour jouer en ligne.",
 		"button": "Jouer",
 		"result": {
@@ -93,8 +100,11 @@
 			"tournament": "Tournoi",
 			"nbPlayers": "Combien de joueurs ?",
 			"nbPlayersPlaceholder": "Enter 2, 4, or 8",
-			"nbPlayersSpec": "Le nombre de joueurs doit être une puissance de 2 (2, 4, 8)."
-		}
+			"nbPlayersSpec": "Le nombre de joueurs doit être une puissance de 2 (2, 4, 8).",
+			"allAliases": "Tous les noms de joueurs doivent être remplis.",
+			"invalidAliases": "Les noms de jouers ne sont pas valides"
+		},
+		"selectTournamentSize": "Sélectionnez la taille du tournoi"
 	},
 	"register": {
 		"title": "Inscription",
@@ -130,6 +140,8 @@
 		"identifierPlaceholder": "Entrez votre nom d'utilisateur ou e-mail",
 		"passwordLabel": "Mot de passe",
 		"button": "Se connecter",
+		"google": "Se connecter avec Google",
+		"googleVerifying": "Vérification de votre compte Google...",
 		"registerLink": "Pas de compte ? S'inscrire",
 		"attemptingLogin": "Tentative de connexion...",
 		"success": "Connexion réussie ! Bienvenue",
@@ -201,6 +213,10 @@
 			"opponent": "Adversaire",
 			"error": "Erreur lors du chargement de l'historique des matchs."
 		},
+		"type": {
+			"tournament": "Tournoi",
+			"quickMatch": "Match rapide"
+		},
 		"details": {
 			"player": "Joueur",
 			"players": "Joueurs",
@@ -219,15 +235,46 @@
 			"history": "Historique des matchs"
 		}
 	},
+	"tournament": {
+		"title": "Arbre du tournoi",
+		"titleOnline": "Tournoi en ligne",
+		"waitingForPlayers": "En attente de joueurs... {current}/{required}",
+		"waitingForPlayersShort": "En attente de joueurs...",
+		"ready": "Prêt",
+		"waitingForOpponent": "En attente de l'adversaire...",
+		"inProgress": "En cours",
+		"yourNextMatch": "Votre prochain match",
+		"winnerShort": "Vainqueur",
+		"timeout": "La recherche de match a expiré. Veuillez réessayer.",
+		"redirecting": "Vous avez un tournoi en cours, redirection...",
+		"nextRound": "Prochain tour",
+		"notOver": "Tous les matchs de la manche actuelle doivent être terminés avant de passer à la manche suivante.",
+		"winnerIs": "🏆 Gagnant du tournoi: ",
+		"winner": "Vainqueur : ",
+		"nextMatch": "Prochain match",
+		"finale": "Finale",
+		"round": "Tour ",
+		"current": "Actuel",
+		"completed": "Terminé",
+		"playMatch": "Jouer le match",
+		"waiting": "En attente..."
+	},
 	"general": {
 		"yes": "Oui",
 		"no": "Non",
 		"on": "Le",
 		"at": "à",
+		"or": "OU",
+		"and": "et",
+		"ok": "OK",
+		"close": "Fermer",
+		"save": "Enregistrer",
+		"delete": "Supprimer",
 		"error": "Erreur",
 		"loading": "Chargement...",
 		"cancel": "Annuler",
-		"confirm": "Confirmer"
+		"confirm": "Confirmer",
+		"back": "Retour"
 	},
 	"msg": {
 		"redirect": {
@@ -247,6 +294,7 @@
 			"malformedResponse": "La réponse du serveur est mal formée.",
 			"networkError": "Erreur de réseau ou impossible de joindre le serveur.",
 			"loadingContent": "Erreur lors du chargement du contenu. Veuillez réessayer plus tard.",
+			"createLocalMatch": "Erreur lors de la création d'une partie locale. Veuillez réessayer.",
 			"login": {
 				"invalidCredentials": "Identifiant ou mot de passe invalide.",
 				"unknown": "Erreur inconnue lors de la connexion.",
@@ -267,6 +315,7 @@
 				"missCsrf": "Jeton CSRF manquant. Veuillez rafraîchir la page et réessayer.",
 				"fetchCsrf": "Echec de la récupération du jeton CSRF. Veuillez rafraîchir la page et réessayer.",
 				"loadingProfile": "Une erreur est survenue lors du chargement du profil utilisateur.",
+				"2faFailed": "L'authentification à deux facteurs a échoué. Veuillez réessayer.",
 				"notFound": "Utilisateur non trouvé."
 			}
 		}

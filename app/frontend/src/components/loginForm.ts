@@ -30,7 +30,7 @@ export function LoginForm(props: LoginFormProps): HTMLElement {
 			type: 'submit',
 			id: 'login-button',
 			textContent: t('login.button'),
-			className: 'w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium disabled:opacity-50 transition-colors duration-200 bg-green-500 hover:bg-green-600 text-white border border-green-400/50'
+			className: 'w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-xl font-beach font-medium disabled:opacity-50 transition-colors duration-200 bg-green-500 hover:bg-green-600 text-white border border-green-400/50'
 		});
 
 		const form = createElement('form', { id: 'login-form-component', className: 'space-y-6' }, [

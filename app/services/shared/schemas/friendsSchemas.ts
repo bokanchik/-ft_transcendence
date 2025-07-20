@@ -4,7 +4,7 @@ import { UserBaseSchema, UserOnlineStatusSchema, ErrorResponseSchema } from './u
 export enum FriendshipStatus {
 	PENDING = 'pending',
 	ACCEPTED = 'accepted',
-	DECLINED = 'declined', // Pertinent ?
+	DECLINED = 'declined',
 	BLOCKED = 'blocked',
 }
 export const FriendshipStatusSchema = z.nativeEnum(FriendshipStatus);
@@ -16,7 +16,7 @@ export const FriendshipBaseSchema = z.object({
 	user2_id: z.number().int(),
 	initiator_id: z.number().int(),
 	status: FriendshipStatusSchema,
-	created_at: z.string(), // Ou z.string().date()
+	created_at: z.string(),
 });
 export type Friendship = z.infer<typeof FriendshipBaseSchema>;
 
@@ -54,7 +54,6 @@ export type FriendshipIdParams = z.infer<typeof FriendshipIdParamsSchema>;
 export const FriendRequestUserSchema = UserBaseSchema.pick({
 	id: true,
 	username: true,
-	// email: true, // email ici ?
 	display_name: true,
 	avatar_url: true,
 });

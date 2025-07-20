@@ -78,7 +78,7 @@ describe('domUtils', () => {
         btn.click();
         
         await vi.waitFor(() => {
-            expect(showToast).toHaveBeenCalledWith('Failed to save-data.', 'error');
+            expect(showToast).toHaveBeenCalledWith('msg.error.fail save-data.', 'error');
         });
 
         expect(btn.disabled).toBe(false);

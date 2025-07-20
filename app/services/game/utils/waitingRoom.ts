@@ -13,10 +13,8 @@ export async function waitingRoomHandler(socket: Socket) {
     
     socket.on('authenticate', async ({ display_name, userId }) => {
         try {
-            // Ajout arthur : MAJ status utilisateur
             await updateUserStatus(userId, UserOnlineStatus.IN_GAME);
 
-            // store display_name and socket.id in waiting list if not already in        
             const newPlayer = await addPlayerToWaitingList(display_name, userId, socket);
             
             if (newPlayer) {
@@ -94,7 +92,6 @@ export async function waitingRoom() {
             removePlayerFromWaitingList(player1.socket.id);
             removePlayerFromWaitingList(player2.socket.id);
             
-            // timeout pour syncroniser le client et le serveur : est-ce que c'est la bonne solution ?
             setTimeout(() => startRemoteGame(player1.socket, player2.socket, matchId), 3000);
             
             return;

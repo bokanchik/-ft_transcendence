@@ -11,6 +11,8 @@ secrets:
     file: ../secrets/crypto_secret.txt
   api_key:
     file: ../secrets/api_key.txt
+  google_client_secret:
+    file: ../secrets/callback_secret.txt
 
 networks:
   tranet:
@@ -23,20 +25,15 @@ networks:
 volumes:
   frontdata:
     name: frontdata
-    # driver: local
-    # driver_opts:
-    #   type: none
-    #   device: ./frontdata
-    #   o: bind
 
 services:
-  gateaway: # entrypoint for services
-    container_name: gateaway
-    build: ./gateaway
+  gateway:
+    container_name: gateway
+    build: ./gateway
     ports:
       - "8443:8443"
     restart: always
-    env_file: ./env/gateaway.env
+    env_file: ./env/gateway.env
     volumes:
       - frontdata:/usr/share/nginx/html:ro
     depends_on:
@@ -53,13 +50,13 @@ services:
     command: npm run dev
     restart: always
     ports:
-      - "5000:5000" # for development (live-server)
+      - "5000:5000"
     volumes:
       - frontdata:/app/dist
     networks:
       - tranet
 
-  frontend-tests: # <--- NOUVEAU SERVICE POUR LES TESTS
+  frontend-tests:
     container_name: frontend-tests
     build: ./frontend
     command: npm run test:watch
@@ -80,12 +77,14 @@ services:
       - SESSION_SECRET__FILE=/run/secrets/session_secret
       - CRYPTO_SECRET__FILE=/run/secrets/crypto_secret
       - API_KEY__FILE=/run/secrets/api_key
+      - GOOGLE_CLIENT_SECRET__FILE=/run/secrets/google_client_secret
     secrets:
       - jwt_secret
       - cookie_secret
       - session_secret
       - crypto_secret
       - api_key
+      - google_client_secret
     restart: always
     volumes:
       - ./services/shared:/app/shared:ro
@@ -106,12 +105,14 @@ services:
       - SESSION_SECRET__FILE=/run/secrets/session_secret
       - CRYPTO_SECRET__FILE=/run/secrets/crypto_secret
       - API_KEY__FILE=/run/secrets/api_key
+      - GOOGLE_CLIENT_SECRET__FILE=/run/secrets/google_client_secret
     secrets:
       - jwt_secret
       - cookie_secret
       - session_secret
       - crypto_secret
       - api_key
+      - google_client_secret
     restart: always
     volumes:
       - ./services/shared:/app/shared:ro
@@ -132,12 +133,14 @@ services:
       - SESSION_SECRET__FILE=/run/secrets/session_secret
       - CRYPTO_SECRET__FILE=/run/secrets/crypto_secret
       - API_KEY__FILE=/run/secrets/api_key
+      - GOOGLE_CLIENT_SECRET__FILE=/run/secrets/google_client_secret
     secrets:
       - jwt_secret
       - cookie_secret
       - session_secret
       - crypto_secret
       - api_key
+      - google_client_secret
     restart: always
     volumes:
       - ./services/shared:/app/shared:ro
@@ -165,7 +168,6 @@ services:
       - monitoring
     depends_on:
       - cadvisor
-      # - nginx_exporter
     restart: always
   
   grafana:
@@ -182,15 +184,3 @@ services:
     networks:
       - monitoring
     restart: always
-
-  # nginx_exporter:
-  #   image: nginx/nginx-prometheus-exporter:0.11
-  #   container_name: nginx_exporter
-  #   command:
-  #     - '-nginx.scrape-uri=http://gateaway:8081/stub_status'
-  #   networks:
-  #     - tranet
-  #     - monitoring
-  #   restart: unless-stopped
-  #   depends_on:
-  #     - gateaway

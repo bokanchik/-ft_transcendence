@@ -1,23 +1,28 @@
 import Fastify, {  FastifyInstance,  FastifyReply, FastifyRequest } from 'fastify';
 import { serializerCompiler, validatorCompiler, ZodTypeProvider } from "fastify-type-provider-zod";
+import { Server, Socket } from 'socket.io';
 import fastifyRateLimit from '@fastify/rate-limit';
 import { tournamentRoutes } from './routes/tournaments.ts';
 //@ts-ignore
 import { setupPlugins } from './shared/auth-plugin/tokens.js'
+import { handleTournamentLogic } from './handlers/tournamentHandler.ts';
 
 const fastify: FastifyInstance = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
 
-// set rate-limit to avoid too many requests
+
+const io: Server = new Server(fastify.server, {
+    path: "/socket-tournament/"
+});
+fastify.decorate('io', io);
+
 fastify.register(fastifyRateLimit, {
     max: 50,
     timeWindow: '1 minute',
 });
 
-// Add schema validator and serializer
 fastify.setValidatorCompiler(validatorCompiler);
 fastify.setSerializerCompiler(serializerCompiler);
 
-// Register routes
 const registerRoutes = () => {
   fastify.get('/api/users/csrf-token', async (request: FastifyRequest, reply: FastifyReply) => {
     const token: string = await reply.generateCsrf();
@@ -26,15 +31,19 @@ const registerRoutes = () => {
   })
   
   fastify.register(tournamentRoutes, { prefix: '/api/tournament/' });
- 
   fastify.log.info('Routes registred');
 };
 
-// Start server game and setup socket.io
 const start = async () => {
   try {
 
-    await fastify.ready(); // wait for all plugins to be ready    
+    await fastify.ready(); 
+
+    fastify.io.on('connection', (socket: Socket) => {
+        handleTournamentLogic(socket);
+    });
+
+    fastify.log.info('Socket server for TOURNAMENT is ready');
 
     await fastify.listen({ port: 6001, host: '0.0.0.0' });
 
@@ -52,4 +61,4 @@ const run = async() => {
 
 run();
 
-export { fastify } ; // Export the io instance for use in other modules
+export { fastify, io } ;

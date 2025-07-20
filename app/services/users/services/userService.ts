@@ -271,3 +271,52 @@ export async function updateUserStats(userId: number, statsUpdate: UpdateUserSta
     console.log(`Stats updated successfully for user ID: ${userId}. New stats: W=${updatedUser.wins}, L=${updatedUser.losses}`);
     return updatedUser;
 }
+
+/**
+ * Finds a user by email, or creates a new one if not found.
+ * Designed for OAuth providers like Google.
+ * @param {object} profile - The user profile from the OAuth provider.
+ * @param {string} profile.email - The user's email.
+ * @param {string} profile.display_name - The user's display name.
+ * @param {string | null} profile.avatar_url - The user's avatar URL.
+ * @returns {Promise<UserWithSecrets>} The found or newly created user.
+ */
+export async function findOrCreateUserFromProvider(profile: {
+    email: string;
+    display_name: string;
+    avatar_url: string | null;
+}): Promise<UserWithSecrets> {
+    
+    let user = await userModel.getUserByEmailFromDb(profile.email);
+
+    if (user) {
+        console.log(`User found for Google login: ${profile.email}`);
+        return user;
+    }
+
+    console.log(`Creating new user for Google login: ${profile.email}`);
+    
+    const baseUsername = profile.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '');
+    let username = baseUsername;
+    let counter = 1;
+    while (await userModel.isUsernameInDb(username)) {
+        username = `${baseUsername}${counter++}`;
+    }
+
+    const payload: CreateUserPayload = {
+        username,
+        email: profile.email,
+        password_hash: await passwordUtils.hashPassword(crypto.randomUUID()),
+        display_name: profile.display_name,
+        avatar_url: profile.avatar_url || generateDefaultAvatarUrl(profile.display_name),
+        language: 'en',
+    };
+
+    await userModel.createUser(payload);
+
+    const newUser = await userModel.getUserByEmailFromDb(profile.email);
+    if (!newUser) {
+        throw new AppError(ERROR_KEYS.DATABASE_ERROR, 500, { detail: 'Failed to retrieve user after creation' });
+    }
+    return newUser;
+}

@@ -3,7 +3,7 @@
 @layer base {
   body {
     overflow: hidden;
-    background-image: url('/assets/background.jpg');
+    background-image: url('/assets/background.webp');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -24,32 +24,8 @@
 
 @font-face {
   font-display: swap;
-  font-family: SpiritFox;
-  src: url('../fonts/SpiritFox.woff2') format('woff2');
-}
-
-@font-face {
-  font-display: swap;
-  font-family: JungleFever;
-  src: url('../fonts/JungleFever.woff2') format('woff2');
-}
-
-@font-face {
-  font-display: swap;
   font-family: JungleRoar;
   src: url('../fonts/JungleRoar.woff2') format('woff2');
-}
-
-@font-face {
-  font-display: swap;
-  font-family: Workout;
-  src: url('../fonts/Workout.woff2') format('woff2');
-}
-
-@font-face {
-  font-display: swap;
-  font-family: Gulag;
-  src: url('../fonts/Gulag.woff2') format('woff2');
 }
 
 @font-face {
@@ -66,17 +42,50 @@
 
 @font-face {
   font-display: swap;
-  font-family: Maksimir;
-  src: url('../fonts/Maksimir.woff2') format('woff2');
+  font-family: MoreIsLess;
+  src: url('../fonts/MoreIsLess.woff2') format('woff2');
 }
 
 @theme {
-  --font-spirtit-fox: SpiritFox, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-workout: Workout, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-jurassic: JurassicPark, Beograd, ZeroCool, Maksimir, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-jurassic: JurassicPark, MoreIsLess, ZeroCool, Beograd, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-roar: JungleRoar, ZeroCool, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-fever: JungleFever, Beograd, ZeroCool, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --font-beach: Beachclub, JungleRoar, Beograd, ZeroCool, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-beach: Beachclub, JungleRoar, MoreIsLess, ZeroCool, Beograd, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+@layer utilities {
+    .animate-pulse-custom {
+      animation: pulseCustom 2s infinite;
+    }
+  
+    @keyframes pulseCustom {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.7; }
+    }
+
+    .animate-spin {
+      animation: spin 1s linear infinite;
+    }
+
+    /* Custom scrollbar styles */
+    .overflow-y-auto::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .overflow-y-auto::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+    }
+    
+    .overflow-y-auto::-webkit-scrollbar-thumb {
+        background-color: rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+        border: 2px solid transparent;
+        background-clip: content-box;
+    }
+    
+    .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+        background-color: rgba(255, 255, 255, 0.5);
+    }
 }
 
 /* --- Styles pour les plantes --- */
@@ -142,22 +151,6 @@
   100% { transform: rotate(0deg); }
 }
 
-/* --- Styles de input.css --- */
-@layer utilities {
-    .animate-pulse-custom {
-      animation: pulseCustom 2s infinite;
-    }
-  
-    @keyframes pulseCustom {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.1); opacity: 0.7; }
-    }
-
-    .animate-spin {
-      animation: spin 1s linear infinite;
-    }
-}
-
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
@@ -175,10 +168,11 @@
 .titleText{
 	fill-opacity: 0;
 	stroke-width: 2px;
-	stroke-dasharray: 350;
-	stroke-dashoffset: 350;
+	stroke-dasharray: 390;
+	stroke-dashoffset: 390;
 	animation: titleAnimation 2s ease-in-out 1 forwards;
 }
+
 @keyframes titleAnimation {
 	0%{
 		stroke-dashoffset: 330;
@@ -187,16 +181,16 @@
 		fill-opacity: 0;
 	}
 	100%{
-		fill-opacity: 100;
+		fill-opacity: 60;
 		stroke-dashoffset: 0;
 	}
 }
 
-.titlePaddle{
-	stroke-dasharray: 222;
-	stroke-dashoffset: 0;
+/* .titlePaddle{ */
+	/* stroke-dasharray: 222; */
+	/* stroke-dashoffset: 0; */
 	/* animation: titlePaddleAnimation 2s ease-in-out 1 forwards; */
-}
+/* } */
 
 @keyframes titlePaddleAnimation {
 	0%{
@@ -211,11 +205,11 @@
 	}
 }
 
-.titleHandle{
+/* .titleHandle{
 	stroke-dasharray: 123.456;
 	stroke-dashoffset: 0;
 	/* animation: titleHandleAnimation 2s ease-in-out 1 forwards; */
-}
+/* }  */
 
 @keyframes titleHandleAnimation {
 	0%{

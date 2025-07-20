@@ -25,6 +25,7 @@ export function createElement<K extends keyof HTMLElementTagNameMap>(
 		selected?: boolean;
 		htmlFor?: string;
 		role?: string;
+		referrerpolicy?: string;
 	},
 	children?: (HTMLElement | string | Node | null | undefined)[]
 ): HTMLElementTagNameMap[K] {
@@ -41,6 +42,7 @@ export function createElement<K extends keyof HTMLElementTagNameMap>(
 	if (options?.selected && el instanceof HTMLOptionElement) el.selected = options.selected;
 	if (options?.htmlFor && el instanceof HTMLLabelElement) el.htmlFor = options.htmlFor;
 
+	if (options?.referrerpolicy) el.setAttribute('referrerpolicy', options.referrerpolicy);
 	if (options?.href && el instanceof HTMLAnchorElement) el.href = options.href;
 	if (options?.src && el instanceof HTMLImageElement) el.src = options.src;
 	if (options?.alt && el instanceof HTMLImageElement) el.alt = options.alt;
@@ -90,33 +92,36 @@ export function createActionButton(props: ActionButtonProps): HTMLButtonElement 
 		type: 'button'
 	});
 
-	let colorClasses = 'bg-gray-500 hover:bg-gray-600 text-white font-fever';
-	if (props.baseClass) {
-		colorClasses = props.baseClass;
-	} else if (props.variant) {
-		switch (props.variant) {
-			case 'primary':
-				colorClasses = 'bg-blue-700 hover:bg-blue-500 text-white border border-blue-600/50';
-				break;
-			case 'secondary':
-				colorClasses = 'bg-white/10 hover:bg-white/20 text-gray-200 border border-white/20';
-				break;
-			case 'danger':
-				colorClasses = 'bg-red-900 hover:bg-red-700 text-white border border-red-800/50';
-				break;
-			case 'warning':
-				colorClasses = 'bg-yellow-600 hover:bg-yellow-400 text-black border border-yellow-500/50';
-				break;
-			case 'success':
-				colorClasses = 'bg-teal-800 hover:bg-teal-600 text-white border border-teal-700/50';
-				break;
-			case 'info':
-				colorClasses = 'bg-teal-500 hover:bg-teal-600 text-white border border-teal-400/50';
-				break;
-		}
-	}
 
-	button.className = `${colorClasses} text-xs font-semibold py-1 px-2.5 rounded transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed`;
+	if (props.baseClass) {
+		button.className = props.baseClass;
+	} else {
+		let colorClasses = 'bg-gray-500 hover:bg-gray-600 text-white font-beach';
+		if (props.variant) {
+			switch (props.variant) {
+				case 'primary':
+					colorClasses = 'bg-blue-700 hover:bg-blue-500 text-white border border-blue-600/50';
+					break;
+				case 'secondary':
+					colorClasses = 'bg-white/10 hover:bg-white/20 text-gray-200 border border-white/20';
+					break;
+				case 'danger':
+					colorClasses = 'bg-red-900 hover:bg-red-700 text-white border border-red-800/50';
+					break;
+				case 'warning':
+					colorClasses = 'bg-yellow-600 hover:bg-yellow-400 text-black border border-yellow-500/50';
+					break;
+				case 'success':
+					colorClasses = 'bg-teal-800 hover:bg-teal-600 text-white border border-teal-700/50';
+					break;
+				case 'info':
+					colorClasses = 'bg-teal-500 hover:bg-teal-600 text-white border border-teal-400/50';
+					break;
+			}
+		}
+		button.className = `${colorClasses} text-xs font-beach font-thin py-1 px-2.5 rounded transition-all duration-200`;
+	} 
+	button.className += ' disabled:opacity-50 disabled:cursor-not-allowed';
 	if (props.disabled) {
 		button.disabled = true;
 	}
@@ -153,8 +158,8 @@ interface InputFieldOptions {
 	value?: string;
 	minLength?: number;
 	maxLength?: number;
-	min?: string; // for type=number
-	max?: string; // for type=number
+	min?: string;
+	max?: string;
 	readonly?: boolean;
 	inputClass?: string;
 	labelClass?: string;

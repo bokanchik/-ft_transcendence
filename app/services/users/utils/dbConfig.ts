@@ -55,3 +55,36 @@ export async function initializeDb(): Promise<Database> {
 		throw new Error('Database initialization failed');
 	}
 }
+
+/**
+ * Exécute une requête SQL qui ne retourne pas de lignes (INSERT, UPDATE, DELETE).
+ * @param sql La requête SQL à exécuter.
+ * @param params Les paramètres pour la requête.
+ * @returns Le résultat de l'exécution (ex: { changes: 1 }).
+ */
+export async function execute(sql: string, params: any[] = []) {
+    const db = getDb();
+    return db.run(sql, params);
+}
+
+/**
+ * Exécute une requête SELECT et retourne toutes les lignes correspondantes.
+ * @param sql La requête SQL SELECT.
+ * @param params Les paramètres pour la requête.
+ * @returns Un tableau de toutes les lignes trouvées.
+ */
+export async function fetchAll<T>(sql: string, params: any[] = []): Promise<T[]> {
+    const db = getDb();
+    return db.all<T[]>(sql, params);
+}
+
+/**
+ * Exécute une requête SELECT et ne retourne que la première ligne correspondante.
+ * @param sql La requête SQL SELECT.
+ * @param params Les paramètres pour la requête.
+ * @returns La première ligne trouvée, ou undefined.
+ */
+export async function fetchFirst<T>(sql: string, params: any[] = []): Promise<T | undefined> {
+    const db = getDb();
+    return db.get<T>(sql, params);
+}

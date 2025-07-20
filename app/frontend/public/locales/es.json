@@ -12,6 +12,7 @@
 		"dashboard": "Volver al panel",
 		"newGame": "Volver a la sala de juego",
 		"tournament": "Volver al torneo",
+		"backToGame": "Volver a la selección de juego",
 		"lobby": "Volver a la sala"
 	},
 	"user": {
@@ -23,6 +24,7 @@
 		"wins": "Victorias",
 		"losses": "Derrotas",
 		"loading": "Cargando datos del usuario...",
+		"noUser": "Usuario no encontrado.",
 		"status": {
 			"title": "Estado",
 			"online": "En línea",
@@ -75,11 +77,16 @@
 		"welcome": "Bienvenido al juego",
 		"loading": "Cargando juego...",
 		"start": "Iniciar Juego",
+		"quickMatch": "Partida rápida",
+		"startTournament": "Torneo",
 		"quitButton": "Salir",
+		"quitConfirm": "¿Estás seguro de que quieres salir de la Partida?",
 		"startIn": "Empezando en",
 		"waitOpponent": "Esperando oponente...",
+		"sessionExpired": "La sesión de juego local ya no existe. Redirigiendo a la página de juego local.",
 		"vs": "VS",
 		"player": "Jugador",
+		"players": "{count} Jugadores",
 		"deniedMsg": "Debes iniciar sesión para jugar en línea.",
 		"button": "Jugar",
 		"result": {
@@ -93,8 +100,11 @@
 			"tournament": "Torneo",
 			"nbPlayers": "¿Cuántos jugadores?",
 			"nbPlayersPlaceholder": "Introduce 2, 4 u 8",
-			"nbPlayersSpec": "El número de jugadores debe ser una potencia de 2 (2, 4, 8)."
-		}
+			"nbPlayersSpec": "El número de jugadores debe ser una potencia de 2 (2, 4, 8).",
+			"allAliases": "Todos los nombres de jugadores deben estar completos.",
+			"invalidAliases": "Los nombres de jugadores no son válidos"
+		},
+		"selectTournamentSize": "Selecciona el tamaño del torneo"
 	},
 	"register": {
 		"title": "Registro",
@@ -130,6 +140,8 @@
 		"identifierPlaceholder": "Introduce tu usuario o correo",
 		"passwordLabel": "Contraseña",
 		"button": "Entrar",
+		"google": "Iniciar sesión con Google",
+		"googleVerifying": "Verificando tu cuenta de Google...",
 		"registerLink": "¿No tienes cuenta? Registrarse",
 		"attemptingLogin": "Iniciando sesión...",
 		"success": "¡Inicio de sesión exitoso! Bienvenido",
@@ -201,6 +213,10 @@
 			"opponent": "Oponente",
 			"error": "Error al cargar el historial de partidas."
 		},
+		"type": {
+			"tournament": "Torneo",
+			"quickMatch": "Partida rápida"
+		},
 		"details": {
 			"player": "Jugador",
 			"players": "Jugadores",
@@ -219,15 +235,45 @@
 			"history": "Historial de partidas"
 		}
 	},
+	"tournament": {
+		"title": "Árbol del torneo",
+		"titleOnline": "Torneo en línea",
+		"waitingForPlayers": "Esperando jugadores... {current}/{required}",
+		"waitingForPlayersShort": "Esperando jugadores...",
+		"ready": "Listo",
+		"waitingForOpponent": "Esperando oponente...",
+		"inProgress": "En curso",
+		"yourNextMatch": "Tu próximo partido",
+		"winnerShort": "Ganador",
+		"timeout": "La búsqueda de partidas ha expirado. Por favor, inténtalo de nuevo.",
+		"redirecting": "Tienes un torneo en curso, redirigiendo...",
+		"round": "Ronda",
+		"finale": "Final",
+		"current": "Actual",
+		"completed": "Completado",
+		"playMatch": "Jugar partida",
+		"waiting": "Esperando...",
+		"notOver": "Todas las partidas de la ronda actual deben completarse antes de proceder a la siguiente ronda.",
+		"winnerIs": "🏆 Ganador del torneo: ",
+		"nextRound": "Siguiente ronda",
+		"winner" : "Ganador :"
+	},
 	"general": {
 		"yes": "Sí",
 		"no": "No",
 		"on": "El",
 		"at": "a las",
+		"or": "O",
+		"and": "y",
+		"ok": "OK",
+		"close": "Cerrar",
+		"save": "Guardar",
+		"delete": "Eliminar",
 		"error": "Error",
 		"loading": "Cargando...",
 		"cancel": "Cancelar",
-		"confirm": "Confirmar"
+		"confirm": "Confirmar",
+		"back": "Atrás"
 	},
 	"msg": {
 		"redirect": {
@@ -247,6 +293,7 @@
 			"malformedResponse": "La respuesta del servidor está mal formada.",
 			"networkError": "Error de red o no se pudo contactar al servidor.",
 			"loadingContent": "Error al cargar el contenido. Por favor, inténtalo de nuevo más tarde.",
+			"createLocalMatch": "Error al crear una partida local. Por favor, inténtalo de nuevo.",
 			"login": {
 				"invalidCredentials": "Identificador o contraseña no válidos.",
 				"unknown": "error desconocido al iniciar sesión.",
@@ -267,6 +314,7 @@
 				"missCsrf": "Falta el token CSRF. Por favor, refresca la página e inténtalo de nuevo.",
 				"fetchCsrf": "Fallo al obtener el token CSRF. Por favor, refresca la página e inténtalo de nuevo.",
 				"loadingProfile": "Ocurrió un error al cargar el perfil del usuario.",
+				"2faFailed": "La autenticación de dos factores falló. Por favor, inténtalo de nuevo.",
 				"notFound": "Usuario no encontrado."
 			}
 		}

@@ -5,36 +5,23 @@ import { GameRoomPage } from './pages/gameRoomPage.js';
 import { DashboardPage } from './pages/dashboardPage.js';
 import { SettingsPage } from './pages/settingsPage.js';
 import { ProfilePage } from './pages/profilePage.js';
-import { GamePage } from './components/gamePage.js';
-import { GameMode } from './components/gamePage.js';
+import { GamePage} from './pages/gameSetupPage.js';
+import { GameMode } from './shared/schemas/matchesSchemas.js';
 import { TournamentPage } from './pages/tournamentTree.js';
 import { getUserDataFromStorage } from './services/authService.js';
-import { promptAliasForm } from './components/SelectGameModeForm.js';
+import { promptAliasForm } from './pages/localGameSetupPage.js';
 import { navigateTo } from './services/router.js';
 import { initI18n, t } from './services/i18nService.js';
-import { showcase } from './components/showcase.js';
+import { showcase } from './pages/showcasePage.js';
 import { createElement, clearElement } from './utils/domUtils.js';
+import { renderNotFoundPage } from './pages/notFoundPage.js';
+import { AuthCallbackPage } from './pages/authCallbackPage.js';
 
 const appContainer = document.getElementById('main');
 
 interface RouteConfig {
 	component: (params?: { [key: string]: string }) => HTMLElement | Promise<HTMLElement>;
 	requiredAuth?: boolean;
-}
-
-function renderNotFoundPage(): HTMLElement {
-	const backLink = createElement('a', {
-		href: '/',
-		textContent: t('link.home'),
-		className: 'text-blue-500 hover:underline'
-	});
-	backLink.setAttribute('data-link', '');
-
-	return createElement('div', {}, [
-		createElement('h1', { textContent: t('msg.error.notFound'), className: 'text-3xl font-bold text-red-500 text-center p-8' }),
-		createElement('p', { textContent: t('msg.error.notFoundMsg'), className: 'text-center' }),
-		createElement('div', { className: 'text-center mt-4' }, [backLink])
-	]);
 }
 
 const routes: { [key: string]: RouteConfig } = {
@@ -48,7 +35,9 @@ const routes: { [key: string]: RouteConfig } = {
 	'/game': { component: GamePage },
 	'/local-game': { component: promptAliasForm },
 	'/game-room': { component: () => GameRoomPageFromParams() },
-	'/tournament': { component: TournamentPage }
+	'/tournament': { component: TournamentPage },
+	'/auth/google/callback': { component: AuthCallbackPage },
+	'/tournament/:id': { component: (params) => TournamentPage(params), requiredAuth: true },
 };
 
 function GameRoomPageFromParams(): HTMLElement {
@@ -76,7 +65,7 @@ export async function router() {
 					const paramName = routePattern.split('/:')[1];
 					const paramValue = path.slice(base.length + 1);
 					routeCfg = routes[routePattern];
-					if (paramName === 'id') {
+					if (routePattern.startsWith('/profile/') && paramName === 'id') {
 						params.userId = paramValue;
 					} else {
 						params[paramName] = paramValue;

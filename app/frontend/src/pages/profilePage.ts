@@ -34,7 +34,7 @@ export async function ProfilePage(params: { userId?: string }): Promise<HTMLElem
 	const pageContainer = createElement('div', {
 		className: 'min-h-screen p-4 sm:p-8 flex flex-col items-center bg-cover bg-center bg-fixed'
 	});
-	pageContainer.style.backgroundImage = "url('/assets/background.jpg')";
+	pageContainer.style.backgroundImage = "url('/assets/background.webp')";
 
 	const contentArea = createElement('div', { className: 'flex flex-1 w-full' });
 
@@ -113,6 +113,6 @@ function createProfileSidebar(profiledUser: User, loggedInUser: User): HTMLEleme
 
 	return createElement('aside', {
 		className: 'w-1/4 p-6 border-r border-gray-400/30 space-y-4 overflow-y-auto flex flex-col',
-		role: 'complementary' // Ajout du role pour le test
+		role: 'complementary'
 	}, [avatarContainer, ...infoItems]);
 }

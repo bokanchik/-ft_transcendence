@@ -4,6 +4,7 @@ import { UserOnlineStatus } from '../shared/schemas/usersSchemas.js';
 
 const API_KEY = config.API_KEY;
 const USER_SERVICE_URL = config.API_USER_URL;
+const TOURNAMENT_SERVICE_URL = config.API_TOURNAMENT_URL;
 
 /**
  * Appelle le service utilisateur pour mettre à jour les statistiques d'un joueur.
@@ -18,7 +19,6 @@ export async function updatePlayerStats(userId: number, result: 'win' | 'loss'):
 
     try {
         const response = await fetch(`${USER_SERVICE_URL}/api/users/${userId}/stats`, {
-        // const response = await fetch(`http://users:4000/api/users/${userId}/stats`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -69,5 +69,29 @@ export async function updateUserStatus(userId: number, status: UserOnlineStatus)
 
     } catch (error: any) {
         fastify.log.error(`[GameService] Network error while updating user status for ${userId}. URL: ${url}`, error.message);
+    }
+}
+
+export async function reportMatchResultToTournamentService(tournamentId: string, matchId: string, winnerId: number): Promise<void> {
+    if (!API_KEY) {
+        fastify.log.error('FATAL: API_KEY is not defined!');
+        return;
+    }
+
+    const url = `${TOURNAMENT_SERVICE_URL}/api/tournament/internal/match-result`;
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': API_KEY,
+            },
+            body: JSON.stringify({ tournamentId, matchId, winnerId }),
+        });
+        if (!response.ok) {
+            fastify.log.error(`Failed to report match result for ${matchId} to tournament service.`);
+        }
+    } catch (error) {
+        fastify.log.error(`Network error while reporting match result:`, error);
     }
 }

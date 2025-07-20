@@ -1,90 +1,7 @@
-// import { time } from "console";
-// import { t } from '../services/i18nService.js'
-
-// export function showWaitingToast(socket: SocketIOClient.Socket, controller: AbortController, timeLeft: number) {
-// 	const existingToast = document.querySelector('.custom-waiting-toast');
-// 	if (existingToast) {
-// 		existingToast.remove();
-// 	}
-
-// 	const toast = document.createElement('div') as HTMLElement;
-// 	// toast.className = `custom-waiting-toast fixed bottom-6 right-6 z-[1000]
-// 	//                    bg-white text-gray-800 shadow-lg rounded-full w-48 h-48 p-4 
-// 	//                    flex flex-col items-center justify-center gap-4
-// 	//                    transition-all duration-300 ease-in-out border border-gray-300`;
-// 	toast.className = `custom-waiting-toast fixed bottom-6 right-6 z-[1000]
-//                        bg-gray-900/60 backdrop-blur-lg text-white shadow-2xl rounded-full w-48 h-48 p-4 
-//                        flex flex-col items-center justify-center gap-4
-//                        transition-all duration-300 ease-in-out border border-gray-400/30`;
-
-// 	// Spinner container
-// 	const spinnerContainer = document.createElement('div');
-// 	spinnerContainer.className = 'relative w-16 h-16';
-
-// 	// Spinner ring (outer border)
-// 	const spinner = document.createElement('div');
-// 	// spinner.className = `absolute inset-0 rounded-full border-4 
-// 	//                      border-green-500 border-t-transparent animate-spin`;
-// 	spinner.className = 'absolute inset-0 rounded-full border-4 border-green-400 border-t-transparent animate-spin';
-
-// 	// Message
-// 	const message = document.createElement('p');
-// 	message.textContent = t('game.waitOpponent');
-// 	// message.className = 'text-center text-sm font-medium';
-// 	message.className = 'text-center text-sm font-medium text-gray-300';
-
-
-// 	// Timer
-// 	const timer = document.createElement('div');
-// 	timer.textContent = formatTime(timeLeft);
-// 	// timer.className = 'absolute inset-0 flex items-center justify-center text-lg font-bold text-green-700';
-// 	timer.className = 'absolute inset-0 flex items-center justify-center text-lg font-bold text-green-300';
-
-// 	spinnerContainer.appendChild(spinner);
-// 	spinnerContainer.appendChild(timer);
-
-// 	// Cancel button
-// 	const cancelBtn = document.createElement('button');
-// 	cancelBtn.textContent = t('general.cancel');
-// 	// cancelBtn.className = `bg-red-600 hover:bg-red-700 text-white font-medium py-1 px-4 rounded`;
-// 	cancelBtn.className = `bg-red-600 hover:bg-red-700 text-white font-medium py-1 px-4 rounded-lg border border-red-500/50 transition-colors`;
-
-// 	toast.appendChild(spinnerContainer);
-// 	toast.appendChild(message);
-// 	toast.appendChild(cancelBtn);
-// 	document.body.appendChild(toast);
-
-// 	// Animation d'apparition
-// 	toast.style.opacity = '0';
-// 	toast.style.transform = 'translateY(20px)';
-// 	setTimeout(() => {
-// 		toast.style.opacity = '1';
-// 		toast.style.transform = 'translateY(0)';
-// 	}, 10);
-
-// 	// Timer countdown
-// 	let secondsLeft = timeLeft;
-// 	const countdown = setInterval(() => {
-// 		secondsLeft--;
-// 		timer.textContent = formatTime(secondsLeft);
-// 		if (secondsLeft <= 0) {
-// 			clearInterval(countdown);
-// 		}
-// 	}, 1000);
-
-// 	// Cancel logic
-// 	cancelBtn.addEventListener('click', () => {
-// 		clearInterval(countdown);
-// 		controller.abort();
-// 		socket.emit('cancelMatch');
-// 		socket.disconnect();
-// 		removeWaitingToast();
-// 	});
-// }
-
-
 import { t } from '../services/i18nService.js';
 import { createElement } from '../utils/domUtils.js';
+import socket, { tournamentSocket } from '../services/socket.js';
+import { cleanupSocket } from '../services/initOnlineGame.js';
 
 export function showToast(message: string, type: 'success' | 'error' | 'info' = 'success') {
 	const existingToast = document.querySelector('.custom-toast');
@@ -195,36 +112,26 @@ export function showCustomConfirm(message: string, title: string = "Confirmation
 	});
 }
 
-export function showWaitingToast(socket: SocketIOClient.Socket, controller: AbortController, timeLeft: number) {
+export function showWaitingToast(socket: SocketIOClient.Socket, controller: AbortController, timeLeft: number, initialMessage: string) {
 	const existingToast = document.querySelector('.custom-waiting-toast');
 	if (existingToast) {
-		existingToast.remove();
+		const messageEl = existingToast.querySelector('p');
+		if (messageEl) messageEl.textContent = initialMessage;
+		return;
 	}
 
-	const timer = createElement('div', {
-		textContent: formatTime(timeLeft),
-		className: 'absolute inset-0 flex items-center justify-center text-lg font-bold text-green-300'
-	});
-
+	const timer = createElement('div', { textContent: formatTime(timeLeft), className: 'absolute inset-0 flex items-center justify-center text-lg font-bold text-green-300' });
 	const spinnerContainer = createElement('div', { className: 'relative w-16 h-16' }, [
 		createElement('div', { className: 'absolute inset-0 rounded-full border-4 border-green-400 border-t-transparent animate-spin' }),
 		timer
 	]);
-
-	const cancelBtn = createElement('button', {
-		textContent: t('general.cancel'),
-		className: 'bg-red-600 hover:bg-red-700 text-white font-medium py-1 px-4 rounded-lg border border-red-500/50 transition-colors'
-	});
+	const message = createElement('p', { textContent: initialMessage, className: 'text-center text-sm font-medium text-gray-300' });
+	const cancelBtn = createElement('button', { textContent: t('general.cancel'), className: 'bg-red-600 hover:bg-red-700 text-white font-medium py-1 px-4 rounded-lg border border-red-500/50 transition-colors' });
 
 	const toast = createElement('div', {
 		className: 'custom-waiting-toast fixed bottom-6 right-6 z-[1000] bg-gray-900/60 backdrop-blur-lg text-white shadow-2xl rounded-full w-48 h-48 p-4 flex flex-col items-center justify-center gap-4 transition-all duration-300 ease-in-out border border-gray-400/30'
-	}, [
-		spinnerContainer,
-		createElement('p', { textContent: t('game.waitOpponent'), className: 'text-center text-sm font-medium text-gray-300' }),
-		cancelBtn
-	]);
+	}, [spinnerContainer, message, cancelBtn]);
 
-	// Animation et logique
 	toast.style.opacity = '0';
 	toast.style.transform = 'translateY(20px)';
 	document.body.appendChild(toast);
@@ -237,27 +144,47 @@ export function showWaitingToast(socket: SocketIOClient.Socket, controller: Abor
 	const countdown = setInterval(() => {
 		timeLeft--;
 		timer.textContent = formatTime(timeLeft);
-		if (timeLeft <= 0) {
-			clearInterval(countdown);
-		}
+		if (timeLeft <= 0) clearInterval(countdown);
 	}, 1000);
 
 	cancelBtn.addEventListener('click', () => {
 		clearInterval(countdown);
 		controller.abort();
 		socket.emit('cancelMatch');
-		socket.disconnect();
-		removeWaitingToast();
+		cancelAllSearches();
 	});
 }
 
-export function removeWaitingToast() {
-	const toast = document.querySelector('.custom-waiting-toast');
-	if (toast instanceof HTMLElement) {
-		toast.style.opacity = '0';
-		toast.style.transform = 'translateY(20px)';
-		setTimeout(() => toast.remove(), 300);
-	}
+export function removeWaitingToast(instant: boolean = false) {
+    const toast = document.querySelector('.custom-waiting-toast');
+    if (instant && toast instanceof HTMLElement) {
+        toast.remove();
+        console.log("Waiting toast removed immediately.");
+    } else if (toast instanceof HTMLElement) {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        setTimeout(() => toast.remove(), 300);
+    }
+}
+
+function sendLeaveEvent(socketInstance: SocketIOClient.Socket, eventName: string) {
+    if (socketInstance.connected) {
+        socketInstance.emit(eventName);
+        cleanupSocket(socketInstance);
+        return;
+    }
+}
+
+export function cancelAllSearches(instant: boolean = false) {
+	console.log("Cancelling all game search.");
+	removeWaitingToast(instant);
+	sendLeaveEvent(socket, 'leaveQueue');
+    sendLeaveEvent(tournamentSocket, 'leaveTournamentQueue');
+	// cleanupSocket(socket);
+	// cleanupSocket(tournamentSocket);
+	sessionStorage.removeItem('gameMode');
+    sessionStorage.removeItem('onlineTournamentId');
+    sessionStorage.removeItem('matchId');
 }
 
 function formatTime(timeLeft: number): string {

@@ -5,7 +5,6 @@ import { DashboardPage } from '@/pages/dashboardPage';
 import { getUserDataFromStorage, checkAuthStatus, fetchUsers } from '@/services/authService';
 import * as FriendService from '@/services/friendService';
 
-// Mocks
 vi.mock('../services/router', () => ({ navigateTo: vi.fn() }));
 vi.mock('../services/authService');
 vi.mock('../services/friendService.js');
@@ -31,12 +30,12 @@ describe('DashboardPage', () => {
         email: 'test@user.com',
         wins: 10,
         losses: 5,
-        created_at: new Date('2024-01-01T12:00:00.000Z').toISOString(),
+        created_at: '2024-01-01 12:00:00',
         is_two_fa_enabled: false,
         language: 'fr',
         status: 'online',
         avatar_url: null,
-        updated_at: new Date('2024-01-01T12:00:00.000Z').toISOString(),
+        updated_at: '2024-01-01 12:00:00',
     };
     const mockFriends = [{ 
         friend_id: 2, 
@@ -65,10 +64,11 @@ describe('DashboardPage', () => {
         const pageElement = await DashboardPage();
         document.body.appendChild(pageElement);
         
-        const sidebar = await screen.findByTestId('sidebar');
-        
-        expect(await within(sidebar).findByText('testuser')).toBeInTheDocument();
-        expect(await within(sidebar).findByText('Test User')).toBeInTheDocument();
+        await waitFor(() => {
+            const sidebar = screen.getByTestId('sidebar');
+            expect(within(sidebar).getByText('testuser')).toBeInTheDocument();
+            expect(within(sidebar).getByText('Test User')).toBeInTheDocument();
+        });
     });
 
     it('should initially load the "users" tab content', async () => {

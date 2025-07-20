@@ -44,7 +44,7 @@ export function HomePage(): HTMLElement {
 		HeaderComponent({ currentUser }),
 		container
 	]);
-	pageWrapper.style.backgroundImage = "url('/assets/background.jpg')";
+	pageWrapper.style.backgroundImage = "url('/assets/background.webp')";
 
 	return pageWrapper;
 }

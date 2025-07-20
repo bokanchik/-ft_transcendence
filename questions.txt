@@ -1,4 +1,0 @@
-- environnement dev / prod ? on rend le projet deja compiler en prod ? fichiers persistants
-
-
-- Reste à faire et roadmap

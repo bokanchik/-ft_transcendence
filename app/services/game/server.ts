@@ -11,9 +11,9 @@ import { setupPlugins } from './shared/auth-plugin/tokens.js'
 
 const fastify: FastifyInstance = Fastify({ logger: true }).withTypeProvider<ZodTypeProvider>();
 
-// Initilize socket.io
+// Initialize socket.io
 const io: Server = new Server(fastify.server, {
-    path: "/socket-client/" // correspond a 'location' de nginx.conf, pour connecter le front et le back
+    path: "/socket-client/"
 });
 
 // Attach io to fastify instance
@@ -70,4 +70,4 @@ const run = async() => {
 
 run();
 
-export { fastify } ; // Export the io instance for use in other modules
+export { fastify } ;

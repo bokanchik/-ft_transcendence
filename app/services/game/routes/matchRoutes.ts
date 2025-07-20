@@ -1,10 +1,9 @@
 //import fastify from '../server.ts';
 import type { FastifyInstance } from 'fastify';
-import { createLocalMatchHandler, getMatchIdHandler, getMatchByUserHandler, cancelLocalMatchHandler, getLocalMatchState } from '../handlers/matchHandlers.ts'
-// import { createLocalMatchBody, GetMatchIdRouteSchema, GetMatchByUserIdRouteSchema, InviteFriendRouteSchema } from '../shared/schemas/matchesSchemas.ts';
-import { createLocalMatchBody, createLocalMatchRouteSchema, GetMatchIdRouteSchema, GetMatchByUserIdRouteSchema, cancelLocalMatchRouteSchema, cancelLocalMatchBody, getLocalMatchStateRouteSchema } from '../middleware/matchesSchemas.ts';
+import { createLocalMatchHandler, getMatchIdHandler, getMatchByUserHandler, cancelLocalMatchHandler, getLocalMatchState, createInternalMatchHandler, startOnlineMatchHandler, declareMatchForfeitHandler } from '../handlers/matchHandlers.ts'
+import { createLocalMatchBody, createLocalMatchRouteSchema, GetMatchIdRouteSchema, GetMatchByUserIdRouteSchema, cancelLocalMatchRouteSchema, cancelLocalMatchBody, getLocalMatchStateRouteSchema } from '../shared/schemas/matchesSchemas.ts';
 
-function matchRoutes(fastify: FastifyInstance, _options: unknown) {
+function matchRoutes(fastify: FastifyInstance, _options: unknown, done: () => void) {
 
    fastify.post('/match/local', {  
       preHandler: async (req, reply) => {
@@ -55,7 +54,20 @@ function matchRoutes(fastify: FastifyInstance, _options: unknown) {
       schema: GetMatchByUserIdRouteSchema,
       handler: getMatchByUserHandler
    });
-      
+   fastify.post('/match/internal/create', {
+      onRequest: [fastify.authenticateService],
+      handler: createInternalMatchHandler
+   });
+   fastify.post('/match/internal/start', {
+      onRequest: [fastify.authenticateService],
+      handler: startOnlineMatchHandler
+   });
+   fastify.post('/match/intenal/forfeit', {
+      onRequest: [fastify.authenticateService],
+      handler: declareMatchForfeitHandler
+   });
+
+   done();
 }
 
 

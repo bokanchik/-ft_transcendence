@@ -12,6 +12,7 @@
 		"dashboard": "Back to Dashboard",
 		"newGame": "Back to Game Room",
 		"tournament": "Back to Tournament",
+		"backToGame": "Back to Game Selection",
 		"lobby": "Back to Lobby"
 	},
 	"user": {
@@ -78,11 +79,16 @@
 		"welcome": "Welcome to the Game",
 		"loading": "Loading game...",
 		"start": "Start Game",
+		"quickMatch": "Quick Match",
+		"startTournament": "Tournament",
 		"quitButton": "Quit",
+		"quitConfirm": "Are you sure you want to quit the game?",
 		"startIn": "Starting in",
 		"waitOpponent": "Waiting for opponent...",
+		"sessionExpired": "The local game session no longer exists. Redirecting to the local game page.",
 		"vs": "VS",
 		"player": "Player",
+		"players": "{count} Players",
 		"deniedMsg": "You must be logged in to play online.",
 		"button": "start",
 		"result": {
@@ -96,8 +102,11 @@
 			"tournament": "Tournament",
 			"nbPlayers": "How many players?",
 			"nbPlayersPlaceholder": "Enter 2, 4, or 8",
-			"nbPlayersSpec": "Number of players must be a power of 2 (2, 4, 8)."
-		}
+			"nbPlayersSpec": "Number of players must be a power of 2 (2, 4, 8).",
+			"allAliases": "All player names must be filled.",
+			"invalidAliases": "Aliases are invalid. Try again"
+		},
+		"selectTournamentSize": "Select Tournament Size"
 	},
 	"register": {
 		"title": "Register",
@@ -133,6 +142,8 @@
 		"identifierPlaceholder": "Enter your username or email",
 		"passwordLabel": "Password",
 		"button": "Sign In",
+		"google": "Sign in with Google",
+		"googleVerifying": "Verifying your Google account...",
 		"registerLink": "Don't have an account? Register",
 		"attemptingLogin": "Attempting to Login...",
 		"success": "Login successful! Welcome",
@@ -204,6 +215,10 @@
 			"opponent": "Opponent",
 			"error": "Error while loading match history."
 		},
+		"type": {
+			"tournament": "Tournament",
+			"quickMatch": "Quick Match"
+		},
 		"details": {
 			"player": "Player",
 			"players": "Players",
@@ -222,15 +237,45 @@
 			"history": "Match History"
 		}
 	},
+	"tournament": {
+		"title": "Tournament Tree",
+		"titleOnline": "Online Tournament",
+		"waitingForPlayers": "Waiting for players... {current}/{required}",
+		"waitingForPlayersShort": "Waiting for players...",
+		"ready": "Ready",
+		"waitingForOpponent": "Waiting for opponent...",
+		"inProgress": "In Progress",
+		"yourNextMatch": "Your next match",
+		"winnerShort": "Winner",
+		"timeout": "Match search timed out. Please try again.",
+		"redirecting": "You have an ongoing tournament, redirecting...",
+		"round": "Round",
+		"finale": "Final",
+		"current": "Current",
+		"completed": "Completed",
+		"playMatch": "Play Match",
+		"waiting": "Waiting...",
+		"notOver": "All matches in the current round must be completed before proceeding to the next round.",
+		"winnerIs": "🏆 Tournament Winner: ",
+		"nextRound": "Next Round",
+		"winner" : "winner :"
+	},
 	"general": {
 		"yes": "Yes",
 		"no": "No",
 		"on": "On",
 		"at": "At",
+		"or": "OR",
+		"and": "and",
+		"ok": "OK",
+		"close": "Close",
+		"save": "Save",
+		"delete": "Delete",
 		"error": "Error",
 		"loading": "Loading...",
 		"cancel": "Cancel",
-		"confirm": "Confirm"
+		"confirm": "Confirm",
+		"back": "Back"
 	},
 	"msg": {
 		"redirect": {
@@ -250,6 +295,7 @@
 			"malformedResponse": "The server's error response was malformed.",
 			"networkError": "Network error or could not reach the server.",
 			"loadingContent": "Error loading content. Please try again later.",
+			"createLocalMatch": "Error creating local match. Please try again.",
 			"login": {
 				"invalidCredentials": "Invalid identifier or password.",
 				"unknown": "Unknown error occurred during login.",
@@ -269,6 +315,7 @@
 				"errorCsrf": "Security Error: CSRF token mismatch. Please refresh the page and try again.",
 				"missCsrf": "CSRF token is missing. Please refresh the page and try again.",
 				"fetchCsrf¨": "Failed to fetch CSRF token. Please refresh the page and try again.",
+				"2faFailed": "Two-Factor Authentication failed. Please try again.",
 				"loadingProfile": "An Error occurred while loading the user profile.",
 				"notFound": "User not found."
 			}

@@ -54,7 +54,7 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		className: 'absolute left-0 mt-2 w-48 bg-gray-900/60 backdrop-blur-lg border border-gray-400/30 rounded-lg shadow-xl z-50 hidden flex-col origin-top-left p-2'
 	}, langMenuItems);
 
-	const leftSection = createElement('div', { className: 'relative' }, [langButton, langMenu]);
+	const leftSection = createElement('div', { className: 'relative w-full' }, [langButton, langMenu]);
 
 	// --- Center: Navigation Links ---
 	const navLinks: NavLink[] = [
@@ -76,11 +76,11 @@ export function HeaderComponent(props: HeaderProps): HTMLElement {
 		return link;
 	});
 	const centerSection = createElement('div', {
-		className: 'flex-grow flex justify-center space-x-2 sm:space-x-4'
+		className: 'flex-grow flex justify-center space-x-2 w-full flex justify-center-x-4'
 	}, navLinkElements);
 
 	// --- Right side: User Menu OR Auth Buttons ---
-	const rightSection = createElement('div', { className: 'flex items-center space-x-4' });
+	const rightSection = createElement('div', { className: 'flex items-flex items-center justify-end w-full justify-center' });
 
 	let userMenu: HTMLElement | null = null;
 	if (currentUser) {

@@ -1,73 +1,100 @@
 import { UUID } from "crypto";
 import { navigateTo } from "./router.js";
 import socket from "./socket.js";
+import { tournamentSocket } from "../services/socket.js";
 import { removeWaitingToast, showToast, showWaitingToast } from "../components/toast.js";
 import { initCountdown } from "../components/countdown.js";
-const WAITING_TIME = 60;
+import { config } from "../utils/config.js";
+import { t } from "./i18nService.js";
 
-// --- Main Fonction for online game: 
-export async function handleOnlineGame(display_name: string, userId: number, container: HTMLElement, button: HTMLButtonElement, title: HTMLHeadElement): Promise<void> {
-    button.disabled = true; // pour eviter les multiples click (data race)
+export async function handleOnlineGame(display_name: string, userId: number, controller: AbortController): Promise<void> {
     try {
-        await initOnlineGame(display_name, userId, container, title);
+        await initOnlineGame(display_name, userId, controller);
     } catch (err: unknown) {
         console.log(err);
-        showToast('Error while creating a waiting room. Please, try again later', 'error');
+        throw err;
+    }
+}
+
+type TournamentMatch = {
+    player1: string;
+    player2: string;
+};
+
+export async function handleTournamentSearch(size: number, displayName: string, userId: number, controller: AbortController): Promise<void> {
+
+    if (tournamentSocket.connected) {
+        tournamentSocket.disconnect();
+    }
+    tournamentSocket.removeAllListeners();
+
+    sessionStorage.removeItem('tournamentData');
+    sessionStorage.removeItem('onlineTournamentId');
+
+    showWaitingToast(tournamentSocket, controller, config.settings.online.waitTimeout, t('tournament.waitingForPlayers', { current: '1', required: size.toString() }));
+
+    tournamentSocket.on('tournamentQueueUpdate', ({ current, required }: { current: number; required: number }) => {
+        showWaitingToast(tournamentSocket, controller, config.settings.online.waitTimeout, t('tournament.waitingForPlayers', { current: current.toString(), required: required.toString() }));
+    });
+
+    tournamentSocket.on('tournamentStarting', ({ tournamentId, matches }: { tournamentId: string; matches: TournamentMatch[] }) => {
+        removeWaitingToast();
+        sessionStorage.setItem('onlineTournamentId', tournamentId);
+        navigateTo(`/tournament/${tournamentId}`);
+    });
+
+    tournamentSocket.on('matchTimeout', () => {
+        showToast(t('tournament.timeout'), 'error');
+        cleanupSocket(tournamentSocket);
+        removeWaitingToast();
         navigateTo('/game');
-    } finally {
-        button.disabled = false;
-    }
+    });
+
+    tournamentSocket.on('connect_error', (err: Error) => {
+        console.error(`Connection error: ${err.message}`);
+        showToast(t('msg.error.any'), 'error');
+        cleanupSocket(tournamentSocket);
+        removeWaitingToast();
+    });
+
+    tournamentSocket.on('connect', () => {
+        console.log('Connected to the server for tournament search');
+        tournamentSocket.emit('authenticate', { display_name: displayName, userId });
+        tournamentSocket.emit('joinTournamentQueue', { size });
+    });
+    tournamentSocket.connect();
 }
 
-// for debugging
-interface SocketError extends Error {
-  code?: string;
-  description?: string;
-  context?: string;
-}
+export async function initOnlineGame(display_name: string, userId: number, controller: AbortController): Promise<void> {
 
-// --- Fonction pour initialiser le client socket et le mettre dans le waiting room ---
-export async function initOnlineGame(display_name: string, userId: number, buttonsContainer: HTMLElement, title: HTMLHeadElement) {
-    const controller: AbortController = new AbortController();
-
-    if (!socket.connected) {
-        socket.connect();
+    if (socket.connected) {
+        socket.disconnect();
     }
+    socket.removeAllListeners();
     
     socket.on('connect', () => {
         console.log('Connect to the server');
         socket.emit('authenticate', { display_name, userId });
+        socket.emit('joinQuickMatchQueue');
     });
     
     socket.on('inQueue', () => {
         console.log('In the queue...');
-        showWaitingToast(socket, controller, WAITING_TIME);
+        showWaitingToast(socket, controller, config.settings.online.waitTimeout, t('game.waitOpponent'));
     });
 
-    // --- Socket listener on matchFound event --> if opponenet is found
     socket.on('matchFound', async ({ matchId, displayName, side, opponent }: { matchId: UUID; displayName: string, side: 'left' | 'right'; opponent: string}) => {
 
         sessionStorage.setItem('matchId', matchId);
         sessionStorage.setItem('displayName', displayName);
         sessionStorage.setItem('side', side);
         sessionStorage.setItem('opponent', opponent);
-
         removeWaitingToast();
 
-        const countdownContainer = document.createElement('div');
-        countdownContainer.className = `
-            fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50
-            text-lime-200 text-6xl font-extrabold tracking-widest jungle-font
-        `;        
-        document.body.appendChild(countdownContainer);
-
-        await initCountdown(countdownContainer);
-
+        sessionStorage.setItem('showCountdown', 'true');
         navigateTo(`/game-room?matchId=${matchId}`);
-
     });
     
-    // --- Socket listeners on errors from the server side
     socket.on('disconnect', (reason: string, details?: any) => { 
         console.log(`Disconnected from the server: reason ${reason}`);
         if (details){
@@ -75,76 +102,27 @@ export async function initOnlineGame(display_name: string, userId: number, butto
         }
     });
     
-    socket.on('error', (err: Error) => {
-        console.error('Socket error:', err);
-    });
-
-    socket.on('connect_error', (err: SocketError) => {
-       
+    socket.on('error', (err: Error) => { console.error('Socket error:', err); });
+    socket.on('connect_error', (err: Error) => {
         console.error(`Connection to the server is failed: ${err.message}`);
-        console.log(err.description);
-        console.log(err.context);
-       
-        showToast('Failed to connect to server. Please try later.', 'error');
+        showToast(t('msg.error.any'), 'error');
         cleanupSocket(socket);
       });
 
     // --- Match timeout (60s) event ---
     socket.on('matchTimeout', () => {
-        showToast('No opponent found. Please try later.', 'error');
+        showToast(t('msg.error.any'), 'error');
         cleanupSocket(socket);
         removeWaitingToast();
         navigateTo('/game');
     });
+    socket.connect();
 }
-
-// // --- Fonction pour créer une salle d'attente ---
-// export async function createOnlineMatch(token: string, opponentId: string, display_name: string, signal: AbortSignal): Promise<string | null> {
-//     try {
-//         const requestBody = {
-//             player1: display_name,
-//             player2: opponentId,
-//             isLocal: false,
-//         }
-
-//         console.log("Request Body:", requestBody);
-//         const response = await fetch('/api/game/match', {
-//             method: 'POST',
-//             headers: {
-//                 'Authorization': `Bearer ${token}`,
-//                 'Content-Type': 'application/json',
-//             },
-//             body: JSON.stringify({
-//                 player1: display_name,
-//                 player2: opponentId,
-//                 isLocal: false,
-//             }),
-//             signal: signal,
-//           //  cache: 'default',
-//         });
-        
-//         if (!response.ok) { // la reponse echouee (true if (res > 200 && res < 299))
-//             throw new Error(`Failed to create online match: ${await response.text}`);
-//         };
-      
-//         const data = await response.json();  
-//         const matchId = data.matchId;
-
-//         return matchId;
-//     } catch (err: unknown) {
-//         if (err instanceof DOMException && err.name === 'AbortError'){
-//             console.log('Fetch aborted by user');
-//         } else {
-//             alert('Error creating online match');
-//             console.log(err);
-//         }
-//         return null;
-//     }
-// }
-
 
 // --- Helper to cleanup Socket connexion ---
 export function cleanupSocket(socket: SocketIOClient.Socket) {
     socket.removeAllListeners();
-    socket.disconnect();
+    if (socket.connected) {
+        socket.disconnect();
+    }
 }
